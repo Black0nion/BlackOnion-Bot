@@ -55,11 +55,6 @@ public class ActivityCommand implements Command {
 	public CommandVisisbility getVisisbility() {
 		return CommandVisisbility.HIDDEN;
 	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[] {"activity"};
-	}
 	
 	public static Activity getActivity() {
 		return getActivity(ValueManager.getString("activityType"), ValueManager.getString("activity"));
@@ -77,4 +72,8 @@ public class ActivityCommand implements Command {
 		}
 	}
 
+	@Override
+	public String[] getCommand() {
+		return new String[] {"activity"};
+	}
 }

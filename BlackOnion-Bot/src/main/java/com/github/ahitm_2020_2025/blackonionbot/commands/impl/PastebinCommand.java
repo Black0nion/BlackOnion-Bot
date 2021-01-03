@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class PastebinCommand implements Command {
 	
 	private final PasteClient client = new PasteClientBuilder()
-			.setUserAgent("1AHITM BOT")
+			.setUserAgent("BlackOnion-Bot")
 			.build();
 
 	@Override

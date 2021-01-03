@@ -30,11 +30,11 @@ public class AvatarCommand implements Command {
 			channel.sendMessage("Bitte erwähne einen User oder gib den Namen eines Users ein [EXPERIMENTEL]!").queue();
 			return;
 		}
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("Profilbild von " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl());
-		builder.setImage(mentionedUser.getEffectiveAvatarUrl());
-		builder.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl());
-		builder.setTimestamp(Instant.now());
+		EmbedBuilder builder = new EmbedBuilder()
+		.setTitle("Profilbild von " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
+			.setImage(mentionedUser.getEffectiveAvatarUrl())
+			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
+			.setTimestamp(Instant.now());
 		channel.sendMessage(builder.build()).queue();
 	}
 
@@ -49,13 +49,12 @@ public class AvatarCommand implements Command {
 	}
 
 	@Override
-	public String[] getCommand() {
-		return new String[] {"avatar"};
-	}
-	
-	@Override
 	public String getSyntax() {
 		return "<@User>";
 	}
-
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"avatar"};
+	}
 }

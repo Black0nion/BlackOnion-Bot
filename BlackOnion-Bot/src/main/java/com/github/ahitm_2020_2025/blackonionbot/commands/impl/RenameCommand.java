@@ -14,11 +14,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class RenameCommand implements Command {
 
 	@Override
-	public String[] getCommand() {
-		return null;
-	}
-
-	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member sentmember, User author,
 			MessageChannel channel) {
 		message.delete().queue();
@@ -49,5 +44,10 @@ public class RenameCommand implements Command {
 	@Override
 	public CommandVisisbility getVisisbility() {
 		return CommandVisisbility.HIDDEN;
+	}
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"rename", "rn"};
 	}
 }

@@ -21,11 +21,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class StatsCommand implements Command {
 
 	@Override
-	public String[] getCommand() {
-		return null;
-	}
-
-	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 		try {
 	        
@@ -42,6 +37,7 @@ public class StatsCommand implements Command {
 				.addField("Files", String.valueOf(BotInformation.file_count), true)
 				.addField("Commands executed", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
 				.addField("Messages sent", String.valueOf(ValueManager.getInt("messagesSent")), true)
+				.addField("Ping", e.getJDA().getGatewayPing() + "ms", true)
 				.setThumbnail("https://avatars1.githubusercontent.com/u/14834294?s=400&v=4")
 				.setTimestamp(Instant.now());
 			channel.sendMessage(builder.build()).queue();
@@ -53,6 +49,11 @@ public class StatsCommand implements Command {
 	@Override
 	public String getDescription() {
 		return "Zeigt Statistiken über den Bot an";
+	}
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"stats"};
 	}
 
 }

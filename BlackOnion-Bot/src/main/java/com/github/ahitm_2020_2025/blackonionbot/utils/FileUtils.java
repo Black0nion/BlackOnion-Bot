@@ -40,7 +40,7 @@ public class FileUtils {
 		return null;
 	}
 	
-	public static String readFromFileOld(File file) {
+	public static String readFromFile(File file) {
 		try {
 		    BufferedReader reader = new BufferedReader(new FileReader(file));
 		    String output = reader.readLine();

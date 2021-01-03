@@ -11,11 +11,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class InstagramCommand implements Command {
 
 	@Override
-	public String[] getCommand() {
-		return new String[]{"instagram", "insta"};
-	}
-
-	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 		channel.sendMessage("Bitte schrei Insta an weil die nur ne scheiﬂapi haben xD").queue();
 	}
@@ -30,4 +25,8 @@ public class InstagramCommand implements Command {
 		return Progress.PLANNED;
 	}
 
+	@Override
+	public String[] getCommand() {
+		return new String[]{"instagram", "insta"};
+	}
 }

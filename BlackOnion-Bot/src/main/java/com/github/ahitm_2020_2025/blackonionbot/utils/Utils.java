@@ -1,10 +1,13 @@
 package com.github.ahitm_2020_2025.blackonionbot.utils;
 
+import java.io.File;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.json.JSONObject;
 
 import com.google.common.hash.Hashing;
 
@@ -38,5 +41,9 @@ public class Utils {
 	
 	public static String hashSHA256(String input) {
 		return Hashing.sha256().hashString(input, StandardCharsets.UTF_8).toString();
+	}
+	
+	public static String getCountryFromCode(String code) {
+		return new JSONObject(FileUtils.readFromFile(new File("resources/countrycodes.json"))).getString(code);
 	}
 }

@@ -1,15 +1,8 @@
 package com.github.ahitm_2020_2025.blackonionbot.RestAPI.impl.get;
 
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.cpuMhz;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.cpuName;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.file_count;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.line_count;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.os;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.osBean;
-import static com.github.ahitm_2020_2025.blackonionbot.BotInformation.prefix;
-
 import org.json.JSONObject;
 
+import com.github.ahitm_2020_2025.blackonionbot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.RestAPI.GetRequest;
 import com.github.ahitm_2020_2025.blackonionbot.utils.BotUser;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
@@ -24,17 +17,17 @@ public class Stats implements GetRequest {
 	    return new JSONObject()
 	    		.put("success", true)
 	    		.put("code_stats", new JSONObject()
-						.put("line_count", line_count)
-						.put("file_count", file_count))
+						.put("line_count", BotInformation.line_count)
+						.put("file_count", BotInformation.file_count))
 	    		.put("message_stats", new JSONObject()
 	    				.put("messages_sent", ValueManager.getInt("messagesSent"))
 	    				.put("commands_executed", ValueManager.getInt("commandsExecuted")))
 	    		.put("cpu", new JSONObject()
-						.put("cpu_name", cpuName)
-						.put("cpu_cores", osBean.getAvailableProcessors())
-						.put("cpu_speed",  cpuMhz))
-				.put("prefix", prefix)
-				.put("os", os.name())
+						.put("cpu_name", BotInformation.cpuName)
+						.put("cpu_cores", BotInformation.osBean.getAvailableProcessors())
+						.put("cpu_speed",  BotInformation.cpuMhz))
+				.put("prefix", BotInformation.prefix)
+				.put("os", BotInformation.os.name())
 				.toString();
 	}
 
