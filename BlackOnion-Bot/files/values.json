@@ -1,6 +1,6 @@
 {
-  "commandsExecuted": 17,
-  "messagesSent": 50,
+  "commandsExecuted": 18,
+  "messagesSent": 60,
   "runMode": "production",
   "prefix": "?",
   "notifyUsers": [],
@@ -8,6 +8,6 @@
   "activityType": "playing",
   "activity": "spiele lul",
   "bdayDelay": 1000,
-  "lines": 3934,
+  "lines": 3949,
   "files": 63
 }
