@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.github.ahitm_2020_2025.blackonionbot.Command;
 import com.github.ahitm_2020_2025.blackonionbot.bot.Bot;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
+import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,6 +43,11 @@ public class NotifyCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.BOT;
+	}
+
+	@Override
+	public Progress getProgress() {
+		return Progress.PAUSED;
 	}
 	
 	@Override

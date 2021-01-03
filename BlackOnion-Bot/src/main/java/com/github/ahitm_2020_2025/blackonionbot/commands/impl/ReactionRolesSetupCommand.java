@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.github.ahitm_2020_2025.blackonionbot.Command;
 import com.github.ahitm_2020_2025.blackonionbot.SQL.LiteSQL;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -50,6 +52,11 @@ public class ReactionRolesSetupCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<#channel> <message id> <emote> <role mentioned>";
+	}
+	
+	@Override
+	public CommandVisisbility getVisisbility() {
+		return CommandVisisbility.HIDDEN;
 	}
 	
 	@Override

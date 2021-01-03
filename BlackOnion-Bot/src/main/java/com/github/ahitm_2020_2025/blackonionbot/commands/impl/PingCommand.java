@@ -29,5 +29,4 @@ public class PingCommand implements Command {
 	public String[] getCommand() {
 		return new String[] {"ping"};
 	}
-
 }

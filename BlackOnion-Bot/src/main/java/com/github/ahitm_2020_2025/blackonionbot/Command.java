@@ -1,5 +1,7 @@
 package com.github.ahitm_2020_2025.blackonionbot;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
@@ -18,7 +20,7 @@ public interface Command {
 
 	void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel);
 	
-	String getDescription();
+	@NotNull String getDescription();
 	
 	default String getSyntax() {
 		return "";

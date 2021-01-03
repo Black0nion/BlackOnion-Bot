@@ -21,12 +21,6 @@ public class HypixelCommand implements Command {
 	}
 
 	@Override
-	public String[] getCommand() {
-		return new String[] {"hypixel"};
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 //		if (args[1].toLowerCase().equalsIgnoreCase("stats")) {
 //			api.getPlayerByName(args[2]).whenComplete((response, error) -> {
@@ -67,7 +61,8 @@ public class HypixelCommand implements Command {
 //		}
 	}
 	
-	 private static String getFieldOrNA(String field, JsonObject json) {
+	 @SuppressWarnings("unused")
+	private static String getFieldOrNA(String field, JsonObject json) {
 	        JsonElement value = json.get(field);
 	        if (value != null) {
 	            // If the field was found, return its value
@@ -86,6 +81,11 @@ public class HypixelCommand implements Command {
 	@Override
 	public Progress getProgress() {
 		return Progress.PLANNED;
+	}
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"hypixel"};
 	}
 
 }

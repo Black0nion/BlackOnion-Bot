@@ -11,7 +11,6 @@ import com.github.ahitm_2020_2025.blackonionbot.commands.impl.AvatarCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.ClearCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.HelpCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.HypixelCommand;
-import com.github.ahitm_2020_2025.blackonionbot.commands.impl.NNNCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.NotifyCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.PastebinCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.PingCommand;
@@ -21,6 +20,7 @@ import com.github.ahitm_2020_2025.blackonionbot.commands.impl.RenameCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.ShutdownDBCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.StatsCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.StatusCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.impl.WeatherCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.music.JoinCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.music.LeaveCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.impl.music.PlayCommand;
@@ -36,26 +36,26 @@ public class CommandBase extends ListenerAdapter {
 	public static HashMap<String[], Command> commands = new HashMap<>();
 	
 	public static void addCommands() {
-		addCommand(new ActivityCommand(), "activity");
-		addCommand(new AvatarCommand(), "avatar", "pb");
-		addCommand(new ClearCommand(), "clear");
-		addCommand(new HelpCommand(), "help");
-		addCommand(new NotifyCommand(), "notify");
-		addCommand(new PingCommand(), "ping", "poing");
-		addCommand(new ReloadCommand(), "reload", "rl");
-		addCommand(new StatusCommand(), "status");
-		addCommand(new JoinCommand(), "join");
-		addCommand(new PlayCommand(), "play");
-		addCommand(new StopCommand(), "stop");
-		addCommand(new SkipCommand(), "skip");
-		addCommand(new LeaveCommand(), "leave");
-		addCommand(new NNNCommand(), "nnn", "nonutnovember");
-		addCommand(new ShutdownDBCommand(), "shutdowndb", "dbshutdown");
-		addCommand(new ReactionRolesSetupCommand(), "rr", "reactionrole");
-		addCommand(new PastebinCommand(), "pastebin");
-		addCommand(new HypixelCommand(), "hypixel");
-		addCommand(new RenameCommand(), "rename", "rn");
-		addCommand(new StatsCommand(), "stats");
+		addCommand(new ActivityCommand());
+		addCommand(new AvatarCommand());
+		addCommand(new ClearCommand());
+		addCommand(new HelpCommand());
+		addCommand(new NotifyCommand());
+		addCommand(new PingCommand());
+		addCommand(new ReloadCommand());
+		addCommand(new StatusCommand());
+		addCommand(new JoinCommand());
+		addCommand(new PlayCommand());
+		addCommand(new StopCommand());
+		addCommand(new SkipCommand());
+		addCommand(new LeaveCommand());
+		addCommand(new ShutdownDBCommand());
+		addCommand(new ReactionRolesSetupCommand());
+		addCommand(new PastebinCommand());
+		addCommand(new HypixelCommand());
+		addCommand(new RenameCommand());
+		addCommand(new StatsCommand());
+		addCommand(new WeatherCommand());
 	}
 	
 	@Override
@@ -84,5 +84,10 @@ public class CommandBase extends ListenerAdapter {
 	public static void addCommand(Command c, String... command) {
 		if (!commands.containsKey(command))
 			commands.put(command, c);
+	}
+	
+	public static void addCommand(Command c) {
+		if (!commands.containsKey(c.getCommand()))
+			commands.put(c.getCommand(), c);
 	}
 }
