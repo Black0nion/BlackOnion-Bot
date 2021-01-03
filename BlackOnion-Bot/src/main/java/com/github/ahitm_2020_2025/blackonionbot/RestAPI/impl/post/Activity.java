@@ -3,7 +3,7 @@ package com.github.ahitm_2020_2025.blackonionbot.RestAPI.impl.post;
 import org.json.JSONObject;
 
 import com.github.ahitm_2020_2025.blackonionbot.RestAPI.PostRequest;
-import com.github.ahitm_2020_2025.blackonionbot.commands.impl.ActivityCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ActivityCommand;
 import com.github.ahitm_2020_2025.blackonionbot.utils.BotUser;
 import spark.Request;
 import spark.Response;
