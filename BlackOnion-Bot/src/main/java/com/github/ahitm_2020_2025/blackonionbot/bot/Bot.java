@@ -13,20 +13,18 @@ import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
 
-import com.github.ahitm_2020_2025.blackonionbot.BirthdaySystem;
-import com.github.ahitm_2020_2025.blackonionbot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.DefaultValues;
 import com.github.ahitm_2020_2025.blackonionbot.RestAPI.API;
 import com.github.ahitm_2020_2025.blackonionbot.SQL.LiteSQL;
 import com.github.ahitm_2020_2025.blackonionbot.SQL.SQLManager;
-import com.github.ahitm_2020_2025.blackonionbot.commands.CommandBase;
-import com.github.ahitm_2020_2025.blackonionbot.commands.impl.ActivityCommand;
-import com.github.ahitm_2020_2025.blackonionbot.commands.impl.ReloadCommand;
-import com.github.ahitm_2020_2025.blackonionbot.commands.impl.StatusCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ActivityCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ReloadCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatusCommand;
 import com.github.ahitm_2020_2025.blackonionbot.enums.RunMode;
-import com.github.ahitm_2020_2025.blackonionbot.listeners.HandRaiseSystem;
-import com.github.ahitm_2020_2025.blackonionbot.listeners.MessageLogSystem;
-import com.github.ahitm_2020_2025.blackonionbot.listeners.SelfRoleSystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.BirthdaySystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.HandRaiseSystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.MessageLogSystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.SelfRoleSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.JarUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.JDA;

@@ -3,6 +3,7 @@ package com.github.ahitm_2020_2025.blackonionbot;
 import java.util.ArrayList;
 
 import com.github.ahitm_2020_2025.blackonionbot.bot.Bot;
+import com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.enums.RunMode;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 

@@ -22,4 +22,19 @@ public class EmbedUtils {
 		
 		return builder;
 	}
+	
+	public static EmbedBuilder getDefaultSuccessEmbed() {
+		return getDefaultErrorEmbed(null);
+	}
+	
+	public static EmbedBuilder getDefaultSuccessEmbed(User author) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.setTitle("Success")
+				.setColor(Color.GREEN)
+				.setTimestamp(Instant.now());
+		if (author != null)
+			builder.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+		
+		return builder;
+	}
 }

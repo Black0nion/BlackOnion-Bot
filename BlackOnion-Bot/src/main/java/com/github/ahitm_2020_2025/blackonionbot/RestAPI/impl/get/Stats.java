@@ -2,8 +2,8 @@ package com.github.ahitm_2020_2025.blackonionbot.RestAPI.impl.get;
 
 import org.json.JSONObject;
 
-import com.github.ahitm_2020_2025.blackonionbot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.RestAPI.GetRequest;
+import com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.utils.BotUser;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import spark.Request;
