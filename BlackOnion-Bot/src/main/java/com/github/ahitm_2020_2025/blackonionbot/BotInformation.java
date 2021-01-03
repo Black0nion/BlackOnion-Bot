@@ -66,7 +66,7 @@ public class BotInformation {
 				cpuName = cpuName.split("@")[0].trim();
 			}
 
-			cpuName = cpuName.replace("CPU", "").trim();
+			cpuName = cpuName.replace("CPU", "").trim().replaceAll(" s", " ");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
