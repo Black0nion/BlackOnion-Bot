@@ -40,7 +40,7 @@ public class BotInformation {
 			if (os == null) {
 				if (osBean.getName().toLowerCase().contains("windows")) {
 					os = OS.WINDOWS;
-					osName = "WINDOWS";
+					osName = osBean.getName();
 				} else {
 					os = OS.LINUX;
 					File cpuinfofile = new File("/etc/os-release");

@@ -2,7 +2,6 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.bot;
 
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.cpuMhz;
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.cpuName;
-import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.os;
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.osBean;
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.osName;
 
@@ -40,7 +39,7 @@ public class StatsCommand implements Command {
 				.addField("Commands executed", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
 				.addField("Messages sent", String.valueOf(ValueManager.getInt("messagesSent")), true)
 				.addField("Ping", e.getJDA().getGatewayPing() + "ms", true)
-				.setThumbnail("https://avatars1.githubusercontent.com/u/14834294?s=400&v=4")
+				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
 			channel.sendMessage(builder.build()).queue();
 		} catch (Exception ex) {

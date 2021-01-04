@@ -1,11 +1,13 @@
 package com.github.ahitm_2020_2025.blackonionbot.commands.bot;
 
+import java.util.concurrent.TimeUnit;
+
 import com.github.ahitm_2020_2025.blackonionbot.SQL.LiteSQL;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
-import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -16,8 +18,8 @@ public class ShutdownDBCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
-		if (member.hasPermission(Permission.ADMINISTRATOR))
-			LiteSQL.disconnect();
+		LiteSQL.disconnect();
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("LiteSQL", "Disconnected.", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -26,8 +28,13 @@ public class ShutdownDBCommand implements Command {
 	}
 	
 	@Override
-	public CommandVisisbility getVisisbility() {
-		return CommandVisisbility.HIDDEN;
+	public CommandVisibility getVisisbility() {
+		return CommandVisibility.HIDDEN;
+	}
+	
+	@Override
+	public boolean requiresBotAdmin() {
+		return true;
 	}
 	
 	@Override

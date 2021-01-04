@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ActivityCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.AdminHelpCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.HelpCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.NotifyCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.PingCommand;
@@ -25,7 +26,9 @@ import com.github.ahitm_2020_2025.blackonionbot.commands.music.PlayCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.music.SkipCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.music.StopCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.old.HypixelCommand;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.FileUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -34,6 +37,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class CommandBase extends ListenerAdapter {
 	
 	public static HashMap<String[], Command> commands = new HashMap<>();
+	
+	private static String prefix = BotInformation.prefix;
 	
 	public static void addCommands() {
 		addCommand(new ActivityCommand());
@@ -57,6 +62,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new StatsCommand());
 		addCommand(new WeatherCommand());
 		addCommand(new InstagramCommand());
+		addCommand(new AdminHelpCommand());
 	}
 	
 	@Override
@@ -71,12 +77,24 @@ public class CommandBase extends ListenerAdapter {
 		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
-				if (event.getMessage().getContentRaw().toLowerCase().startsWith(BotInformation.prefix + str)) {
+				if (event.getMessage().getContentRaw().toLowerCase().startsWith(prefix + str)) {
 					String message = dtf.format(now) + " | " + event.getChannel().getName() + " | " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + ": " + event.getMessage().getContentRaw();
 					FileUtils.appendToFile("commandLog", message);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 					String[] args = event.getMessage().getContentRaw().split(" ");
-					commands.get(c).execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getChannel());
+					Command cmd = commands.get(c);
+					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(event.getAuthor().getIdLong())) {
+						continue;
+					} else if (cmd.getRequiredPermissions() != null && cmd.getVisisbility() == CommandVisibility.SHOWN && !event.getMember().hasPermission(cmd.getRequiredPermissions())) {
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
+								.addField("Missing Permissions!", "Required Permissions: " + cmd.getRequiredPermissions(), false).build()).queue();
+						continue;
+					} else if (cmd.getRequiredArgumentCount() > args.length) {
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
+								.addField("Wrong argument count!", "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						continue;
+					}
+					cmd.execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getChannel());
 				}
 			}
 		}

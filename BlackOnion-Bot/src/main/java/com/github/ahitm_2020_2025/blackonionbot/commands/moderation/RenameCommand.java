@@ -3,7 +3,7 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.moderation;
 import java.util.concurrent.TimeUnit;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
-import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.Permission;
@@ -44,8 +44,8 @@ public class RenameCommand implements Command {
 	}
 
 	@Override
-	public CommandVisisbility getVisisbility() {
-		return CommandVisisbility.HIDDEN;
+	public CommandVisibility getVisisbility() {
+		return CommandVisibility.HIDDEN;
 	}
 	
 	@Override

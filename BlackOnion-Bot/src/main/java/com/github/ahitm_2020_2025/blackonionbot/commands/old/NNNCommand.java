@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -53,8 +53,8 @@ public class NNNCommand implements Command {
 	}
 	
 	@Override
-	public CommandVisisbility getVisisbility() {
-		return CommandVisisbility.HIDDEN;
+	public CommandVisibility getVisisbility() {
+		return CommandVisibility.HIDDEN;
 	}
 
 	@Override

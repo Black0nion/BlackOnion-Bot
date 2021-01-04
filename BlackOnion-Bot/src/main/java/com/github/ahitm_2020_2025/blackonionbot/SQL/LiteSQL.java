@@ -8,6 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.github.ahitm_2020_2025.blackonionbot.Logger;
+import com.github.ahitm_2020_2025.blackonionbot.enums.LogOrigin;
+
 public class LiteSQL {
 	private static Connection connection;
 	
@@ -23,7 +26,7 @@ public class LiteSQL {
 			String url = "jdbc:sqlite:" + file.getPath();
 			connection = DriverManager.getConnection(url);
 			
-			System.out.println("[SQLite] connected");
+			Logger.logInfo("Connected.", LogOrigin.SQLITE);
 			
 			statement = connection.createStatement();
 		} catch (SQLException | IOException e) {
@@ -35,7 +38,7 @@ public class LiteSQL {
 		try {
 			if (connection != null) {
 				connection.close();
-				System.out.println("[SQLite] disconnected");
+				Logger.logWarning("Disconnected.", LogOrigin.SQLITE);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

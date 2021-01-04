@@ -3,8 +3,10 @@ package com.github.ahitm_2020_2025.blackonionbot.oldcommands;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
-import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
+
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -12,8 +14,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public interface Command {
-	default CommandVisisbility getVisisbility() {
-		return CommandVisisbility.SHOWN;
+	default CommandVisibility getVisisbility() {
+		return CommandVisibility.SHOWN;
 	}
 	
 	String[] getCommand();
@@ -32,5 +34,17 @@ public interface Command {
 	
 	default Progress getProgress() {
 		return Progress.DONE;
+	}
+	
+	default int getRequiredArgumentCount() {
+		return 0;
+	}
+	
+	default Permission[] getRequiredPermissions() {
+		return null;
+	}
+	
+	default boolean requiresBotAdmin() {
+		return false;
 	}
 }

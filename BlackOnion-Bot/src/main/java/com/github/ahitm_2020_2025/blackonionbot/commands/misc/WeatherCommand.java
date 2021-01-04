@@ -28,49 +28,38 @@ public class WeatherCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
-		if (args.length > 1) {
-			String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-			try {
-				JSONObject weather = getWeather(query);
-				JSONObject sys = weather.getJSONObject("sys");
-				JSONObject main = weather.getJSONObject("main");
-				Date sunrise = new Date(sys.getInt("sunrise") * 1000L);
-				Date sunset = new Date(sys.getInt("sunset") * 1000L);
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
-				sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
-				JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-				EmbedBuilder embed = new EmbedBuilder()
-						.setColor(Color.GREEN)
-						.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-						.setTitle("Weather for " + weather.getString("name"))
-						.addField("Weather: ", weatherObject.getString("main"), true)
-						.addField("Temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
-						.addField("Humidity", main.get("humidity") + "%", true)
-						.addField("Wind speed", weather.getJSONObject("wind").get("speed") + " km/h", true)
-						.addField("Country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
-						.addField("Sunrise", sdf.format(sunrise), false)
-						.addField("Sunset", sdf.format(sunset), false)
-						.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-						.setTimestamp(Instant.now());;
-				channel.sendMessage(embed.build()).queue();
-				return;
-			} catch (IOException ex) {
-				EmbedBuilder embed = new EmbedBuilder()
-						.setColor(Color.RED)
-						.setTitle("Error!")
-						.addField("Unknown City:", query, true)
-						.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-						.setTimestamp(Instant.now());
-				channel.sendMessage(embed.build()).queue();
-				return;
-			}
-		} else {
+		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+		try {
+			JSONObject weather = getWeather(query);
+			JSONObject sys = weather.getJSONObject("sys");
+			JSONObject main = weather.getJSONObject("main");
+			Date sunrise = new Date(sys.getInt("sunrise") * 1000L);
+			Date sunset = new Date(sys.getInt("sunset") * 1000L);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
+			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
+			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
+			EmbedBuilder embed = new EmbedBuilder()
+					.setColor(Color.GREEN)
+					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
+					.setTitle("Weather for " + weather.getString("name"))
+					.addField("Weather: ", weatherObject.getString("main"), true)
+					.addField("Temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField("Humidity", main.get("humidity") + "%", true)
+					.addField("Wind speed", weather.getJSONObject("wind").get("speed") + " km/h", true)
+					.addField("Country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+					.addField("Sunrise", sdf.format(sunrise), false)
+					.addField("Sunset", sdf.format(sunset), false)
+					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
+					.setTimestamp(Instant.now());;
+			channel.sendMessage(embed.build()).queue();
+			return;
+		} catch (IOException ex) {
 			EmbedBuilder embed = new EmbedBuilder()
 					.setColor(Color.RED)
 					.setTitle("Error!")
-					.addField("You didn't input any city!", "JUST INPUT A GOD DAMN CITY NAME <:WokePepe:761634643036340224>", true)
+					.addField("Unknown City:", query, true)
 					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-					.setTimestamp(Instant.now());;
+					.setTimestamp(Instant.now());
 			channel.sendMessage(embed.build()).queue();
 			return;
 		}
@@ -100,6 +89,11 @@ public class WeatherCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<City Name>";
+	}
+	
+	@Override
+	public int getRequiredArgumentCount() {
+		return 1;
 	}
 	
 	@Override

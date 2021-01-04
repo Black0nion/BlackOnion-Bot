@@ -30,7 +30,7 @@ public class EmbedUtils {
 	public static EmbedBuilder getDefaultSuccessEmbed(User author) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Success")
-				.setColor(Color.GREEN)
+				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
 		if (author != null)
 			builder.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl());
