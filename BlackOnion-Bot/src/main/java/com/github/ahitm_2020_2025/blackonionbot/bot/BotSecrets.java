@@ -13,6 +13,9 @@ import com.github.ahitm_2020_2025.blackonionbot.utils.FileUtils;
 import com.google.common.io.Files;
 
 public class BotSecrets {
+	
+	public static BotUser counterUser;
+	
 	public static void init() {
 		try {
 			bot_token = (Bot.runMode == RunMode.RELEASE ? FileUtils.readArrayListFromFile("token").get(0) : FileUtils.readArrayListFromFile("token").get(1));
@@ -32,9 +35,12 @@ public class BotSecrets {
 	
 	static {
 		//not very secure, I know
+		counterUser = new BotUser("counter", "cuntUser", BotRole.ADMIN);
+		System.out.println(counterUser.getName() + ":" + counterUser.getPasssword());
 		botUsers.add(new BotUser("SIMULATAN", "simugamz1@gmail.com", "sim", BotRole.ADMIN));
 		botUsers.add(new BotUser("ManuelP", "mani", BotRole.ADMIN));
 		botUsers.add(new BotUser("test", "tester", BotRole.USER));
+		botUsers.add(counterUser);
 		
 		try {
 			if (new File("files/discordusers").exists()) {
