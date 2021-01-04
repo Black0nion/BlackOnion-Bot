@@ -34,15 +34,16 @@ public class API {
 		postRequests.add(new Activity());
 		//----------------------------------------------
 		
-		
 		//Error handling
 		Spark.internalServerError((request, response) -> {
+			response.header("Access-Control-Allow-Origin", "*");
 			response.type("application/json");
 			response.status(500);
 			return new JSONObject().put("success", false).put("reason", 500).toString();
 		});
 		
 		Spark.notFound((request, response) -> {
+			response.header("Access-Control-Allow-Origin", "*");
 			response.type("application/json");
 			response.status(404);
 			return new JSONObject().put("success", false).put("reason", 404).toString();
@@ -57,6 +58,7 @@ public class API {
 			String url = "/api/" + req.url();
 			post(url, (request, response) -> {
 				try {
+					response.header("Access-Control-Allow-Origin", "*");
 					JSONObject body = new JSONObject();
 					if (req.requiredParameters().length != 0)
 						body = new JSONObject(request.body());
@@ -125,6 +127,7 @@ public class API {
 			String url = "/api/" + req.url();
 			get(url, (request, response) -> {
 				try {
+					response.header("Access-Control-Allow-Origin", "*");
 					JSONObject body = new JSONObject();
 					if (req.requiredParameters().length != 0)
 						body = new JSONObject(request.body());
