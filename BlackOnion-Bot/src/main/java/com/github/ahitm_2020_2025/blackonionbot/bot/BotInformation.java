@@ -23,6 +23,7 @@ public class BotInformation {
 
 	public static OperatingSystemMXBean osBean;
 	public static OS os;
+	public static String osName;
 	
 	public static String cpuName = "N/A";
 	public static String cpuMhz = "N/A";
@@ -39,8 +40,18 @@ public class BotInformation {
 			if (os == null) {
 				if (osBean.getName().toLowerCase().contains("windows")) {
 					os = OS.WINDOWS;
+					osName = "WINDOWS";
 				} else {
 					os = OS.LINUX;
+					File cpuinfofile = new File("/etc/os-release");
+					HashMap<String, String> osInfo = new HashMap<>();
+					List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
+					for (String key : input) {
+						String[] pair = key.split("=", 2);
+						osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
+					}
+
+					osName = osInfo.get("PRETTY_NAME").replace("\"", "");
 				}
 			}
 			
