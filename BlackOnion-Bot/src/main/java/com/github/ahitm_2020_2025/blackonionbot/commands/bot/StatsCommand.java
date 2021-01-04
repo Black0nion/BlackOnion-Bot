@@ -4,6 +4,7 @@ import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.cpuMhz
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.cpuName;
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.os;
 import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.osBean;
+import static com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation.osName;
 
 import java.time.Instant;
 
@@ -30,7 +31,7 @@ public class StatsCommand implements Command {
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.addField("Prefix", BotInformation.prefix, true)
 				.addField("RunMode", Bot.runMode.name().toUpperCase(), true)
-				.addField("OS", os.name(), true)
+				.addField("OS", osName, true)
 				.addField("CPU Name", cpuName, true)
 				.addField("CPU Cores", String.valueOf(osBean.getAvailableProcessors()), true)
 				.addField("CPU Speed", cpuMhz, true)
