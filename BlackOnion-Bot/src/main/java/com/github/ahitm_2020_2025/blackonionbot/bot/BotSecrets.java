@@ -36,14 +36,13 @@ public class BotSecrets {
 	static {
 		//not very secure, I know
 		counterUser = new BotUser("counter", "cuntUser", BotRole.ADMIN);
-		System.out.println(counterUser.getName() + ":" + counterUser.getPasssword());
 		botUsers.add(new BotUser("SIMULATAN", "simugamz1@gmail.com", "sim", BotRole.ADMIN));
 		botUsers.add(new BotUser("ManuelP", "mani", BotRole.ADMIN));
 		botUsers.add(new BotUser("test", "tester", BotRole.USER));
 		botUsers.add(counterUser);
 		
 		try {
-			if (new File("files/discordusers").exists()) {
+			if (new File("files/discordusers").exists() && !Bot.isJarFile) {
 				for (String line : Files.readLines(new File("files/discordusers"), StandardCharsets.UTF_8)) {
 					String[] lineSplitted = line.split(":");
 					discordUsers.add(new DiscordUser(Long.valueOf(lineSplitted[0]), Boolean.valueOf(lineSplitted[1])));

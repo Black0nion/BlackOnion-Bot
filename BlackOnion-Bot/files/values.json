@@ -1,6 +1,6 @@
 {
   "commandsExecuted": 83,
-  "messagesSent": 493,
+  "messagesSent": 499,
   "runMode": "production",
   "prefix": "?",
   "notifyUsers": [],
@@ -8,6 +8,6 @@
   "activityType": "playing",
   "activity": "test",
   "bdayDelay": 1000,
-  "lines": 4254,
+  "lines": 4250,
   "files": 67
 }
