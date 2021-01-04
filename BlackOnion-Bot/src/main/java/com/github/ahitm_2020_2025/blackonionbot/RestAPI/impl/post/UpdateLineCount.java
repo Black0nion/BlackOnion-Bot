@@ -36,5 +36,10 @@ public class UpdateLineCount implements PostRequest {
 	public String url() {
 		return "updatefilelinecount";
 	}
+	
+	@Override
+	public boolean requiresAdmin() {
+		return true;
+	}
 
 }

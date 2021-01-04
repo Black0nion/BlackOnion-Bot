@@ -3,15 +3,17 @@ package com.github.ahitm_2020_2025.blackonionbot.bot;
 import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
 
 import java.awt.Color;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -108,22 +110,21 @@ public class BotInformation {
 						@Override
 						public void run() {
 							try {
+								String body = "{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}";
 								URL url = new URL(endpoint + "/api/updatefilelinecount");
-								URLConnection con = url.openConnection();
-								HttpURLConnection http = (HttpURLConnection)con;
-								http.setRequestMethod("POST");
-								http.setDoOutput(true);
-								byte[] out = ("{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}").getBytes(StandardCharsets.UTF_8);
-								int length = out.length;
-		
-								http.setFixedLengthStreamingMode(length);
-								http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-								http.connect();
-								try(OutputStream os = http.getOutputStream()) {
-								    os.write(out);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
+								HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+								httpCon.setDoOutput(true);
+								httpCon.setRequestMethod("POST");
+								httpCon.setRequestProperty("password", BotSecrets.counterUser.getPasssword());
+								httpCon.setRequestProperty("username", BotSecrets.counterUser.getName());
+								OutputStream os = httpCon.getOutputStream();
+								OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
+								osw.write(body);
+								osw.flush();
+								osw.close();
+								os.close();
+								httpCon.connect();
+								httpCon.getInputStream();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
