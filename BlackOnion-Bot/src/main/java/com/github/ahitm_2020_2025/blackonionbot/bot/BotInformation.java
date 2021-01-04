@@ -3,9 +3,7 @@ package com.github.ahitm_2020_2025.blackonionbot.bot;
 import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
 
 import java.awt.Color;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.OutputStream;
