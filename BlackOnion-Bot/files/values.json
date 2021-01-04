@@ -1,13 +1,13 @@
 {
-  "commandsExecuted": 19,
-  "messagesSent": 151,
+  "commandsExecuted": 79,
+  "messagesSent": 469,
   "runMode": "production",
   "prefix": "?",
   "notifyUsers": [],
   "status": "dnd",
   "activityType": "playing",
-  "activity": "spiele lul",
+  "activity": "test",
   "bdayDelay": 1000,
-  "lines": 3964,
-  "files": 63
+  "lines": 4156,
+  "files": 66
 }

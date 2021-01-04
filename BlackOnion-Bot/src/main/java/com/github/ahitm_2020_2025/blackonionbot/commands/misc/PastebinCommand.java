@@ -3,7 +3,6 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.misc;
 import org.menudocs.paste.PasteClient;
 import org.menudocs.paste.PasteClientBuilder;
 
-import com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
@@ -22,11 +21,6 @@ public class PastebinCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
-		if (args.length < 3) {
-			channel.sendMessage("Bitte benutze " + BotInformation.prefix + "pastebin " + getSyntax()).queue();
-			return;
-		}
-		
 		final String language = args[1];
 		final String contentRaw = e.getMessage().getContentRaw();
 		final int index = contentRaw.indexOf(language) + language.length();
@@ -55,6 +49,11 @@ public class PastebinCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<Sprache> <Text>";
+	}
+	
+	@Override
+	public int getRequiredArgumentCount() {
+		return 3;
 	}
 	
 	@Override

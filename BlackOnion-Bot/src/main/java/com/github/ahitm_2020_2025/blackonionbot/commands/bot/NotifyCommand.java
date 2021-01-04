@@ -6,6 +6,7 @@ import com.github.ahitm_2020_2025.blackonionbot.bot.Bot;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,14 +25,14 @@ public class NotifyCommand implements Command {
 			users.remove(author.getId());
 			ValueManager.save("notifyUsers", users);
 			Bot.notifyStatusUsers.remove(author.getId());
-			channel.sendMessage("Du wirst jetzt nicht mehr benachrichtigt, wenn der Bot startet und stoppt.").queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfügbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
 		} else {
 			ArrayList<String> users = new ArrayList<String>();
 			users.addAll(ValueManager.getArrayAsList("notifyUsers"));
 			users.add(author.getId());
 			ValueManager.save("notifyUsers", users);
 			Bot.notifyStatusUsers.add(author.getId());
-			channel.sendMessage("Du wirst jetzt benachrichtigt, wenn der Bot startet und stoppt.").queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfügbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
 		}
 	}
 

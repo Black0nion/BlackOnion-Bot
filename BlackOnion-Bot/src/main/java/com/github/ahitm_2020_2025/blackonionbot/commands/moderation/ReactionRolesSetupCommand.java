@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.github.ahitm_2020_2025.blackonionbot.SQL.LiteSQL;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
-import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisisbility;
+import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -61,8 +61,8 @@ public class ReactionRolesSetupCommand implements Command {
 	}
 	
 	@Override
-	public CommandVisisbility getVisisbility() {
-		return CommandVisisbility.HIDDEN;
+	public CommandVisibility getVisisbility() {
+		return CommandVisibility.HIDDEN;
 	}
 	
 	@Override

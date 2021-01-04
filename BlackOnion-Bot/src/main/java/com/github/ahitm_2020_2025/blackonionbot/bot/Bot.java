@@ -1,7 +1,6 @@
 package com.github.ahitm_2020_2025.blackonionbot.bot;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
@@ -10,8 +9,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Scanner;
-
-import javax.security.auth.login.LoginException;
 
 import com.github.ahitm_2020_2025.blackonionbot.DefaultValues;
 import com.github.ahitm_2020_2025.blackonionbot.RestAPI.API;
@@ -50,7 +47,7 @@ public class Bot extends ListenerAdapter {
 	public static boolean isJarFile = false;
 	
 	@SuppressWarnings("resource")
-	public static void main(String[] args) throws LoginException, NoSuchMethodException, SecurityException, IllegalArgumentException, IOException {
+	public static void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
 		System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 		new File("files").mkdir();

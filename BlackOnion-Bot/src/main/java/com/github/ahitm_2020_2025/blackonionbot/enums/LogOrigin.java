@@ -1,5 +1,5 @@
 package com.github.ahitm_2020_2025.blackonionbot.enums;
 
 public enum LogOrigin {
-	API, BOT, OTHER
+	API, BOT, SQLITE, OTHER
 }
