@@ -30,8 +30,9 @@ public class API {
 		getRequests.add(new Stats());
 		getRequests.add(new Paths());
 		//----------------Post Requests-----------------
-		postRequests.add(new ChangePrefix());
 		postRequests.add(new Activity());
+		postRequests.add(new ChangePrefix());
+		postRequests.add(new UpdateLineCount());
 		//----------------------------------------------
 		
 		//Error handling

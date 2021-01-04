@@ -6,16 +6,22 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
-import com.google.common.io.Files;
-import com.sun.jna.platform.win32.Advapi32Util;
+import com.github.ahitm_2020_2025.blackonionbot.Logger;
+import com.github.ahitm_2020_2025.blackonionbot.enums.LogOrigin;
 import com.github.ahitm_2020_2025.blackonionbot.enums.OS;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
+import com.google.common.io.Files;
+import com.sun.jna.platform.win32.Advapi32Util;
 
 public class BotInformation {
 	public static int line_count = 0;
@@ -95,6 +101,39 @@ public class BotInformation {
 			showFiles(files);
 			ValueManager.save("lines", line_count);
 			ValueManager.save("files", file_count);
+			//Send a request to the servers to update the two counters
+			try {
+				for (String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								URL url = new URL(endpoint + "/api/updatefilelinecount");
+								URLConnection con = url.openConnection();
+								HttpURLConnection http = (HttpURLConnection)con;
+								http.setRequestMethod("POST");
+								http.setDoOutput(true);
+								byte[] out = ("{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}").getBytes(StandardCharsets.UTF_8);
+								int length = out.length;
+		
+								http.setFixedLengthStreamingMode(length);
+								http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+								http.connect();
+								try(OutputStream os = http.getOutputStream()) {
+								    os.write(out);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
+				}
+			} catch (Exception e) {
+				Logger.logWarning("No file \"files/endpoints.txt\"", LogOrigin.API);
+			}
+			
 		}
 	}
 
