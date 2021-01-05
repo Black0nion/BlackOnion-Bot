@@ -42,10 +42,11 @@ public class BotSecrets {
 		botUsers.add(counterUser);
 		
 		try {
-			if (new File("files/discordusers").exists() && !Bot.isJarFile) {
+			if (new File("files/discordusers").exists()) {
 				for (String line : Files.readLines(new File("files/discordusers"), StandardCharsets.UTF_8)) {
 					String[] lineSplitted = line.split(":");
 					discordUsers.add(new DiscordUser(Long.valueOf(lineSplitted[0]), Boolean.valueOf(lineSplitted[1])));
+					System.out.println(discordUsers.get(discordUsers.size() - 1));
 				}
 			}
 		} catch (IOException ex) {}
