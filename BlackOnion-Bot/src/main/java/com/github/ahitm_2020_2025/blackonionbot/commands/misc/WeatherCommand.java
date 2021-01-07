@@ -43,7 +43,7 @@ public class WeatherCommand implements Command {
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle("Weather for " + weather.getString("name"))
 					.addField("Weather: ", weatherObject.getString("main"), true)
-					.addField("Temperature", main.get("temp_min") + "Â° to " + main.get("temp_max") + "Â°", true)
+					.addField("Temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
 					.addField("Humidity", main.get("humidity") + "%", true)
 					.addField("Wind speed", weather.getJSONObject("wind").get("speed") + " km/h", true)
 					.addField("Country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)

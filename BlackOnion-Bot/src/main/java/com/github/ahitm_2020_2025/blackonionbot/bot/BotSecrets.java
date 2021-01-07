@@ -48,7 +48,7 @@ public class BotSecrets {
 					discordUsers.add(new DiscordUser(Long.valueOf(lineSplitted[0]), Boolean.valueOf(lineSplitted[1])));
 				}
 			}
-		} catch (IOException ex) {}
+		} catch (IOException ex) {ex.printStackTrace();}
 	}
 	
 	public static boolean isAdmin(String username, String password) {
@@ -85,5 +85,9 @@ public class BotSecrets {
 				return user;
 		}
 		return null;
+	}
+
+	public static boolean isDiscordUser(String code) {
+		return false;
 	}
 }
