@@ -29,6 +29,7 @@ public class API {
 		//-----------------Get Requests-----------------
 		getRequests.add(new Stats());
 		getRequests.add(new Paths());
+		getRequests.add(new GetTokenFromCode());
 		//----------------Post Requests-----------------
 		postRequests.add(new Activity());
 		postRequests.add(new ChangePrefix());
@@ -76,14 +77,16 @@ public class API {
 					
 					String password = null;
 					String username = null;
+					//String code = null;
 					if (req.requiresLogin()) {
 						if (!headers.has("username") || !headers.has("password")) {
+						//if (!headers.has("code")) {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
-
 						password = headers.getString("password");
 						username = headers.getString("username");
+						//code = headers.getString("code");
 						
 						if (!BotSecrets.credentialsRight(username, password)) {
 							response.status(401);
@@ -95,6 +98,11 @@ public class API {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}
+						
+//						if (!BotSecrets.isDiscordUser(code)) {
+//							response.status(401);
+//							return new JSONObject().put("success", false).put("reason", 401).toString();
+//						}
 					}
 					
 					for (String s : req.requiredParameters()) {

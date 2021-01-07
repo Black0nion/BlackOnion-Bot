@@ -16,6 +16,7 @@ import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatusCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.fun.AvatarCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.InstagramCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.PastebinCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.misc.TestCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.WeatherCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.moderation.ClearCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.moderation.ReactionRolesSetupCommand;
@@ -63,6 +64,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new WeatherCommand());
 		addCommand(new InstagramCommand());
 		addCommand(new AdminHelpCommand());
+		addCommand(new TestCommand());
 	}
 	
 	@Override
@@ -77,7 +79,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
-				if (event.getMessage().getContentRaw().toLowerCase().startsWith(prefix + str)) {
+				if (event.getMessage().getContentRaw().toLowerCase().split(" ")[0].equalsIgnoreCase(prefix + str)) {
 					String message = dtf.format(now) + " | " + event.getChannel().getName() + " | " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + ": " + event.getMessage().getContentRaw();
 					FileUtils.appendToFile("commandLog", message);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
@@ -89,7 +91,7 @@ public class CommandBase extends ListenerAdapter {
 						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
 								.addField("Missing Permissions!", "Required Permissions: " + cmd.getRequiredPermissions(), false).build()).queue();
 						continue;
-					} else if (cmd.getRequiredArgumentCount() > args.length) {
+					} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
 								.addField("Wrong argument count!", "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 						continue;

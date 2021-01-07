@@ -28,7 +28,6 @@ public class HelpCommand implements Command {
 		try {
 			if (args.length >= 2) {
 				//Sum1 entered a category
-				//if (new ArrayList<Category>(Arrays.asList(Category.values())).contains(Category.valueOf(args[1].toUpperCase()))) {
 				List<Category> listOfCategories = Arrays.asList(Category.values());
 				ArrayList<String> listOfNames = new ArrayList<>();
 				listOfCategories.forEach(entry -> {
