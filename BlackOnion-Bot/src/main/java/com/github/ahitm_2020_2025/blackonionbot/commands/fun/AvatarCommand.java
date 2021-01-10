@@ -54,6 +54,11 @@ public class AvatarCommand implements Command {
 	}
 	
 	@Override
+	public int getRequiredArgumentCount() {
+		return 1;
+	}
+	
+	@Override
 	public String[] getCommand() {
 		return new String[] {"avatar"};
 	}

@@ -21,7 +21,7 @@ public class TestCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
-		System.out.println(Utils.getUserIdFromCode(args[1]));
+		
 	}
 
 	@Override
@@ -32,11 +32,6 @@ public class TestCommand implements Command {
 	@Override
 	public CommandVisibility getVisisbility() {
 		return CommandVisibility.HIDDEN;
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
 	}
 
 }

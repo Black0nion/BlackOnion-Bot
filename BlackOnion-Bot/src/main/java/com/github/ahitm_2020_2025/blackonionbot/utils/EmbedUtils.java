@@ -18,13 +18,13 @@ public class EmbedUtils {
 				.setColor(Color.RED)
 				.setTimestamp(Instant.now());
 		if (author != null)
-			builder.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+			builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
 		
 		return builder;
 	}
 	
 	public static EmbedBuilder getDefaultSuccessEmbed() {
-		return getDefaultErrorEmbed(null);
+		return getDefaultSuccessEmbed(null);
 	}
 	
 	public static EmbedBuilder getDefaultSuccessEmbed(User author) {
@@ -33,7 +33,7 @@ public class EmbedUtils {
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
 		if (author != null)
-			builder.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+			builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
 		
 		return builder;
 	}

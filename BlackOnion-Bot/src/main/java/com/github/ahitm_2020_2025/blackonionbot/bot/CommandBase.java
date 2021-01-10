@@ -14,6 +14,7 @@ import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ShutdownDBCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatsCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatusCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.fun.AvatarCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.fun.ConnectFourCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.InstagramCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.PastebinCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.TestCommand;
@@ -32,6 +33,8 @@ import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.FileUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -41,7 +44,10 @@ public class CommandBase extends ListenerAdapter {
 	
 	private static String prefix = BotInformation.prefix;
 	
-	public static void addCommands() {
+	public static EventWaiter waiter;
+	
+	public static void addCommands(EventWaiter newWaiter) {
+		waiter = newWaiter;
 		addCommand(new ActivityCommand());
 		addCommand(new AvatarCommand());
 		addCommand(new ClearCommand());
@@ -65,6 +71,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new InstagramCommand());
 		addCommand(new AdminHelpCommand());
 		addCommand(new TestCommand());
+		addCommand(new ConnectFourCommand(waiter));
 	}
 	
 	@Override
