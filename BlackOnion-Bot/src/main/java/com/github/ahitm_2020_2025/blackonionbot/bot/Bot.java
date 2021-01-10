@@ -24,6 +24,8 @@ import com.github.ahitm_2020_2025.blackonionbot.systems.MessageLogSystem;
 import com.github.ahitm_2020_2025.blackonionbot.systems.SelfRoleSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.JarUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -69,8 +71,11 @@ public class Bot extends ListenerAdapter {
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS);
 
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new SelfRoleSystem(), new HandRaiseSystem());
-		CommandBase.addCommands();
+		EventWaiter waiter = new EventWaiter();
+		
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new SelfRoleSystem(), new HandRaiseSystem(), waiter);
+		
+		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
 		builder.setStatus(StatusCommand.getStatusFromFile());
 		builder.setActivity(ActivityCommand.getActivity());

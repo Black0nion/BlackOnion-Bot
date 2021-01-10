@@ -1,5 +1,5 @@
 {
-  "messagesSent": 84,
+  "messagesSent": 499,
   "runMode": "production",
   "prefix": "?",
   "notifyUsers": [],
@@ -7,7 +7,7 @@
   "activityType": "playing",
   "activity": "spiele lul",
   "bdayDelay": 1000,
-  "lines": 4403,
-  "files": 70,
-  "commandsExecuted": 35
+  "lines": 4801,
+  "files": 74,
+  "commandsExecuted": 109
 }
