@@ -11,7 +11,7 @@
     "helpstatus": "Updates the status of the Bot",
     "helpsupport": "Displays support information",
     "helpavatar": "Sends the profile picture of a user",
-    "helpconnect4": "Play a game of \"Connect Four\" against another user",
+    "helpconnect4": "Spiele eine Runde \"4 Gewinnt\" gegen einen User",
     "helpinstagram": "Displays information about a Instagram user",
     "helppastebin": "Uploads a text / code",
     "helptest": "Testcommand",
@@ -26,6 +26,6 @@
     "helpstop": "Stops the music",
     "helphypixel": "Displays the Hypixel stats of a User",
     "helpnnn": "",
-    "success": "Success",
+    "success": "Erfolg",
     "test": "Testing"
 }
