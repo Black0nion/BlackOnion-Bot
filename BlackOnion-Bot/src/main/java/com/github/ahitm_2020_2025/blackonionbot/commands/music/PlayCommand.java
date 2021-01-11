@@ -57,11 +57,6 @@ public class PlayCommand implements Command {
 			return false;
 		}
 	}
-
-	@Override
-	public String getDescription() {
-		return "Spielt einen Song ab";
-	}
 	
 	@Override
 	public Category getCategory() {

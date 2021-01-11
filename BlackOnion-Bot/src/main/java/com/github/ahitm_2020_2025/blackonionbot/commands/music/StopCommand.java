@@ -37,11 +37,6 @@ public class StopCommand implements Command {
 		
 		channel.sendMessage("Die Musik wurde gestoppt.").queue();
 	}
-
-	@Override
-	public String getDescription() {
-		return "Stoppt die Musik";
-	}
 	
 	@Override
 	public Category getCategory() {

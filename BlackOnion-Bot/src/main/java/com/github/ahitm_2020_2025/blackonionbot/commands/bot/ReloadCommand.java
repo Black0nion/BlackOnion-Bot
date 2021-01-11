@@ -11,6 +11,7 @@ import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.systems.BirthdaySystem;
 import com.github.ahitm_2020_2025.blackonionbot.systems.MessageLogSystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.entities.Member;
@@ -35,16 +36,12 @@ public class ReloadCommand implements Command {
 		Bot.notifyStatusUsers = new ArrayList<String>(ValueManager.getArrayAsList("notifyUsers"));
 		BotInformation.init();
 		BirthdaySystem.reload();
+		LanguageSystem.init();
 	}
 	
 	@Override
 	public boolean requiresBotAdmin() {
 		return true;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Reloaded alle Configs";
 	}
 	
 	@Override

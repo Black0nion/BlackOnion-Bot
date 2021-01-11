@@ -46,11 +46,6 @@ public class NNNCommand implements Command {
 			ex.printStackTrace();
 		}
 	}
-
-	@Override
-	public String getDescription() {
-		return "";
-	}
 	
 	@Override
 	public CommandVisibility getVisisbility() {

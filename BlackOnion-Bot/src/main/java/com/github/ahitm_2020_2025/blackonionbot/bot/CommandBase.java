@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ActivityCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.AdminHelpCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.HelpCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.LanguageCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.NotifyCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.PingCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ReloadCommand;
@@ -74,6 +75,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new TestCommand());
 		addCommand(new ConnectFourCommand(waiter));
 		addCommand(new SupportCommand());
+		addCommand(new LanguageCommand());
 	}
 	
 	@Override
