@@ -38,11 +38,6 @@ public class ActivityCommand implements Command {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Setzt die Aktivität des Bots";
-	}
-
-	@Override
 	public String getSyntax() {
 		return "[playing | watching | listening] <Text>";
 	}

@@ -44,11 +44,6 @@ public class ReactionRolesSetupCommand implements Command {
 			}
 		}
 	}
-
-	@Override
-	public String getDescription() {
-		return "Fügt eine Reaction Rolle hinzu";
-	}
 	
 	@Override
 	public String getSyntax() {

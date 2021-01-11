@@ -22,6 +22,7 @@ import com.github.ahitm_2020_2025.blackonionbot.systems.BirthdaySystem;
 import com.github.ahitm_2020_2025.blackonionbot.systems.HandRaiseSystem;
 import com.github.ahitm_2020_2025.blackonionbot.systems.MessageLogSystem;
 import com.github.ahitm_2020_2025.blackonionbot.systems.SelfRoleSystem;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.JarUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -61,6 +62,7 @@ public class Bot extends ListenerAdapter {
 		
 		LiteSQL.connect();
 		SQLManager.onCreate();
+		LanguageSystem.init();
 		
 		BotSecrets.init();
 		builder = JDABuilder

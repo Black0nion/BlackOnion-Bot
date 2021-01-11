@@ -35,12 +35,7 @@ public class NotifyCommand implements Command {
 			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfügbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
 		}
 	}
-
-	@Override
-	public String getDescription() {
-		return "Der Bot schreibt dich per DM an, wenn er startet und stoppt.";
-	}
-
+	
 	@Override
 	public Category getCategory() {
 		return Category.BOT;

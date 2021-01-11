@@ -21,11 +21,6 @@ public class ShutdownDBCommand implements Command {
 		LiteSQL.disconnect();
 		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("LiteSQL", "Disconnected.", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 	}
-
-	@Override
-	public String getDescription() {
-		return "";
-	}
 	
 	@Override
 	public CommandVisibility getVisisbility() {

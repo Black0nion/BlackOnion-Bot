@@ -40,11 +40,6 @@ public class PastebinCommand implements Command {
 				})
 		);
 	}
-
-	@Override
-	public String getDescription() {
-		return "Uploaded einen Text";
-	}
 	
 	@Override
 	public String getSyntax() {

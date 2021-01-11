@@ -72,12 +72,7 @@ public class HypixelCommand implements Command {
 	            // Otherwise, return "N/A"
 	            return "N/A";
 	        }
-	    }
-
-	@Override
-	public String getDescription() {
-		return "Gibt die Hypixel Stats aus";
-	}
+    }
 	
 	@Override
 	public Progress getProgress() {

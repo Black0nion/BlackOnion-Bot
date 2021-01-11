@@ -7,12 +7,14 @@ import java.util.HashMap;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ActivityCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.AdminHelpCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.HelpCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.LanguageCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.NotifyCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.PingCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ReloadCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.ShutdownDBCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatsCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.bot.StatusCommand;
+import com.github.ahitm_2020_2025.blackonionbot.commands.bot.SupportCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.fun.AvatarCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.fun.ConnectFourCommand;
 import com.github.ahitm_2020_2025.blackonionbot.commands.misc.InstagramCommand;
@@ -72,6 +74,8 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new AdminHelpCommand());
 		addCommand(new TestCommand());
 		addCommand(new ConnectFourCommand(waiter));
+		addCommand(new SupportCommand());
+		addCommand(new LanguageCommand());
 	}
 	
 	@Override

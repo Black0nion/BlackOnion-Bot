@@ -17,11 +17,6 @@ public class InstagramCommand implements Command {
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 		channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Reason:", "Bitte schrei Insta an weil die nur ne scheißapi haben xD", false).build()).queue();
 	}
-
-	@Override
-	public String getDescription() {
-		return "Gibt Infos über einen Instagram User aus";
-	}
 	
 	@Override
 	public Progress getProgress() {

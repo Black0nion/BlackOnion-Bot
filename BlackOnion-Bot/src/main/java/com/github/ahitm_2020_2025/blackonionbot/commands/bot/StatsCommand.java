@@ -9,6 +9,7 @@ import java.time.Instant;
 
 import com.github.ahitm_2020_2025.blackonionbot.bot.Bot;
 import com.github.ahitm_2020_2025.blackonionbot.bot.BotInformation;
+import com.github.ahitm_2020_2025.blackonionbot.bot.CommandBase;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
@@ -38,6 +39,7 @@ public class StatsCommand implements Command {
 				.addField("Files", String.valueOf(BotInformation.file_count), true)
 				.addField("Commands executed", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
 				.addField("Messages sent", String.valueOf(ValueManager.getInt("messagesSent")), true)
+				.addField("Commands", String.valueOf(CommandBase.commands.size()), true)
 				.addField("Ping", e.getJDA().getGatewayPing() + "ms", true)
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
@@ -45,11 +47,6 @@ public class StatsCommand implements Command {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	@Override
-	public String getDescription() {
-		return "Zeigt Statistiken über den Bot an";
 	}
 	
 	@Override
