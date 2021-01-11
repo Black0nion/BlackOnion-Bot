@@ -37,11 +37,6 @@ public class AvatarCommand implements Command {
 			.setTimestamp(Instant.now());
 		channel.sendMessage(builder.build()).queue();
 	}
-
-	@Override
-	public String getDescription() {
-		return "Postet das Profilbild eines Benutzers";
-	}
 	
 	@Override
 	public Category getCategory() {

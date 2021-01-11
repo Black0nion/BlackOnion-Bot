@@ -16,11 +16,6 @@ public class PingCommand implements Command {
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Ping").addField("Pong :D", "Mein Ping: " + e.getJDA().getGatewayPing() + "ms", false).build()).queue();
 	}
-
-	@Override
-	public String getDescription() {
-		return "Zeigt den Ping des Bots an";
-	}
 	
 	@Override
 	public Category getCategory() {

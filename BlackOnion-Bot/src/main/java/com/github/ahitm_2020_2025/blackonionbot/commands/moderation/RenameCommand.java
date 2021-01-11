@@ -39,11 +39,6 @@ public class RenameCommand implements Command {
 	}
 
 	@Override
-	public String getDescription() {
-		return "";
-	}
-
-	@Override
 	public CommandVisibility getVisisbility() {
 		return CommandVisibility.HIDDEN;
 	}

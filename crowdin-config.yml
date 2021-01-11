@@ -1,0 +1,3 @@
+files:
+  - source: /BlackOnion-Bot/files/translations/German.json
+    translation: /BlackOnion-Bot/files/translations/%language%.json

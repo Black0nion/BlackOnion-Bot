@@ -33,11 +33,6 @@ public class JoinCommand implements Command {
 		
 		audioManager.openAudioConnection(memberChannel);
 	}
-
-	@Override
-	public String getDescription() {
-		return "Der Bot tritt deinem Voicechannel bei!";
-	}
 	
 	@Override
 	public String[] getCommand() {

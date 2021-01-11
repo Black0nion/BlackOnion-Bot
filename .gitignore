@@ -51,4 +51,5 @@ EXPORT
 POSTMAN
 .settings
 .metadata
-BlackOnion-Bot/files
+BlackOnion-Bot/files/*
+!BlackOnion-Bot/files/translations

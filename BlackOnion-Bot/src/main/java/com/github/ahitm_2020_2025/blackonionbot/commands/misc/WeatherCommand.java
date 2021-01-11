@@ -82,11 +82,6 @@ public class WeatherCommand implements Command {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Gibt dir das Wetter an einem Ort aus";
-	}
-
-	@Override
 	public String getSyntax() {
 		return "<City Name>";
 	}
