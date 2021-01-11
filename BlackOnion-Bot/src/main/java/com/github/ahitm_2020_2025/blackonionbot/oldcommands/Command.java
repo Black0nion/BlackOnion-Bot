@@ -43,4 +43,8 @@ public interface Command {
 	default boolean requiresBotAdmin() {
 		return false;
 	}
+	
+	default boolean dmCommand() {
+		return false;
+	}
 }

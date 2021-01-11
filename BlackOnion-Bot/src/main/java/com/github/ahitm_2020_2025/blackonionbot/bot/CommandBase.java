@@ -37,6 +37,7 @@ import com.github.ahitm_2020_2025.blackonionbot.utils.FileUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -96,6 +97,10 @@ public class CommandBase extends ListenerAdapter {
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 					String[] args = event.getMessage().getContentRaw().split(" ");
 					Command cmd = commands.get(c);
+					if (cmd.dmCommand() && event.isFromType(ChannelType.PRIVATE)) {
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setDescription("This command can't be accessed through private chat! Use it on a server!").build()).queue();
+						continue;
+					}
 					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(event.getAuthor().getIdLong())) {
 						continue;
 					} else if (cmd.getRequiredPermissions() != null && cmd.getVisisbility() == CommandVisibility.SHOWN && !event.getMember().hasPermission(cmd.getRequiredPermissions())) {
