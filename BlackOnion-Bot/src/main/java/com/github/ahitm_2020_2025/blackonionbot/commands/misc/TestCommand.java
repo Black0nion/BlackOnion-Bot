@@ -1,7 +1,5 @@
 package com.github.ahitm_2020_2025.blackonionbot.commands.misc;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
@@ -21,11 +19,6 @@ public class TestCommand implements Command {
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
 		
-	}
-
-	@Override
-	public @NotNull String getDescription() {
-		return "Testing Command";
 	}
 	
 	@Override

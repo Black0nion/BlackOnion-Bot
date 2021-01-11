@@ -51,11 +51,6 @@ public class ClearCommand implements Command {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Löscht eine bestimme Anzahl an Nachrichten";
-	}
-
-	@Override
 	public String getSyntax() {
 		return "<message count>";
 	}

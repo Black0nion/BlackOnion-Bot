@@ -22,11 +22,6 @@ public class LeaveCommand implements Command {
 			channel.sendMessage("Ich habe den Kanal verlassen!").queue();
 		}
 	}
-
-	@Override
-	public String getDescription() {
-		return "Der Bot leavt den Voicechannel";
-	}
 	
 	@Override
 	public Category getCategory() {

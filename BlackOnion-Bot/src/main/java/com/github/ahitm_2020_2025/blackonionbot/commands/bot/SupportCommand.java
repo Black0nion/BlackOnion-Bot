@@ -1,7 +1,5 @@
 package com.github.ahitm_2020_2025.blackonionbot.commands.bot;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
@@ -25,11 +23,6 @@ public class SupportCommand implements Command {
 				.addField("Creators", "[SIMULATAN](https://github.com/SIMULATAN), [ManuelP](https://github.com/ManuelPuchner), [MatseCrafter_304](https://github.com/MatseCrafter-304)", false)
 				.addField("Libraries", "```org.json:20201115\ncom.google.gson\nnet.dv8tion:JDA:4.2.0_227\ncom.jagrosh:jda-utilities:3.0.5\ncom.sparkjava:spark-core:2.9.3\nnet.java.dev.jna:jna-platform:5.6.0\norg.menudocs:paste-client-java:1.0.16\norg.xerial:sqlite-jdbc:3.32.3.2\ncom.mashape.unirest:unirest-java:1.3.1\nclub.minnced:discord-webhooks:0.5.4-rc```", false)
 				.build()).queue();
-	}
-
-	@Override
-	public @NotNull String getDescription() {
-		return "Zeigt Supportinformationen an";
 	}
 
 	@Override

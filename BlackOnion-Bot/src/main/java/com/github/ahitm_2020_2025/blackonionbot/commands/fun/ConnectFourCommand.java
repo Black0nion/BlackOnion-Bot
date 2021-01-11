@@ -3,8 +3,6 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.fun;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.systems.games.connectfour.ConnectFour;
@@ -117,11 +115,6 @@ public class ConnectFourCommand implements Command {
 	  			}, 
 	  		30, TimeUnit.SECONDS, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField("Timeout", "Du hast zu lange gebraucht, um zu antworten!", false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
-	}
-
-	@Override
-	public @NotNull String getDescription() {
-		return "Play a Game of Connect 4 against another player!";
 	}
 	
 	@Override

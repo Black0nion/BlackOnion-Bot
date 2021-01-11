@@ -49,11 +49,6 @@ public class StatusCommand implements Command {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Setzt den Status des Bots";
-	}
-
-	@Override
 	public String getSyntax() {
 		return "[online | invisible, offline | idle, afk | dnd, donotdisturb]";
 	}
