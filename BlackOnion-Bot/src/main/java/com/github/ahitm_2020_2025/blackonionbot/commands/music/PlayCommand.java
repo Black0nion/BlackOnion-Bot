@@ -8,6 +8,8 @@ import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
 import com.github.ahitm_2020_2025.blackonionbot.lavaplayer.PlayerManager;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.utils.Utils;
+
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -20,7 +22,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 public class PlayCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final GuildVoiceState selfVoiceState = e.getGuild().getSelfMember().getVoiceState();
 		
 		if (!selfVoiceState.inVoiceChannel()) {
@@ -40,7 +42,7 @@ public class PlayCommand implements Command {
 			return;
 		}
 		
-		String link = String.join(" ", Utils.getStringFromList(args));
+		String link = String.join(" ", Utils.removeFirstArg(args));
 		
 		if (!isUrl(link)) {
 			link = "ytsearch:" + link;

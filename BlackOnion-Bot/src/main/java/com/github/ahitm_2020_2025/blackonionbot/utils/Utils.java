@@ -18,7 +18,8 @@ public class Utils {
 		return text.replace("_", "\\_").replace("*", "\\*");
 	}
 
-	public static CharSequence getStringFromList(String[] args) {
+	//TODO: overarbeit
+	public static CharSequence removeFirstArg(String[] args) {
 		String str = "";
 		ArrayList<String> argsArray = new ArrayList<>(Arrays.asList(args));
 		argsArray.remove(0);

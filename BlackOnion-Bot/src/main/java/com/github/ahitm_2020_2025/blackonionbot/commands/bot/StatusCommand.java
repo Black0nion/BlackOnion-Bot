@@ -5,9 +5,11 @@ import java.util.concurrent.TimeUnit;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,7 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class StatusCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		message.delete().queue();
 		OnlineStatus status = getStatusFromFile();
 		switch (args[1]) {
@@ -41,11 +43,11 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			e.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Status setzen fehlgeschlagen!", "Bitte benutze [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] oder [``dnd``, ``donotdisturb``]", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			e.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("statussetfail", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslatedString("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
 			return;
 		}
 		e.getJDA().getPresence().setStatus(status);
-		e.getChannel().sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("Erfolgreich Status gesetzt!", "Neuer Status: **" + status + "**", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
+		e.getChannel().sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(LanguageSystem.getTranslatedString("statussetsuccess", author, guild), LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status + "**", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 
 	@Override

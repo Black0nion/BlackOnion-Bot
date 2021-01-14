@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -124,7 +125,8 @@ public class BotInformation {
 								httpCon.connect();
 								httpCon.getInputStream();
 							} catch (Exception e) {
-								e.printStackTrace();
+								if (!(e instanceof ConnectException))
+									e.printStackTrace();
 							}
 						}
 					}).start();

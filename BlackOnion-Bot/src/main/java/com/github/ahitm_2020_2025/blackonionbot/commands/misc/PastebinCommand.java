@@ -5,8 +5,10 @@ import org.menudocs.paste.PasteClientBuilder;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -20,7 +22,7 @@ public class PastebinCommand implements Command {
 			.build();
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final String language = args[1];
 		final String contentRaw = e.getMessage().getContentRaw();
 		final int index = contentRaw.indexOf(language) + language.length();
@@ -29,7 +31,7 @@ public class PastebinCommand implements Command {
 		client.createPaste(language, body).async(
 				(id) -> client.getPaste(id).async((paste) -> {
 					EmbedBuilder builder = new EmbedBuilder()
-							.setTitle("Paste erstellt", paste.getPasteUrl())
+							.setTitle(LanguageSystem.getTranslatedString("pastecreated", author, guild), paste.getPasteUrl())
 							.setDescription("```")
 							.appendDescription(paste.getLanguage().getId())
 							.appendDescription("\n")

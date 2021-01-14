@@ -6,8 +6,11 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,20 +20,20 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ClearCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		if (member.hasPermission(e.getTextChannel(), Permission.MESSAGE_MANAGE) ) {
 			if (args.length == 2) {
 				try {
 					int amount = Integer.parseInt(args[1]);
 					e.getTextChannel().deleteMessages(get(channel, amount)).queue();
-					e.getTextChannel().sendMessage(amount + " Nachrichten gelöscht.").complete().delete().queueAfter(3, TimeUnit.SECONDS);
+					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 				} catch (NumberFormatException ex) {
-					channel.sendMessage("Bitte gebe eine gültige Zahl ein!").complete().delete().queueAfter(3, TimeUnit.SECONDS);
+					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 					return;
 				}
 				return;
 			} else {
-				channel.sendMessage("Bitte gebe die Anzahl an zu löschenden Nachrichten an!").complete().delete().queueAfter(3, TimeUnit.SECONDS);
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 				return;
 			}
 		}
@@ -48,6 +51,11 @@ public class ClearCommand implements Command {
 		}
 		
 		return messages;
+	}
+	
+	@Override
+	public Permission[] getRequiredPermissions() {
+		return new Permission[] {Permission.MESSAGE_MANAGE};
 	}
 
 	@Override

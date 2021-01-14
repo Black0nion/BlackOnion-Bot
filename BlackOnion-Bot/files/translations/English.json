@@ -26,6 +26,8 @@
     "helpstop": "Stops the music",
     "helphypixel": "Displays the Hypixel stats of a User",
     "helpnnn": "",
+    "languageupdated": "Language changed!",
+    "newlanguage": "New language:",
     "success": "Success",
-    "test": "Testing"
+    "error": "Error"
 }

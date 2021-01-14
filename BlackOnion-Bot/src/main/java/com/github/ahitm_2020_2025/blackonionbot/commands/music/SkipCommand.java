@@ -7,6 +7,7 @@ import com.github.ahitm_2020_2025.blackonionbot.lavaplayer.GuildMusicManager;
 import com.github.ahitm_2020_2025.blackonionbot.lavaplayer.PlayerManager;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,7 +18,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class SkipCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final GuildVoiceState selfVoiceState = e.getGuild().getSelfMember().getVoiceState();
 		if (!selfVoiceState.inVoiceChannel()) {
 			channel.sendMessage("Ich spiele gerade keine Musik!").queue();

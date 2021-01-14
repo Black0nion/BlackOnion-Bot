@@ -8,6 +8,8 @@ import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
+
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,7 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class NotifyCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		if (Bot.notifyStatusUsers.contains(author.getId())) {
 			Bot.notifyStatusUsers.remove(author.getId());
 			ArrayList<String> users = new ArrayList<String>();

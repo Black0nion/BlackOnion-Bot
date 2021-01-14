@@ -4,8 +4,11 @@ import java.time.Instant;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -15,9 +18,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class AvatarCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		User mentionedUser = null;
-		String user = String.join(" ", Utils.getStringFromList(args));
+		String user = String.join(" ", Utils.removeFirstArg((args)));
 		if (!message.getMentionedUsers().isEmpty()) {
 			mentionedUser = message.getMentionedUsers().get(0);
 		} else if (!e.getGuild().getMembersByEffectiveName(user, true).isEmpty()) {
@@ -27,11 +30,11 @@ public class AvatarCommand implements Command {
 		} else if(!e.getGuild().getMembersByNickname(user, true).isEmpty()) {
 			mentionedUser = e.getGuild().getMembersByNickname(user, true).get(0).getUser();
 		} else {
-			channel.sendMessage("Bitte erwähne einen User oder gib den Namen eines Users ein [EXPERIMENTEL]!").queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder()
-		.setTitle("Profilbild von " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
+		.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 			.setImage(mentionedUser.getEffectiveAvatarUrl())
 			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 			.setTimestamp(Instant.now());
