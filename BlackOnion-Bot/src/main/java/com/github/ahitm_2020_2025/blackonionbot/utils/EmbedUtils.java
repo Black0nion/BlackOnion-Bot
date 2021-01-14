@@ -3,7 +3,11 @@ package com.github.ahitm_2020_2025.blackonionbot.utils;
 import java.awt.Color;
 import java.time.Instant;
 
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.Language;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
+
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
 public class EmbedUtils {
@@ -13,8 +17,18 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getDefaultErrorEmbed(User author) {
+		return getDefaultErrorEmbed(author, LanguageSystem.getDefaultLanguage());
+	}
+	
+	public static EmbedBuilder getDefaultErrorEmbed(User author, Guild guild) {
+		Language authorLanguage = LanguageSystem.getUserLanguage(author.getId());
+		Language guildLanguage = LanguageSystem.getGuildLanguage(guild.getId());
+		return getDefaultErrorEmbed(author, authorLanguage != null ? authorLanguage : (guildLanguage != null ? guildLanguage : LanguageSystem.getDefaultLanguage()));
+	}
+	
+	public static EmbedBuilder getDefaultErrorEmbed(User author, Language lang) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.setTitle("Error")
+				.setTitle(lang.getTranslatedString("error"))
 				.setColor(Color.RED)
 				.setTimestamp(Instant.now());
 		if (author != null)
@@ -28,8 +42,18 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getDefaultSuccessEmbed(User author) {
+		return getDefaultSuccessEmbed(author, LanguageSystem.getUserLanguage(author.getId()) != null ? LanguageSystem.getUserLanguage(author.getId()) : LanguageSystem.getDefaultLanguage());
+	}
+	
+	public static EmbedBuilder getDefaultSuccessEmbed(User author, Guild guild) {
+		Language authorLanguage = LanguageSystem.getUserLanguage(author.getId());
+		Language guildLanguage = LanguageSystem.getGuildLanguage(guild.getId());
+		return getDefaultSuccessEmbed(author, authorLanguage != null ? authorLanguage : (guildLanguage != null ? guildLanguage : LanguageSystem.getDefaultLanguage()));
+	}
+	
+	public static EmbedBuilder getDefaultSuccessEmbed(User author, Language lang) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.setTitle("Success")
+				.setTitle(lang.getTranslatedString("success"))
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
 		if (author != null)

@@ -3,6 +3,7 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.misc;
 import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,13 +18,18 @@ public class TestCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		
 	}
 	
 	@Override
 	public CommandVisibility getVisisbility() {
 		return CommandVisibility.HIDDEN;
+	}
+	
+	@Override
+	public boolean requiresBotAdmin() {
+		return true;
 	}
 
 }

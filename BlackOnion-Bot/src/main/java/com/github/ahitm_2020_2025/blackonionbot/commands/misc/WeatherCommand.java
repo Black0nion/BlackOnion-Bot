@@ -1,13 +1,11 @@
 package com.github.ahitm_2020_2025.blackonionbot.commands.misc;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -15,9 +13,12 @@ import org.json.JSONObject;
 
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
+import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -27,7 +28,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class WeatherCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		try {
 			JSONObject weather = getWeather(query);
@@ -38,29 +39,20 @@ public class WeatherCommand implements Command {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
 			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			EmbedBuilder embed = new EmbedBuilder()
-					.setColor(Color.GREEN)
+			EmbedBuilder embed = EmbedUtils.getDefaultSuccessEmbed(author, guild)
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-					.setTitle("Weather for " + weather.getString("name"))
-					.addField("Weather: ", weatherObject.getString("main"), true)
-					.addField("Temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
-					.addField("Humidity", main.get("humidity") + "%", true)
-					.addField("Wind speed", weather.getJSONObject("wind").get("speed") + " km/h", true)
-					.addField("Country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
-					.addField("Sunrise", sdf.format(sunrise), false)
-					.addField("Sunset", sdf.format(sunset), false)
-					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-					.setTimestamp(Instant.now());;
+					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"))
+					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+					.addField(LanguageSystem.getTranslatedString("temperature", author, guild), main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField(LanguageSystem.getTranslatedString("humidity", author, guild), main.get("humidity") + "%", true)
+					.addField(LanguageSystem.getTranslatedString("windspeed", author, guild), weather.getJSONObject("wind").get("speed") + " km/h", true)
+					.addField(LanguageSystem.getTranslatedString("country", author, guild), Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+					.addField(LanguageSystem.getTranslatedString("sunrise", author, guild), sdf.format(sunrise), false)
+					.addField(LanguageSystem.getTranslatedString("sunset", author, guild), sdf.format(sunset), false);
 			channel.sendMessage(embed.build()).queue();
 			return;
 		} catch (IOException ex) {
-			EmbedBuilder embed = new EmbedBuilder()
-					.setColor(Color.RED)
-					.setTitle("Error!")
-					.addField("Unknown City:", query, true)
-					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-					.setTimestamp(Instant.now());
-			channel.sendMessage(embed.build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("unknowncity", author, guild), query, false).build()).queue();
 			return;
 		}
 	}

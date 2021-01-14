@@ -5,6 +5,7 @@ import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Progress;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -18,7 +19,7 @@ public interface Command {
 	
 	String[] getCommand();
 
-	void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel);
+	void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel);
 	
 	default String getSyntax() {
 		return "";

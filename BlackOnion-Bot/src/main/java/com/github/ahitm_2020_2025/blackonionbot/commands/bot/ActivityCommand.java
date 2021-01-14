@@ -5,9 +5,11 @@ import java.util.concurrent.TimeUnit;
 import com.github.ahitm_2020_2025.blackonionbot.enums.Category;
 import com.github.ahitm_2020_2025.blackonionbot.enums.CommandVisibility;
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
+import com.github.ahitm_2020_2025.blackonionbot.systems.language.LanguageSystem;
 import com.github.ahitm_2020_2025.blackonionbot.utils.EmbedUtils;
 import com.github.ahitm_2020_2025.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,7 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ActivityCommand implements Command {
 	
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		String status = "";
 		for (int i = 2; i <= args.length - 1; i++) {
 			status += args[i] + (i == args.length - 1 ? "" : " ");
@@ -29,10 +31,10 @@ public class ActivityCommand implements Command {
 		} else if (args[1].toLowerCase().contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Wrong argument!", "Please use ``playing``, ``watching`` or ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " ``playing``, ``watching`` " + LanguageSystem.getTranslatedString("or", author, guild) + " ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("Neuer Status!", args[1] + " " + status, false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(LanguageSystem.getTranslatedString("newactivity", author, e.getGuild()), args[1] + " " + status, false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 		ValueManager.save("activityType", args[1]);
 		ValueManager.save("activity", status);
 	}

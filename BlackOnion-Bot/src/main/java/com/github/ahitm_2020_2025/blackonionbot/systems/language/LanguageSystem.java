@@ -1,24 +1,37 @@
 package com.github.ahitm_2020_2025.blackonionbot.systems.language;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.github.ahitm_2020_2025.blackonionbot.utils.CustomManager;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+
 public class LanguageSystem {
-	
-	public static String defaultLocale = "EN";
 	
 	static HashMap<String, Language> languages = new HashMap<>();
 	static HashMap<String, Language> userLanguages = new HashMap<>();
 	static HashMap<String, Language> guildLanguages = new HashMap<>();
 	
+	static ArrayList<Language> allLanguages = new ArrayList<>();
+	
 	private static CustomManager userManager = new CustomManager("userLanguages");
 	private static CustomManager guildManager = new CustomManager("guildLanguages");
 	
+	public static Language german;
+	public static Language english;
+	
+	public static Language defaultLocale = english;
+	
 	public static void init() {
 		languages.clear();
-		languages.put("EN", new Language("English", "EN"));
-		languages.put("DE", new Language("German", "DE"));
+		english = new Language("English", "EN");
+		german = new Language("German", "DE");
+		allLanguages.add(english);
+		allLanguages.add(german);
+		languages.put("EN", english);
+		languages.put("DE", german);
 		
 		reloadUserGuildLanguages();
 	}
@@ -40,6 +53,22 @@ public class LanguageSystem {
 		return languages;
 	}
 	
+	public static Language getDefaultLanguage() {
+		return defaultLocale;
+	}
+	
+	public static Language getUserLanguage(String user) {
+		try {
+			return userLanguages.get(user);
+		} catch (Exception ignored) {return null;}
+	}
+	
+	public static Language getGuildLanguage(String guild) {
+		try {
+			return guildLanguages.get(guild);
+		} catch (Exception ignored) {return null;}
+	}
+	
 	public static void updateUserLocale(String user, String locale) {
 		userManager.save(user, locale);
 		reloadUserGuildLanguages();
@@ -52,49 +81,49 @@ public class LanguageSystem {
 	
 	public static Language getLanguageFromName(String name) {
 		try {
-			return languages.get(name);
+			return languages.get(name.toUpperCase());
 		} catch (Exception ignored) {}
 		return null;
 	}
 	
-	public static String getTranslatedString(String key, String user, String guild) {
+	public static String getTranslatedString(String key, User author, Guild guild) {
 		try {
-			return userLanguages.get(user).getTranslatedString(key);
+			return userLanguages.get(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
-			return guildLanguages.get(guild).getTranslatedString(key);
+			return guildLanguages.get(guild.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
-			return languages.get(defaultLocale).getTranslatedString(key);
+			return defaultLocale.getTranslatedString(key);
 		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + getLanguageFromName(defaultLocale) + ".json!\nPlease report this issue to the admins!";
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
 	public static String getDefaultTranslatedString(String key) {
 		try {
-			return languages.get(defaultLocale).getTranslatedString(key);
+			return defaultLocale.getTranslatedString(key);
 		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + getLanguageFromName(defaultLocale) + ".json!\nPlease report this issue to the admins!";
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
 	public static String getLocaleTranslatedString(String key, String locale) {
 		try {
 			return languages.get(locale).getTranslatedString(key);
 		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + getLanguageFromName(defaultLocale) + ".json!\nPlease report this issue to the admins!";
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
 	public static String getUserTranslatedString(String key, String user) {
 		try {
 			return userLanguages.get(user).getTranslatedString(key);
 		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + getLanguageFromName(defaultLocale) + ".json!\nPlease report this issue to the admins!";
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
 	public static String getGuildTranslatedString(String key, String guild) {
 		try {
 			return guildLanguages.get(guild).getTranslatedString(key);
 		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + getLanguageFromName(defaultLocale) + ".json!\nPlease report this issue to the admins!";
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 }

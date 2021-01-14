@@ -18,12 +18,20 @@ public class Language {
 	public Language(String fileName, String languageCode) {
 		try {
 			this.name = fileName;
+			this.languageCode = languageCode;
 			this.file = new File("files/translations/" + fileName + ".json");
 			messages = new HashMap<>();
 			JSONObject translations = new JSONObject(String.join("\n", Files.readLines(file, StandardCharsets.UTF_8)));
+			
+			if (translations.isEmpty()) {
+				System.out.println("fileName" + ".json is empty!");
+				return;
+			}
+			
 			for (String key : translations.keySet()) {
-				if (!translations.isEmpty())
-					messages.put(key, translations.getString(key));
+				if (!translations.getString(key).toLowerCase().equals(translations.getString(key)))
+					System.out.println(key + " is not entirely in lower case! Please correct in " + fileName + ".json!");
+				messages.put(key.toLowerCase(), translations.getString(key));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

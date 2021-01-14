@@ -112,7 +112,7 @@ public class CommandBase extends ListenerAdapter {
 								.addField("Wrong argument count!", "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 						continue;
 					}
-					cmd.execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getChannel());
+					cmd.execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getGuild(), event.getChannel());
 				}
 			}
 		}

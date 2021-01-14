@@ -2,6 +2,7 @@ package com.github.ahitm_2020_2025.blackonionbot.commands.music;
 
 import com.github.ahitm_2020_2025.blackonionbot.oldcommands.Command;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,7 +15,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 public class JoinCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, MessageChannel channel) {
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final Member self = e.getGuild().getSelfMember();
 		final GuildVoiceState selfVoiceState = self.getVoiceState();
 		
