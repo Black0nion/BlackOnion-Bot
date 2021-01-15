@@ -97,7 +97,7 @@ public class BotInformation {
 			line_count = ValueManager.getInt("lines");
 			file_count = ValueManager.getInt("files");
 		} else {
-			File dir = new File("src/main/java/com/github/ahitm_2020_2025/blackonionbot");
+			File dir = new File("src/main/java/com/github/black0nion/blackonionbot");
 			File[] files = dir.listFiles();
 			showFiles(files);
 			ValueManager.save("lines", line_count);

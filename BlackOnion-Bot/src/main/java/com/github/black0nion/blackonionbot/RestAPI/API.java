@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetTokenFromCode;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.Paths;
+import com.github.black0nion.blackonionbot.RestAPI.impl.get.RefreshToken;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.Stats;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
@@ -35,6 +36,7 @@ public class API {
 		getRequests.add(new Stats());
 		getRequests.add(new Paths());
 		getRequests.add(new GetTokenFromCode());
+		getRequests.add(new RefreshToken());
 		//----------------Post Requests-----------------
 		postRequests.add(new Activity());
 		postRequests.add(new ChangePrefix());
