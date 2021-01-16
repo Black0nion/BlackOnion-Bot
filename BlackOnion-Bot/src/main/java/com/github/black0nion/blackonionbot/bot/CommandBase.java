@@ -12,11 +12,13 @@ import com.github.black0nion.blackonionbot.commands.misc.*;
 import com.github.black0nion.blackonionbot.commands.moderation.*;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.oldcommands.Command;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -78,18 +80,20 @@ public class CommandBase extends ListenerAdapter {
 					String[] args = event.getMessage().getContentRaw().split(" ");
 					Command cmd = commands.get(c);
 					if (cmd.dmCommand() && event.isFromType(ChannelType.PRIVATE)) {
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setDescription("This command can't be accessed through private chat! Use it on a server!").build()).queue();
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild()).setDescription("This command can't be accessed through private chat! Use it on a server!").build()).queue();
 						continue;
 					}
 					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(event.getAuthor().getIdLong())) {
 						continue;
-					} else if (cmd.getRequiredPermissions() != null && cmd.getVisisbility() == CommandVisibility.SHOWN && !event.getMember().hasPermission(cmd.getRequiredPermissions())) {
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
-								.addField("Missing Permissions!", "Required Permissions: " + cmd.getRequiredPermissions(), false).build()).queue();
+					} else if (cmd.getRequiredPermissions() != null && !event.getMember().hasPermission(cmd.getRequiredPermissions())) {
+						if (cmd.getVisisbility() != CommandVisibility.SHOWN)
+							continue;
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild())
+								.addField(LanguageSystem.getTranslatedString("missingpermissions", event.getAuthor(), event.getGuild()), LanguageSystem.getTranslatedString("requiredpermissions", event.getAuthor(), event.getGuild()) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 						continue;
 					} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor())
-								.addField("Wrong argument count!", "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild())
+								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", event.getAuthor(), event.getGuild()), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 						continue;
 					}
 					cmd.execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getGuild(), event.getChannel());
@@ -106,5 +110,13 @@ public class CommandBase extends ListenerAdapter {
 	public static void addCommand(Command c) {
 		if (!commands.containsKey(c.getCommand()))
 			commands.put(c.getCommand(), c);
+	}
+	
+	public static String getPermissionString(Permission[] permissions) {
+		String output = "```";
+		for (int i = 0; i  < permissions.length; i++) {
+			output += "- " + permissions[i].getName() + (i == permissions.length-1 ? "```" : "\n");
+		}
+		return output;
 	}
 }

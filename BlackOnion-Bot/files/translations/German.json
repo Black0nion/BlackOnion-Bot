@@ -1,4 +1,6 @@
 {
+    "missingpermissions": "Fehlende Permissions!",
+    "requiredpermissions": "Benötigte Permissions:",
     "helpactivity": "Setzt die Aktivität des Bots",
     "helpadminhelp": "Help for se admins",
     "helphelp": "Zeigt die Hilfe an",
@@ -27,6 +29,7 @@
     "helphypixel": "Gibt die Hypixel Stats eines Users aus",
     "helpnnn": "",
     "wrongargument": "Falsches Argument!",
+    "wrongargumentcount": "Falsche Anzahl an Argumenten!",
     "wronginput": "Falsche Eingabe!",
     "languageupdated": "Sprache geändert!",
     "newlanguage": "Neue Sprache:",

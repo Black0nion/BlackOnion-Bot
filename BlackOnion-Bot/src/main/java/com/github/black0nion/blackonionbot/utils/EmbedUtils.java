@@ -17,7 +17,8 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getDefaultErrorEmbed(User author) {
-		return getDefaultErrorEmbed(author, LanguageSystem.getDefaultLanguage());
+		Language authorLanguage = LanguageSystem.getUserLanguage(author.getId());
+		return getDefaultErrorEmbed(author, (authorLanguage != null ? authorLanguage : LanguageSystem.getDefaultLanguage()));
 	}
 	
 	public static EmbedBuilder getDefaultErrorEmbed(User author, Guild guild) {
