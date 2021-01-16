@@ -22,12 +22,13 @@ public class LanguageSystem {
 	public static Language german;
 	public static Language english;
 	
-	public static Language defaultLocale = english;
+	public static Language defaultLocale;
 	
 	public static void init() {
 		languages.clear();
 		english = new Language("English", "EN");
 		german = new Language("German", "DE");
+		defaultLocale = english;
 		allLanguages.add(english);
 		allLanguages.add(german);
 		languages.put("EN", english);

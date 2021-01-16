@@ -1,4 +1,6 @@
 {
+    "missingpermissions": "Fehlende Permissions!",
+    "requiredpermissions": "Benötigte Permissions:",
     "helpactivity": "Updates the activity of the Bot",
     "helpadminhelp": "Help for se admins",
     "helphelp": "Displays the Help",
@@ -78,6 +80,6 @@
     "tooktoolong": "Du hast zu lange gebraucht, um zu antworten!",
     "nousermentioned": "Kein User angegeben!",
     "inputusertoplayagainst": "Bitte gebe einen User an, gegen den du spielen willst!",
-    "success": "Erfolg",
-    "error": "Fehler"
+    "success": "Success",
+    "error": "Error"
 }
