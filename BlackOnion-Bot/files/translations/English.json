@@ -29,6 +29,7 @@
     "helphypixel": "Displays the Hypixel stats of a User",
     "helpnnn": "",
     "wrongargument": "Falsches Argument!",
+    "wrongargumentcount": "Falsche Anzahl an Argumenten!",
     "wronginput": "Falsche Eingabe!",
     "languageupdated": "Sprache geändert!",
     "newlanguage": "Neue Sprache:",
@@ -80,6 +81,6 @@
     "tooktoolong": "Du hast zu lange gebraucht, um zu antworten!",
     "nousermentioned": "Kein User angegeben!",
     "inputusertoplayagainst": "Bitte gebe einen User an, gegen den du spielen willst!",
-    "success": "Success",
-    "error": "Error"
+    "success": "Erfolg",
+    "error": "Fehler"
 }
