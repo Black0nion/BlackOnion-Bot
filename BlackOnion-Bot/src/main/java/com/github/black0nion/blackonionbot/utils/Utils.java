@@ -4,6 +4,8 @@ import java.io.File;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,6 +17,9 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 public class Utils {
+
+	private static ArrayList<CachedUserInfo> cachedUserInfo = new ArrayList<>();
+	
 	public static String removeMarkdown(String text) {
 		return text.replace("_", "\\_").replace("*", "\\*");
 	}
@@ -52,19 +57,41 @@ public class Utils {
 	}
 	
 	public static boolean isDiscordUser(String token) {
-		JSONObject response = new JSONObject(getUserInfoFromToken(token).getBody());
-		return response.has("id");
+		return getUserInfoFromToken(token).has("id");
 	}
 	
 	public static String getUserIdFromToken(String token) {
-			JSONObject userInfo = new JSONObject(getUserInfoFromToken(token).getBody());
+			JSONObject userInfo = getUserInfoFromToken(token);
 			if (userInfo.has("id"))
 				return userInfo.getString("id");
 			else
 				return null;
 	}
 	
-	public static HttpResponse<String> getUserInfoFromToken(String token) {
+	public static JSONObject getUserInfoFromToken(String token) {
+		
+		for (int i = 0; i < cachedUserInfo.size(); i++) {
+			CachedUserInfo userInfo = cachedUserInfo.get(i);
+			if (userInfo.getToken().equals(token)) {
+				if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 24) {
+					cachedUserInfo.remove(i);
+					CachedUserInfo refreshed = userInfo.refresh(token);
+					cachedUserInfo.add(refreshed);
+					return userInfo.refresh(token).getInfo();
+				} else {
+					return userInfo.getInfo();
+				}
+			}
+		}
+		
+		CachedUserInfo newInfo = new CachedUserInfo(new JSONObject(getUserInfoFromTokenResponse(token).getBody()), token);
+		
+		cachedUserInfo.add(newInfo);
+		
+		return new JSONObject(getUserInfoFromTokenResponse(token).getBody());
+	}
+	
+	public static HttpResponse<String> getUserInfoFromTokenResponse(String token) {
 		try {
 			Unirest.setTimeouts(0, 0);
 			return Unirest.get("https://discord.com/api/users/@me")
@@ -100,8 +127,6 @@ public class Utils {
 	}
 
 	public static boolean isAdmin(String token) {
-		final HttpResponse<String> userResponse = getUserInfoFromToken(token);
-		JSONObject userInfo = new JSONObject(userResponse.getBody());
-		return BotSecrets.isAdmin(Long.valueOf(userInfo.getString("id")));
+		return BotSecrets.isAdmin(Long.valueOf(getUserInfoFromToken(token).getString("id")));
 	}
 }
