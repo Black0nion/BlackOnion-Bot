@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.RestAPI.GetRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import spark.Request;
@@ -13,7 +13,7 @@ import spark.Response;
 public class Stats implements GetRequest {
 
 	@Override
-	public String handle(Request request, Response response, JSONObject body, BotUser user) {
+	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
 		response.type("application/json");
 	    return new JSONObject()
 	    		.put("success", true)

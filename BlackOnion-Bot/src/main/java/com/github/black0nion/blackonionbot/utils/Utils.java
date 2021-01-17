@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -50,16 +51,17 @@ public class Utils {
 		return new JSONObject(FileUtils.readFromFile(new File("resources/countrycodes.json"))).getString(code);
 	}
 	
-	public static String getUserIdFromCode(String code) {
-		JSONObject obj = new JSONObject(getTokenFromCode(code).getBody());
-		if (obj.has("access_token")) {
-			JSONObject userInfo = new JSONObject(getUserInfoFromToken(obj.getString("access_token")).getBody());
+	public static boolean isDiscordUser(String token) {
+		JSONObject response = new JSONObject(getUserInfoFromToken(token).getBody());
+		return response.has("id");
+	}
+	
+	public static String getUserIdFromToken(String token) {
+			JSONObject userInfo = new JSONObject(getUserInfoFromToken(token).getBody());
 			if (userInfo.has("id"))
 				return userInfo.getString("id");
 			else
 				return null;
-		} else 
-			return null;
 	}
 	
 	public static HttpResponse<String> getUserInfoFromToken(String token) {
@@ -74,6 +76,7 @@ public class Utils {
 		return null;
 	}
 
+	@Deprecated
 	public static HttpResponse<String> getTokenFromCode(String code) {
 		ArrayList<String> discordAuthSettings = FileUtils.readArrayListFromFile("discordauthsettings");
 		if (discordAuthSettings.size() < 3) {
@@ -94,5 +97,11 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static boolean isAdmin(String token) {
+		final HttpResponse<String> userResponse = getUserInfoFromToken(token);
+		JSONObject userInfo = new JSONObject(userResponse.getBody());
+		return BotSecrets.isAdmin(Long.valueOf(userInfo.getString("id")));
 	}
 }

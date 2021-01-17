@@ -59,7 +59,7 @@ public class LiteSQL {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("null");
+		System.out.println(sql + " is null or sth");
 		return null;
 	}
 }

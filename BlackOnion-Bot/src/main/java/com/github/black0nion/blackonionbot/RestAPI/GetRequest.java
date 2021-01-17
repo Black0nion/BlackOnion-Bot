@@ -2,13 +2,13 @@ package com.github.black0nion.blackonionbot.RestAPI;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import spark.Request;
 import spark.Response;
 
 public interface GetRequest {
-	String handle(Request request, Response response, JSONObject body, BotUser user);
+	String handle(Request request, Response response, JSONObject body, DiscordUser user);
 	
 	default boolean requiresLogin() {
 		return false;

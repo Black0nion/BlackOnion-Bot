@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import spark.Request;
 import spark.Response;
@@ -12,7 +12,7 @@ import spark.Response;
 public class Activity implements PostRequest {
 
 	@Override
-	public String handle(Request request, Response response, JSONObject body, BotUser user) {
+	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
 		String newActivityType = body.getString("activityType");
 		String newActivity = body.getString("activity");
 		if (ActivityCommand.getActivity(newActivityType, newActivity) == null) {
