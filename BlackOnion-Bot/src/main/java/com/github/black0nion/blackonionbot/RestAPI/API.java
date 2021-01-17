@@ -99,7 +99,8 @@ public class API {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}
-						userInfo = new JSONObject(Utils.getUserInfoFromToken(token).getBody());
+						
+						userInfo = Utils.getUserInfoFromToken(token);
 					}
 					
 					for (String s : req.requiredParameters()) {
@@ -160,7 +161,8 @@ public class API {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}
-						userInfo = new JSONObject(Utils.getUserInfoFromToken(token).getBody());
+						
+						userInfo = Utils.getUserInfoFromToken(token);
 					}
 					
 					for (String s : req.requiredParameters()) {
