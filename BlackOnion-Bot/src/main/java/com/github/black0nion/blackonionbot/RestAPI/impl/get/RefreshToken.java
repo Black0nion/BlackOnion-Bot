@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.RestAPI.impl.get;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.RestAPI.GetRequest;
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -13,7 +13,7 @@ import spark.Response;
 public class RefreshToken implements GetRequest {
 
 	@Override
-	public String handle(Request request, Response response, JSONObject body, BotUser user) {
+	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
 		JSONObject tokenResponse = refreshTokenJSON(body.getString("refresh_token"));
 		if (tokenResponse == null) {
 			response.status(500);

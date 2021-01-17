@@ -6,7 +6,7 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
 import com.github.black0nion.blackonionbot.bot.BotManager;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import spark.Request;
 import spark.Response;
@@ -14,9 +14,9 @@ import spark.Response;
 public class ChangePrefix implements PostRequest {
 
 	@Override
-	public String handle(Request request, Response response, JSONObject body, BotUser user) {
+	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
 		BotManager.updatePrefix(body.getString("prefix"));
-		Logger.logWarning("New Prefix: " + body.getString("prefix") + " | Changed by user " + user.getOriginalName(), LogOrigin.BOT);
+		Logger.logWarning("New Prefix: " + body.getString("prefix") + " | Changed by user " + user.getUserName() + "#" + user.getDiscriminator(), LogOrigin.BOT);
 		return new JSONObject()
 				.put("success", true)
 				.put("new_prefix", body.getString("prefix"))

@@ -11,12 +11,15 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
+import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.API;
 import com.github.black0nion.blackonionbot.SQL.LiteSQL;
 import com.github.black0nion.blackonionbot.SQL.SQLManager;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
+import com.github.black0nion.blackonionbot.enums.LogMode;
+import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
@@ -105,7 +108,7 @@ public class Bot extends ListenerAdapter {
 
 	@Override
 	public void onReady(ReadyEvent e) {
-		System.out.println("Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
+		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
 		jda = e.getJDA();
 		Thread status = new Thread(new Runnable() {
 			@Override

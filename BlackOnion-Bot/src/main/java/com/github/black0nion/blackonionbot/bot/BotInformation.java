@@ -114,8 +114,7 @@ public class BotInformation {
 								HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 								httpCon.setDoOutput(true);
 								httpCon.setRequestMethod("POST");
-								httpCon.setRequestProperty("password", BotSecrets.counterUser.getPasssword());
-								httpCon.setRequestProperty("username", BotSecrets.counterUser.getName());
+								httpCon.setRequestProperty("token", "updatepls");
 								OutputStream os = httpCon.getOutputStream();
 								OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
 								osw.write(body);

@@ -16,9 +16,9 @@ import com.github.black0nion.blackonionbot.RestAPI.impl.get.Stats;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
-import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
-import com.github.black0nion.blackonionbot.utils.BotUser;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import spark.Spark;
 
@@ -27,7 +27,6 @@ public class API {
 	static ArrayList<PostRequest> postRequests = new ArrayList<>();
 	static ArrayList<GetRequest> getRequests = new ArrayList<>();
 
-	@SuppressWarnings("deprecation")
 	public API() {
 		
 		//Spark.secure("files/keystore.jks", "ahitm20202025", null, null);
@@ -82,34 +81,25 @@ public class API {
 					if (req.isJson())
 						response.type("application/json");
 					
-					String password = null;
-					String username = null;
-					//String code = null;
+					String token = null;
+					JSONObject userInfo = null;
 					if (req.requiresLogin()) {
-						if (!headers.has("username") || !headers.has("password")) {
-						//if (!headers.has("code")) {
+						if (!headers.has("token")) {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
-						password = headers.getString("password");
-						username = headers.getString("username");
-						//code = headers.getString("code");
 						
-						if (!BotSecrets.credentialsRight(username, password)) {
+						token = headers.getString("token");
+						
+						if (!Utils.isDiscordUser(token)) {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
-
-						if (req.requiresAdmin()
-								&& !BotSecrets.isAdmin(username, password)) {
+						if (req.requiresAdmin() && !Utils.isAdmin(token)) {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}
-						
-//						if (!BotSecrets.isDiscordUser(code)) {
-//							response.status(401);
-//							return new JSONObject().put("success", false).put("reason", 401).toString();
-//						}
+						userInfo = new JSONObject(Utils.getUserInfoFromToken(token).getBody());
 					}
 					
 					for (String s : req.requiredParameters()) {
@@ -118,12 +108,7 @@ public class API {
 							return new JSONObject().put("success", false).put("reason", 400).toString();
 						}
 					}
-					
-					BotUser user = null;
-					if (username != null && password != null) {
-						user = BotSecrets.getUserByCredentials(username, password);
-					}
-					
+					DiscordUser user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
 					return req.handle(request, response, body, user);
 				} catch (JSONException e) {
 					API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
@@ -157,27 +142,25 @@ public class API {
 					if (req.isJson())
 						response.type("application/json");
 					
-					String password = null;
-					String username = null;
+					String token = null;
+					JSONObject userInfo = null;
 					if (req.requiresLogin()) {
-						if (!headers.has("username") || !headers.has("password")) {
+						if (!headers.has("token")) {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
 						
-						password = headers.getString("password");
-						username = headers.getString("username");
-
-						if (!BotSecrets.credentialsRight(username, password)) {
+						token = headers.getString("token");
+						
+						if (!Utils.isDiscordUser(token)) {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
-
-						if (req.requiresAdmin()
-								&& !BotSecrets.isAdmin(username, password)) {
+						if (req.requiresAdmin() && !Utils.isAdmin(token)) {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}
+						userInfo = new JSONObject(Utils.getUserInfoFromToken(token).getBody());
 					}
 					
 					for (String s : req.requiredParameters()) {
@@ -187,12 +170,8 @@ public class API {
 						}
 					}
 					
-					BotUser user = null;
-					if (username != null && password != null) {
-						user = BotSecrets.getUserByCredentials(username, password);
-					}
-					
-					return req.handle(request, response, body ,user);
+					DiscordUser user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
+					return req.handle(request, response, body, user);
 				} catch (JSONException e) {
 					response.status(400);
 					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
