@@ -92,6 +92,8 @@
     "bannedfor": "User war gebannt für: %reason%",
     "inputnumber": "Bitte gebe eine gültige Zahl ein!",
     "usernotfound": "User nicht gefunden!",
+    "welcome": "Willkommen,",
+    "goodbye": "Auf Wiedersehen,",
     "message": "Nachricht",
     "success": "Erfolg",
     "error": "Fehler"
