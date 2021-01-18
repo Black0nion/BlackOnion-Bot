@@ -11,7 +11,10 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
+import com.github.black0nion.blackonionbot.enums.LogMode;
+import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -68,12 +71,22 @@ public class Utils {
 				return null;
 	}
 	
-	public static JSONObject getUserInfoFromToken(String token) {
+	public static int gc() {
+		ArrayList<CachedUserInfo> found = new ArrayList<>();
+		for (CachedUserInfo userInfo : cachedUserInfo) {
+			if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2)
+				found.add(userInfo);
+		}
 		
+		cachedUserInfo.removeAll(found);
+		return found.size();
+	}
+	
+	public static JSONObject getUserInfoFromToken(String token) {
 		for (int i = 0; i < cachedUserInfo.size(); i++) {
 			CachedUserInfo userInfo = cachedUserInfo.get(i);
 			if (userInfo.getToken().equals(token)) {
-				if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 24) {
+				if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2) {
 					cachedUserInfo.remove(i);
 					CachedUserInfo refreshed = userInfo.refresh(token);
 					cachedUserInfo.add(refreshed);
@@ -107,6 +120,7 @@ public class Utils {
 	public static HttpResponse<String> getTokenFromCode(String code) {
 		ArrayList<String> discordAuthSettings = FileUtils.readArrayListFromFile("discordauthsettings");
 		if (discordAuthSettings.size() < 3) {
+			Logger.log(LogMode.ERROR, LogOrigin.API, "DiscordAuthSettings isn't filled correctly!");
 			return null;
 		}
 		try {

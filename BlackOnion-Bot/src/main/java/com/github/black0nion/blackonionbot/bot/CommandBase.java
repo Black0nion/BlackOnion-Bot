@@ -59,6 +59,9 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new ConnectFourCommand(waiter));
 		addCommand(new SupportCommand());
 		addCommand(new LanguageCommand());
+		addCommand(new KickCommand());
+		addCommand(new BanCommand());
+		addCommand(new UnbanCommand());
 	}
 	
 	@Override
