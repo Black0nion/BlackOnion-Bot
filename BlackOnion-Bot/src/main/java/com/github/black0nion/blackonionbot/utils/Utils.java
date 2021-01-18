@@ -1,5 +1,8 @@
 package com.github.black0nion.blackonionbot.utils;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
@@ -143,4 +147,12 @@ public class Utils {
 	public static boolean isAdmin(String token) {
 		return BotSecrets.isAdmin(Long.valueOf(getUserInfoFromToken(token).getString("id")));
 	}
+	
+	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {
+        final ColorModel cm = bufferedImage.getColorModel();
+        final boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        final WritableRaster raster = bufferedImage.copyData(bufferedImage.getRaster().createCompatibleWritableRaster());
+
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
 }

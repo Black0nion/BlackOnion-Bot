@@ -23,6 +23,7 @@ import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
+import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.SelfRoleSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -78,7 +79,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new SelfRoleSystem(), new HandRaiseSystem(), waiter);
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new SelfRoleSystem(), new HandRaiseSystem(), new JoinSystem(), waiter);
 		
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
