@@ -28,7 +28,7 @@ public class LanguageSystem {
 		languages.clear();
 		english = new Language("English", "EN");
 		german = new Language("German", "DE");
-		defaultLocale = english;
+		defaultLocale = german;
 		allLanguages.add(english);
 		allLanguages.add(german);
 		languages.put("EN", english);
@@ -93,6 +93,16 @@ public class LanguageSystem {
 		} catch (Exception ignored) {}
 		try {
 			return guildLanguages.get(guild.getId()).getTranslatedString(key);
+		} catch (Exception ignored) {}
+		try {
+			return defaultLocale.getTranslatedString(key);
+		} catch (Exception ignored) {}
+		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
+	}
+	
+	public static String getTranslatedString(String key, User author) {
+		try {
+			return userLanguages.get(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
 			return defaultLocale.getTranslatedString(key);

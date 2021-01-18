@@ -114,6 +114,7 @@ public class API {
 				} catch (JSONException e) {
 					API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
 					response.status(400);
+					response.type("application/json");
 					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
 				}
 			});
@@ -176,6 +177,7 @@ public class API {
 					return req.handle(request, response, body, user);
 				} catch (JSONException e) {
 					response.status(400);
+					response.type("application/json");
 					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
 				}
 			});
