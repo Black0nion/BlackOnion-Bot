@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.enums.DrawType;
 import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,6 +30,8 @@ public class TestCommand implements Command {
 		try {
 			file = JoinSystem.generateImage(Color.black, member, guild, DrawType.JOIN);
 			guild.getTextChannelById("800032895803719751").sendFile(file, "welcome.png").queue();
+			GuildManager.createGuildOptions(guild.getId());
+			System.out.println(GuildManager.getGuildSettings(guild.getId()));
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

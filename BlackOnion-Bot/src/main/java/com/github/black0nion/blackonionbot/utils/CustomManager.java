@@ -18,7 +18,6 @@ public class CustomManager {
 	
 	public CustomManager(String name) {
 		file = new File("files", name + ".json");
-		file.mkdirs();
 	}
 	
 	public void save(String key, String value) {
@@ -27,40 +26,46 @@ public class CustomManager {
 		doc.saveAsFile(file);
 	}
 	
-	public void save(String key, Number value) {
+	public Document save(String key, Number value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
+		return doc;
 	}
 
-	public void save(String key, Boolean value) {
+	public Document save(String key, Boolean value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
+		return doc;
 	}
 
-	public void save(String key, JsonElement value) {
+	public Document save(String key, JsonElement value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
+		return doc;
 	}
 	
-	public void save(String key, Document value) {
+	public Document save(String key, Document value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
+		return doc;
 	}
 
-	public void save(String key, Object value) {
+	public Document save(String key, Object value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
+		return doc;
 	}
 	
-	public void remove(String key) {
+	public Document remove(String key) {
 		doc = Document.loadDocument(file);
 		doc.remove(key);
 		doc.saveAsFile(file);
+		return doc;
 	}
 	
 	public Set<String> getKeys() {
