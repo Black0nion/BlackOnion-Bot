@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetGuildsToManage;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetTokenFromCode;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.Paths;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.RefreshToken;
@@ -36,6 +37,7 @@ public class API {
 		getRequests.add(new Paths());
 		getRequests.add(new GetTokenFromCode());
 		getRequests.add(new RefreshToken());
+		getRequests.add(new GetGuildsToManage());
 		//----------------Post Requests-----------------
 		postRequests.add(new Activity());
 		postRequests.add(new ChangePrefix());
@@ -138,8 +140,7 @@ public class API {
 					request.headers().forEach(head -> {
 						headers.put(head, request.headers(head));
 					});
-					API.logInfo("Answered GET request (Path: " + url + ") from: " + request.ip() + " with header: "
-							+ body.toString());
+					API.logInfo("Answered GET request (Path: " + url + ") from: " + request.ip() + " with header: " + body.toString());
 
 					if (req.isJson())
 						response.type("application/json");
@@ -174,11 +175,11 @@ public class API {
 					}
 					
 					DiscordUser user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
-					return req.handle(request, response, body, user);
+					return req.handle(request, response, null, user);
 				} catch (JSONException e) {
 					response.status(400);
 					response.type("application/json");
-					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
+					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException: " + e.getMessage()).toString();
 				}
 			});
 		}

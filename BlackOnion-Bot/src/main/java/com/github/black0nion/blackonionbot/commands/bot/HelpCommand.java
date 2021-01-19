@@ -89,8 +89,8 @@ public class HelpCommand implements Command {
 			if (!(ex instanceof IllegalArgumentException)) {
 				ex.printStackTrace();
 			} else {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Diese Kategorie existiert nicht!", 
-						"Benutze " + BotInformation.prefix + "help, um alle Module aufgelistet zu bekommen!", false).build()).queue();
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("What just happend?", 
+						"There is a key me", false).build()).queue();
 			}
 		}
 	}

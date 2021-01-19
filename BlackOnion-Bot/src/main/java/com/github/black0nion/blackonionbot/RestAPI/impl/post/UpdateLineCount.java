@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.RestAPI.impl.post;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.RestAPI.API;
 import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
@@ -24,6 +25,7 @@ public class UpdateLineCount implements PostRequest {
 		ValueManager.save("files", newFileCount);
 		BotInformation.line_count = newLineCount;
 		BotInformation.file_count = newFileCount;
+		API.logWarning("New file / line count! " + newLineCount + " and " + newFileCount);
 		return new JSONObject()
 				.put("success", true)
 				.put("line_count", newLineCount)

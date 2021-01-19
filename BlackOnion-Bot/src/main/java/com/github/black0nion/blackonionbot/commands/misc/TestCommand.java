@@ -29,9 +29,8 @@ public class TestCommand implements Command {
 		File file;
 		try {
 			file = JoinSystem.generateImage(Color.black, member, guild, DrawType.JOIN);
-			guild.getTextChannelById("800032895803719751").sendFile(file, "welcome.png").queue();
+			guild.getTextChannelById("800032895803719751").sendMessage(GuildManager.getGuildSettings(guild).getWelcomeMessage().replace("%user%", author.getName())).addFile(file, "goodbye.png").queue();
 			GuildManager.createGuildOptions(guild.getId());
-			System.out.println(GuildManager.getGuildSettings(guild.getId()));
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

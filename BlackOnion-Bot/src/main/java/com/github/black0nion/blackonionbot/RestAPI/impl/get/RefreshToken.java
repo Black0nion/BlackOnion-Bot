@@ -22,9 +22,8 @@ public class RefreshToken implements GetRequest {
 			if (tokenResponse.has("access_token") && tokenResponse.has("refresh_token")) {
 				return new JSONObject().put("success", true).put("access_token", tokenResponse.getString("access_token")).put("refresh_token", tokenResponse.getString("refresh_token")).toString();
 			} else {
-				System.out.println(tokenResponse);
 				response.status(500);
-				return new JSONObject().put("success", false).toString();
+				return new JSONObject().put("success", false).put("response", tokenResponse).toString();
 			}
 		}
 	}

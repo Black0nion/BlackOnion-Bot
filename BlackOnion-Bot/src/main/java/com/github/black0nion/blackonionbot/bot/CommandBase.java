@@ -62,6 +62,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new KickCommand());
 		addCommand(new BanCommand());
 		addCommand(new UnbanCommand());
+		addCommand(new GuildLanguageCommand());
 	}
 	
 	@Override

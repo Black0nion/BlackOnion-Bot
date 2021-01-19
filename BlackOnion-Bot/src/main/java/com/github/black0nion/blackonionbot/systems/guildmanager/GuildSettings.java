@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.guildmanager;
 
+import com.github.black0nion.blackonionbot.systems.language.Language;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
 
 @SuppressWarnings("unused")
@@ -9,17 +11,18 @@ public class GuildSettings {
 	String welcomeMessage;
 	String leaveMessage;
 	String testCommand;
+	Language language;
 	CustomManager guildManager;
 	
 	public GuildSettings(String guildId) {
-		this.guildManager = new CustomManager(guildId);
+		this.guildManager = new CustomManager("guildoptions/" + guildId);
 		
 		this.welcomeChannel = setIfNotPresent("welcomeChannel", "none");
 		this.welcomeMessage = setIfNotPresent("welcomeMessage", "Welcome, %user%");
 		this.leaveMessage = setIfNotPresent("goodbyeMessage", "Bye, %user%");
 		this.testCommand = setIfNotPresent("testCommand", "test");
+		this.language = LanguageSystem.getLanguageFromName(setIfNotPresent("language", LanguageSystem.defaultLocale.getLanguageCode()));
 		this.guildId = guildId;
-		System.out.println(guildId);
 	}
 	
 	public String getGuildId() {
@@ -55,6 +58,15 @@ public class GuildSettings {
 	public void setLeaveMessage(String leaveMessage) {
 		guildManager.save("leaveMessage", leaveMessage);
 		this.leaveMessage = leaveMessage;
+	}
+	
+	public Language getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(Language language) {
+		guildManager.save("language", language.getLanguageCode());
+		this.language = language;
 	}
 
 	private String setIfNotPresent(String key, String value) {
