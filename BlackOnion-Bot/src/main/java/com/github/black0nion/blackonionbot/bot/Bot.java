@@ -86,7 +86,7 @@ public class Bot extends ListenerAdapter {
 		builder.setStatus(StatusCommand.getStatusFromFile());
 		builder.setActivity(ActivityCommand.getActivity());
 		try {
-			builder.build();
+			jda = builder.build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("[BOT] Failed to connect to the bot! Please make sure to have a file named \"token.ahitm\" with the bot's token in the files folder!");
@@ -110,7 +110,6 @@ public class Bot extends ListenerAdapter {
 	@Override
 	public void onReady(ReadyEvent e) {
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
-		jda = e.getJDA();
 		Thread status = new Thread(new Runnable() {
 			@Override
 			public void run() {

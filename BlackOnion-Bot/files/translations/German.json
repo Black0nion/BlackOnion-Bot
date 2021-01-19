@@ -30,6 +30,8 @@
     "helpnnn": "",
     "helpkick": "Kickt einen User",
     "helpban": "Bannt einen User",
+    "helpunban": "Entbannt einen User",
+    "helpguildlanguage": "Ändert die Serversprache",
     "wrongargument": "Falsches Argument!",
     "wrongargumentcount": "Falsche Anzahl an Argumenten!",
     "wronginput": "Falsche Eingabe!",

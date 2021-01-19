@@ -17,8 +17,8 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getDefaultErrorEmbed(User author) {
-		Language authorLanguage = LanguageSystem.getUserLanguage(author.getId());
-		return getDefaultErrorEmbed(author, (authorLanguage != null ? authorLanguage : LanguageSystem.getDefaultLanguage()));
+			Language authorLanguage = (author != null ? LanguageSystem.getUserLanguage(author.getId()) : null);
+			return getDefaultErrorEmbed(author, (authorLanguage != null ? authorLanguage : LanguageSystem.getDefaultLanguage()));
 	}
 	
 	public static EmbedBuilder getDefaultErrorEmbed(User author, Guild guild) {
@@ -43,7 +43,8 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getDefaultSuccessEmbed(User author) {
-		return getDefaultSuccessEmbed(author, LanguageSystem.getUserLanguage(author.getId()) != null ? LanguageSystem.getUserLanguage(author.getId()) : LanguageSystem.getDefaultLanguage());
+		Language authorLanguage = (author != null ? LanguageSystem.getUserLanguage(author.getId()) : null);
+		return getDefaultSuccessEmbed(author, (authorLanguage != null ? authorLanguage : LanguageSystem.getDefaultLanguage()));
 	}
 	
 	public static EmbedBuilder getDefaultSuccessEmbed(User author, Guild guild) {

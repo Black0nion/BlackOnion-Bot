@@ -157,7 +157,7 @@ public class ConnectFour {
 		char[] charInput = input.toCharArray();
 		try {
 			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
-			if (ConnectFourGameManager.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.X) {
+			if (ConnectFourGameManager.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.Y) {
 				return true;
 			}
 		} catch (Exception ignored) {}
@@ -173,12 +173,12 @@ public class ConnectFour {
 	
 	public String getField() {
 		String output = "";
-		output += "⠀⠀A⠀⠀B⠀⠀C⠀⠀⠀D⠀⠀E⠀⠀⠀F⠀⠀G⠀⠀⠀H⠀⠀I⠀⠀\n⠀------------------------------------------------------\n";
+		output += "   A   B   C   D   E   F   G   H   I\n ----------------------------\n";
 		for (int y = 0; y < ConnectFourGameManager.Y; y++) {
 			for (int x = 0; x < ConnectFourGameManager.X; x++) {
-				output += "|" + (field[y][x] == FieldType.EMPTY ? "⠀⠀⠀" : "⠀" + field[y][x].name() + "⠀");
+				output += "\\| " + (field[y][x] == FieldType.EMPTY ? "    " : " " + field[y][x].name() + " ");
 			}
-			output += "|⠀(" + y + ")\n⠀-------------------------------------------------------\n";
+			output += "| (" + y + ")\n----------------------------\n";
 		}
 		return output;
 	}

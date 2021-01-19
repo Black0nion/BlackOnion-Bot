@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.systems.language;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildSettings;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,7 +19,6 @@ public class LanguageSystem {
 	static ArrayList<Language> allLanguages = new ArrayList<>();
 	
 	private static CustomManager userManager = new CustomManager("userLanguages");
-	private static CustomManager guildManager = new CustomManager("guildLanguages");
 	
 	public static Language german;
 	public static Language english;
@@ -45,8 +46,10 @@ public class LanguageSystem {
 			userLanguages.put(user, getLanguageFromName(userManager.getString(user)));
 		}
 		
-		for (String guild : guildManager.getKeys()) {
-			guildLanguages.put(guild, getLanguageFromName(guildManager.getString(guild)));
+		GuildManager.init();
+		
+		for (GuildSettings guildSettings : GuildManager.getAllGuildOptions()) {
+			guildLanguages.put(guildSettings.getGuildId(), guildSettings.getLanguage());
 		}
 	}
 	
@@ -76,7 +79,7 @@ public class LanguageSystem {
 	}
 	
 	public static void updateGuildLocale(String guild, String locale) {
-		guildManager.save(guild, locale);
+		GuildManager.getGuildSettings(guild).setLanguage(getLanguageFromName(locale));
 		reloadUserGuildLanguages();
 	}
 	
