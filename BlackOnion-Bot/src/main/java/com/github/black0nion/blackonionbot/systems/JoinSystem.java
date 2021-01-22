@@ -129,7 +129,7 @@ public class JoinSystem extends ListenerAdapter {
         return file;
     }
     
-    private @NotNull static BufferedImage makeRoundedCorner(final @NotNull BufferedImage image) {
+    public @NotNull static BufferedImage makeRoundedCorner(final @NotNull BufferedImage image) {
         final int w = image.getWidth();
         final int h = image.getHeight();
         final BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
