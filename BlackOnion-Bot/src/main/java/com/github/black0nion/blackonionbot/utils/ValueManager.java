@@ -18,7 +18,12 @@ public class ValueManager {
 	
 	public ValueManager() {
 		file = new File("files", "values.json");
-		file.mkdirs();
+		file.getParentFile().mkdirs();
+		try {
+			file.createNewFile();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void save(String key, String value) {
