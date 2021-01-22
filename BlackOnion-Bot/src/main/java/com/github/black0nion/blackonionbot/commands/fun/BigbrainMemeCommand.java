@@ -52,15 +52,10 @@ public class BigbrainMemeCommand implements Command {
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + BotInformation.prefix + getCommand()[0] + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.prefix + getCommand()[0] + " " + getSyntax(), false).build()).queue();
 			return;
 		}
-		channel.sendMessage("bigbrain lol").addFile(generateImage(messages), "test.png").queue();
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
+		channel.sendMessage("bigbrain lol").addFile(generateImage(messages), "bigbrain.png").queue();
 	}
 	
 	@Override
@@ -81,7 +76,7 @@ public class BigbrainMemeCommand implements Command {
 	        newGraphics.setColor(Color.DARK_GRAY);
 	        
 	        // lil brain
-	        newGraphics.drawString(args[0], 15, 50);
+	        newGraphics.drawString(args[0], 10, 50);
 	        
 	        // medium brain
 	        newGraphics.drawString(args[1], 10, 275);
