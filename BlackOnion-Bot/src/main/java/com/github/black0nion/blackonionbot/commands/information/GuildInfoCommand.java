@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.information;
 import java.time.format.DateTimeFormatter;
 
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
@@ -34,6 +35,11 @@ public class GuildInfoCommand implements Command {
 				.addField(LanguageSystem.getTranslatedString("boostlevel", author, guild), guild.getBoostTier().name(), true)
 				.addField(LanguageSystem.getTranslatedString("created", author, guild), guild.getTimeCreated().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")), true)
 				.build()).queue();
+	}
+	
+	@Override
+	public Category getCategory() {
+		return Category.INFORMATION;
 	}
 	
 }
