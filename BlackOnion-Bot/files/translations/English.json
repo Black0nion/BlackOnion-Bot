@@ -97,6 +97,14 @@
     "welcome": "Willkommen,",
     "goodbye": "Auf Wiedersehen,",
     "message": "Nachricht",
+    "name": "Name",
+    "rolecount": "Rollenzahl",
+    "membercount": "Memberzahl",
+    "channelcount": "Kanalzahl",
+    "guildinfo": "Guild Info",
+    "serverid": "Server ID",
+    "boostlevel": "Boost Level",
+    "created": "Erstellt",
     "success": "Erfolg",
     "error": "Fehler"
 }
