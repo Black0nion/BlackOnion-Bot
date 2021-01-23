@@ -5,8 +5,8 @@ import static com.github.black0nion.blackonionbot.systems.language.LanguageSyste
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.FieldType;

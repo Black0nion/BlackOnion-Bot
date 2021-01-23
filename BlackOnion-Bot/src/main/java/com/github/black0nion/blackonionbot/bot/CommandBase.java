@@ -4,14 +4,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.*;
 import com.github.black0nion.blackonionbot.commands.music.*;
 import com.github.black0nion.blackonionbot.commands.old.*;
 import com.github.black0nion.blackonionbot.commands.fun.*;
+import com.github.black0nion.blackonionbot.commands.information.GuildInfoCommand;
+import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
 import com.github.black0nion.blackonionbot.commands.misc.*;
 import com.github.black0nion.blackonionbot.commands.moderation.*;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -64,6 +66,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new UnbanCommand());
 		addCommand(new GuildLanguageCommand());
 		addCommand(new BigbrainMemeCommand());
+		addCommand(new GuildInfoCommand());
 	}
 	
 	@Override

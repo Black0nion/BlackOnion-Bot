@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import com.github.black0nion.blackonionbot.enums.RunMode;
-import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.google.common.io.Files;
 
 public class BotSecrets {
 	
 	public static void init() {
 		try {
-			bot_token = (Bot.runMode == RunMode.RELEASE ? FileUtils.readArrayListFromFile("token").get(0) : FileUtils.readArrayListFromFile("token").get(1));
+			//bot_token = (Bot.runMode == RunMode.RELEASE ? FileUtils.readArrayListFromFile("token").get(0) : FileUtils.readArrayListFromFile("token").get(1));
+			bot_token = Bot.getCredentialsManager().getString("token");
 		} catch (Exception e) {
 			if (e instanceof IndexOutOfBoundsException) {
 				System.out.println("[BOT] Please type in a second line with a valid token for the development bot!");

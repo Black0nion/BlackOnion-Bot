@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.old;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.Progress;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -19,7 +19,8 @@ public class HypixelCommand implements Command {
 	
 	public HypixelCommand() {
 //		if (ValueManager.getString("hypixelapikey") != null)
-//			api = new HypixelAPI(UUID.fromString(ValueManager.getString("hypixelapikey")));
+//		if (Bot.getCredentialsManager().has("hypixel"))
+//			api = new HypixelAPI(UUID.fromString(Bot.getCredentialsManager().getString("hypixel")));
 	}
 
 	@Override

@@ -3,9 +3,9 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import java.util.ArrayList;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.Progress;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 

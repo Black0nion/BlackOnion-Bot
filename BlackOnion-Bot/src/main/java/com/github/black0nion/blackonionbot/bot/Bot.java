@@ -27,6 +27,7 @@ import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.SelfRoleSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -53,8 +54,10 @@ public class Bot extends ListenerAdapter {
 	
 	public static boolean isJarFile = false;
 	
+	private static CredentialsManager credentialsManager;
+	
 	@SuppressWarnings("resource")
-	public static void startBot() {
+	public void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
 		System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 		new File("files").mkdir();
@@ -62,6 +65,7 @@ public class Bot extends ListenerAdapter {
 		
 		new ValueManager();
 		DefaultValues.init();
+		credentialsManager = new CredentialsManager(runMode.name().toLowerCase());
 		BotInformation.init();
 		
 		LiteSQL.connect();
@@ -170,5 +174,9 @@ public class Bot extends ListenerAdapter {
 			}
 		}
 		return things;
+	}
+	
+	public static CredentialsManager getCredentialsManager() {
+		return credentialsManager;
 	}
 }

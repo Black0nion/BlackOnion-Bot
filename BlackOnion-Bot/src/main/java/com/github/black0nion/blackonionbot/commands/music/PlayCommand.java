@@ -3,10 +3,10 @@ package com.github.black0nion.blackonionbot.commands.music;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.Progress;
 import com.github.black0nion.blackonionbot.lavaplayer.PlayerManager;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Guild;

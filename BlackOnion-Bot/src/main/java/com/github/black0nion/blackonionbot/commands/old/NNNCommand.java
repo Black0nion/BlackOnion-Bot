@@ -9,8 +9,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

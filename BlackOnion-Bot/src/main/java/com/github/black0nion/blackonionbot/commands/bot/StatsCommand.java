@@ -10,8 +10,8 @@ import java.time.Instant;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;

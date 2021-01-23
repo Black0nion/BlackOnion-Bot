@@ -3,9 +3,9 @@ package com.github.black0nion.blackonionbot.commands.misc;
 import java.awt.Color;
 import java.io.File;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.enums.DrawType;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
