@@ -57,6 +57,21 @@ public class LanguageSystem {
 		return languages;
 	}
 	
+	public static Language getLanguage(User author, Guild guild) {
+		try {
+			if (userLanguages.get(author.getId()) != null)
+			return userLanguages.get(author.getId());
+		} catch (Exception ignored) {}
+		try {
+			if (guildLanguages.get(guild.getId()) != null)
+			return guildLanguages.get(guild.getId());
+		} catch (Exception ignored) {}
+		try {
+			return defaultLocale;
+		} catch (Exception ignored) {}
+		return null;
+	}
+	
 	public static Language getDefaultLanguage() {
 		return defaultLocale;
 	}

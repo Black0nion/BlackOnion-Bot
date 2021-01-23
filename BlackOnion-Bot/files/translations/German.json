@@ -103,8 +103,13 @@
     "channelcount": "Kanalzahl",
     "guildinfo": "Guild Info",
     "serverid": "Server ID",
+    "userid": "User ID",
     "boostlevel": "Boost Level",
     "created": "Erstellt",
+    "userinfo": "User Info",
+    "language": "Sprache",
+    "discriminator": "Tag",
+    "badges": "Badges",
     "success": "Erfolg",
     "error": "Fehler"
 }

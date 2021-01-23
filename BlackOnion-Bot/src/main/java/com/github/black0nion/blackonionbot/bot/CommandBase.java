@@ -9,8 +9,7 @@ import com.github.black0nion.blackonionbot.commands.bot.*;
 import com.github.black0nion.blackonionbot.commands.music.*;
 import com.github.black0nion.blackonionbot.commands.old.*;
 import com.github.black0nion.blackonionbot.commands.fun.*;
-import com.github.black0nion.blackonionbot.commands.information.GuildInfoCommand;
-import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
+import com.github.black0nion.blackonionbot.commands.information.*;
 import com.github.black0nion.blackonionbot.commands.misc.*;
 import com.github.black0nion.blackonionbot.commands.moderation.*;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
@@ -67,6 +66,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new GuildLanguageCommand());
 		addCommand(new BigbrainMemeCommand());
 		addCommand(new GuildInfoCommand());
+		addCommand(new UserInfoCommand());
 	}
 	
 	@Override
