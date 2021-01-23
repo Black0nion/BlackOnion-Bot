@@ -162,6 +162,10 @@ public class Document {
 
         return c;
     }
+    
+    public boolean has(String key) {
+    	return dataCatcher.has(key);
+    }
 
     public JsonElement get(String key)
     {

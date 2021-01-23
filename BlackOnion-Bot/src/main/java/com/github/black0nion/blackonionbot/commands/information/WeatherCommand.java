@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.misc;
+package com.github.black0nion.blackonionbot.commands.information;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -85,7 +85,7 @@ public class WeatherCommand implements Command {
 	
 	@Override
 	public Category getCategory() {
-		return Category.MISC;
+		return Category.INFORMATION;
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
@@ -122,8 +123,8 @@ public class Utils {
 
 	@Deprecated
 	public static HttpResponse<String> getTokenFromCode(String code) {
-		ArrayList<String> discordAuthSettings = FileUtils.readArrayListFromFile("discordauthsettings");
-		if (discordAuthSettings.size() < 3) {
+		CredentialsManager manager = Bot.getCredentialsManager();
+		if (!manager.has("client_id") || !manager.has("client_secret") || !manager.has("redirect_uri")) {
 			Logger.log(LogMode.ERROR, LogOrigin.API, "DiscordAuthSettings isn't filled correctly!");
 			return null;
 		}
@@ -132,10 +133,10 @@ public class Utils {
 			return Unirest.post("https://discord.com/api/oauth2/token")
 					  .header("Content-Type", "application/x-www-form-urlencoded")
 					  .field("code", code)
-					  .field("client_id", discordAuthSettings.get(0))
-					  .field("client_secret", discordAuthSettings.get(1))
+					  .field("client_id", manager.getString("client_id"))
+					  .field("client_secret", manager.getString("client_secret"))
 					  .field("grant_type", "authorization_code")
-					  .field("redirect_uri", discordAuthSettings.get(2))
+					  .field("redirect_uri", manager.getString("redirect_uri"))
 					  .field("scope", "identify")
 					  .asString();
 		} catch (Exception e) {

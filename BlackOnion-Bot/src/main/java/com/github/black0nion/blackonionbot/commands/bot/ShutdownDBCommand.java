@@ -3,9 +3,9 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.SQL.LiteSQL;
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.entities.Guild;

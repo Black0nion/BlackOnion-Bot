@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.Progress;
 import com.github.black0nion.blackonionbot.lavaplayer.GuildMusicManager;
 import com.github.black0nion.blackonionbot.lavaplayer.PlayerManager;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;

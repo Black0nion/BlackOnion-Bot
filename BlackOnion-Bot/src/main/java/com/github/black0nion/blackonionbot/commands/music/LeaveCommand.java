@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.oldcommands.Command;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

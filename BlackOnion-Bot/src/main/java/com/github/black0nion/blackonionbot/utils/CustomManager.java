@@ -18,6 +18,12 @@ public class CustomManager {
 	
 	public CustomManager(String name) {
 		file = new File("files", name + ".json");
+		file.getParentFile().mkdirs();
+		try {
+			file.createNewFile();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void save(String key, String value) {

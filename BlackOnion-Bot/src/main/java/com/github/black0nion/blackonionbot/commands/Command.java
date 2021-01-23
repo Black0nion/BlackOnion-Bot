@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.oldcommands;
+package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
