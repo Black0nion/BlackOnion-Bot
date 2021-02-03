@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,7 +20,6 @@ public class TestCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		channel.sendMessage(EmbedUtils.getDefaultTranslatedErrorEmbed(author, guild).addField("experimental", "inputusertoplayagainst", false).build()).queue();
 	}
 	
 	@Override

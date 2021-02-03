@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,17 +29,17 @@ public class AdminHelpCommand implements Command {
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		message.delete().complete();
-		EmbedBuilder builder = EmbedUtils.getDefaultSuccessEmbed(author)
+		EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
 				.setTitle("Adminhilfe")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
 		
 		for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 			if (entry.getValue().getVisisbility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
-				builder.addField(BotInformation.prefix + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false);
+				builder.addField(BotInformation.prefix + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase()	, false);
 			}
 		}
 		
-		channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+		channel.sendMessage(builder.build()).submit().join().delete().queueAfter(10, TimeUnit.SECONDS);
 	}
 	
 	@Override

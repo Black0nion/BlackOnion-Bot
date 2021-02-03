@@ -35,7 +35,7 @@ public class ActivityCommand implements Command {
 			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " ``playing``, ``watching`` " + LanguageSystem.getTranslatedString("or", author, guild) + " ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(LanguageSystem.getTranslatedString("newactivity", author, e.getGuild()), args[1] + " " + status, false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
 		ValueManager.save("activityType", args[1]);
 		ValueManager.save("activity", status);
 	}
