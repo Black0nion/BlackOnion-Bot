@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import java.util.concurrent.TimeUnit;
 
-import com.github.black0nion.blackonionbot.SQL.LiteSQL;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
@@ -19,8 +18,8 @@ public class ShutdownDBCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		LiteSQL.disconnect();
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("LiteSQL", "Disconnected.", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+		//TODO: disconnect
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("MongoDB", "Disconnected.", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 	}
 	
 	@Override
