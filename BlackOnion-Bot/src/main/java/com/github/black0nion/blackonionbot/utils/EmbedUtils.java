@@ -63,4 +63,18 @@ public class EmbedUtils {
 		
 		return builder;
 	}
+	
+	public static EmbedBuilder getDefaultTranslatedErrorEmbed(User author, Guild guild) {
+		return new Embed(author, guild)
+				.setTitle("error")
+				.setColor(Color.RED)
+				.setTimestamp(Instant.now());
+	}
+	
+	public static EmbedBuilder getDefaultTranslatedSuccessEmbed(User author, Guild guild) {
+		return new Embed(author, guild)
+				.setTitle("success")
+				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
+				.setTimestamp(Instant.now());
+	}
 }

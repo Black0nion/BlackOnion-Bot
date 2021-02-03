@@ -1,13 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import java.awt.Color;
-import java.io.File;
-
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.enums.DrawType;
-import com.github.black0nion.blackonionbot.systems.JoinSystem;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -26,14 +21,7 @@ public class TestCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		File file;
-		try {
-			file = JoinSystem.generateImage(Color.black, member, guild, DrawType.JOIN);
-			guild.getTextChannelById("800032895803719751").sendMessage(GuildManager.getGuildSettings(guild).getWelcomeMessage().replace("%user%", author.getName())).addFile(file, "goodbye.png").queue();
-			GuildManager.createGuildOptions(guild.getId());
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+		channel.sendMessage(EmbedUtils.getDefaultTranslatedErrorEmbed(author, guild).addField("experimental", "inputusertoplayagainst", false).build()).queue();
 	}
 	
 	@Override
