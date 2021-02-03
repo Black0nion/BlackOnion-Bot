@@ -1,6 +1,7 @@
 {
     "missingpermissions": "Fehlende Permissions!",
     "requiredpermissions": "Benötigte Permissions:",
+    "help": "Hilfe",
     "helpactivity": "Updates the activity of the Bot",
     "helpadminhelp": "Help for se admins",
     "helphelp": "Displays the Help",
