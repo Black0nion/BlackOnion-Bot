@@ -110,6 +110,15 @@
     "language": "Sprache",
     "discriminator": "Tag",
     "badges": "Badges",
+    "emotenotfound": "Emoji nicht gefunden!",
+    "invalidrole": "Rollenfehler",
+    "iseveryone": "@everyone und @here können nicht verwendet werden!",
+    "messagenotfound": "Nachricht nicht gefunden!",
+    "messagecouldntbefound": "Diese Nachricht wurde nicht gefunden!",
+    "alreadyexisting": "Bereits vorhanden!",
+    "thisalreadyexisting": "Dieser Eintrag ist bereits vorhanden!",
     "success": "Erfolg",
-    "error": "Fehler"
+    "error": "Fehler",
+    "errorhappened": "Ein Fehler ist aufgetreten!",
+    "somethingwentwrong": "Irgendwie ist etwas schiefgegangen :("
 }

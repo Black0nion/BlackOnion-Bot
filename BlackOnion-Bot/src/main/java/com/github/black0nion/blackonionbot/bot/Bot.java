@@ -13,24 +13,25 @@ import java.util.Scanner;
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.API;
-import com.github.black0nion.blackonionbot.SQL.LiteSQL;
-import com.github.black0nion.blackonionbot.SQL.SQLManager;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
-import com.github.black0nion.blackonionbot.systems.SelfRoleSystem;
+import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
+import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.mongodb.client.MongoDatabase;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -56,6 +57,8 @@ public class Bot extends ListenerAdapter {
 	
 	private static CredentialsManager credentialsManager;
 	
+	public static MongoDatabase database;
+	
 	@SuppressWarnings("resource")
 	public void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
@@ -66,13 +69,12 @@ public class Bot extends ListenerAdapter {
 		new ValueManager();
 		DefaultValues.init();
 		credentialsManager = new CredentialsManager(runMode.name().toLowerCase());
-		BotInformation.init();
-		
-		LiteSQL.connect();
-		SQLManager.onCreate();
-		LanguageSystem.init();
 		
 		BotSecrets.init();
+		CustomManager mongoManager = new CustomManager("mongodb");
+		MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
+		database = MongoManager.getDatabase("bot");
+		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
 						GatewayIntent.GUILD_MESSAGE_REACTIONS)
@@ -83,7 +85,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new SelfRoleSystem(), new HandRaiseSystem(), new JoinSystem(), waiter);
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), waiter);
 		
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
@@ -94,10 +96,11 @@ public class Bot extends ListenerAdapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("[BOT] Failed to connect to the bot! Please make sure to have a file named \"token.ahitm\" with the bot's token in the files folder!");
-			LiteSQL.disconnect();
 			System.out.println("Terminating bot.");
 		}
-		
+
+		BotInformation.init();
+		LanguageSystem.init();
 		BirthdaySystem.init();
 		
 		new API();

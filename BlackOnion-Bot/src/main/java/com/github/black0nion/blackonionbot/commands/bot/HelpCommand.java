@@ -35,6 +35,9 @@ public class HelpCommand implements Command {
 				listOfCategories.forEach(entry -> {
 					listOfNames.add(entry.name());
 				});
+				
+				// a category
+				
 				if (listOfNames.contains(args[1].toUpperCase())) {
 					EmbedBuilder builder = EmbedUtils.getDefaultSuccessEmbed(author)
 							.setTitle("Hilfe | " + args[1].toUpperCase())
@@ -60,7 +63,11 @@ public class HelpCommand implements Command {
 					}
 					
 					channel.sendMessage(builder.build()).queue();
-				} else {
+				} 
+				
+				// a command
+				
+				else {
 					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
 							channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(BotInformation.prefix + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
