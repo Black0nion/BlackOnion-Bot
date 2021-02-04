@@ -1,6 +1,8 @@
 {
     "missingpermissions": "Fehlende Permissions!",
     "requiredpermissions": "Benötigte Permissions:",
+    "commandnotfound": "Dieser Command wurde nicht gefunden!",
+    "thecommandnotfound": "Der Command %command% wurde nicht gefunden!",
     "help": "Hilfe",
     "helpactivity": "Updates the activity of the Bot",
     "helpadminhelp": "Help for se admins",
