@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,7 +72,7 @@ public class HelpCommand implements Command {
 							return;
 						}
 					}
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieser Command wurde nicht gefunden!", "Der Command ``" + args[1] + "`` konnte nicht gefunden werden!", false).build()).queue();
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
 				}
 			} else {
 				EmbedBuilder builder = new EmbedBuilder()
@@ -96,7 +95,7 @@ public class HelpCommand implements Command {
 				ex.printStackTrace();
 			} else {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("What just happend?", 
-						"There is a key me", false).build()).queue();
+						"hau did u do that???", false).build()).queue();
 			}
 		}
 	}

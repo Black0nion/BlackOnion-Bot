@@ -19,7 +19,7 @@ public class ShutdownDBCommand implements Command {
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		//TODO: disconnect
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField("MongoDB", "Disconnected.", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("MongoDB", "Disconnected.", false).build()).submit().join().delete().queueAfter(3,TimeUnit.SECONDS);
 	}
 	
 	@Override

@@ -16,7 +16,7 @@ public class PingCommand implements Command {
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Ping").addField("Pong :D", LanguageSystem.getTranslatedString("myping", author, guild) + e.getJDA().getGatewayPing() + "ms", false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ping").addField("Pong :D", LanguageSystem.getTranslatedString("myping", author, guild) + e.getJDA().getGatewayPing() + "ms", false).build()).queue();
 	}
 	
 	@Override

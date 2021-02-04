@@ -30,7 +30,7 @@ public class ReloadCommand implements Command {
 		message.delete().queue();
 		//e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID, "k").queue();
 		reload();
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(LanguageSystem.getTranslatedString("configreload", author, guild), LanguageSystem.getTranslatedString("messagedelete5", author, guild), false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("configreload", "messagedelete5", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 	
 	public static void reload() {
