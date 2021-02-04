@@ -44,11 +44,12 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			e.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("statussetfail", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslatedString("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslatedString("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 			return;
 		}
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+		
 		e.getJDA().getPresence().setStatus(status);
-		e.getChannel().sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(LanguageSystem.getTranslatedString("statussetsuccess", author, guild), LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status + "**", false).build()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 
 	@Override

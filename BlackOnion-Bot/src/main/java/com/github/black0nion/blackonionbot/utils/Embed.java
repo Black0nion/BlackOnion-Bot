@@ -42,4 +42,8 @@ public class Embed extends EmbedBuilder {
 			value = tempValue;
 		return super.addField(name, value, inline);
 	}
+	
+	public EmbedBuilder addUntranslatedField(String name, String value, boolean inline) {
+		return super.addField(name, value, inline);
+	}
 }
