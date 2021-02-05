@@ -28,11 +28,12 @@ public class ContentModeratorSystem extends ListenerAdapter {
 		try {
 			HttpResponse<String> response = Unirest.get("https://www.purgomalum.com/service/plain?text=" + URLEncoder.encode(event.getMessage().getContentDisplay(), "UTF-8")).asString();
 			
-			if (!response.getBody().equals(event.getMessage().getContentDisplay())) {
+			String message = response.getBody().replace("Ã¤", "ä").replace("Ã„", "Ä").replace("Ã¶", "ö").replace("Ã–", "Ö").replace("Ã¼", "ü").replace("Ãœ", "Ü");
+			
+			if (!message.equals(event.getMessage().getContentDisplay())) {
 				if (true) {
 					event.getMessage().delete().queue();
 					WebhookMessageBuilder builder = new WebhookMessageBuilder();
-					String message = response.getBody();
 					message = Utils.removeMarkdown(message);
 					builder.setContent(message);
 					builder.setUsername(event.getMember().getEffectiveName());
