@@ -31,7 +31,7 @@ public class AvatarCommand implements Command {
 		} else if(!e.getGuild().getMembersByNickname(user, true).isEmpty()) {
 			mentionedUser = e.getGuild().getMembersByNickname(user, true).get(0).getUser();
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "tagornameuser", false).build()).queue();
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder()

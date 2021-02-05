@@ -52,10 +52,12 @@ public class BigbrainMemeCommand implements Command {
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.prefix + getCommand()[0] + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.prefix + getCommand()[0] + " " + getSyntax(), false).build()).queue();
 			return;
 		}
-		channel.sendMessage("bigbrain lol").addFile(generateImage(messages), "bigbrain.png").queue();
+		Message m = channel.sendMessage("Generating your image...").submit().join();
+		channel.sendMessage("bigbrian").addFile(generateImage(messages), "bigbrain.png").submit().join();
+		m.delete().queue();
 	}
 	
 	@Override
