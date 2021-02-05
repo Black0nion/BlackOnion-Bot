@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems;
 
 import org.bson.Document;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ReactionRoleSystem extends ListenerAdapter {
 	
-	public static final MongoCollection<Document> collection = Bot.database.getCollection("reactionroles");
+	public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("reactionroles");
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {

@@ -1,40 +1,43 @@
 package com.github.black0nion.blackonionbot.systems.guildmanager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.Guild;
+import org.bson.Document;
+
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 
 public class GuildManager {
 	
-	private static List<GuildSettings> guildOptions = new ArrayList<>();
+	private static MongoCollection<Document> collection;
 	
 	public static void init() {
-		guildOptions.clear();
-		for (File f : new File("files/guildoptions").listFiles()) {
-			guildOptions.add(new GuildSettings(f.getName().replace(".json", "")));
+		if (collection == null)
+			collection = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
+	}
+
+	public static List<Document> getAllConfigs() {
+		return collection.find().into(new ArrayList<>());
+	}
+	
+	public static String getString(String guild, String key) {
+		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getString(key);
+	}
+	
+	public static String getString(String guild, String key, String defaultValue) {
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc.containsKey(key))
+			return doc.getString(key);
+		else {
+			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document(key, defaultValue));
+			return defaultValue;
 		}
 	}
 	
-	public static GuildSettings createGuildOptions(String guildId) {
-		if (!guildOptions.stream().anyMatch(guildOption -> guildOption.guildId.equals(guildId))) {
-			GuildSettings newSettings = new GuildSettings(guildId);
-			guildOptions.add(newSettings);
-			return newSettings;
-		}
-		return getGuildSettings(guildId);
-	}
-	
-	public static GuildSettings getGuildSettings(Guild guild) {
-		return getGuildSettings(guild.getId());
-	}
-	
-	public static GuildSettings getGuildSettings(String guildId) {
-		return guildOptions.stream().anyMatch(guildOption -> guildOption.guildId.equals(guildId)) ? guildOptions.stream().filter(guildOption -> guildOption.guildId.equals(guildId)).findFirst().get() : createGuildOptions(guildId);
-	}
-	
-	public static List<GuildSettings> getAllGuildOptions() {
-		return guildOptions;
+	public static void saveString(String guild, String key, Object value) {
+		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append("guildid", guild).append(key, value));
 	}
 }

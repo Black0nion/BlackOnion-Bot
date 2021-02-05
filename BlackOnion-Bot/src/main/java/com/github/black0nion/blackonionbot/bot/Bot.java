@@ -32,7 +32,6 @@ import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.mongodb.client.MongoDatabase;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -58,8 +57,6 @@ public class Bot extends ListenerAdapter {
 	
 	private static CredentialsManager credentialsManager;
 	
-	public static MongoDatabase database;
-	
 	@SuppressWarnings("resource")
 	public void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
@@ -74,7 +71,6 @@ public class Bot extends ListenerAdapter {
 		BotSecrets.init();
 		CustomManager mongoManager = new CustomManager("mongodb");
 		MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
-		database = MongoManager.getDatabase("bot");
 		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,

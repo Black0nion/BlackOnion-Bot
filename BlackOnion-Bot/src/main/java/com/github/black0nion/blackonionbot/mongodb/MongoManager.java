@@ -1,9 +1,7 @@
 package com.github.black0nion.blackonionbot.mongodb;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bson.Document;
 
@@ -89,16 +87,11 @@ public class MongoManager {
 		collection.updateMany(query, updateObject);
 	}
 	
-	public static void updateValue(MongoCollection<Document> collection, BasicDBObject query, Document updatedValue) {
-		HashMap<String, Object> docMap = new HashMap<>();
-		for (Map.Entry<String, Object> entry : updatedValue.entrySet()) {
-			docMap.put(entry.getKey(), entry.getValue());
-		}
-		Document newDoc = collection.find().first();
-		newDoc.putAll(docMap);
-		
-		BasicDBObject updateObject = new BasicDBObject();
-		updateObject.put("$set", newDoc);
-		collection.updateOne(query, updateObject);
+	public static void updateValue(MongoCollection<Document> collection, BasicDBObject query, Document updatedValue) {	
+		final Document tempDoc = collection.find(query).first();
+		if (tempDoc != null && tempDoc.keySet().containsAll(updatedValue.keySet()))
+			collection.updateOne(query, new BasicDBObject().append("$set", updatedValue));
+		else
+			collection.insertOne(updatedValue);	
 	}
 }
