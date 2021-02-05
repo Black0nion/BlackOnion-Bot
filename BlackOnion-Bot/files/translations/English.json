@@ -113,6 +113,8 @@
     "language": "Sprache",
     "discriminator": "Tag",
     "badges": "Badges",
+    "joined": "Beigetreten",
+    "boosted": "Geboosted",
     "emotenotfound": "Emoji nicht gefunden!",
     "invalidrole": "Rollenfehler",
     "iseveryone": "@everyone und @here können nicht verwendet werden!",
