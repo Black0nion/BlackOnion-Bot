@@ -37,6 +37,8 @@ public class BotInformation {
 	
 	public static String prefix;
 	public static Color mainColor = Color.getHSBColor(0.8F, 1, 0.5F);
+	
+	public static long botId;
 
 	public static void init() {
 		try {

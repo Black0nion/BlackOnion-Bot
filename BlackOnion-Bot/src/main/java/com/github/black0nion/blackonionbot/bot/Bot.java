@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
+import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
@@ -85,7 +86,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), waiter);
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), new ContentModeratorSystem(), waiter);
 		
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
@@ -116,6 +117,7 @@ public class Bot extends ListenerAdapter {
 
 	@Override
 	public void onReady(ReadyEvent e) {
+		BotInformation.botId = e.getJDA().getSelfUser().getIdLong();
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
 		Thread status = new Thread(new Runnable() {
 			@Override
