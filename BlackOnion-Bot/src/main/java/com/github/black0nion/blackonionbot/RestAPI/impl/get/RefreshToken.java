@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.RestAPI.impl.get;
 
+import javax.annotation.Nullable;
+
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.RestAPI.GetRequest;
@@ -38,6 +40,7 @@ public class RefreshToken implements GetRequest {
 		return new String[] {"refresh_token"};
 	}
 	
+	@Nullable
 	public static String refreshToken(String refreshToken) {
 		JSONObject obj = refreshTokenJSON(refreshToken);
 		return obj != null ? obj.getString("access_token") + ":" + obj.getString("refresh_token") : null;
