@@ -16,8 +16,12 @@ import com.github.black0nion.blackonionbot.RestAPI.impl.get.RefreshToken;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.Stats;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
+import com.github.black0nion.blackonionbot.RestAPI.impl.post.Login;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
+import com.github.black0nion.blackonionbot.RestAPI.impl.post.news.CreatePost;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
+import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -42,6 +46,8 @@ public class API {
 		postRequests.add(new Activity());
 		postRequests.add(new ChangePrefix());
 		postRequests.add(new UpdateLineCount());
+		postRequests.add(new Login());
+		postRequests.add(new CreatePost());
 		//----------------------------------------------
 		
 		//Error handling
@@ -83,38 +89,25 @@ public class API {
 					if (req.isJson())
 						response.type("application/json");
 					
-					String token = null;
-					JSONObject userInfo = null;
-					if (req.requiresLogin()) {
-						if (!headers.has("token")) {
-							response.status(401);
-							return new JSONObject().put("success", false).put("reason", 401).toString();
-						}
-						
-						token = headers.getString("token");
-						
-						if (!Utils.isDiscordUser(token)) {
-							response.status(401);
-							return new JSONObject().put("success", false).put("reason", 401).toString();
-						}
-						if (req.requiresAdmin() && !Utils.isAdmin(token)) {
-							response.status(403);
-							return new JSONObject().put("success", false).put("reason", 403).toString();
-						}
-						
-						userInfo = Utils.getUserInfoFromToken(token);
-					}
-					
 					for (String s : req.requiredParameters()) {
 						if (!body.has(s)) {
 							response.status(400);
 							return new JSONObject().put("success", false).put("reason", 400).toString();
 						}
 					}
-					DiscordUser user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
+					
+					DashboardSessionInformation information = SessionManager.generateSession(request.session());
+					DiscordUser user = information != null ? information.getUser() : null;
+					
+					if (req.requiresLogin() && user == null) {
+						response.status(401);
+						return new JSONObject().put("success", false).put("reason", 401).toString();
+					}
+					
 					return req.handle(request, response, body, user);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
+					e.printStackTrace();
 					response.status(400);
 					response.type("application/json");
 					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();

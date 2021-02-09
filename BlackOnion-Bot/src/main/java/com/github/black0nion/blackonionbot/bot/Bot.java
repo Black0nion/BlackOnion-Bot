@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
@@ -26,6 +27,7 @@ import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
+import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
@@ -101,14 +103,18 @@ public class Bot extends ListenerAdapter {
 		BirthdaySystem.init();
 		
 		new API();
+
+		SessionManager.init();
 		
-		while (true) {
-			Scanner sc = new Scanner(System.in);
-			String input = sc.nextLine();
-			if (input.equalsIgnoreCase("reload")) {
-				ReloadCommand.reload();
+		Executors.newCachedThreadPool().submit(() -> { 
+			while (true) {
+				Scanner sc = new Scanner(System.in);
+				String input = sc.nextLine();
+				if (input.equalsIgnoreCase("reload")) {
+					ReloadCommand.reload();
+				}
 			}
-		}
+		});
 	}
 
 	@Override
