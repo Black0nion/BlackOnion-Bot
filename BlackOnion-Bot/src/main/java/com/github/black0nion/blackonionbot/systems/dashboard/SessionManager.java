@@ -6,6 +6,7 @@ import org.bson.Document;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 
 import spark.Session;
@@ -16,18 +17,39 @@ public class SessionManager {
 	
 	public static void init() {
 		collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
+		
+		for (Document doc : collection.find()) {
+			if (!doc.containsKey("sessionid"))
+				System.out.println("Error! Object with id " + doc.getObjectId("_id").toHexString() + " is invalid!");
+			else if (doc.containsKey("sessionid") && doc.containsKey("access_token") && doc.containsKey("refresh_token"))
+				DashboardSessionInformation.from(doc.getString("sessionid"), doc.getString("access_token"), doc.getString("refresh_token"));
+			else
+				DashboardSessionInformation.from(doc.getString("sessionid"));
+		}
 	}
 	
-	public static Session genereteSession(Session session) {
+	public static DashboardSessionInformation generateSession(Session session) {
+		final Document doc = MongoManager.getDocumentInCollection(collection, "sessionid", session.id());
+		
+		if (doc == null) {
+			MongoManager.insertOne(collection, new Document().append("sessionid", session.id()));
+			return DashboardSessionInformation.from(session.id());
+		} else if (doc.containsKey("access_token") && doc.containsKey("refresh_token")) {
+			return DashboardSessionInformation.from(session.id(), doc.getString("access_token"), doc.getString("refresh_token"));
+		} else {
+			return DashboardSessionInformation.from(session.id());
+		}
+	}
+	
+	public static DashboardSessionInformation generateSession(Session session, String accessToken, String refreshToken) {
 		if (MongoManager.getDocumentInCollection(collection, "sessionid", session.id()) == null)
 			MongoManager.insertOne(collection, new Document().append("sessionid", session.id()));
-		return session;
-	}
-	
-	public static Session generateSession(Session session, String accessToken, String refreshToken) {
-		if (MongoManager.getDocumentInCollection(collection, "sessionid", session.id()) == null)
-			MongoManager.insertOne(collection, new Document().append("sessionid", session.id()).append("accesstoken", accessToken).append("refreshtoken", refreshToken));
-		return session;
+		else
+			MongoManager.updateOne(collection, new BasicDBObject("sessionid", session.id()), new BasicDBObject()
+					.append("sessionid", session.id())
+					.append("access_token", accessToken)
+					.append("refresh_token", refreshToken));
+		return DashboardSessionInformation.from(session.id(), accessToken, refreshToken);
 	}
 	
 	@Nullable
