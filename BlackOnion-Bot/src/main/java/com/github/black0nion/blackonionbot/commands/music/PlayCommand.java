@@ -1,13 +1,12 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.enums.Progress;
-import com.github.black0nion.blackonionbot.lavaplayer.PlayerManager;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.systems.music.AudioLoadResult;
+import com.github.black0nion.blackonionbot.systems.music.MusicController;
+import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -22,44 +21,39 @@ import net.dv8tion.jda.api.managers.AudioManager;
 public class PlayCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "playlol" };
+	}
+
+	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		final GuildVoiceState selfVoiceState = e.getGuild().getSelfMember().getVoiceState();
-		
-		if (!selfVoiceState.inVoiceChannel()) {
-			if (member.getVoiceState().inVoiceChannel()) {
-				final AudioManager audioManager = e.getGuild().getAudioManager();
-				final VoiceChannel memberChannel = member.getVoiceState().getChannel();
-				
-				audioManager.openAudioConnection(memberChannel);
-			} else {
-				channel.sendMessage("Du bist in keinem Voicechat!").queue();
-				return;
-			}
-		} else if (member.getVoiceState().getChannel() == selfVoiceState.getChannel()) {
+		GuildVoiceState state = member.getVoiceState();
+		VoiceChannel vc;
+		if (state != null && (vc = state.getChannel()) != null) {
+			MusicController controller = MusicSystem.playerManager.getController(guild.getIdLong());
+			AudioPlayerManager apm = MusicSystem.audioPlayerManager;
+			AudioManager manager = guild.getAudioManager();
+			manager.openAudioConnection(vc);
 			
+			StringBuilder builder = new StringBuilder();
+			for (int i = 1; i < args.length; i++) builder.append(args[i] + " ");
+			
+			String url = builder.toString().trim();
+			if (!url.startsWith("http")) {
+				url = "ytsearch:" + url;
+			}
+			System.out.println(url);
+			apm.loadItem(url, new AudioLoadResult(controller, url));
 		} else {
-			channel.sendMessage("Ich bin bereits in einem Voicechannel!").queue();
-			return;
-		}
-		
-		String link = String.join(" ", Utils.removeFirstArg(args));
-		
-		if (!isUrl(link)) {
-			link = "ytsearch:" + link;
-		}
-		
-		PlayerManager.getInstance().loadAndPlay(e.getTextChannel(), link);
-	}
-	
-	private boolean isUrl(String url) {
-		try {
-			new URI(url);
-			return true;
-		} catch (URISyntaxException e) {
-			return false;
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();
 		}
 	}
 	
+	@Override
+	public int getRequiredArgumentCount() {
+		return 1;
+	}
+
 	@Override
 	public Category getCategory() {
 		return Category.MUSIC;
@@ -67,16 +61,6 @@ public class PlayCommand implements Command {
 	
 	@Override
 	public String getSyntax() {
-		return "<Song Name / Link>";
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"play"};
-	}
-	
-	@Override
-	public Progress getProgress() {
-		return Progress.PAUSED;
+		return "<url / search term>";
 	}
 }
