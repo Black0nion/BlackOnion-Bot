@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.*;
 import com.github.black0nion.blackonionbot.commands.music.*;
+import com.github.black0nion.blackonionbot.commands.music.old.LeaveCommand;
 import com.github.black0nion.blackonionbot.commands.old.*;
 import com.github.black0nion.blackonionbot.commands.fun.*;
 import com.github.black0nion.blackonionbot.commands.information.*;
@@ -42,10 +43,8 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new PingCommand());
 		addCommand(new ReloadCommand());
 		addCommand(new StatusCommand());
-		addCommand(new JoinCommand());
 		addCommand(new PlayCommand());
 		addCommand(new StopCommand());
-		addCommand(new SkipCommand());
 		addCommand(new LeaveCommand());
 		addCommand(new ShutdownDBCommand());
 		addCommand(new ReactionRolesSetupCommand());
@@ -67,6 +66,9 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new BigbrainMemeCommand());
 		addCommand(new GuildInfoCommand());
 		addCommand(new UserInfoCommand());
+		addCommand(new VirusCommand());
+		addCommand(new com.github.black0nion.blackonionbot.commands.music.PlayCommand());
+		addCommand(new com.github.black0nion.blackonionbot.commands.music.StopCommand());
 	}
 	
 	@Override

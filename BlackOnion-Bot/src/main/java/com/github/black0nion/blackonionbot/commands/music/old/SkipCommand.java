@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.music;
+package com.github.black0nion.blackonionbot.commands.music.old;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;

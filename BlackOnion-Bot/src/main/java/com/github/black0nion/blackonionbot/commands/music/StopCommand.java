@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.enums.Progress;
-import com.github.black0nion.blackonionbot.lavaplayer.GuildMusicManager;
-import com.github.black0nion.blackonionbot.lavaplayer.PlayerManager;
+import com.github.black0nion.blackonionbot.systems.music.MusicController;
+import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -13,44 +13,29 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class StopCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		final GuildVoiceState selfVoiceState = e.getGuild().getSelfMember().getVoiceState();
-		if (!selfVoiceState.inVoiceChannel()) {
-			channel.sendMessage("Ich spiele gerade keine Musik!").queue();
-			return;
-		} else if (!member.getVoiceState().inVoiceChannel()) {
-			channel.sendMessage("Du bist nicht in einem Voicechannel!").queue();
-			return;
-		} else if (member.getVoiceState().getChannel() != selfVoiceState.getChannel()){
-			channel.sendMessage("Du bist nicht in meinem Voicechannel!").queue();
-			return;
-		}
-		
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
-		
-		musicManager.scheduler.player.stopTrack();
-		
-		musicManager.scheduler.queue.clear();
-		
-		channel.sendMessage("Die Musik wurde gestoppt.").queue();
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MUSIC;
+	public String[] getCommand() {
+		return new String[] { "stoplol" };
 	}
 
 	@Override
-	public String[] getCommand() {
-		return new String[] {"stop"};
+	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+		GuildVoiceState state = guild.getSelfMember().getVoiceState();
+		if (state != null && state.getChannel() != null) {
+			MusicController controller = MusicSystem.playerManager.getController(guild.getIdLong());
+			AudioManager manager = guild.getAudioManager();
+			AudioPlayer player = controller.getPlayer();
+			
+			player.stopTrack();
+			manager.closeAudioConnection();
+			message.addReaction("U+1F44B").queue();
+		} else {
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
+		}
 	}
-	
-	@Override
-	public Progress getProgress() {
-		return Progress.PAUSED;
-	}
+
 }
