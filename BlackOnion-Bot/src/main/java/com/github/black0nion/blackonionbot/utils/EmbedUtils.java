@@ -65,18 +65,20 @@ public class EmbedUtils {
 	}
 	
 	public static EmbedBuilder getErrorEmbed(User author, Guild guild) {
-		return new Embed(author, guild)
+		EmbedBuilder builder = new Embed(author, guild)
 				.setTitle("error")
 				.setColor(Color.RED)
-				.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.setTimestamp(Instant.now());
+		if (author != null) builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+		return builder;
 	}
 	
 	public static EmbedBuilder getSuccessEmbed(User author, Guild guild) {
-		return new Embed(author, guild)
+		EmbedBuilder builder = new Embed(author, guild)
 				.setTitle("success")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
-				.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.setTimestamp(Instant.now());
+		if (author != null) builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+		return builder;
 	}
 }
