@@ -2,9 +2,10 @@ package com.github.black0nion.blackonionbot.systems.music;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -17,6 +18,24 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class TrackScheduler extends AudioEventAdapter {
+	
+	private final AudioPlayer player;
+	private final BlockingQueue<AudioTrack> queue;
+	
+	public TrackScheduler(AudioPlayer player) {
+		this.player = player;
+		this.queue = new LinkedBlockingQueue<>();
+	}
+	
+	public void queue(AudioTrack track) {
+		if (!this.player.startTrack(track, true))
+			this.queue.offer(track);
+	}
+	
+	public void nextTrack() {
+		player.startTrack(queue.poll(), false);
+	}
+	
 	@Override
 	public void onPlayerPause(AudioPlayer player) {
 	}
@@ -32,7 +51,6 @@ public class TrackScheduler extends AudioEventAdapter {
 		
 		AudioTrackInfo info = track.getInfo();
 		EmbedBuilder builder = EmbedUtils.getSuccessEmbed(null, guild);
-		builder.setDescription(LanguageSystem.getTranslatedString("nowplaying", null, guild).replace("%track%", info.title));
 		
 		long seconds = info.length / 1000;
 		long minutes = seconds / 60;
@@ -41,6 +59,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		seconds %= 60;
 		
 		String url = info.uri;
+		builder.setTitle("nowplaying");
 		builder.addField(info.author, "[" + info.title + "](" + url + ")", false);
 		builder.addField("length", info.isStream ? "STREAM" : (hours > 0 ? hours + "h " : "") + minutes + "min " + seconds + "s", true);
 		
@@ -69,5 +88,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		if (endReason.mayStartNext)
+			nextTrack();
 	}
 }

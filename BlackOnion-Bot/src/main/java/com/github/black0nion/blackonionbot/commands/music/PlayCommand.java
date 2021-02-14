@@ -22,7 +22,7 @@ public class PlayCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] { "playlol" };
+		return new String[] { "play" };
 	}
 
 	@Override
@@ -31,9 +31,6 @@ public class PlayCommand implements Command {
 		VoiceChannel vc;
 		if (state != null && (vc = state.getChannel()) != null) {
 			MusicController controller = MusicSystem.playerManager.getController(guild.getIdLong());
-			AudioPlayerManager apm = MusicSystem.audioPlayerManager;
-			AudioManager manager = guild.getAudioManager();
-			manager.openAudioConnection(vc);
 			
 			StringBuilder builder = new StringBuilder();
 			for (int i = 1; i < args.length; i++) builder.append(args[i] + " ");
@@ -44,8 +41,12 @@ public class PlayCommand implements Command {
 			}
 			
 			MusicSystem.musicChannels.put(guild.getIdLong(), channel.getIdLong());
-			
+
+			AudioPlayerManager apm = MusicSystem.audioPlayerManager;
+			AudioManager manager = guild.getAudioManager();
+			manager.openAudioConnection(vc);
 			apm.loadItem(url, new AudioLoadResult(controller, url));
+			
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();
 		}

@@ -15,6 +15,7 @@ import com.github.black0nion.blackonionbot.commands.misc.*;
 import com.github.black0nion.blackonionbot.commands.moderation.*;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.music.AudioLoadResult;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
@@ -35,6 +36,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
+		AudioLoadResult.waiter = newWaiter;
 		addCommand(new ActivityCommand());
 		addCommand(new AvatarCommand());
 		addCommand(new ClearCommand());
@@ -67,8 +69,6 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new GuildInfoCommand());
 		addCommand(new UserInfoCommand());
 		addCommand(new VirusCommand());
-		addCommand(new com.github.black0nion.blackonionbot.commands.music.PlayCommand());
-		addCommand(new com.github.black0nion.blackonionbot.commands.music.StopCommand());
 	}
 	
 	@Override

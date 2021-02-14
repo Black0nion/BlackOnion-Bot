@@ -13,7 +13,7 @@ public class MusicController {
 		this.player = MusicSystem.audioPlayerManager.createPlayer();
 		
 		this.guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(player));
-		this.player.addListener(new TrackScheduler());
+		this.player.addListener(new TrackScheduler(player));
 		this.player.setVolume(10);
 	}
 	
