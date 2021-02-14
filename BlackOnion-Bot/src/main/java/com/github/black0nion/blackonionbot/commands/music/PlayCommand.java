@@ -42,7 +42,9 @@ public class PlayCommand implements Command {
 			if (!url.startsWith("http")) {
 				url = "ytsearch:" + url;
 			}
-			System.out.println(url);
+			
+			MusicSystem.musicChannels.put(guild.getIdLong(), channel.getIdLong());
+			
 			apm.loadItem(url, new AudioLoadResult(controller, url));
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();

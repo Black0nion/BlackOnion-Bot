@@ -20,4 +20,9 @@ public class PlayerManager {
 			return temp;
 		}
 	}
+	
+	public long getGuildByPlayerHash(int hash) {
+		try { return controllers.values().stream().filter(controller -> {return controller.getPlayer().hashCode() == hash;}).findFirst().get().getGuild().getIdLong(); } catch (Exception ignored) {}
+		return -1;
+	}
 }

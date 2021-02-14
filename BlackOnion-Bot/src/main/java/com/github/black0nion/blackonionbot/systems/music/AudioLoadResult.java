@@ -22,17 +22,17 @@ public class AudioLoadResult implements AudioLoadResultHandler {
 
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
-		
+		// IF SEARCH RESULTS DISPLAY MAYBE OTHERWISE START FIRST ONE AND IF NOT SEARCH RESULT PLAY PLAYLISTTTTTTT REEEELOOL
+		controller.getPlayer().playTrack(playlist.getTracks().get(0));
 	}
 
 	@Override
 	public void noMatches() {
-		
 	}
 
 	@Override
 	public void loadFailed(FriendlyException exception) {
-		
+		exception.printStackTrace();
 	}
 
 }
