@@ -126,7 +126,7 @@
     "goinvc": "Für diesen Command musst du in einem Voicechannel sein!",
     "notconnected": "Ich bin derzeit nicht verbunden!",
     "startmusictostop": "Du musst zuerst eine Musik starten, bevor du sie stoppen kannst ;)",
-    "nowplaying": "JETZT SPIELT",
+    "nowplaying": "JETZT SPIELT: ",
     "notfound": "Nicht gefunden!",
     "musicnotfound": "Dieser Track konnte nicht gefunden werden!",
     "length": "Länge",

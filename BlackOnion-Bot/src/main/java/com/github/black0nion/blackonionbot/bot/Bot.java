@@ -29,7 +29,6 @@ import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
@@ -102,7 +101,7 @@ public class Bot extends ListenerAdapter {
 		BotInformation.init();
 		LanguageSystem.init();
 		BirthdaySystem.init();
-		MusicSystem.init();
+		//MusicSystem.init();
 		
 		new API();
 

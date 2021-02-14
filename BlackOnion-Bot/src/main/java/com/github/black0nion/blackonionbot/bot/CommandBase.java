@@ -5,17 +5,42 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.bot.*;
-import com.github.black0nion.blackonionbot.commands.music.*;
+import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
+import com.github.black0nion.blackonionbot.commands.bot.GuildLanguageCommand;
+import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
+import com.github.black0nion.blackonionbot.commands.bot.LanguageCommand;
+import com.github.black0nion.blackonionbot.commands.bot.NotifyCommand;
+import com.github.black0nion.blackonionbot.commands.bot.PingCommand;
+import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.bot.ShutdownDBCommand;
+import com.github.black0nion.blackonionbot.commands.bot.StatsCommand;
+import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
+import com.github.black0nion.blackonionbot.commands.bot.SupportCommand;
+import com.github.black0nion.blackonionbot.commands.fun.AvatarCommand;
+import com.github.black0nion.blackonionbot.commands.fun.BigbrainMemeCommand;
+import com.github.black0nion.blackonionbot.commands.fun.ConnectFourCommand;
+import com.github.black0nion.blackonionbot.commands.information.GuildInfoCommand;
+import com.github.black0nion.blackonionbot.commands.information.UserInfoCommand;
+import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
+import com.github.black0nion.blackonionbot.commands.misc.InstagramCommand;
+import com.github.black0nion.blackonionbot.commands.misc.PastebinCommand;
+import com.github.black0nion.blackonionbot.commands.misc.TestCommand;
+import com.github.black0nion.blackonionbot.commands.misc.VirusCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.BanCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.ClearCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.KickCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.ReactionRolesSetupCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.RenameCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.UnbanCommand;
+import com.github.black0nion.blackonionbot.commands.music.PlayCommand;
+import com.github.black0nion.blackonionbot.commands.music.SkipCommand;
+import com.github.black0nion.blackonionbot.commands.music.StopCommand;
+import com.github.black0nion.blackonionbot.commands.music.old.JoinCommand;
 import com.github.black0nion.blackonionbot.commands.music.old.LeaveCommand;
-import com.github.black0nion.blackonionbot.commands.old.*;
-import com.github.black0nion.blackonionbot.commands.fun.*;
-import com.github.black0nion.blackonionbot.commands.information.*;
-import com.github.black0nion.blackonionbot.commands.misc.*;
-import com.github.black0nion.blackonionbot.commands.moderation.*;
+import com.github.black0nion.blackonionbot.commands.old.HypixelCommand;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.music.AudioLoadResult;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
@@ -36,7 +61,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
-		AudioLoadResult.waiter = newWaiter;
+		//AudioLoadResult.waiter = newWaiter;
 		addCommand(new ActivityCommand());
 		addCommand(new AvatarCommand());
 		addCommand(new ClearCommand());
@@ -69,6 +94,8 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new GuildInfoCommand());
 		addCommand(new UserInfoCommand());
 		addCommand(new VirusCommand());
+		addCommand(new JoinCommand());
+		addCommand(new SkipCommand());
 	}
 	
 	@Override

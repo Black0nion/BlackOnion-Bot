@@ -3,8 +3,8 @@ package com.github.black0nion.blackonionbot.commands.music.old;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.Progress;
-import com.github.black0nion.blackonionbot.lavaplayer.GuildMusicManager;
-import com.github.black0nion.blackonionbot.lavaplayer.PlayerManager;
+import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
+import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,7 +31,7 @@ public class SkipCommand implements Command {
 			return;
 		}
 		
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		
 		if (audioPlayer.getPlayingTrack() == null) {
