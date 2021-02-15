@@ -19,11 +19,13 @@ import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.enums.DrawType;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -48,9 +50,12 @@ public class JoinSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		try {
-			//TODO: connect to mongodb
-			final File file = generateImage(Color.BLACK, event.getMember(), event.getGuild(), DrawType.JOIN);
-			event.getGuild().getTextChannelById("800032895803719751").sendMessage("Welcome, " + event.getMember().getAsMention() + "! :)").addFile(file, "welcome.png").queue();
+			String id = GuildManager.getString(event.getGuild(), "welcomechannel");
+			if (id == null) return;
+			TextChannel channel = event.getGuild().getTextChannelById(id);
+			if (channel == null) return;
+			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.JOIN);
+			channel.sendMessage("Welcome, " + event.getMember().getAsMention() + "! :)").addFile(file, "welcome.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,8 +64,12 @@ public class JoinSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		try {
-			final File file = generateImage(Color.BLACK, event.getMember(), event.getGuild(), DrawType.LEAVE);
-			event.getGuild().getTextChannelById("800032895803719751").sendMessage("Goodbye, " + event.getMember().getAsMention() + "! :(").addFile(file, "goodbye.png").queue();
+			String id = GuildManager.getString(event.getGuild(), "leavechannel");
+			if (id == null) return;
+			TextChannel channel = event.getGuild().getTextChannelById(id);
+			if (channel == null) return;
+			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.LEAVE);
+			channel.sendMessage("Goodbye, " + event.getUser().getAsMention() + "! :(").addFile(file, "goodbye.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -72,7 +81,7 @@ public class JoinSystem extends ListenerAdapter {
 	}
 	
     @NotNull
-	public static File generateImage(@NotNull final Color textColor, final @NotNull Member member, final @NotNull Guild guild, final DrawType drawType) throws Exception {
+	public static File generateImage(@NotNull final Color textColor, final @NotNull User user, final @NotNull Guild guild, final DrawType drawType) throws Exception {
         final double separatorTransparency = 1;
 
         BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
@@ -88,9 +97,9 @@ public class JoinSystem extends ListenerAdapter {
             innerBox.dispose();
         }
         
-        if (member.getUser().getAvatarUrl() != null) {
+        if (user.getAvatarUrl() != null) {
             final Graphics2D avatar = bufferedImage.createGraphics();
-            final URL url = new URL(member.getUser().getAvatarUrl());
+            final URL url = new URL(user.getAvatarUrl());
             final HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
             connection.setRequestProperty(
@@ -111,15 +120,15 @@ public class JoinSystem extends ListenerAdapter {
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
         newGraphics.setColor(Color.DARK_GRAY);
-        String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslatedString("welcome", member.getUser(), guild) : LanguageSystem.getTranslatedString("goodbye", member.getUser(), guild);
+        String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslatedString("welcome", user, guild) : LanguageSystem.getTranslatedString("goodbye", user, guild);
         newGraphics.drawString(message, 205, 55);
         newGraphics.setFont(new Font("Arial", Font.BOLD, 80));
         newGraphics.setColor(textColor);
-        String user = member.getUser().getName();
-        int width = newGraphics.getFontMetrics().stringWidth(user);
-        newGraphics.drawString(user, 190 + (500 - width) / 2, 145);
+        String userName = user.getName();
+        int width = newGraphics.getFontMetrics().stringWidth(userName);
+        newGraphics.drawString(userName, 190 + (500 - width) / 2, 145);
 
-        final File file = new File("tmp/joinleave/" + member.getId() + ".png");
+        final File file = new File("tmp/joinleave/" + user.getId() + ".png");
 
         if (file.getParentFile() != null) {
             file.getParentFile().mkdirs();

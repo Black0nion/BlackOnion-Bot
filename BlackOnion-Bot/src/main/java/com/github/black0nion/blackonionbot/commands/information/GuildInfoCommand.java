@@ -18,11 +18,12 @@ public class GuildInfoCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] { "guildinfo" };
+		return new String[] { "guildinfo", "serverinfo" };
 	}
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+		//TODO: fix shit
 		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild)
 				.setTitle(LanguageSystem.getTranslatedString("guildinfo", author, guild))
 				.setThumbnail(guild.getIconUrl())
@@ -41,5 +42,4 @@ public class GuildInfoCommand implements Command {
 	public Category getCategory() {
 		return Category.INFORMATION;
 	}
-	
 }
