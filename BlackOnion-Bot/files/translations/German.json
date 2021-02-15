@@ -130,6 +130,8 @@
     "notfound": "Nicht gefunden!",
     "musicnotfound": "Dieser Track konnte nicht gefunden werden!",
     "addedtoqueue": "Zur Queue hinzugefügt!",
+    "musicstopped": "Die Musik wurde gestoppt!",
+    "leftvc": "Außerdem bin ich den Voicechannel geleavt.",
     "length": "Länge",
     "success": "Erfolg",
     "error": "Fehler",
