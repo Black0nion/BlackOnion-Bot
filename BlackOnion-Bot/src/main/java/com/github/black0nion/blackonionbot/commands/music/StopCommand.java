@@ -27,7 +27,6 @@ public class StopCommand implements Command {
 			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
 			musicManager.scheduler.player.stopTrack();
 			musicManager.scheduler.queue.clear();
-			
 			e.getGuild().getAudioManager().closeAudioConnection();
 			
 			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("musicstopped", "leftvc", false).build()).queue();

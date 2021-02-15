@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -19,7 +20,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
@@ -63,15 +66,14 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(User author, TextChannel channel, String trackUrl) {
+    public void loadAndPlay(User author, TextChannel channel, String trackUrl, AudioManager manager, VoiceChannel vc) {
         final GuildMusicManager musicManager = this.getMusicManager(channel);
         MusicSystem.channels.put(channel.getGuild().getIdLong(), channel.getIdLong());
 
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                musicManager.scheduler.queue(track);
-
+                musicManager.scheduler.queue(track, manager, vc);
                 channel.sendMessage(EmbedUtils.getSuccessEmbed(author, channel.getGuild()).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
             }
 
@@ -86,16 +88,26 @@ public class PlayerManager {
         				AudioTrack track = trackz.get(i);
         				builder.addField(emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
         			}
-        			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager);});
+        			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
                 } else {
                 	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, channel.getGuild());
                 	
                 	builder.setTitle("addedtoqueue");
                 	
-	                for (final AudioTrack track : tracks) {
-	                	builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
-	                	musicManager.scheduler.queue(track);
-	                }
+                	if (tracks.size() <= 10) {
+	                	tracks.forEach(track -> {
+	                		builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
+		                	musicManager.scheduler.queue(track, manager, vc);
+	                	});
+                	} else {
+                		builder.setDescription(LanguageSystem.getTranslatedString("thistracksplusadded", author, channel.getGuild()).replace("%tracks%", String.valueOf(tracks.size() - 10)));
+                		for (int i = 0; i < tracks.size(); i++) {
+                			final AudioTrack track = tracks.get(i);
+							musicManager.scheduler.queue(track, manager, vc);
+                			if (i < 10) builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
+                		}
+                	}
+                	
 	                channel.sendMessage(builder.build()).queue();
                 }
             }
@@ -113,17 +125,17 @@ public class PlayerManager {
         });
     }
     
-    private void retry(User author, Message msg, List<AudioTrack> tracks, GuildMusicManager musicManager) {
+    private void retry(User author, Message msg, List<AudioTrack> tracks, GuildMusicManager musicManager, AudioManager manager, VoiceChannel vc) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class, 
 			(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
 			event -> {
 				event.getReaction().removeReaction(event.getUser()).queue();
 				if (!event.getReactionEmote().isEmoji() || !numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey()) {
-					retry(author, msg, tracks, musicManager);
+					retry(author, msg, tracks, musicManager, manager, vc);
 					return;
 				}
 				final AudioTrack track = tracks.get(numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey());
-				musicManager.scheduler.queue(track);
+				musicManager.scheduler.queue(track, manager, vc);
 		}, 1, TimeUnit.MINUTES, () -> msg.editMessage(EmbedUtils.getErrorEmbed(author, msg.getGuild()).addField("timeout", "tooktoolong", false).build()).queue());
 	}
 

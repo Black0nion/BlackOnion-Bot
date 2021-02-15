@@ -12,6 +12,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class TrackScheduler extends AudioEventAdapter {
     public final AudioPlayer player;
@@ -24,7 +26,8 @@ public class TrackScheduler extends AudioEventAdapter {
         this.queue = new LinkedBlockingQueue<>();
     }
 
-    public void queue(AudioTrack track) {
+    public void queue(AudioTrack track, AudioManager manager, VoiceChannel vc) {
+    	manager.openAudioConnection(vc);
         if (!player.startTrack(track, true)) {
             queue.offer(track);
         }

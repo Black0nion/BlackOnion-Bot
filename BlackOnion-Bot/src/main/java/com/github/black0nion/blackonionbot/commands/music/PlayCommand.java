@@ -11,7 +11,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayCommand implements Command {
 
@@ -33,9 +35,10 @@ public class PlayCommand implements Command {
 				url = "ytsearch:" + url;
 			}
 			
-			//TODO: auto join
+			final AudioManager audioManager = e.getGuild().getAudioManager();
+			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
 			
-			PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), url);
+			PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), url, audioManager, memberChannel);
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();
 		}

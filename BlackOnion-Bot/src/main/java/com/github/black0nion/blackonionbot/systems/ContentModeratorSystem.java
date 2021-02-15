@@ -32,7 +32,7 @@ public class ContentModeratorSystem extends ListenerAdapter {
 			
 			if (!message.equals(event.getMessage().getContentDisplay())) {
 				if (true) {
-					event.getMessage().delete().queue();
+					//event.getMessage().delete().queue();
 					WebhookMessageBuilder builder = new WebhookMessageBuilder();
 					message = Utils.removeMarkdown(message);
 					builder.setContent(message);
