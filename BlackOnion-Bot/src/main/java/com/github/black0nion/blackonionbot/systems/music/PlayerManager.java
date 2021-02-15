@@ -72,12 +72,13 @@ public class PlayerManager {
             public void trackLoaded(AudioTrack track) {
                 musicManager.scheduler.queue(track);
 
-                channel.sendMessage("Adding to queue: `")
-                        .append(track.getInfo().title)
-                        .append("` by `")
-                        .append(track.getInfo().author)
-                        .append('`')
-                        .queue();
+                channel.sendMessage(EmbedUtils.getSuccessEmbed(author, channel.getGuild()).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
+//                channel.sendMessage("Adding to queue: `")
+//                        .append(track.getInfo().title)
+//                        .append("` by `")
+//                        .append(track.getInfo().author)
+//                        .append('`')
+//                        .queue();
             }
 
             @Override
@@ -93,26 +94,33 @@ public class PlayerManager {
         			}
         			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager);});
                 } else {
+                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, channel.getGuild());
+                	
+                	builder.setTitle("addedtoqueue");
+                	
 	                for (final AudioTrack track : tracks) {
+	                	builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
 	                	musicManager.scheduler.queue(track);
 	                }
-	                channel.sendMessage("Adding to queue: `")
-	                .append(String.valueOf(tracks.size()))
-	                .append("`elements from playlist `")
-	                .append(playlist.getName())
-	                .append('`')
-	                .queue();
+	                channel.sendMessage(builder.build()).queue();
+//	                
+//	                channel.sendMessage("Adding to queue: `")
+//	                .append(String.valueOf(tracks.size()))
+//	                .append("`elements from playlist `")
+//	                .append(playlist.getName())
+//	                .append('`')
+//	                .queue();
                 }
             }
 
             @Override
             public void noMatches() {
-            	// TODO: send proper message
-                channel.sendMessage("nix da :(").queue();
+            	channel.sendMessage(EmbedUtils.getErrorEmbed(author, channel.getGuild()).addField("notfound", "musicnotfound", false).build()).queue();
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
+            	channel.sendMessage(EmbedUtils.getErrorEmbed(author, channel.getGuild()).addField("errorhappened", "somethingwentwrong", false).build()).queue();
                 exception.printStackTrace();
             }
         });
