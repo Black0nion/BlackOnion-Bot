@@ -43,7 +43,7 @@ public class PlayerManager {
 		numbersUnicode.put(10,"U+1F51F");
 	};
 	
-	private static final String[] emojis = new String[] { "zero", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
+	private static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
 
     public PlayerManager() {
         this.musicManagers = new HashMap<>();
@@ -73,12 +73,6 @@ public class PlayerManager {
                 musicManager.scheduler.queue(track);
 
                 channel.sendMessage(EmbedUtils.getSuccessEmbed(author, channel.getGuild()).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
-//                channel.sendMessage("Adding to queue: `")
-//                        .append(track.getInfo().title)
-//                        .append("` by `")
-//                        .append(track.getInfo().author)
-//                        .append('`')
-//                        .queue();
             }
 
             @Override
@@ -103,13 +97,6 @@ public class PlayerManager {
 	                	musicManager.scheduler.queue(track);
 	                }
 	                channel.sendMessage(builder.build()).queue();
-//	                
-//	                channel.sendMessage("Adding to queue: `")
-//	                .append(String.valueOf(tracks.size()))
-//	                .append("`elements from playlist `")
-//	                .append(playlist.getName())
-//	                .append('`')
-//	                .queue();
                 }
             }
 
