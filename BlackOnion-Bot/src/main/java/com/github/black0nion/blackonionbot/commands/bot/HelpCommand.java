@@ -30,12 +30,13 @@ public class HelpCommand implements Command {
 			if (args.length >= 2) {
 				//Sum1 entered a category
 				List<Category> listOfCategories = Arrays.asList(Category.values());
-				ArrayList<String> listOfNames = new ArrayList<>();
+				List<String> listOfNames = new ArrayList<>();
 				listOfCategories.forEach(entry -> {
 					listOfNames.add(entry.name());
 				});
 				
-				// a category
+				// a category (wait why does this stand here?)
+				// TODO: maybe do that with streams
 				
 				if (listOfNames.contains(args[1].toUpperCase())) {
 					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
@@ -75,6 +76,7 @@ public class HelpCommand implements Command {
 					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
 				}
 			} else {
+				//TODO: translate
 				EmbedBuilder builder = new EmbedBuilder()
 						.setTitle("Hilfe | Module")
 						.setColor(BotInformation.mainColor);

@@ -38,6 +38,7 @@ import com.github.black0nion.blackonionbot.commands.moderation.UnbanCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.joinleave.SetLeaveChannelCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.joinleave.SetWelcomeChannelCommand;
 import com.github.black0nion.blackonionbot.commands.music.PlayCommand;
+import com.github.black0nion.blackonionbot.commands.music.QueueCommand;
 import com.github.black0nion.blackonionbot.commands.music.SkipCommand;
 import com.github.black0nion.blackonionbot.commands.music.StopCommand;
 import com.github.black0nion.blackonionbot.commands.music.old.JoinCommand;
@@ -74,6 +75,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new StatusCommand());
 		addCommand(new PlayCommand());
 		addCommand(new StopCommand());
+		addCommand(new QueueCommand());
 		addCommand(new LeaveCommand());
 		addCommand(new ShutdownDBCommand());
 		addCommand(new ReactionRolesSetupCommand());
