@@ -48,6 +48,7 @@ public class JoinSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		try {
+			//TODO: connect to mongodb
 			final File file = generateImage(Color.BLACK, event.getMember(), event.getGuild(), DrawType.JOIN);
 			event.getGuild().getTextChannelById("800032895803719751").sendMessage("Welcome, " + event.getMember().getAsMention() + "! :)").addFile(file, "welcome.png").queue();
 		} catch (Exception e) {

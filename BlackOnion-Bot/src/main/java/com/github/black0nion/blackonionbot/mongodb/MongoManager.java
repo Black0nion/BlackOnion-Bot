@@ -98,7 +98,7 @@ public class MongoManager {
 	
 	public static void updateValue(MongoCollection<Document> collection, BasicDBObject query, Document updatedValue) {	
 		final Document tempDoc = collection.find(query).first();
-		if (tempDoc != null && tempDoc.keySet().containsAll(updatedValue.keySet()))
+		if (tempDoc != null)
 			collection.updateOne(query, new BasicDBObject().append("$set", updatedValue));
 		else
 			collection.insertOne(updatedValue);	
