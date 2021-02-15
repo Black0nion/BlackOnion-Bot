@@ -54,3 +54,4 @@ POSTMAN
 BlackOnion-Bot/tmp
 BlackOnion-Bot/files/*
 !BlackOnion-Bot/files/translations
+BlackOnion-Bot/.classpath

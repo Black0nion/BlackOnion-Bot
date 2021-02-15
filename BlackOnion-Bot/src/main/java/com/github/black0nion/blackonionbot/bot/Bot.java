@@ -72,7 +72,10 @@ public class Bot extends ListenerAdapter {
 		
 		BotSecrets.init();
 		CustomManager mongoManager = new CustomManager("mongodb");
-		MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
+		if (mongoManager.getString("connection_string") != null)
+			MongoManager.connect(mongoManager.getString("connection_string"));
+		else
+			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
 		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,

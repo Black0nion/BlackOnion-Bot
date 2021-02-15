@@ -8,6 +8,7 @@ import org.bson.Document;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
@@ -19,12 +20,20 @@ public class MongoManager {
 	
 	public static MongoClient client;
 	
-	public static void connect(String ip) {
-		client = new MongoClient(ip);
+	@SuppressWarnings("deprecation")
+	public static boolean connect(String connectionString) {
+		client = new MongoClient(new MongoClientURI(connectionString));
+		try {
+			client.isLocked();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
-	public static void connect(String ip, String db, String userName, String password) {
-		connect(ip, "27017", db, userName, password, 20000);
+	public static boolean connect(String ip, String db, String userName, String password) {
+		return connect(ip, "27017", db, userName, password, 20000);
 	}
 
 	@SuppressWarnings("deprecation")
