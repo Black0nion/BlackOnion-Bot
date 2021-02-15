@@ -13,7 +13,9 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mongodb.BasicDBObject;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ListedEmote;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -41,12 +43,12 @@ public class ReactionRolesSetupCommand implements Command {
 			}
 			
 			final String[] finalArgs = args; 
-			String messageIDString = args[2];
+			String messageIDString = args[3];
 			
 			try {
 				long messageID = Long.parseLong(messageIDString);
 				tc.retrieveMessageById(messageID).queue(success -> {
-					final String emoteName = finalArgs[3];
+					final String emoteName = finalArgs[4];
 					guild.retrieveEmotes().queue(emoteList -> {
 						String emote = null;
 						
@@ -62,21 +64,51 @@ public class ReactionRolesSetupCommand implements Command {
 								return;
 							});
 						}
+						if (finalArgs[1].equalsIgnoreCase("create")) {
 						
-						if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
-								.append("channelid", tc.getIdLong())
-								.append("messageid", messageID)
-								.append("roleid", role.getIdLong())).first() != null) {
-							channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("alreadyexisting", author, guild), LanguageSystem.getTranslatedString("thisalreadyexisting", author, guild), false).build()).queue();
+							if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
+									.append("channelid", tc.getIdLong())
+									.append("messageid", messageID)
+									.append("roleid", role.getIdLong())).first() != null) {
+								channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
+								return;
+							}
+							
+							ReactionRoleSystem.collection.insertOne(new Document()
+									.append("guildid", e.getGuild().getIdLong())
+									.append("channelid", tc.getIdLong())
+									.append("messageid", messageID)
+									.append("emote", emote)
+									.append("roleid", role.getIdLong()));
+							
+							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslatedString("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
+							return;
+						} else if (finalArgs[1].equalsIgnoreCase("remove")) {
+							if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
+									.append("channelid", tc.getIdLong())
+									.append("messageid", messageID)
+									.append("roleid", role.getIdLong())).first() != null) {
+								ReactionRoleSystem.collection.deleteOne(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
+										.append("channelid", tc.getIdLong())
+										.append("messageid", messageID)
+										.append("roleid", role.getIdLong()));
+								final Message msg = tc.retrieveMessageById(messageID).submit().join();
+								final ListedEmote customEmote = guild.retrieveEmoteById(emote.split(":")[2].replace(">", "")).submit().join();
+								if (customEmote != null) {
+									msg.clearReactions(customEmote).queue();
+								} else {
+									msg.clearReactions(emote).queue();
+								}
+								channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("entrydeleted", "reactionroledeleted", false).build()).queue();
+								return;
+							} else {
+								channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "thisnotfound", false).build()).queue();
+								return;
+							}
+						} else {
+							channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "pleaseuse" + " " + getSyntax(), false).build()).queue();
 							return;
 						}
-						
-						ReactionRoleSystem.collection.insertOne(new Document()
-								.append("guildid", e.getGuild().getIdLong())
-								.append("channelid", tc.getIdLong())
-								.append("messageid", messageID)
-								.append("emote", emote)
-								.append("roleid", role.getIdLong()));
 					}, fail -> {
 						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("errorhappened", author, guild), LanguageSystem.getTranslatedString("somethingwentwrong", author, guild), false).build()).queue();
 						return;
@@ -95,17 +127,22 @@ public class ReactionRolesSetupCommand implements Command {
 	
 	@Override
 	public String getSyntax() {
-		return "<#channel> <message id> <emote> <role to give>";
+		return "<create | remove / delete> <#channel> <message id> <emote> <role to give>";
 	}
 	
 	@Override
 	public int getRequiredArgumentCount() {
-		return 4;
+		return 5;
 	}
 	
 	@Override
 	public Category getCategory() {
 		return Category.MODERATION;
+	}
+	
+	@Override
+	public Permission[] getRequiredPermissions() {
+		return new Permission[] { Permission.MANAGE_ROLES };
 	}
 	
 	@Override
