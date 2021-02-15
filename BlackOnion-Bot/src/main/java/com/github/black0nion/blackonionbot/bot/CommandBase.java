@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
 import com.github.black0nion.blackonionbot.commands.bot.LanguageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.NotifyCommand;
 import com.github.black0nion.blackonionbot.commands.bot.PingCommand;
+import com.github.black0nion.blackonionbot.commands.bot.PrefixCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ShutdownDBCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatsCommand;
@@ -58,8 +59,6 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static HashMap<String[], Command> commands = new HashMap<>();
 	
-	private static String prefix = BotInformation.prefix;
-	
 	public static EventWaiter waiter;
 	
 	public static void addCommands(EventWaiter newWaiter) {
@@ -102,6 +101,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new AutoRolesCommand());
 		addCommand(new SetWelcomeChannelCommand());
 		addCommand(new SetLeaveChannelCommand());
+		addCommand(new PrefixCommand());
 	}
 	
 	@Override
@@ -113,6 +113,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
 		LocalDateTime now = LocalDateTime.now();
+		String prefix = BotInformation.getPrefix(event.getGuild());
 		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {

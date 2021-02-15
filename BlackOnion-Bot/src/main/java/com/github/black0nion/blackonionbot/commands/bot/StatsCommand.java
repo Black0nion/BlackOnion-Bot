@@ -31,7 +31,7 @@ public class StatsCommand implements Command {
 			EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Bot Stats")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-				.addField("Prefix", BotInformation.prefix, true)
+				.addField("Prefix", BotInformation.getPrefix(guild), true)
 				.addField("RunMode", Bot.runMode.name().toUpperCase(), true)
 				.addField("OS", osName, true)
 				.addField("CPU Name", cpuName, true)

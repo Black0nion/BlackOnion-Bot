@@ -27,7 +27,7 @@ public class Stats implements GetRequest {
 						.put("cpu_name", BotInformation.cpuName)
 						.put("cpu_cores", BotInformation.osBean.getAvailableProcessors())
 						.put("cpu_speed",  BotInformation.cpuMhz))
-				.put("prefix", BotInformation.prefix)
+				.put("prefix", BotInformation.defaultPrefix)
 				.put("os", BotInformation.osName)
 				.toString();
 	}

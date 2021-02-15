@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.API;
+import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
@@ -29,6 +30,7 @@ import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
@@ -78,6 +80,8 @@ public class Bot extends ListenerAdapter {
 		else
 			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
 		
+		GuildManager.init();
+		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
 						GatewayIntent.GUILD_MESSAGE_REACTIONS)
@@ -88,7 +92,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), new ContentModeratorSystem(), new AutoRolesSystem(), waiter);
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), new ContentModeratorSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
 		
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
@@ -137,7 +141,7 @@ public class Bot extends ListenerAdapter {
 							e.getJDA().getPresence().setActivity(ActivityCommand.getActivity());
 							Thread.sleep(5000);
 						}
-						e.getJDA().getPresence().setActivity(Activity.listening("dem Prefix " + BotInformation.prefix));
+						e.getJDA().getPresence().setActivity(Activity.listening("dem Prefix " + BotInformation.defaultPrefix));
 						Thread.sleep(5000);
 						e.getJDA().getPresence().setActivity(Activity.listening("dem OS " + os.getName()));
 						Thread.sleep(5000);
