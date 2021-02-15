@@ -20,9 +20,12 @@ import java.util.List;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.OS;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;
 import com.sun.jna.platform.win32.Advapi32Util;
+
+import net.dv8tion.jda.api.entities.Guild;
 
 public class BotInformation {
 	public static int line_count = 0;
@@ -35,12 +38,18 @@ public class BotInformation {
 	public static String cpuName = "N/A";
 	public static String cpuMhz = "N/A";
 	
-	public static String prefix;
+	public static String defaultPrefix;
+	private static HashMap<String, String> guildPrefixes = new HashMap<>();
+
 	public static Color mainColor = Color.getHSBColor(0.8F, 1, 0.5F);
 	
 	public static long botId;
 
 	public static void init() {
+		
+		guildPrefixes.clear();
+		for (org.bson.Document doc : GuildManager.getAllConfigs()) if (doc.containsKey("prefix")) guildPrefixes.put(doc.getString("guildid"), doc.getString("prefix"));
+		
 		try {
 			calculateCodeLines();
 			if (osBean == null)
@@ -168,5 +177,24 @@ public class BotInformation {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getPrefix(Guild guild) {
+		return getPrefix(guild.getId());
+	}
+	
+	public static String getPrefix(String guildID) {
+		if (guildPrefixes.containsKey(guildID))
+			return guildPrefixes.get(guildID);
+		return defaultPrefix;
+	}
+	
+	public static void setPrefix(Guild guild, String prefix) {
+		setPrefix(guild.getId(), prefix);
+	}
+
+	public static void setPrefix(String guildId, String prefix) {
+		guildPrefixes.put(guildId, prefix);
+		GuildManager.saveString(guildId, "prefix", prefix);
 	}
 }

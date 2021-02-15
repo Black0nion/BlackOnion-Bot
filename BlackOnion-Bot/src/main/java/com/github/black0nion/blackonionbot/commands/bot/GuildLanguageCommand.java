@@ -49,7 +49,7 @@ public class GuildLanguageCommand implements Command {
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use ``" + BotInformation.prefix + getCommand()[0] + " " + getSyntax() + "``\nTo get a list of all valid language codes use ``" + BotInformation.prefix + "language list``", false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use ``" + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax() + "``\nTo get a list of all valid language codes use ``" + BotInformation.getPrefix(guild) + "language list``", false).build()).queue();
 		}
 	}
 	

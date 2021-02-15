@@ -77,7 +77,7 @@ public class JoinSystem extends ListenerAdapter {
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
-		event.getGuild().getOwner().getUser().openPrivateChannel().complete().sendMessage("Thank you for adding the **BlackOnion-Bot**! To get help, use ``" + BotInformation.prefix + "help``!").queue();
+		event.getGuild().getOwner().getUser().openPrivateChannel().complete().sendMessage("Thank you for adding the **BlackOnion-Bot**! To get help, use ``" + BotInformation.defaultPrefix + "help``!").queue();
 	}
 	
     @NotNull

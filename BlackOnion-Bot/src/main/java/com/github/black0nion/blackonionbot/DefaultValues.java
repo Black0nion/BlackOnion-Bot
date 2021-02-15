@@ -31,7 +31,7 @@ public class DefaultValues {
 		
 		Bot.runMode = RunMode.valueOf(ValueManager.getString("runMode").toUpperCase());
 		
-		BotInformation.prefix = ValueManager.getString("prefix");
+		BotInformation.defaultPrefix = ValueManager.getString("prefix");
 		
 		Bot.notifyStatusUsers = new ArrayList<String>(ValueManager.getArrayAsList("notifyUsers"));
 	}
