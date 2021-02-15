@@ -18,10 +18,6 @@ public class LeaveCommand implements Command {
 		if (!member.hasPermission(Permission.MANAGE_CHANNEL)) {
 			channel.sendMessage("Du darfst das nicht!").queue();
 		}
-		if (e.getGuild().getSelfMember().getVoiceState().inVoiceChannel()) {
-			e.getGuild().getAudioManager().closeAudioConnection();
-			channel.sendMessage("Ich habe den Kanal verlassen!").queue();
-		}
 	}
 	
 	@Override

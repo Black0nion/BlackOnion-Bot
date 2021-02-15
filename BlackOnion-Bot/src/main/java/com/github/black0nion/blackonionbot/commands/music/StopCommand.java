@@ -28,7 +28,9 @@ public class StopCommand implements Command {
 			musicManager.scheduler.player.stopTrack();
 			musicManager.scheduler.queue.clear();
 			
-			channel.sendMessage("stopped lmao").queue();
+			e.getGuild().getAudioManager().closeAudioConnection();
+			
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("musicstopped", "leftvc", false).build()).queue();
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
 		}
