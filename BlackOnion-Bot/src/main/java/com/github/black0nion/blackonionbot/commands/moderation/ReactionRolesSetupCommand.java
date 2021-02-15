@@ -83,7 +83,7 @@ public class ReactionRolesSetupCommand implements Command {
 							
 							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslatedString("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
 							return;
-						} else if (finalArgs[1].equalsIgnoreCase("remove")) {
+						} else if (finalArgs[1].equalsIgnoreCase("remove") || finalArgs[1].equalsIgnoreCase("delete")) {
 							if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
 									.append("channelid", tc.getIdLong())
 									.append("messageid", messageID)

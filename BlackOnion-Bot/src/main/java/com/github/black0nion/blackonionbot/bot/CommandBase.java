@@ -27,6 +27,7 @@ import com.github.black0nion.blackonionbot.commands.misc.InstagramCommand;
 import com.github.black0nion.blackonionbot.commands.misc.PastebinCommand;
 import com.github.black0nion.blackonionbot.commands.misc.TestCommand;
 import com.github.black0nion.blackonionbot.commands.misc.VirusCommand;
+import com.github.black0nion.blackonionbot.commands.moderation.AutoRolesCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.BanCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.ClearCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.KickCommand;
@@ -96,6 +97,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new VirusCommand());
 		addCommand(new JoinCommand());
 		addCommand(new SkipCommand());
+		addCommand(new AutoRolesCommand());
 	}
 	
 	@Override
