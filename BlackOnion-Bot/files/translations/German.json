@@ -122,6 +122,7 @@
     "messagecouldntbefound": "Diese Nachricht wurde nicht gefunden!",
     "alreadyexisting": "Bereits vorhanden!",
     "thisalreadyexisting": "Dieser Eintrag ist bereits vorhanden!",
+    "thisnotfound": "Dieser Eintrag konnte nicht gefunden werden!",
     "notinvc": "Nicht in einem Voicechannel!",
     "goinvc": "Für diesen Command musst du in einem Voicechannel sein!",
     "notconnected": "Ich bin derzeit nicht verbunden!",
