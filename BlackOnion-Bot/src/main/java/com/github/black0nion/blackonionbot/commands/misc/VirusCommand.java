@@ -1,8 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.json.JSONObject;
 
@@ -25,12 +23,10 @@ public class VirusCommand implements Command {
 	public String[] getCommand() {
 		return new String[] { "viruscheck", "virus" };
 	}
-	
-	private static final ExecutorService executor = Executors.newCachedThreadPool();
 
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		executor.submit(() -> {
+		Bot.executor.submit(() -> {
 			final List<Attachment> attachments = message.getAttachments();
 			
 			String url = "";

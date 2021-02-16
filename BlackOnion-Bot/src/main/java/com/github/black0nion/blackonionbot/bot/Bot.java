@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
@@ -62,6 +63,8 @@ public class Bot extends ListenerAdapter {
 	public static boolean isJarFile = false;
 	
 	private static CredentialsManager credentialsManager;
+	
+	public static final ExecutorService executor = Executors.newCachedThreadPool();
 	
 	@SuppressWarnings("resource")
 	public void startBot() {
