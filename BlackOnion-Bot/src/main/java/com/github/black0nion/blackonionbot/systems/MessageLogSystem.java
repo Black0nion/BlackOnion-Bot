@@ -18,6 +18,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class MessageLogSystem extends ListenerAdapter {
+	
+	public static int messagesSentLastTenSecs = 0;
+	
 	public static ArrayList<String> logChannels = new ArrayList<>();
 	
 	File logsFile;
@@ -37,10 +40,11 @@ public class MessageLogSystem extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReceived(final MessageReceivedEvent event) {
+		messagesSentLastTenSecs++;
 		ValueManager.save("messagesSent", ValueManager.getInt("messagesSent") + 1);
 		if (event.getAuthor().isBot() || !logChannels.contains(event.getChannel().getId()))
 			return;
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		new File("files/logs/channels/").mkdir();
 		FileUtils.appendToFile("logs/channels/" + event.getChannel().getName(), dtf.format(now) + " | " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + ": " + event.getMessage().getContentRaw());
