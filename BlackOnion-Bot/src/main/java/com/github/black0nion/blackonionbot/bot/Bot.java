@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
+import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
@@ -79,6 +80,8 @@ public class Bot extends ListenerAdapter {
 			MongoManager.connect(mongoManager.getString("connection_string"));
 		else
 			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
+		
+		InfluxManager.init();
 		
 		GuildManager.init();
 		
