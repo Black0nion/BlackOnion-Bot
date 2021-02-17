@@ -19,6 +19,7 @@ import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.domain.WritePrecision;
@@ -44,6 +45,11 @@ public class InfluxManager {
 	}
 	
 	public static void init() {
+		try {
+			Bot.jda.awaitReady();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		CredentialsManager manager = Bot.getCredentialsManager();
 		if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org")))
 			return;
@@ -52,19 +58,18 @@ public class InfluxManager {
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				saveCommandExecuted();
+				saveStats();
 			}
 		}, 0L, 10000L);
 	
 	}
 	
-	public static void saveCommandExecuted() {
-		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("cmdcount", CommandBase.commandsLastTenSecs).addField("messagecount", MessageLogSystem.messagesSentLastTenSecs).addField("cpuload", getProcessCpuLoad());
+	public static void saveStats() {
+		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("cmdcount", CommandBase.commandsLastTenSecs).addField("messagecount", MessageLogSystem.messagesSentLastTenSecs).addField("cpuload", getProcessCpuLoad()).addField("guildcount", getGuildCount());
 		influxDB.getWriteApi().writePoint(point);
 		CommandBase.commandsLastTenSecs = 0;
 		MessageLogSystem.messagesSentLastTenSecs = 0;
 	}
-	
 	
 	
 	@TestOnly
@@ -99,10 +104,14 @@ public class InfluxManager {
 			    // usually takes a couple of seconds before we get real values
 			    if (value == -1.0)      return Double.NaN;
 			    // returns a percentage value with 1 decimal point precision
-			    return ((int)(value * 1000) / 10.0);
+			    return Utils.roundToDouble("#0.000", value);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return Double.NaN;
+	}
+	
+	public static int getGuildCount() {
+		return Bot.jda.getGuilds().size();
 	}
 }

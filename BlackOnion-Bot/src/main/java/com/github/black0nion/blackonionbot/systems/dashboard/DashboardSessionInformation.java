@@ -58,7 +58,8 @@ public class DashboardSessionInformation {
 				return false;
 			return inf.getAccessToken().equals(accessToken) && inf.getRefreshToken().equals(refreshToken) && inf.getSessionId().equals(sessionId);
 		}).findFirst().orElseGet(() -> {
-			DashboardSessionInformation newInfo = new DashboardSessionInformation(sessionId, accessToken, refreshToken, (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null)); 
+			DashboardSessionInformation newInfo = new DashboardSessionInformation(sessionId, accessToken, refreshToken, (userInfo != null && userInfo.has("id") ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null));
+			if (newInfo.user == null) newInfo.refreshToken();
 			existingSessions.add(newInfo);
 			return newInfo;
 		});
@@ -105,5 +106,11 @@ public class DashboardSessionInformation {
 	
 	public DiscordUser getUser() {
 		return user;
+	}
+
+	@Override
+	public String toString() {
+		return "DashboardSessionInformation [sessionId=" + sessionId + ", accessToken=" + accessToken
+				+ ", refreshToken=" + refreshToken + ", user=" + user + "]";
 	}
 }

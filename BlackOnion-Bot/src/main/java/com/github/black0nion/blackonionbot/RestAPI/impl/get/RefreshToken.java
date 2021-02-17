@@ -43,7 +43,9 @@ public class RefreshToken implements GetRequest {
 	@Nullable
 	public static String refreshToken(String refreshToken) {
 		JSONObject obj = refreshTokenJSON(refreshToken);
-		return obj != null ? obj.getString("access_token") + ":" + obj.getString("refresh_token") : null;
+		if (obj.has("access_token") && obj.has("refresh_token"))
+			return obj != null ? obj.getString("access_token") + ":" + obj.getString("refresh_token") : null;
+		return null;
 	}
 	
 	public static JSONObject refreshTokenJSON(String refreshToken) {
