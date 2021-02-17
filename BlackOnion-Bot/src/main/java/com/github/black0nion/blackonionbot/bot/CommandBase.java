@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.commands.bot.SupportCommand;
 import com.github.black0nion.blackonionbot.commands.fun.AvatarCommand;
 import com.github.black0nion.blackonionbot.commands.fun.BigbrainMemeCommand;
 import com.github.black0nion.blackonionbot.commands.fun.ConnectFourCommand;
+import com.github.black0nion.blackonionbot.commands.fun.GiveawayCommand;
 import com.github.black0nion.blackonionbot.commands.information.GuildInfoCommand;
 import com.github.black0nion.blackonionbot.commands.information.UserInfoCommand;
 import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
@@ -106,6 +107,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new SetWelcomeChannelCommand());
 		addCommand(new SetLeaveChannelCommand());
 		addCommand(new PrefixCommand());
+		addCommand(new GiveawayCommand());
 	}
 	
 	@Override

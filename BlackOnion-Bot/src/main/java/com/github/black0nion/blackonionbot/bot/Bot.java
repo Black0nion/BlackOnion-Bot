@@ -32,6 +32,7 @@ import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
+import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
@@ -115,6 +116,7 @@ public class Bot extends ListenerAdapter {
 		BotInformation.init();
 		LanguageSystem.init();
 		BirthdaySystem.init();
+		GiveawaysSystem.init();
 		//MusicSystem.init();
 		
 		new API();
