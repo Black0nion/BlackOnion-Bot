@@ -156,4 +156,8 @@ public class Utils {
 
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
+	
+	 public static<T> T[] subArray(T[] array, int beg, int end) {
+	        return Arrays.copyOfRange(array, beg, end + 1);
+	    }
 }
