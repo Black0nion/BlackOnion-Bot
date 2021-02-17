@@ -51,17 +51,17 @@ public class GiveawayCommand implements Command {
 		}
 		
 		if (duration == -1 || endDate == null || winnersCount == -1) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 			return;
 		}
 		
 		if (winnersCount > 100) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("toomanywinners", "maxhundretwinners", false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("toomanywinners", "maxhundretwinners", false).build()).queue();
 			return;
 		}
 		
 		if (TimeUnit.SECONDS.convert(endDate.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS) < 60) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("tooshort", "minonemin", false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("tooshort", "minonemin", false).build()).queue();
 			return;
 		}
 		
