@@ -2,16 +2,13 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.Category;
+import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -25,8 +22,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class GiveawayCommand implements Command {
-	
-	ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
 	
@@ -65,35 +60,15 @@ public class GiveawayCommand implements Command {
 			return;
 		}
 		
-		if (TimeUnit.SECONDS.convert(new Date().getTime() - endDate.getTime(), TimeUnit.MILLISECONDS) < 60) {
+		if (TimeUnit.SECONDS.convert(endDate.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS) < 60) {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("tooshort", "minonemin", false).build()).queue();
 			return;
 		}
 		
-		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", String.join(" ", Utils.subArray(args, 3, args.length - 1))).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate)), false).build()).submit().join();
+		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
+		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate)), false).build()).submit().join();
 		msg.addReaction("U+1F389").queue();
-		final int winnas = winnersCount;
-		executor.schedule(() -> {
-			try {
-				final List<User> users = msg.retrieveReactionUsers("\uD83C\uDF89").submit().join();
-				if (users.size() == 0 || users.stream().filter(user -> {return user.getIdLong() != e.getJDA().getSelfUser().getIdLong();}).count() == 0) {
-					msg.editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
-					return;
-				}
-				users.remove(e.getJDA().getSelfUser());
-				String[] winners = new String[winnas < users.size() ? winnas : users.size()];
-				
-				Collections.shuffle(users, random);
-				
-				for (int i = 0; i < winners.length; i++) {
-					winners[i] = users.get(i).getAsMention();
-				}
-				
-				msg.editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslatedString("giveawaywinner", author, guild).replace("%winner%", String.join("\n", winners)), false).build()).queue();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}, endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
+		GiveawaysSystem.createGiveaway(endDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, winnersCount);
 	}
 	
 	@Override
