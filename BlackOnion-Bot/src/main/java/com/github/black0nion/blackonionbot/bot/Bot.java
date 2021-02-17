@@ -85,10 +85,6 @@ public class Bot extends ListenerAdapter {
 		else
 			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
 		
-		InfluxManager.init();
-		
-		GuildManager.init();
-		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
 						GatewayIntent.GUILD_MESSAGE_REACTIONS)
@@ -111,8 +107,12 @@ public class Bot extends ListenerAdapter {
 			e.printStackTrace();
 			System.out.println("[BOT] Failed to connect to the bot! Please make sure to have a file named \"token.ahitm\" with the bot's token in the files folder!");
 			System.out.println("Terminating bot.");
+			System.exit(-1);
 		}
+		
 
+		InfluxManager.init();
+		GuildManager.init();
 		BotInformation.init();
 		LanguageSystem.init();
 		BirthdaySystem.init();

@@ -49,6 +49,12 @@ public class Utils {
 	    return df.format(number);
 	}
 	
+	public static double roundToDouble(String decimal, double number) {
+		DecimalFormat df = new DecimalFormat(decimal);
+		df.setRoundingMode(RoundingMode.CEILING);
+		return Double.valueOf(df.format(number).replace(",", "."));
+	}
+	
 	public static boolean compareSHA256(String hashed, String unhashed) {
 		String sha256hex = Hashing.sha256()
 				  .hashString(unhashed, StandardCharsets.UTF_8)
@@ -95,9 +101,10 @@ public class Utils {
 					cachedUserInfo.remove(i);
 					CachedUserInfo refreshed = userInfo.refresh(token);
 					cachedUserInfo.add(refreshed);
-					return userInfo.refresh(token).getInfo();
+					userInfo = userInfo.refresh(token);
+					return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
 				} else {
-					return userInfo.getInfo();
+					return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
 				}
 			}
 		}
@@ -106,7 +113,7 @@ public class Utils {
 		
 		cachedUserInfo.add(newInfo);
 		
-		return new JSONObject(getUserInfoFromTokenResponse(token).getBody());
+		return newInfo.getInfo().has("id") ? newInfo.getInfo() : null;
 	}
 	
 	public static HttpResponse<String> getUserInfoFromTokenResponse(String token) {
