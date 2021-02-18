@@ -21,9 +21,10 @@ public class SessionManager {
 		for (Document doc : collection.find()) {
 			if (!doc.containsKey("sessionid"))
 				System.out.println("Error! Object with id " + doc.getObjectId("_id").toHexString() + " is invalid!");
-			else if (doc.containsKey("sessionid") && doc.containsKey("access_token") && doc.containsKey("refresh_token"))
-				DashboardSessionInformation.from(doc.getString("sessionid"), doc.getString("access_token"), doc.getString("refresh_token"));
-			else
+			else if (doc.containsKey("sessionid") && doc.containsKey("access_token") && doc.containsKey("refresh_token")) {
+				final DashboardSessionInformation info = DashboardSessionInformation.from(doc.getString("sessionid"), doc.getString("access_token"), doc.getString("refresh_token"));
+				if (info.getUser() == null) collection.deleteOne(new BasicDBObject().append("sessionid", doc.getString("sessionid")));
+			} else
 				DashboardSessionInformation.from(doc.getString("sessionid"));
 		}
 	}

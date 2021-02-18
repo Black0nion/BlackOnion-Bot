@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
@@ -21,6 +22,7 @@ import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.enums.RunMode;
+import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
@@ -63,6 +65,8 @@ public class Bot extends ListenerAdapter {
 	
 	private static CredentialsManager credentialsManager;
 	
+	public static final ExecutorService executor = Executors.newCachedThreadPool();
+	
 	@SuppressWarnings("resource")
 	public void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
@@ -80,8 +84,6 @@ public class Bot extends ListenerAdapter {
 			MongoManager.connect(mongoManager.getString("connection_string"));
 		else
 			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
-		
-		GuildManager.init();
 		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
@@ -105,8 +107,12 @@ public class Bot extends ListenerAdapter {
 			e.printStackTrace();
 			System.out.println("[BOT] Failed to connect to the bot! Please make sure to have a file named \"token.ahitm\" with the bot's token in the files folder!");
 			System.out.println("Terminating bot.");
+			System.exit(-1);
 		}
+		
 
+		InfluxManager.init();
+		GuildManager.init();
 		BotInformation.init();
 		LanguageSystem.init();
 		BirthdaySystem.init();
