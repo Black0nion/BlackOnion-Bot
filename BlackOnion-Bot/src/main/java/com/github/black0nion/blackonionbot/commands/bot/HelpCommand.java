@@ -43,8 +43,10 @@ public class HelpCommand implements Command {
 							.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + args[1].toUpperCase());
 					
 					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
-						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == Category.valueOf(args[1].toUpperCase()) || Category.valueOf(args[1].toUpperCase()) == Category.ALL)) {
+						System.out.println(entry.getValue());
+						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == Category.valueOf(args[1].toUpperCase()))) {
 							if (entry.getValue().getProgress() == Progress.DONE) {
+								System.out.println(entry.getKey()[0]);
 								builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
 							}
 						}
@@ -55,7 +57,7 @@ public class HelpCommand implements Command {
 							continue;
 						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 							Command command = entry.getValue();
-							if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == Category.valueOf(args[1].toUpperCase()) || Category.valueOf(args[1].toUpperCase()) == Category.ALL) && command.getProgress() == pr) {
+							if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == Category.valueOf(args[1].toUpperCase())) && command.getProgress() == pr) {
 								builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), "help" + command.getCommand()[0].toLowerCase(), false);
 							}
 						}
@@ -69,7 +71,7 @@ public class HelpCommand implements Command {
 				else {
 					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
-							channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
+							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
 							return;
 						}
 					}
@@ -81,7 +83,7 @@ public class HelpCommand implements Command {
 						.setTitle("Hilfe | Module")
 						.setColor(BotInformation.mainColor);
 				for (Category c : Category.values()) {
-					if (c == Category.ALL)
+					if (c == Category.OTHER)
 						continue;
 					String commandsInCategory = "";
 					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
@@ -96,6 +98,7 @@ public class HelpCommand implements Command {
 			if (!(ex instanceof IllegalArgumentException)) {
 				ex.printStackTrace();
 			} else {
+				ex.printStackTrace();
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("What just happend?", 
 						"hau did u do that???", false).build()).queue();
 			}
