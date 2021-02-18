@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class PrefixInfo extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if (event.getMessage().getMentionedUsers().size() == 0) return;
+		if (event.getAuthor().isBot() || event.getMessage().getMentionedUsers().size() == 0) return;
 		final User author = event.getAuthor();
 		final Guild guild = event.getGuild();
 		final long botId = BotInformation.botId;

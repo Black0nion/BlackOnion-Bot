@@ -26,7 +26,7 @@ public interface Command {
 	}
 	
 	default Category getCategory() {
-		return Category.ALL;
+		return Category.OTHER;
 	}
 	
 	default Progress getProgress() {

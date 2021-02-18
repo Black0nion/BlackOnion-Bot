@@ -62,6 +62,8 @@ public class CommandBase extends ListenerAdapter {
 	public static HashMap<String[], Command> commands = new HashMap<>();
 	
 	public static EventWaiter waiter;
+
+	public static int commandsLastTenSecs = 0;
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
@@ -125,6 +127,7 @@ public class CommandBase extends ListenerAdapter {
 					String message = dtf.format(now) + " | " + event.getChannel().getName() + " | " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + ": " + event.getMessage().getContentRaw();
 					FileUtils.appendToFile("commandLog", message);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
+					commandsLastTenSecs++;
 					String[] args = event.getMessage().getContentRaw().split(" ");
 					Command cmd = commands.get(c);
 					if (cmd.dmCommand() && event.isFromType(ChannelType.PRIVATE)) {
