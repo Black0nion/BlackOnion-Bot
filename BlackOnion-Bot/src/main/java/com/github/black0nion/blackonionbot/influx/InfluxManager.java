@@ -30,6 +30,8 @@ public class InfluxManager {
 	
 	private static InfluxDBClient influxDB = null;
 	
+	private static final int mb = 1024 * 1024;
+	
 	public static boolean connect(String databaseURL, String token, String org) {
 		if (influxDB != null) influxDB.close();
 		influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
@@ -65,7 +67,13 @@ public class InfluxManager {
 	}
 	
 	public static void saveStats() {
-		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("cmdcount", CommandBase.commandsLastTenSecs).addField("messagecount", MessageLogSystem.messagesSentLastTenSecs).addField("cpuload", getProcessCpuLoad()).addField("guildcount", getGuildCount());
+		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS)
+				.addField("cmdcount", CommandBase.commandsLastTenSecs)
+				.addField("messagecount", MessageLogSystem.messagesSentLastTenSecs)
+				.addField("cpuload", getProcessCpuLoad())
+				.addField("guildcount", getGuildCount())
+				.addField("ramload", getProcessRamLoad())
+				.addField("maxramload", getProcessMaxRamLoad());
 		influxDB.getWriteApi().writePoint(point);
 		CommandBase.commandsLastTenSecs = 0;
 		MessageLogSystem.messagesSentLastTenSecs = 0;
@@ -109,6 +117,16 @@ public class InfluxManager {
 			e.printStackTrace();
 		}
 		return Double.NaN;
+	}
+	
+	private static double getProcessRamLoad() {
+		Runtime runtime = Runtime.getRuntime();
+		return (runtime.totalMemory() - runtime.freeMemory()) / mb;
+	}
+	
+	private static double getProcessMaxRamLoad() {
+		Runtime runtime = Runtime.getRuntime();
+		return runtime.maxMemory() / mb;
 	}
 	
 	public static int getGuildCount() {
