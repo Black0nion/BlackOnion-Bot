@@ -73,7 +73,8 @@ public class InfluxManager {
 				.addField("cpuload", getProcessCpuLoad())
 				.addField("guildcount", getGuildCount())
 				.addField("ramload", getProcessRamLoad())
-				.addField("maxramload", getProcessMaxRamLoad());
+				.addField("maxramload", getProcessMaxRamLoad())
+				.addField("running", true);
 		influxDB.getWriteApi().writePoint(point);
 		CommandBase.commandsLastTenSecs = 0;
 		MessageLogSystem.messagesSentLastTenSecs = 0;
