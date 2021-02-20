@@ -74,6 +74,7 @@ public class InfluxManager {
 				.addField("guildcount", getGuildCount())
 				.addField("ramload", getProcessRamLoad())
 				.addField("maxramload", getProcessMaxRamLoad())
+				.addField("ping", Bot.jda.getGatewayPing())
 				.addField("running", true);
 		influxDB.getWriteApi().writePoint(point);
 		CommandBase.commandsLastTenSecs = 0;

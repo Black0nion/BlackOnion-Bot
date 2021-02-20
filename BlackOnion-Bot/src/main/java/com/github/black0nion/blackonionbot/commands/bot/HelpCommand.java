@@ -99,7 +99,7 @@ public class HelpCommand implements Command {
 				ex.printStackTrace();
 			} else {
 				ex.printStackTrace();
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("What just happend?", 
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("What just happend?", 
 						"hau did u do that???", false).build()).queue();
 			}
 		}
