@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -16,10 +17,11 @@ public class PrefixInfo extends ListenerAdapter {
 		final User author = event.getAuthor();
 		final Guild guild = event.getGuild();
 		final long botId = BotInformation.botId;
-		if (event.getMessage().getMentionedUsers().stream().filter(user -> {return user.getIdLong() == botId;}).findFirst().get() != null) {
-			if (event.getMember().hasPermission(Permission.ADMINISTRATOR) && event.getMessage().getContentRaw().split(" ").length >= 2)
-				BotInformation.setPrefix(guild, event.getMessage().getContentRaw().split(" ")[1]);
-			event.getChannel().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("\u1F44B", "My Prefix is: " + BotInformation.getPrefix(guild), false).build()).queue();
+		if (event.getMessage().getMentionedUsers().stream().filter(user -> {return user.getIdLong() == botId;}).findFirst().orElse(null) != null) {
+			final String[] args = event.getMessage().getContentRaw().split(" ");
+			if (event.getMember().hasPermission(Permission.ADMINISTRATOR) && args.length >= 2)
+				BotInformation.setPrefix(guild, args[1]);
+			event.getChannel().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), LanguageSystem.getTranslatedString("changeprefix", author, guild).replace("%command%", event.getJDA().getSelfUser().getAsMention() + " <prefix>"), false).build()).queue();
 		}
 	}
 }
