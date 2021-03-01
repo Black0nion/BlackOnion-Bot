@@ -67,6 +67,8 @@ public class Bot extends ListenerAdapter {
 	
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
 	
+	public static final long startTime = System.currentTimeMillis();
+	
 	@SuppressWarnings("resource")
 	public void startBot() {
 		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
