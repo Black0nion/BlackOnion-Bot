@@ -30,7 +30,10 @@ public class PlayerManager {
     private final Map<Long, GuildMusicManager> musicManagers;
     private final AudioPlayerManager audioPlayerManager;
 
-	private static final HashMap<Integer, String> numbersUnicode = new HashMap<>();
+    /**
+     * WARNING: ONLY UNTIL 10 (inclusive)
+     */
+	public static final HashMap<Integer, String> numbersUnicode = new HashMap<>();
 	
 	static {
 		numbersUnicode.put(0, "U+30U+fe0fU+20e3");
@@ -46,7 +49,7 @@ public class PlayerManager {
 		numbersUnicode.put(10,"U+1F51F");
 	};
 	
-	private static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
+	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
 
     public PlayerManager() {
         this.musicManagers = new HashMap<>();

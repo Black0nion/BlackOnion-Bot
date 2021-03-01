@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.bot;
 
 import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,8 +39,6 @@ public class BotInformation {
 	
 	public static String defaultPrefix;
 	private static HashMap<String, String> guildPrefixes = new HashMap<>();
-
-	public static Color mainColor = Color.getHSBColor(0.8F, 1, 0.5F);
 	
 	public static long botId;
 

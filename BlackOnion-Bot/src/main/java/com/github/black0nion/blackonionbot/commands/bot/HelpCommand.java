@@ -2,8 +2,8 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.enums.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class HelpCommand implements Command {
 
@@ -28,73 +30,43 @@ public class HelpCommand implements Command {
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		try {
 			if (args.length >= 2) {
-				//Sum1 entered a category
-				List<Category> listOfCategories = Arrays.asList(Category.values());
-				List<String> listOfNames = new ArrayList<>();
-				listOfCategories.forEach(entry -> {
-					listOfNames.add(entry.name());
-				});
-				
-				// a category (wait why does this stand here?)
-				// TODO: maybe do that with streams
-				
-				if (listOfNames.contains(args[1].toUpperCase())) {
-					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
-							.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + args[1].toUpperCase());
-					
-					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
-						System.out.println(entry.getValue());
-						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == Category.valueOf(args[1].toUpperCase()))) {
-							if (entry.getValue().getProgress() == Progress.DONE) {
-								System.out.println(entry.getKey()[0]);
-								builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
-							}
-						}
-					}
-					
-					for (Progress pr : Progress.values()) {
-						if (pr == Progress.DONE)
-							continue;
-						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
-							Command command = entry.getValue();
-							if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == Category.valueOf(args[1].toUpperCase())) && command.getProgress() == pr) {
-								builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), "help" + command.getCommand()[0].toLowerCase(), false);
-							}
-						}
-					}
-					
-					channel.sendMessage(builder.build()).queue();
-				} 
-				
 				// a command
+				for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
+						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
+						return;
+					}
+				}
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
+			} else {
+				// start the help system thingy lmao
+				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
+						.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + LanguageSystem.getTranslatedString("modules", author, guild));
 				
-				else {
-					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
-						if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
-							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
-							return;
+				final Category[] cats = Category.values();
+				for (int i = 0; i <= cats.length; i++) {
+					String commandsInCategory = "";
+					Category c = null;
+					if (i == 0) {
+						commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", author, guild);
+					} else {						
+						c = cats[i - 1];
+						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+							if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
+								commandsInCategory += ", " + entry.getValue().getCommand()[0];
 						}
 					}
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
+					
+					builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
 				}
-			} else {
-				//TODO: translate
-				EmbedBuilder builder = new EmbedBuilder()
-						.setTitle("Hilfe | Module")
-						.setColor(BotInformation.mainColor);
-				for (Category c : Category.values()) {
-					if (c == Category.OTHER)
-						continue;
-					String commandsInCategory = "";
-					for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
-						if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
-							commandsInCategory += ", " + entry.getValue().getCommand()[0];
-					}
-					builder.addField(c.name(), commandsInCategory.substring(1), false);
-				}
-				channel.sendMessage(builder.build()).queue();
+				channel.sendMessage(builder.build()).queue((msg) -> {
+					for (int i = 0; i <= cats.length; i++)
+						msg.addReaction(PlayerManager.numbersUnicode.get(i)).queue();
+					waitForHelpCatSelection(msg, member, cats.length+1);
+				});
 			}
 		} catch (Exception ex) {
+			// sum stupid exception bruh
 			if (!(ex instanceof IllegalArgumentException)) {
 				ex.printStackTrace();
 			} else {
@@ -103,6 +75,69 @@ public class HelpCommand implements Command {
 						"hau did u do that???", false).build()).queue();
 			}
 		}
+	}
+	
+	private static final void waitForHelpCatSelection(Message msg, Member author, int catCount) {
+		CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class, 
+				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
+				(event) -> {
+					event.getReaction().removeReaction(event.getUser()).queue();
+					Integer emojiReactionNum = PlayerManager.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
+					
+					if (!event.getReactionEmote().isEmoji() || !PlayerManager.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || catCount < emojiReactionNum)
+						waitForHelpCatSelection(msg, author, catCount);
+					
+					final Guild guild = msg.getGuild();
+					final User user = author.getUser();
+					
+					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild);
+					
+					if (emojiReactionNum == 0) {
+						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + LanguageSystem.getTranslatedString("modules", user, guild));
+
+						final Category[] cats = Category.values();
+						for (int i = 0; i <= cats.length; i++) {
+							String commandsInCategory = "";
+							Category c = null;
+							if (i == 0) {
+								commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", user, guild);
+							} else {						
+								c = cats[i - 1];
+								for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+									if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
+										commandsInCategory += ", " + entry.getValue().getCommand()[0];
+								}
+							}
+							
+							builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", user, guild)), commandsInCategory.substring(1), false);
+						}
+					} else {
+						emojiReactionNum--;
+						final Category category = Category.values()[emojiReactionNum];
+						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + category.name().toUpperCase());
+						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+							if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == category)) {
+								if (entry.getValue().getProgress() == Progress.DONE) {
+									builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
+								}
+							}
+						}
+						
+						for (Progress pr : Progress.values()) {
+							if (pr == Progress.DONE)
+								continue;
+							for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+								Command command = entry.getValue();
+								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
+									builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), "help" + command.getCommand()[0].toLowerCase(), false);
+								}
+							}
+						}
+					}
+					
+					msg.editMessage(builder.build()).queue();
+					waitForHelpCatSelection(msg, author, catCount);
+		}, 1, TimeUnit.MINUTES, () -> {msg.delete().queue();});
 	}
 
 	@Override
