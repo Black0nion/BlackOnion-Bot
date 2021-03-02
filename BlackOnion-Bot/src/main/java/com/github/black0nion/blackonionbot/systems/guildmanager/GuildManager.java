@@ -47,6 +47,28 @@ public class GuildManager {
 		}
 	}
 	
+	public static boolean getBoolean(Guild guild, String key) {
+		return getBoolean(guild.getId(), key);
+	}
+	
+	public static boolean getBoolean(String guild, String key) {
+		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getBoolean(key);
+	}
+	
+	public static boolean getBoolean(Guild guild, String key, boolean defaultValue) {
+		return getBoolean(guild.getId(), key, defaultValue);
+	}
+	
+	public static boolean getBoolean(String guild, String key, boolean defaultValue) {
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc.containsKey(key))
+			return doc.getBoolean(key);
+		else {
+			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document(key, defaultValue));
+			return defaultValue;
+		}
+	}
+	
 	public static <T> List<T> getList(String guild, String key, List<T> defaultValue, Class<T> clazz) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey(key))
@@ -57,11 +79,28 @@ public class GuildManager {
 		}
 	}
 	
-	public static void saveString(String guild, String key, Object value) {
+	public static void save(Guild guild, String key, Object value) {
+		save(guild.getId(), key, value);
+	}
+	
+	public static void save(String guild, String key, Object value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
 	}
 	
 	public static <T> void saveList(String guild, String key, List<T> value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
+	}
+	
+	public static boolean isPremium(Guild guild) {
+		return isPremium(guild.getId());
+	}
+	
+	public static boolean isPremium(String guild) {
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc.containsKey("isPremium")) return doc.getBoolean("isPremium");
+		else {
+			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document("isPremium", false));
+			return false;
+		}
 	}
 }

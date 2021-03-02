@@ -192,6 +192,6 @@ public class BotInformation {
 
 	public static void setPrefix(String guildId, String prefix) {
 		guildPrefixes.put(guildId, prefix);
-		GuildManager.saveString(guildId, "prefix", prefix);
+		GuildManager.save(guildId, "prefix", prefix);
 	}
 }

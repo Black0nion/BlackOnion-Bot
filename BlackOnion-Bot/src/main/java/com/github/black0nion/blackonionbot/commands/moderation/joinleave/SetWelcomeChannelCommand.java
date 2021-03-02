@@ -25,7 +25,7 @@ public class SetWelcomeChannelCommand implements Command {
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		message.delete().queue();
-		GuildManager.saveString(guild.getId(), "welcomechannel", channel.getId());
+		GuildManager.save(guild.getId(), "welcomechannel", channel.getId());
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 	
