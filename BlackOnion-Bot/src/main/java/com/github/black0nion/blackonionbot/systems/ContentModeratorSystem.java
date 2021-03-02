@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -12,6 +13,7 @@ import com.mashape.unirest.http.Unirest;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -24,7 +26,16 @@ public class ContentModeratorSystem extends ListenerAdapter {
 	@SuppressWarnings("unused")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		final Guild guild = event.getGuild();
 		if (event.getAuthor().isBot()) return;
+		if (GuildManager.isPremium(guild)) {
+			if (!GuildManager.getBoolean(guild, "antiSwear"))
+				return;
+		} else {
+			if (GuildManager.getBoolean(guild, "antiSwear"))
+				GuildManager.save(guild, "antiSwear", false);
+			return;
+		}
 		try {
 			HttpResponse<String> response = Unirest.get("https://www.purgomalum.com/service/plain?text=" + URLEncoder.encode(event.getMessage().getContentDisplay(), "UTF-8")).asString();
 			

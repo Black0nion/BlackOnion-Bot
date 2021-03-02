@@ -25,7 +25,7 @@ public class SetLeaveChannelCommand implements Command {
 	@Override
 	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		message.delete().queue();
-		GuildManager.saveString(guild.getId(), "leavechannel", channel.getId());
+		GuildManager.save(guild.getId(), "leavechannel", channel.getId());
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 	

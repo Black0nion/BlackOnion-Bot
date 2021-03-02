@@ -96,7 +96,7 @@ public class LanguageSystem {
 	
 	public static void updateGuildLocale(String guild, String locale) {
 		locale = locale.toUpperCase();
-		GuildManager.saveString(guild, "language", locale);
+		GuildManager.save(guild, "language", locale);
 		guildLanguages.remove(guild);
 		guildLanguages.put(guild, getLanguageFromName(locale));
 	}
