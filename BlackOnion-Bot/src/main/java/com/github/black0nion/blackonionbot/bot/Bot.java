@@ -26,7 +26,6 @@ import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
-import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
@@ -97,7 +96,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), new ContentModeratorSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
+		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
 		
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();

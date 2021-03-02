@@ -18,6 +18,8 @@ public class CredentialsManager {
 	
 	public String getString(String key) {
 		doc = Document.loadDocument(file);
+		if (!doc.has(key))
+			System.out.println("FATAL: NO CREDENTIAL FOR KEY " + key);
 		return doc.getString(key);
 	}
 	

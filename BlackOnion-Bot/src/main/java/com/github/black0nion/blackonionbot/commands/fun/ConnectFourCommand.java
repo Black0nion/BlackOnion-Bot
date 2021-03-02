@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ConnectFourCommand implements Command {
 	
@@ -36,7 +37,7 @@ public class ConnectFourCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		if (message.getMentionedUsers().size() != 0) {
 			User challenged = message.getMentionedUsers().get(0);
 			if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {

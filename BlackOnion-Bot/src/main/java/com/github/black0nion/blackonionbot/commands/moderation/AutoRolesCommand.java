@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AutoRolesCommand implements Command {
 
@@ -26,7 +26,7 @@ public class AutoRolesCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		if (args[1].equalsIgnoreCase("create")) {
 			List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;

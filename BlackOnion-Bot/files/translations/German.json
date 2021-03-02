@@ -181,6 +181,8 @@
     "antiswearis": "AntiSwear ist jetzt %status%.",
     "on": "an",
     "off": "aus",
+    "dontexecuteprofanitycommands": "Kommandos können nur ohne unangebrachten Wörtern ausgeführt werden!",
+    "pleaseremoveprofanity": "Bitte entferne alle unangebrachten Wörter aus deiner Nachricht!",
     "success": "Erfolg",
     "error": "Fehler",
     "errorhappened": "Ein Fehler ist aufgetreten!",
