@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayCommand implements Command {
@@ -23,7 +23,7 @@ public class PlayCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		GuildVoiceState state = member.getVoiceState();
 		if (state != null && state.getChannel() != null) {
 			
@@ -38,7 +38,7 @@ public class PlayCommand implements Command {
 			final AudioManager audioManager = e.getGuild().getAudioManager();
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
 			
-			PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), url, audioManager, memberChannel);
+			PlayerManager.getInstance().loadAndPlay(author, e.getChannel(), url, audioManager, memberChannel);
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();
 		}

@@ -1,9 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
@@ -43,10 +42,11 @@ import com.github.black0nion.blackonionbot.commands.music.PlayCommand;
 import com.github.black0nion.blackonionbot.commands.music.QueueCommand;
 import com.github.black0nion.blackonionbot.commands.music.SkipCommand;
 import com.github.black0nion.blackonionbot.commands.music.StopCommand;
-import com.github.black0nion.blackonionbot.commands.music.old.JoinCommand;
-import com.github.black0nion.blackonionbot.commands.music.old.LeaveCommand;
 import com.github.black0nion.blackonionbot.commands.old.HypixelCommand;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
+import com.github.black0nion.blackonionbot.enums.LogMode;
+import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -54,8 +54,12 @@ import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandBase extends ListenerAdapter {
@@ -80,7 +84,6 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new PlayCommand());
 		addCommand(new StopCommand());
 		addCommand(new QueueCommand());
-		addCommand(new LeaveCommand());
 		addCommand(new ShutdownDBCommand());
 		addCommand(new ReactionRolesSetupCommand());
 		addCommand(new PastebinCommand());
@@ -102,7 +105,6 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new GuildInfoCommand());
 		addCommand(new UserInfoCommand());
 		addCommand(new VirusCommand());
-		addCommand(new JoinCommand());
 		addCommand(new SkipCommand());
 		addCommand(new AutoRolesCommand());
 		addCommand(new SetWelcomeChannelCommand());
@@ -113,43 +115,47 @@ public class CommandBase extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
-		if (event.getAuthor().isBot())
+	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		final User author = event.getAuthor();
+		if (author.isBot()) return;
+		
+		final Guild guild = event.getGuild();
+		final String prefix = BotInformation.getPrefix(guild);
+		final TextChannel channel = event.getChannel();
+		final Member member = event.getMember();
+		final Message message = event.getMessage();
+		final String msgContent = message.getContentRaw();
+		final String log = channel.getName() + " | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent;
+		
+		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
+
+		if (ContentModeratorSystem.checkMessageForProfanity(event)) {
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
 			return;
-		
-		System.out.println("Message received: " + event.getMessage().getContentRaw());
-		
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-		LocalDateTime now = LocalDateTime.now();
-		String prefix = BotInformation.getPrefix(event.getGuild());
+		}
 		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
-				if (event.getMessage().getContentRaw().toLowerCase().split(" ")[0].equalsIgnoreCase(prefix + str)) {
-					String message = dtf.format(now) + " | " + event.getChannel().getName() + " | " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + ": " + event.getMessage().getContentRaw();
-					FileUtils.appendToFile("commandLog", message);
+				if (msgContent.toLowerCase().split(" ")[0].equalsIgnoreCase(prefix + str)) {
+					FileUtils.appendToFile("commandLog", log);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 					commandsLastTenSecs++;
-					String[] args = event.getMessage().getContentRaw().split(" ");
+					String[] args = msgContent.split(" ");
 					Command cmd = commands.get(c);
-					if (cmd.dmCommand() && event.isFromType(ChannelType.PRIVATE)) {
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild()).setDescription("This command can't be accessed through private chat! Use it on a server!").build()).queue();
+					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
 						continue;
-					}
-					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(event.getAuthor().getIdLong())) {
-						continue;
-					} else if (cmd.getRequiredPermissions() != null && !event.getMember().hasPermission(cmd.getRequiredPermissions())) {
+					} else if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
 						if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 							continue;
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild())
-								.addField(LanguageSystem.getTranslatedString("missingpermissions", event.getAuthor(), event.getGuild()), LanguageSystem.getTranslatedString("requiredpermissions", event.getAuthor(), event.getGuild()) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
+								.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 						continue;
 					} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-						event.getChannel().sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor(), event.getGuild())
-								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", event.getAuthor(), event.getGuild()), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
+								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 						continue;
 					}
-					cmd.execute(args, event, event.getMessage(), event.getMember(), event.getAuthor(), event.getGuild(), event.getChannel());
+					cmd.execute(args, event, message, member, author, guild, channel);
 				}
 			}
 		}

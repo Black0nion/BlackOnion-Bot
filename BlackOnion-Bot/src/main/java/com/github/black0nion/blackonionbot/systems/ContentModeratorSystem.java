@@ -1,9 +1,12 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import java.io.File;
-import java.net.URLEncoder;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -15,66 +18,92 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class ContentModeratorSystem extends ListenerAdapter {
+public class ContentModeratorSystem {
 	
 	private static final File file = new File("resources/logo.png");
 	
-	@SuppressWarnings("unused")
-	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	/**
+	 * @param event
+	 * @return true if the message contained unwanted content
+	 */
+	public static boolean checkMessageForProfanity(GuildMessageReceivedEvent event) {
 		final Guild guild = event.getGuild();
-		if (event.getAuthor().isBot()) return;
+		if (event.getAuthor().isBot()) return false;
 		if (GuildManager.isPremium(guild)) {
 			if (!GuildManager.getBoolean(guild, "antiSwear"))
-				return;
+				return false;
 		} else {
 			if (GuildManager.getBoolean(guild, "antiSwear"))
 				GuildManager.save(guild, "antiSwear", false);
-			return;
+			return false;
 		}
 		try {
-			HttpResponse<String> response = Unirest.get("https://www.purgomalum.com/service/plain?text=" + URLEncoder.encode(event.getMessage().getContentDisplay(), "UTF-8")).asString();
-			
-			String message = response.getBody().replace("Ã¤", "ä").replace("Ã„", "Ä").replace("Ã¶", "ö").replace("Ã–", "Ö").replace("Ã¼", "ü").replace("Ãœ", "Ü");
-			
-			if (!message.equals(event.getMessage().getContentDisplay())) {
-				if (true) {
-					//event.getMessage().delete().queue();
-					WebhookMessageBuilder builder = new WebhookMessageBuilder();
-					message = Utils.removeMarkdown(message);
-					builder.setContent(message);
-					builder.setUsername(event.getMember().getEffectiveName());
-					builder.setAvatarUrl(event.getAuthor().getEffectiveAvatarUrl());
-					final List<Webhook> webhooks = event.getChannel().retrieveWebhooks().submit().join();
-					
-					Webhook webhook;
-					
-					if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
-						webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
-					} else {
-						webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+			if (event.getMessage().getContentRaw().equalsIgnoreCase("")) return false;
+			Message messageRaw = event.getMessage();
+			final String msg = messageRaw.getContentRaw();
+			Unirest.setTimeouts(0, 0);
+			HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True")
+			  .header("Content-Type", "text/plain")
+			  .header("Ocp-Apim-Subscription-Key", Bot.getCredentialsManager().getString("content_moderator_key"))
+			  .body(msg)
+			  .asString();
+
+			JSONObject responseJson = new JSONObject(response.getBody());
+			// check for profanity
+			if (responseJson.has("Terms")) {
+				// this will happen if it doesn't contain any profanity
+				if (!(responseJson.get("Terms") instanceof JSONArray)) return false;
+				Bot.executor.submit(() -> {
+					try {
+						event.getMessage().delete().queue();
+						WebhookMessageBuilder builder = new WebhookMessageBuilder();
+						final JSONArray terms = responseJson.getJSONArray("Terms");
+						
+						String message = msg;
+						
+						for (int i = 0; i < terms.length(); i++) {
+							final String term = terms.getJSONObject(i).getString("Term");
+							message = message.replaceAll("(?i)" + term, term.replaceAll(".", "*"));
+						}
+						
+						message = Utils.removeMarkdown(message);
+						builder.setContent(message);
+						builder.setUsername(event.getMember().getEffectiveName());
+						builder.setAvatarUrl(event.getAuthor().getEffectiveAvatarUrl());
+						final List<Webhook> webhooks = event.getChannel().retrieveWebhooks().submit().join();
+						
+						Webhook webhook;
+						
+						if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
+							webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
+						} else {
+							webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+						}
+						
+						WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+						clientBuilder.setThreadFactory((job) -> {
+							Thread thread = new Thread(job);
+							thread.setName("ContentModerator");
+							thread.setDaemon(true);
+							return thread;
+						});
+						
+						WebhookClient client = clientBuilder.build();
+						client.send(builder.build());
+						client.close();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					
-					WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
-					clientBuilder.setThreadFactory((job) -> {
-						Thread thread = new Thread(job);
-						thread.setName("ContentModerator");
-						thread.setDaemon(true);
-						return thread;
-					});
-					
-					WebhookClient client = clientBuilder.build();
-					client.send(builder.build());
-					client.close();
-				} else 
-					event.getMessage().delete().queue();
-			}
+				});
+				return true;
+			} else throw new RuntimeException("Some error happened while contacting the Microsoft API. Response: \n" + response.getBody());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 }

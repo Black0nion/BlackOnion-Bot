@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public interface Command {
 	default CommandVisibility getVisisbility() {
@@ -19,7 +19,7 @@ public interface Command {
 	
 	String[] getCommand();
 
-	void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel);
+	void execute(String[] args, final GuildMessageReceivedEvent e, final Message message, final Member member, final User author, final Guild guild, final MessageChannel channel);
 	
 	default String getSyntax() {
 		return "";
@@ -42,10 +42,6 @@ public interface Command {
 	}
 	
 	default boolean requiresBotAdmin() {
-		return false;
-	}
-	
-	default boolean dmCommand() {
 		return false;
 	}
 }

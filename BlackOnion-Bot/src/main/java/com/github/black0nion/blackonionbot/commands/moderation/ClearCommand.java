@@ -14,18 +14,20 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ClearCommand implements Command {
 
 	@Override
-	public void execute(String[] args, MessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		if (member.hasPermission(e.getTextChannel(), Permission.MESSAGE_MANAGE) ) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+		final TextChannel textChannel = e.getChannel();
+		if (member.hasPermission(textChannel, Permission.MESSAGE_MANAGE) ) {
 			if (args.length == 2) {
 				try {
 					int amount = Integer.parseInt(args[1]);
-					e.getTextChannel().deleteMessages(get(channel, amount)).queue();
+					textChannel.deleteMessages(get(channel, amount)).queue();
 					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 				} catch (NumberFormatException ex) {
 					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
