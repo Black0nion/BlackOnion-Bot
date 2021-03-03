@@ -85,6 +85,11 @@ public class GuildManager {
 	}
 	
 	@Nonnull
+	public static <T> List<T> getList(Guild guild, String key, List<T> defaultValue, Class<T> clazz) {
+		return getList(guild.getId(), key, clazz);
+	}
+	
+	@Nonnull
 	public static <T> List<T> getList(String guild, String key, List<T> defaultValue, Class<T> clazz) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey(key))
@@ -96,16 +101,27 @@ public class GuildManager {
 	}
 	
 	@Nullable
+	public static <T> List<T> getList(Guild guild, String key, Class<T> clazz) {
+		return getList(guild.getId(), key, clazz);
+	}
+	
+	@Nullable
+	public static <T> List<T> getList(String guild,  String key, Class<T> clazz) {
+		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getList(key, clazz);
+	}
+	
 	public static void save(Guild guild, String key, Object value) {
 		save(guild.getId(), key, value);
 	}
 	
-	@Nullable
 	public static void save(String guild, String key, Object value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
 	}
 	
-	@Nullable
+	public static <T> void saveList(Guild guild, String key, List<T> value) {
+		saveList(guild.getId(), key, value);
+	}
+	
 	public static <T> void saveList(String guild, String key, List<T> value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
 	}
