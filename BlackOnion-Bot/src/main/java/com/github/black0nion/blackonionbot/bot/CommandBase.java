@@ -19,6 +19,7 @@ import com.github.black0nion.blackonionbot.commands.bot.ShutdownDBCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatsCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
 import com.github.black0nion.blackonionbot.commands.bot.SupportCommand;
+import com.github.black0nion.blackonionbot.commands.bot.SwearWhitelistCommand;
 import com.github.black0nion.blackonionbot.commands.fun.AvatarCommand;
 import com.github.black0nion.blackonionbot.commands.fun.BigbrainMemeCommand;
 import com.github.black0nion.blackonionbot.commands.fun.ConnectFourCommand;
@@ -113,6 +114,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new GiveawayCommand());
 		addCommand(new AntiSwearCommand());
 		addCommand(new BugReportCommand());
+		addCommand(new SwearWhitelistCommand());
 	}
 	
 	@Override
