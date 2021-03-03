@@ -130,10 +130,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
 
-		if (ContentModeratorSystem.checkMessageForProfanity(event)) {
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
-			return;
-		}
+		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
 		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
@@ -156,6 +153,12 @@ public class CommandBase extends ListenerAdapter {
 								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 						continue;
 					}
+					
+					if (containsProfanity) {
+						channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
+						continue;
+					}
+					
 					cmd.execute(args, event, message, member, author, guild, channel);
 				}
 			}

@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.systems.guildmanager;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.bson.Document;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -47,10 +49,12 @@ public class GuildManager {
 		}
 	}
 	
+	@Nullable
 	public static boolean getBoolean(Guild guild, String key) {
 		return getBoolean(guild.getId(), key);
 	}
 	
+	@Nullable
 	public static boolean getBoolean(String guild, String key) {
 		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getBoolean(key);
 	}
