@@ -48,10 +48,12 @@ public class SwearWhitelistCommand implements Command {
 			
 			if (mentionedStuff.size() != 0) {
 				List<String> newWhitelist = GuildManager.getList(guild, "whitelist", String.class);
+				if (newWhitelist == null) newWhitelist = new ArrayList<>();
 				List<String> temp = newWhitelist;
-				if (add) { 
+				if (add) {
 					temp.retainAll(mentionedStuff);
 					newWhitelist.removeAll(temp);
+					newWhitelist.addAll(temp);
 				} else newWhitelist.removeAll(mentionedStuff);
 				GuildManager.saveList(guild, "whitelist", newWhitelist);
 				// TODO: test
