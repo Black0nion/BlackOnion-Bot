@@ -3,8 +3,11 @@ package com.github.black0nion.blackonionbot.systems.music;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -24,11 +27,18 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import com.wrapper.spotify.Api;
+import com.wrapper.spotify.methods.TrackRequest;
+import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
+import com.wrapper.spotify.models.ClientCredentials;
+
 public class PlayerManager {
     private static PlayerManager INSTANCE;
 
     private final Map<Long, GuildMusicManager> musicManagers;
     private final AudioPlayerManager audioPlayerManager;
+    
+    private static Api spotifyApi;
 
     /**
      * WARNING: ONLY UNTIL 10 (inclusive)
@@ -48,6 +58,31 @@ public class PlayerManager {
 		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
 		numbersUnicode.put(10,"U+1F51F");
 	};
+	
+	public static void init() {
+		if (!Bot.getCredentialsManager().has("spotify_client_id") || !Bot.getCredentialsManager().has("spotify_client_secret")) {
+			System.out.println("No Spotify API Key specified! You won't be able to play spotify tracks!");
+			return;
+		}
+		
+		spotifyApi = new Api.Builder()
+				.clientId(Bot.getCredentialsManager().getString("spotify_client_id"))
+				.clientSecret(Bot.getCredentialsManager().getString("spotify_client_secret"))
+				.build();
+		
+		new Timer().scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						ClientCredentialsGrantRequest clientCredentialsRequest = spotifyApi.clientCredentialsGrant().build();
+						ClientCredentials credentials = clientCredentialsRequest.get();
+						spotifyApi.setAccessToken(credentials.getAccessToken());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}, 0, 3500000);
+	}
 	
 	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
 
@@ -73,6 +108,18 @@ public class PlayerManager {
         final GuildMusicManager musicManager = this.getMusicManager(channel);
         MusicSystem.channels.put(channel.getGuild().getIdLong(), channel.getIdLong());
 
+        if (trackUrl.contains("spotify.com")) {
+        	String[] parsed = trackUrl.split("/track/");
+        	if (parsed.length == 2) {
+        		final TrackRequest request = spotifyApi.getTrack(parsed[1]).build();
+        		try {
+        			trackUrl = "ytsearch:" + request.get().getName();
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
+        	}
+        }
+        
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {

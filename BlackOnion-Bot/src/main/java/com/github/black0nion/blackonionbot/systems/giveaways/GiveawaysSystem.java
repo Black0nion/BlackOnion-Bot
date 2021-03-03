@@ -50,16 +50,18 @@ public class GiveawaysSystem {
 	public static void init() {
 		collection = MongoDB.botDatabase.getCollection("giveaways");
 		
-		try {
-			Bot.jda.awaitReady();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		for (Document doc : collection.find()) {
-			if (doc.keySet().containsAll(giveawayKeys))
-				createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
-		}
+		Bot.executor.submit(() -> {
+			try {
+				Bot.jda.awaitReady();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			for (Document doc : collection.find()) {
+				if (doc.keySet().containsAll(giveawayKeys))
+					createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
+			}
+		});
 	}
 	
 	@SuppressWarnings("unchecked")
