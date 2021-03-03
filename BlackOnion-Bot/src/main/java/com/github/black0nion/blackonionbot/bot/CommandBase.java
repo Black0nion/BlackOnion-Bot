@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AntiSwearCommand;
+import com.github.black0nion.blackonionbot.commands.bot.BugReportCommand;
 import com.github.black0nion.blackonionbot.commands.bot.GuildLanguageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
 import com.github.black0nion.blackonionbot.commands.bot.LanguageCommand;
@@ -72,7 +73,6 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
-		//AudioLoadResult.waiter = newWaiter;
 		addCommand(new ActivityCommand());
 		addCommand(new AvatarCommand());
 		addCommand(new ClearCommand());
@@ -112,6 +112,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new PrefixCommand());
 		addCommand(new GiveawayCommand());
 		addCommand(new AntiSwearCommand());
+		addCommand(new BugReportCommand());
 	}
 	
 	@Override

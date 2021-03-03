@@ -34,6 +34,7 @@ import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
@@ -110,7 +111,6 @@ public class Bot extends ListenerAdapter {
 			System.out.println("Terminating bot.");
 			System.exit(-1);
 		}
-		
 
 		InfluxManager.init();
 		GuildManager.init();
@@ -118,6 +118,7 @@ public class Bot extends ListenerAdapter {
 		LanguageSystem.init();
 		BirthdaySystem.init();
 		GiveawaysSystem.init();
+		PlayerManager.init();
 		//MusicSystem.init();
 		
 		new API();
