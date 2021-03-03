@@ -17,6 +17,7 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -75,10 +76,12 @@ public class InfluxManager {
 				.addField("ramload", getProcessRamLoad())
 				.addField("maxramload", getProcessMaxRamLoad())
 				.addField("ping", Bot.jda.getGatewayPing())
+				.addField("profanityfiltered", ContentModeratorSystem.profanityFilteredLastTenSecs)
 				.addField("running", true);
-		influxDB.getWriteApi().writePoint(point);
 		CommandBase.commandsLastTenSecs = 0;
 		MessageLogSystem.messagesSentLastTenSecs = 0;
+		ContentModeratorSystem.profanityFilteredLastTenSecs = 0;
+		influxDB.getWriteApi().writePoint(point);
 	}
 	
 	

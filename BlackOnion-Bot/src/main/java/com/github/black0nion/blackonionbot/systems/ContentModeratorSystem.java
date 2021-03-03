@@ -24,6 +24,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ContentModeratorSystem {
 	
+	public static int profanityFilteredLastTenSecs = 0;
+	
 	private static final File file = new File("resources/logo.png");
 	
 	/**
@@ -58,6 +60,7 @@ public class ContentModeratorSystem {
 				// this will happen if it doesn't contain any profanity
 				if (!(responseJson.get("Terms") instanceof JSONArray)) return false;
 				Bot.executor.submit(() -> {
+					profanityFilteredLastTenSecs++;
 					try {
 						event.getMessage().delete().queue();
 						WebhookMessageBuilder builder = new WebhookMessageBuilder();
