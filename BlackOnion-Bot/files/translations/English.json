@@ -186,6 +186,8 @@
     "foundabug": "Du hast einen Bug gefunden?",
     "plsreportbug": "Dann melde ihn doch bitte!",
     "inourgitrepo": "Erstelle bitte eine Issue in diesem Repository: %repo%",
+    "antiswearstatus": "AntiSwear ist gerade %status%",
+    "howtoantiswearstatustoggle": "Um AntiSwear ein oder aus zu schalten, benutze %command%",
     "success": "Erfolg",
     "error": "Fehler",
     "errorhappened": "Ein Fehler ist aufgetreten!",
