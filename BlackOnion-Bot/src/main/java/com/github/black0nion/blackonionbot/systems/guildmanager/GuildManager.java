@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.systems.guildmanager;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
@@ -23,22 +24,30 @@ public class GuildManager {
 			collection = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
 	}
 
+	@Nonnull
+	/**
+	 * @return an arraylist containing all configs, empty if none present
+	 */
 	public static List<Document> getAllConfigs() {
 		return collection.find().into(new ArrayList<>());
 	}
 	
+	@Nullable
 	public static String getString(Guild guild, String key) {
 		return getString(guild.getId(), key);
 	}
 	
+	@Nullable
 	public static String getString(String guild, String key) {
 		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getString(key);
 	}
 	
+	@Nonnull
 	public static String getString(Guild guild, String key, String defaultValue) {
 		return getString(guild.getId(), key, defaultValue);
 	}
 	
+	@Nonnull
 	public static String getString(String guild, String key, String defaultValue) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey(key))
@@ -59,10 +68,12 @@ public class GuildManager {
 		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getBoolean(key);
 	}
 	
+	@Nonnull
 	public static boolean getBoolean(Guild guild, String key, boolean defaultValue) {
 		return getBoolean(guild.getId(), key, defaultValue);
 	}
 	
+	@Nonnull
 	public static boolean getBoolean(String guild, String key, boolean defaultValue) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey(key))
@@ -73,6 +84,7 @@ public class GuildManager {
 		}
 	}
 	
+	@Nonnull
 	public static <T> List<T> getList(String guild, String key, List<T> defaultValue, Class<T> clazz) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey(key))
@@ -83,22 +95,27 @@ public class GuildManager {
 		}
 	}
 	
+	@Nullable
 	public static void save(Guild guild, String key, Object value) {
 		save(guild.getId(), key, value);
 	}
 	
+	@Nullable
 	public static void save(String guild, String key, Object value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
 	}
 	
+	@Nullable
 	public static <T> void saveList(String guild, String key, List<T> value) {
 		MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document().append(key, value));
 	}
 	
+	@Nonnull
 	public static boolean isPremium(Guild guild) {
 		return isPremium(guild.getId());
 	}
 	
+	@Nonnull
 	public static boolean isPremium(String guild) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
 		if (doc.containsKey("isPremium")) return doc.getBoolean("isPremium");
