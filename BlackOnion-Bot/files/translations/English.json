@@ -188,6 +188,8 @@
     "inourgitrepo": "Erstelle bitte eine Issue in diesem Repository: %repo%",
     "antiswearstatus": "AntiSwear ist gerade %status%",
     "howtoantiswearstatustoggle": "Um AntiSwear ein oder aus zu schalten, benutze %command%",
+    "bannedusage": "Die Benutzung der Commands wurde untersagt!",
+    "cantusecommandsanymore": "%userorguild% kann nun keine Commands mehr ausführen!",
     "success": "Erfolg",
     "error": "Fehler",
     "errorhappened": "Ein Fehler ist aufgetreten!",
