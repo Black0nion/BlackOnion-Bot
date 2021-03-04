@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;

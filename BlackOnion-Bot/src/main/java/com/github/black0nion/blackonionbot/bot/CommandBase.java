@@ -64,6 +64,10 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.ricecode.similarity.JaroWinklerStrategy;
+import net.ricecode.similarity.SimilarityStrategy;
+import net.ricecode.similarity.StringSimilarityService;
+import net.ricecode.similarity.StringSimilarityServiceImpl;
 
 public class CommandBase extends ListenerAdapter {
 	
@@ -72,6 +76,9 @@ public class CommandBase extends ListenerAdapter {
 	public static EventWaiter waiter;
 
 	public static int commandsLastTenSecs = 0;
+	
+	private static final SimilarityStrategy strategy = new JaroWinklerStrategy();
+	private static final StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
@@ -130,19 +137,30 @@ public class CommandBase extends ListenerAdapter {
 		final Member member = event.getMember();
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
-		final String log = channel.getName() + " | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent;
+		final String log = guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent;
+		final String[] args = msgContent.toLowerCase().split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
+		
+		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
 
 		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
 		
+		String possibleCommand = null;
+		double lastScore = 0;
+		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
-				if (msgContent.toLowerCase().split(" ")[0].equalsIgnoreCase(prefix + str)) {
+				final double tempScore = service.score(args[0], prefix + str);
+				if (tempScore > 0.70 && lastScore < tempScore) {
+					lastScore = tempScore;
+					possibleCommand = prefix + str;
+				}
+				if (args[0].equalsIgnoreCase(prefix + str) || tempScore > 0.8) {
+					args[0] = possibleCommand;
 					FileUtils.appendToFile("commandLog", log);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 					commandsLastTenSecs++;
-					String[] args = msgContent.split(" ");
 					Command cmd = commands.get(c);
 					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
 						continue;
@@ -162,11 +180,16 @@ public class CommandBase extends ListenerAdapter {
 						channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
 						continue;
 					}
-					
-					cmd.execute(args, event, message, member, author, guild, channel);
+					Bot.executor.submit(() -> {
+						System.out.println(String.join(", ", args));
+						cmd.execute(args, event, message, member, author, guild, channel);
+					});
+					return;
 				}
 			}
 		}
+		
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("commandnotfound", possibleCommand != null ? LanguageSystem.getTranslatedString("didyoumean", author, guild).replace("%command%", possibleCommand) : LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	public static void addCommand(Command c, String... command) {

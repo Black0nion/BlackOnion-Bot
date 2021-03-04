@@ -33,7 +33,9 @@ public class HelpCommand implements Command {
 				// a command
 				for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
-						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild()), false).build()).queue();
+						final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
+						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
+						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
 					}
 				}
@@ -56,7 +58,7 @@ public class HelpCommand implements Command {
 								commandsInCategory += ", " + entry.getValue().getCommand()[0];
 						}
 					}
-					
+					if (commandsInCategory.length() <= 2) continue;
 					builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
 				}
 				channel.sendMessage(builder.build()).queue((msg) -> {
@@ -118,7 +120,9 @@ public class HelpCommand implements Command {
 						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 							if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == category)) {
 								if (entry.getValue().getProgress() == Progress.DONE) {
-									builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
+									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
+									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
+									builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
@@ -129,7 +133,9 @@ public class HelpCommand implements Command {
 							for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
 								Command command = entry.getValue();
 								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
-									builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), "help" + command.getCommand()[0].toLowerCase(), false);
+									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
+									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
+									builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
