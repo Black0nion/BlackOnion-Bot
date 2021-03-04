@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -45,6 +46,9 @@ public class ContentModeratorSystem {
 		}
 		try {
 			if (event.getMessage().getContentRaw().equalsIgnoreCase("")) return false;
+			// check for whitelist
+			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);
+			if (whitelist != null && (whitelist.contains(event.getChannel().getAsMention()) || event.getMember().getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
 			Message messageRaw = event.getMessage();
 			final String msg = messageRaw.getContentRaw();
 			Unirest.setTimeouts(0, 0);
