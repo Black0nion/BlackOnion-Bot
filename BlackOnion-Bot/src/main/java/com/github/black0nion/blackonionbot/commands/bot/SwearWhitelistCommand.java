@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -28,7 +27,7 @@ public class SwearWhitelistCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		if (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove")) {
+		if (args.length >= 3 && (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove"))) {
 			List<String> mentionedStuff = new ArrayList<>();
 			List<Role> roles = message.getMentionedRoles();
 			List<TextChannel> channels = message.getMentionedChannels();
@@ -56,20 +55,17 @@ public class SwearWhitelistCommand implements Command {
 					newWhitelist.addAll(mentionedStuff);
 				} else newWhitelist.removeAll(mentionedStuff);
 				GuildManager.saveList(guild, "whitelist", newWhitelist);
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("whitelistupdated", (add ? LanguageSystem.getTranslatedString("addedtowhitelist", author, guild).replace("%add%", mentionedStuff.toString()) : LanguageSystem.getTranslatedString("removedfromwhitelist", author, guild).replace("%removed%", mentionedStuff.toString())), false).build()).queue();
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
+			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"), false).build()).queue();
 		}
 	}
 
 	@Override
 	public Permission[] getRequiredPermissions() {
 		return new Permission[] { Permission.ADMINISTRATOR };
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 2;
 	}
 	
 	@Override
