@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AntiSwearCommand;
+import com.github.black0nion.blackonionbot.commands.bot.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.BugReportCommand;
 import com.github.black0nion.blackonionbot.commands.bot.GuildLanguageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
@@ -115,6 +116,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new AntiSwearCommand());
 		addCommand(new BugReportCommand());
 		addCommand(new SwearWhitelistCommand());
+		addCommand(new BanUsageCommand());
 	}
 	
 	@Override
