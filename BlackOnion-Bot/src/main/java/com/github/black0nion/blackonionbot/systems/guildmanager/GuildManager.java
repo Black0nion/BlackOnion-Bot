@@ -39,7 +39,9 @@ public class GuildManager {
 	
 	@Nullable
 	public static String getString(String guild, String key) {
-		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getString(key);
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc == null) return null;
+		return doc.getString(key);
 	}
 	
 	@Nonnull
@@ -50,7 +52,7 @@ public class GuildManager {
 	@Nonnull
 	public static String getString(String guild, String key, String defaultValue) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
-		if (doc.containsKey(key))
+		if (doc != null && doc.containsKey(key))
 			return doc.getString(key);
 		else {
 			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document(key, defaultValue));
@@ -64,8 +66,15 @@ public class GuildManager {
 	}
 	
 	@Nullable
+	/**
+	 * @param guild
+	 * @param key
+	 * @return FALSE IF NOT PRESENT!
+	 */
 	public static boolean getBoolean(String guild, String key) {
-		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getBoolean(key);
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc == null) return false;
+		return doc.getBoolean(key);
 	}
 	
 	@Nonnull
@@ -76,7 +85,7 @@ public class GuildManager {
 	@Nonnull
 	public static boolean getBoolean(String guild, String key, boolean defaultValue) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
-		if (doc.containsKey(key))
+		if (doc != null && doc.containsKey(key))
 			return doc.getBoolean(key);
 		else {
 			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document(key, defaultValue));
@@ -92,7 +101,7 @@ public class GuildManager {
 	@Nonnull
 	public static <T> List<T> getList(String guild, String key, List<T> defaultValue, Class<T> clazz) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
-		if (doc.containsKey(key))
+		if (doc != null && doc.containsKey(key))
 			return doc.getList(key, clazz);
 		else {
 			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document(key, defaultValue));
@@ -107,7 +116,9 @@ public class GuildManager {
 	
 	@Nullable
 	public static <T> List<T> getList(String guild,  String key, Class<T> clazz) {
-		return MongoManager.getDocumentInCollection(collection, "guildid", guild).getList(key, clazz);
+		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
+		if (doc == null) return null;
+		return doc.getList(key, clazz);
 	}
 	
 	public static void save(Guild guild, String key, Object value) {
@@ -134,7 +145,7 @@ public class GuildManager {
 	@Nonnull
 	public static boolean isPremium(String guild) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
-		if (doc.containsKey("isPremium")) return doc.getBoolean("isPremium");
+		if (doc != null && doc.containsKey("isPremium")) return doc.getBoolean("isPremium");
 		else {
 			MongoManager.updateValue(collection, new BasicDBObject().append("guildid", guild), new Document("isPremium", false));
 			return false;
