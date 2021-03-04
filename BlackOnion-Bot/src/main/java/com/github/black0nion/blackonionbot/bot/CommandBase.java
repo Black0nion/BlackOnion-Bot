@@ -137,7 +137,7 @@ public class CommandBase extends ListenerAdapter {
 		final Member member = event.getMember();
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
-		final String log = guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent;
+		final String log = guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent.replace("\n", "\\n");
 		final String[] args = msgContent.toLowerCase().split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);

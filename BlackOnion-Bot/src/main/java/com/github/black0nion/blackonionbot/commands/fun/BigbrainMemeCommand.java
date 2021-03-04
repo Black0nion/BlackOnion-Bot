@@ -2,13 +2,16 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -30,6 +33,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class BigbrainMemeCommand implements Command {
 	
 	private static BufferedImage defaultBackGround;
+	
+	final static int maxWidth = 420;
 	
 	public BigbrainMemeCommand() {
 		try {
@@ -56,13 +61,15 @@ public class BigbrainMemeCommand implements Command {
 			return;
 		}
 		Message m = channel.sendMessage("Generating your image...").submit().join();
-		channel.sendMessage("bigbrian").addFile(generateImage(messages), "bigbrain.png").submit().join();
+		final @NotNull File file = generateImage(messages);
+		channel.sendMessage("bigbrian").addFile(file, "bigbrain.png").submit().join();
+		file.delete();
 		m.delete().queue();
 	}
 	
 	@Override
 	public String getSyntax() {
-		return "<arg1>,<arg2>,<arg3>,<arg4>";
+		return "<smul brain text>,<medium brain text>,<big brain text>,<thicc brain text>";
 	}
 	
 	@NotNull
@@ -77,17 +84,77 @@ public class BigbrainMemeCommand implements Command {
 	        newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
 	        newGraphics.setColor(Color.DARK_GRAY);
 	        
-	        // lil brain
-	        newGraphics.drawString(args[0], 10, 50);
+	        final FontMetrics fontMetrics = newGraphics.getFontMetrics();
 	        
+	        List<String> lines = new ArrayList<>();
+	        int width;
+	        String current;
+	        String[] input;
+	        
+	        // lil brain
+	        lines.clear();
+	        width = 0;
+	        current = "";
+	        input = args[0].split(" ");
+			for (int i = 0; i < input.length; i++) {
+				final String s = input[i];
+	        	width += fontMetrics.stringWidth(s);
+	        	if (width > maxWidth || i == input.length-1) {
+	        		lines.add(current);
+	        		current = s + " ";
+	        		width = 0;
+	        	} else current += s + " ";
+	        }
+	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 50);
+        	
 	        // medium brain
-	        newGraphics.drawString(args[1], 10, 275);
+	        lines.clear();
+	        width = 0;
+	        current = "";
+	        input = args[1].split(" ");
+			for (int i = 0; i < input.length; i++) {
+				final String s = input[i];
+	        	width += fontMetrics.stringWidth(s);
+	        	if (width > maxWidth || i == input.length-1) {
+	        		lines.add(current);
+	        		current = s + " ";
+	        		width = 0;
+	        	} else current += s + " ";
+	        }
+	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 275);
+        	
 	        
 	        // big brain
-	        newGraphics.drawString(args[2], 10, 520);
+	        lines.clear();
+	        width = 0;
+	        current = "";
+	        input = args[2].split(" ");
+			for (int i = 0; i < input.length; i++) {
+				final String s = input[i];
+	        	width += fontMetrics.stringWidth(s);
+	        	if (width > maxWidth || i == input.length-1) {
+	        		lines.add(current);
+	        		current = s + " ";
+	        		width = 0;
+	        	} else current += s + " ";
+	        }
+	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 520);
 	        
 	        // giga brain
-	        newGraphics.drawString(args[3], 10, 750);
+	        lines.clear();
+	        width = 0;
+	        current = "";
+	        input = args[3].split(" ");
+			for (int i = 0; i < input.length; i++) {
+				final String s = input[i];
+	        	width += fontMetrics.stringWidth(s);
+	        	if (width > maxWidth || i == input.length-1) {
+	        		lines.add(current);
+	        		current = s + " ";
+	        		width = 0;
+	        	} else current += s + " ";
+	        }
+	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 750);
 	
 	        final File file = new File("tmp/bigbrain/" + System.currentTimeMillis() + ".png");
 	
