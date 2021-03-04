@@ -56,7 +56,6 @@ public class SwearWhitelistCommand implements Command {
 					newWhitelist.addAll(mentionedStuff);
 				} else newWhitelist.removeAll(mentionedStuff);
 				GuildManager.saveList(guild, "whitelist", newWhitelist);
-				// TODO: test
 			}
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
