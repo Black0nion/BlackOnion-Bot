@@ -3,6 +3,7 @@
     "requiredpermissions": "Benötigte Permissions:",
     "commandnotfound": "Dieser Command wurde nicht gefunden!",
     "thecommandnotfound": "Der Command %command% wurde nicht gefunden!",
+    "didyoumean": "Meintest du %command%?",
     "help": "Hilfe",
     "modules": "Module",
     "helpmodules": "Zeigt alle Module an",
