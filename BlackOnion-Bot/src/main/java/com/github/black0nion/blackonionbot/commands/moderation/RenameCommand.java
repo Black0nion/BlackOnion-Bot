@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -17,21 +18,24 @@ public class RenameCommand implements Command {
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member sentmember, User author, Guild guild, MessageChannel channel) {
 		message.delete().queue();
-		e.getGuild().retrieveMembersByPrefix(args[1], 99).onSuccess(members -> {
-			if (members.size() != 0) {
-				Member member = members.get(0);
-				String nickname = "";
-				for (int i = 2; i < args.length; i++) {
-					nickname += args[i] + " ";
-				}
-				nickname.trim();
-				member.modifyNickname(String.join(" ", nickname)).queue();
-				return;
-			} else {
-				channel.sendMessage("Doesn't work m8").submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
-				return;
+		final Member mem = guild.getMemberById(args[1]);
+		final List<Member> members = e.getGuild().retrieveMembersByPrefix(args[1], 99).get();
+		if (members.size() != 0 || mem != null) {
+			Member member;
+			if (members.size() != 0) member = members.get(0);
+			if (mem != null) member = mem;
+			else return;
+			String nickname = "";
+			for (int i = 2; i < args.length; i++) {
+				nickname += args[i] + " ";
 			}
-		});
+			nickname.trim();
+			member.modifyNickname(String.join(" ", nickname)).queue();
+			return;
+		} else {
+			channel.sendMessage("Doesn't work m8").submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
+			return;
+		}
 	}
 	
 	@Override
