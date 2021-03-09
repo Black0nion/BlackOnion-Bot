@@ -139,7 +139,7 @@ public class CommandBase extends ListenerAdapter {
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent.replace("\n", "\\n"));
-		final String[] args = msgContent.toLowerCase().split(" ");
+		final String[] args = msgContent.split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
 		
@@ -182,7 +182,6 @@ public class CommandBase extends ListenerAdapter {
 						continue;
 					}
 					Bot.executor.submit(() -> {
-						System.out.println(String.join(", ", args));
 						cmd.execute(args, event, message, member, author, guild, channel);
 					});
 					return;
