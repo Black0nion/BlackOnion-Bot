@@ -75,6 +75,10 @@ public class BigbrainMemeCommand implements Command {
 	@NotNull
 	public static File generateImage(String[] args) {
 		try {
+			for (int i = 0; i < args.length; i++) {
+				args[i] = args[i].trim();
+			}
+			
         	BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
 	
 	        final Graphics2D newGraphics = bufferedImage.createGraphics();
@@ -100,6 +104,7 @@ public class BigbrainMemeCommand implements Command {
 				final String s = input[i];
 	        	width += fontMetrics.stringWidth(s);
 	        	if (width > maxWidth || i == input.length-1) {
+	        		if (i == input.length-1) current += s;
 	        		lines.add(current);
 	        		current = s + " ";
 	        		width = 0;
@@ -116,6 +121,7 @@ public class BigbrainMemeCommand implements Command {
 				final String s = input[i];
 	        	width += fontMetrics.stringWidth(s);
 	        	if (width > maxWidth || i == input.length-1) {
+	        		if (i == input.length-1) current += s;
 	        		lines.add(current);
 	        		current = s + " ";
 	        		width = 0;
@@ -133,6 +139,7 @@ public class BigbrainMemeCommand implements Command {
 				final String s = input[i];
 	        	width += fontMetrics.stringWidth(s);
 	        	if (width > maxWidth || i == input.length-1) {
+	        		if (i == input.length-1) current += s;
 	        		lines.add(current);
 	        		current = s + " ";
 	        		width = 0;
@@ -149,6 +156,7 @@ public class BigbrainMemeCommand implements Command {
 				final String s = input[i];
 	        	width += fontMetrics.stringWidth(s);
 	        	if (width > maxWidth || i == input.length-1) {
+	        		if (i == input.length-1) current += s;
 	        		lines.add(current);
 	        		current = s + " ";
 	        		width = 0;

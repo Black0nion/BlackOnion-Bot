@@ -28,10 +28,15 @@ public class RenameCommand implements Command {
 				member.modifyNickname(String.join(" ", nickname)).queue();
 				return;
 			} else {
-				channel.sendMessage("Doesn't work m8").complete().delete().queueAfter(3, TimeUnit.SECONDS);
+				channel.sendMessage("Doesn't work m8").submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
 				return;
 			}
 		});
+	}
+	
+	@Override
+	public String getSyntax() {
+		return "<old name> <new name>";
 	}
 	
 	@Override
