@@ -55,6 +55,7 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.vdurmont.emoji.EmojiParser;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -137,7 +138,7 @@ public class CommandBase extends ListenerAdapter {
 		final Member member = event.getMember();
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
-		final String log = guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent.replace("\n", "\\n");
+		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): " + msgContent.replace("\n", "\\n"));
 		final String[] args = msgContent.toLowerCase().split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
