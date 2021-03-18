@@ -196,6 +196,8 @@
     "removedfromwhitelist": "%removed% wurde von der Whitelist entfernt!",
     "antiswearwhitelist": "Die AntiSwearWhitelist enthält derzeit folgende Elemente:",
     "empty": "Leer!",
+    "poll": "Umfrage",
+    "polltutorial": "Reagiere mit den Emojis, um abzustimmen!",
     "success": "Erfolg",
     "error": "Fehler",
     "errorhappened": "Ein Fehler ist aufgetreten!",
