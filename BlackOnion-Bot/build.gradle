@@ -59,8 +59,6 @@ dependencies {
   	compile "com.influxdb:influxdb-client-java:1.8.0"
   	
   	compile 'se.michaelthelin.spotify:spotify-web-api-java:1.5.0'
-  	
-    compile group: 'net.ricecode', name: 'string-similarity', version: '1.0.0'
     
     implementation group: 'com.vdurmont', name: 'emoji-java', version: '5.1.1'
 }

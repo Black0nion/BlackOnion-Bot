@@ -30,6 +30,7 @@ import com.github.black0nion.blackonionbot.commands.information.UserInfoCommand;
 import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
 import com.github.black0nion.blackonionbot.commands.misc.InstagramCommand;
 import com.github.black0nion.blackonionbot.commands.misc.PastebinCommand;
+import com.github.black0nion.blackonionbot.commands.misc.PollCommand;
 import com.github.black0nion.blackonionbot.commands.misc.TestCommand;
 import com.github.black0nion.blackonionbot.commands.misc.VirusCommand;
 import com.github.black0nion.blackonionbot.commands.moderation.AutoRolesCommand;
@@ -65,10 +66,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.ricecode.similarity.JaroWinklerStrategy;
-import net.ricecode.similarity.SimilarityStrategy;
-import net.ricecode.similarity.StringSimilarityService;
-import net.ricecode.similarity.StringSimilarityServiceImpl;
 
 public class CommandBase extends ListenerAdapter {
 	
@@ -77,9 +74,6 @@ public class CommandBase extends ListenerAdapter {
 	public static EventWaiter waiter;
 
 	public static int commandsLastTenSecs = 0;
-	
-	private static final SimilarityStrategy strategy = new JaroWinklerStrategy();
-	private static final StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		waiter = newWaiter;
@@ -125,6 +119,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new BugReportCommand());
 		addCommand(new SwearWhitelistCommand());
 		addCommand(new BanUsageCommand());
+		addCommand(new PollCommand());
 	}
 	
 	@Override
@@ -147,18 +142,9 @@ public class CommandBase extends ListenerAdapter {
 
 		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
 		
-		String possibleCommand = null;
-		double lastScore = 0;
-		
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
-				final double tempScore = service.score(args[0], prefix + str);
-				if (tempScore > 0.70 && lastScore < tempScore) {
-					lastScore = tempScore;
-					possibleCommand = prefix + str;
-				}
-				if (args[0].equalsIgnoreCase(prefix + str) || tempScore > 0.8) {
-					args[0] = possibleCommand;
+				if (args[0].equalsIgnoreCase(prefix + str)) {
 					FileUtils.appendToFile("commandLog", log);
 					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 					commandsLastTenSecs++;
@@ -189,7 +175,7 @@ public class CommandBase extends ListenerAdapter {
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("commandnotfound", possibleCommand != null ? LanguageSystem.getTranslatedString("didyoumean", author, guild).replace("%command%", possibleCommand) : LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	public static void addCommand(Command c, String... command) {
