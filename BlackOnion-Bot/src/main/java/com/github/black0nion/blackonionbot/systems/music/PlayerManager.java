@@ -58,6 +58,9 @@ public class PlayerManager {
 		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
 		numbersUnicode.put(10,"U+1F51F");
 	};
+
+	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
+
 	
 	public static void init() {
 		if (!Bot.getCredentialsManager().has("spotify_client_id") || !Bot.getCredentialsManager().has("spotify_client_secret")) {
@@ -84,8 +87,6 @@ public class PlayerManager {
 			}, 0, 3500000);
 	}
 	
-	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
-
     public PlayerManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
