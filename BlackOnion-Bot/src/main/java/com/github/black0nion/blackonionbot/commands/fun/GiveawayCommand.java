@@ -44,6 +44,7 @@ public class GiveawayCommand implements Command {
 		try { endDate = format.parse(args[1]); } catch (Exception ignored) {
 			try {
 				duration = Integer.parseInt(args[1]);
+				duration *= 1000;
 				Calendar cal = Calendar.getInstance(); 
 				cal.setTimeInMillis(cal.getTimeInMillis() + (long) duration);
 				endDate = cal.getTime();
@@ -66,7 +67,7 @@ public class GiveawayCommand implements Command {
 		}
 		
 		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
-		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate)), false).build()).submit().join();
+		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).submit().join();
 		msg.addReaction("U+1F389").queue();
 		GiveawaysSystem.createGiveaway(endDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, winnersCount);
 	}
@@ -88,6 +89,6 @@ public class GiveawayCommand implements Command {
 
 	@Override
 	public String getSyntax() {
-		return "<time in ms | date in " + format.toPattern() + "> <winners> <item to give away>";
+		return "<time in s | date in " + format.toPattern() + "> <winners> <item to give away>";
 	}
 }
