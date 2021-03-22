@@ -153,14 +153,14 @@ public class CommandBase extends ListenerAdapter {
 						continue;
 					} else if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
 						if (cmd.getVisisbility() != CommandVisibility.SHOWN)
-							continue;
+							return;
 						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
 								.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
-						continue;
+						return;
 					} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
 								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
-						continue;
+						return;
 					}
 					
 					if (containsProfanity) {
