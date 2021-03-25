@@ -46,6 +46,7 @@
     "helpautoroles": "Erstellt eine Autorole",
     "helpsetwelcomechannel": "Setzt den Kanal für die Willkommensnachrichten",
     "helpsetleavechannel": "Setzt den Kanal für die Verabschiedungsnachrichten",
+    "helpjoinleavemessage": "Setzt die Nachricht für das Leaven / Joinen eines Users\n**Platzhalter:**\n``%user%`` -> der Benutzer der gejoint / geleavt ist\n``%guild%`` -> der Name des Servers",
     "wrongargument": "Falsches Argument!",
     "wrongargumentcount": "Falsche Anzahl an Argumenten!",
     "wronginput": "Falsche Eingabe!",
@@ -201,5 +202,9 @@
     "success": "Erfolg",
     "error": "Fehler",
     "errorhappened": "Ein Fehler ist aufgetreten!",
-    "somethingwentwrong": "Irgendwie ist etwas schiefgegangen :("
+    "somethingwentwrong": "Irgendwie ist etwas schiefgegangen :(",
+    "setleavemessage": "Leave Nachricht gesetzt!",
+    "setjoinmessage": "Join Nachricht gesetzt!",
+    "leavemessagesetto": "Die Leave Nachricht wurde auf %msg% gesetzt!",
+    "joinmessagesetto": "Die Join Nachricht wurde auf %msg% gesetzt!"
 }
