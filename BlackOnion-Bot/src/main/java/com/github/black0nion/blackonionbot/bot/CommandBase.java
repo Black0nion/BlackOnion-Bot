@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.commands.bot.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.BugReportCommand;
 import com.github.black0nion.blackonionbot.commands.bot.GuildLanguageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
+import com.github.black0nion.blackonionbot.commands.bot.JoinLeaveMessageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.LanguageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.NotifyCommand;
 import com.github.black0nion.blackonionbot.commands.bot.PingCommand;
@@ -120,6 +121,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new SwearWhitelistCommand());
 		addCommand(new BanUsageCommand());
 		addCommand(new PollCommand());
+		addCommand(new JoinLeaveMessageCommand());
 	}
 	
 	@Override
@@ -138,10 +140,10 @@ public class CommandBase extends ListenerAdapter {
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
 		
-		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
-
 		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
 		
+		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
+
 		for (String[] c : commands.keySet()) {
 			for (String str : c) {
 				if (args[0].equalsIgnoreCase(prefix + str)) {
@@ -165,7 +167,7 @@ public class CommandBase extends ListenerAdapter {
 					
 					if (containsProfanity) {
 						channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
-						continue;
+						return;
 					}
 					Bot.executor.submit(() -> {
 						cmd.execute(args, event, message, member, author, guild, channel);
@@ -175,7 +177,7 @@ public class CommandBase extends ListenerAdapter {
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	public static void addCommand(Command c, String... command) {

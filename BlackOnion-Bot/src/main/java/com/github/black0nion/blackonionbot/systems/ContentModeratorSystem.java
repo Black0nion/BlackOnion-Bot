@@ -78,7 +78,7 @@ public class ContentModeratorSystem {
 						
 						message = Utils.removeMarkdown(message);
 						builder.setContent(message);
-						builder.setUsername(event.getMember().getEffectiveName());
+						builder.setUsername(event.getMember().getEffectiveName() + "#" + event.getAuthor().getDiscriminator());
 						builder.setAvatarUrl(event.getAuthor().getEffectiveAvatarUrl());
 						final List<Webhook> webhooks = event.getChannel().retrieveWebhooks().submit().join();
 						
