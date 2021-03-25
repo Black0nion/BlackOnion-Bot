@@ -17,12 +17,18 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
 
@@ -164,7 +170,15 @@ public class Utils {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 	
-	 public static<T> T[] subArray(T[] array, int beg, int end) {
-	        return Arrays.copyOfRange(array, beg, end + 1);
-	    }
+	public static<T> T[] subArray(T[] array, int beg) {
+		return subArray(array, beg, array.length-1);
+	}
+	
+	public static<T> T[] subArray(T[] array, int beg, int end) {
+	       return Arrays.copyOfRange(array, beg, end + 1);
+	}
+	 
+	public static String getPleaseUse(Guild guild, User author, Command command) {
+		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
+	}
 }

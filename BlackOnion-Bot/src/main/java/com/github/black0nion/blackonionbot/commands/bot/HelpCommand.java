@@ -143,7 +143,7 @@ public class HelpCommand implements Command {
 					
 					msg.editMessage(builder.build()).queue();
 					waitForHelpCatSelection(msg, author, catCount);
-		}, 1, TimeUnit.MINUTES, () -> {msg.delete().queue();});
+		}, 5, TimeUnit.MINUTES, () -> {msg.delete().queue();});
 	}
 
 	@Override
