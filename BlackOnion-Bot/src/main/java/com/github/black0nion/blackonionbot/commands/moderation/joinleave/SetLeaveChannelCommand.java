@@ -38,5 +38,4 @@ public class SetLeaveChannelCommand implements Command {
 	public Category getCategory() {
 		return Category.MODERATION;
 	}
-
 }
