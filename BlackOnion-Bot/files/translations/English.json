@@ -206,5 +206,10 @@
     "setleavemessage": "Leave Nachricht gesetzt!",
     "setjoinmessage": "Join Nachricht gesetzt!",
     "leavemessagesetto": "Die Leave Nachricht wurde auf %msg% gesetzt!",
-    "joinmessagesetto": "Die Join Nachricht wurde auf %msg% gesetzt!"
+    "joinmessagesetto": "Die Join Nachricht wurde auf %msg% gesetzt!",
+    "thankyouforadding": "Danke, dass du mich auf deinen Server gebracht hast!",
+    "commandtohelp": "Um Hilfe zu erhalten, benutze %cmd%!",
+    "changelanguage": "Um deine Sprache zu wechseln, benutze %usercmd%!\nUm die Sprache für den ganzen Server zu ändern, benutze %guildcmd%!",
+    "defaultjoinmessage": "Willkommen, **%user%** auf **%guild%**! :)",
+    "defaultleavemessage": "Auf Wiedersehen, **%user%**, auf **%guild%** :("
 }
