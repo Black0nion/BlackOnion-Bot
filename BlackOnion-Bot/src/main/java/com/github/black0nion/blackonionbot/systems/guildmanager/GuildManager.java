@@ -151,4 +151,12 @@ public class GuildManager {
 			return false;
 		}
 	}
+	
+	public static void remove(String guild, String key) {
+		MongoManager.removeValue(collection, new BasicDBObject().append("guildid", guild), key);
+	}
+	
+	public static void remove(Guild guild, String key) {
+		remove(guild.getId(), key);
+	}
 }
