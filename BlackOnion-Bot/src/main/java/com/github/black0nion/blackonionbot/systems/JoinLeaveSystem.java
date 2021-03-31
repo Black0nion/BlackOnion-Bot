@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.enums.DrawType;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,11 +32,11 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class JoinSystem extends ListenerAdapter {
+public class JoinLeaveSystem extends ListenerAdapter {
 
     private static BufferedImage defaultBackGround;
     
-    public JoinSystem() {
+    public JoinLeaveSystem() {
     	try {
     		InputStream inputstream = new FileInputStream(new File("files/background.png"));
 
@@ -50,12 +51,14 @@ public class JoinSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		try {
-			String id = GuildManager.getString(event.getGuild(), "welcomechannel");
+			final Guild guild = event.getGuild();
+			final User author = event.getUser();
+			String id = GuildManager.getString(guild, "welcomechannel");
 			if (id == null) return;
-			TextChannel channel = event.getGuild().getTextChannelById(id);
+			TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
-			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.JOIN);
-			channel.sendMessage("Welcome, " + event.getMember().getAsMention() + "! :)").addFile(file, "welcome.png").queue();
+			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
+			channel.sendMessage(GuildManager.getString(guild, "joinmessage", LanguageSystem.getTranslatedString("defaultjoinmessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -64,12 +67,14 @@ public class JoinSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		try {
+			final Guild guild = event.getGuild();
+			final User author = event.getUser();
 			String id = GuildManager.getString(event.getGuild(), "leavechannel");
 			if (id == null) return;
 			TextChannel channel = event.getGuild().getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.LEAVE);
-			channel.sendMessage("Goodbye, " + event.getUser().getAsMention() + "! :(").addFile(file, "goodbye.png").queue();
+			channel.sendMessage(GuildManager.getString(guild, "leavemessage", LanguageSystem.getTranslatedString("defaultleavemessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +82,10 @@ public class JoinSystem extends ListenerAdapter {
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
-		event.getGuild().getOwner().getUser().openPrivateChannel().complete().sendMessage("Thank you for adding the **BlackOnion-Bot**! To get help, use ``" + BotInformation.defaultPrefix + "help``!").queue();
+		final Guild guild = event.getGuild();
+		final User author = guild.retrieveOwner().submit().join().getUser();
+		final String prefix = BotInformation.getPrefix(guild);
+		author.openPrivateChannel().complete().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslatedString("commandtohelp", author, guild).replace("%cmd%", prefix + "help"), LanguageSystem.getTranslatedString("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
 	}
 	
     @NotNull

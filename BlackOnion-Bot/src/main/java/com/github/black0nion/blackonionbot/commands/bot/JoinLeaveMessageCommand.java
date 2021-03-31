@@ -27,6 +27,7 @@ public class JoinLeaveMessageCommand implements Command {
 		final String newMessage = String.join(" ", Utils.subArray(args, 2));
 		if (args[1].equalsIgnoreCase("join")) {
 			GuildManager.save(guild, "joinmessage", newMessage);
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("setjoinmessage", LanguageSystem.getTranslatedString("joinmessagesetto", author, guild).replace("%msg%", "``" + newMessage + "``"), false).build()).queue();
 		} else if (args[1].equalsIgnoreCase("leave")) {
 			GuildManager.save(guild, "leavemessage", newMessage);
 			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("setleavemessage", LanguageSystem.getTranslatedString("leavemessagesetto", author, guild).replace("%msg%", "``" + newMessage + "``"), false).build()).queue();

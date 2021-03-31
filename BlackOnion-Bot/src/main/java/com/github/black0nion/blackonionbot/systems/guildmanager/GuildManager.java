@@ -73,7 +73,7 @@ public class GuildManager {
 	 */
 	public static boolean getBoolean(String guild, String key) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "guildid", guild);
-		if (doc == null) return false;
+		if (doc == null || !doc.containsKey(key)) return false;
 		return doc.getBoolean(key);
 	}
 	

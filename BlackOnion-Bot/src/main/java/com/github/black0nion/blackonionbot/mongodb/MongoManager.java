@@ -100,7 +100,9 @@ public class MongoManager {
 		final Document tempDoc = collection.find(query).first();
 		if (tempDoc != null)
 			collection.updateOne(query, new BasicDBObject().append("$set", updatedValue));
-		else
+		else {
+			updatedValue.putAll(query);
 			collection.insertOne(updatedValue);	
+		}
 	}
 }
