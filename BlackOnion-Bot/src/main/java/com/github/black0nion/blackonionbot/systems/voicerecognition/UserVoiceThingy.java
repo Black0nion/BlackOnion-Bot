@@ -16,6 +16,7 @@ import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.api.StreamSpeechRecognizer;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.entities.User;
+import spark.utils.IOUtils;
 
 public class UserVoiceThingy {
 	private byte[] packet;
@@ -54,10 +55,22 @@ public class UserVoiceThingy {
 		AudioInputStream is = AudioSystem.getAudioInputStream(target, audioInputStream);
         // Write a temporary file to the computer somewhere, this method will return a InputStream that can be used for recognition
         try {
-            AudioSystem.write(is, AudioFileFormat.Type.WAVE, new File(user.getId() + ".wav"));
+            AudioSystem.write(is, AudioFileFormat.Type.WAVE, new File("tmp/" + user.getId() + ".wav"));
+            InputStream stream = new FileInputStream("tmp/" + user.getId() + ".wav");
+            byte[] isArray = new byte[is.available()];
+            byte[] streamArray = new byte[stream.available()];
+	    	stream.read(streamArray);
+	    	is.read(isArray);
+	    	stream.close();
         } catch(Exception e) {e.printStackTrace();}
         
-	    InputStream stream = new FileInputStream(user.getId() + ".wav");
+        InputStream stream = new FileInputStream("tmp/" + user.getId() + ".wav");
+        try {
+        	stream = new ByteArrayInputStream(packet);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+	    
 	    recognizer.startRecognition(stream);
 	    SpeechResult result;
 	    while ((result = recognizer.getResult()) != null) {
