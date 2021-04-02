@@ -83,7 +83,7 @@ public class ConnectFourCommand implements Command {
 	  				User author = answerEvent.getAuthor();
 	  				Guild guild = answerEvent.getGuild();
 	  				answerEvent.getMessage().delete().queue();
-	  				if (msg.equalsIgnoreCase("exit")) {
+	  				if (msg.equalsIgnoreCase("exit") || msg.equalsIgnoreCase("stop") || msg.equalsIgnoreCase("cancel") || msg.equalsIgnoreCase("leave")) {
 	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("gaveup", author, guild)).addField(Utils.removeMarkdown(getTranslatedString("usergaveup", author, guild).replace("%user%", answerEvent.getAuthor().getName())), getTranslatedString("sadloose", author, guild), false).build()).queue();
 	  					ConnectFourGameManager.deleteGame(game);
 	  					return;

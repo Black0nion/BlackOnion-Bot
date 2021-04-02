@@ -81,7 +81,7 @@ public class HelpCommand implements Command {
 	
 	private static final void waitForHelpCatSelection(Message msg, Member author, int catCount) {
 		CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class, 
-				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
+				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUserIdLong() == author.getIdLong(), 
 				(event) -> {
 					event.getReaction().removeReaction(event.getUser()).queue();
 					Integer emojiReactionNum = PlayerManager.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
