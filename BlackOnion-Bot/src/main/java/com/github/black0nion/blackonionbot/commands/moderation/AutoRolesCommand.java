@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -27,6 +28,13 @@ public class AutoRolesCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+		List<String> argz = Arrays.asList(args); 
+		
+		if (argz.contains("@everyone") || argz.contains("@here")) {
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
+			return;
+		}
+		
 		if (args[1].equalsIgnoreCase("create")) {
 			List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;

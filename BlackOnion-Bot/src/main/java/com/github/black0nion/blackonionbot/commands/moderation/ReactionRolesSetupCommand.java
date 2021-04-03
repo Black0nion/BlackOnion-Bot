@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +33,16 @@ public class ReactionRolesSetupCommand implements Command {
 		List<TextChannel> channels = message.getMentionedChannels();
 		List<Role> roles = message.getMentionedRoles();
 		
+		List<String> argz = Arrays.asList(args); 
+		
+		if (argz.contains("@everyone") || argz.contains("@here")) {
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
+			return;
+		}
+		
 		if (!channels.isEmpty() && !roles.isEmpty()) {
 			TextChannel tc = channels.get(0);
 			Role role = roles.get(0);
-			if (role.isPublicRole()) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
-				return;
-			} else if (role.canInteract(role)) {
-				
-			}
 			
 			final String[] finalArgs = args; 
 			String messageIDString = args[3];
