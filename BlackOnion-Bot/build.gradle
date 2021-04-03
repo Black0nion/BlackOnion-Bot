@@ -15,6 +15,10 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    maven {
+	    url 'https://m2.dv8tion.net/releases'
+	    name 'm2-dv8tion'
+  }
 }
 
 dependencies {
@@ -29,7 +33,8 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
     
-    compile("net.dv8tion:JDA:4.2.0_227")
+    compile 'net.dv8tion:JDA:4.2.1_253'
+    
     compile 'com.jagrosh:jda-utilities:3.0.5'
     
     implementation 'com.sedmelluq:lavaplayer:1.3.50'
