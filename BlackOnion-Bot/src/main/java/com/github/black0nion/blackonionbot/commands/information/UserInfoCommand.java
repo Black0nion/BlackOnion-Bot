@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 public class UserInfoCommand implements Command {
 	
@@ -44,11 +46,10 @@ public class UserInfoCommand implements Command {
 						channel.sendMessage(getUserInfo(author, member, idUser, null).build()).queue();
 						return;
 					});
-				}, (err) -> {
-					if (err.getMessage().equalsIgnoreCase("10013: Unknown User")) channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue();
-					else channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
-					return;
-				});
+				}, new ErrorHandler()
+						.handle(ErrorResponse.UNKNOWN_USER, (errr) -> channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue())
+						.handle(Throwable.class, (err) -> channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue())
+				);
 			} else {
 				statsUser = author;
 				statsMember = member;
