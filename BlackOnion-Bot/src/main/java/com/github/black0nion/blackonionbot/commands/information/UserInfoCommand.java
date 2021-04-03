@@ -32,24 +32,35 @@ public class UserInfoCommand implements Command {
 		if (message.getMentionedMembers().size() > 0) {
 			statsMember = message.getMentionedMembers().get(0);
 			statsUser = statsMember.getUser();
+			channel.sendMessage(getUserInfo(author, member, statsUser, statsMember).build()).queue();
 		} else {
 			if (args.length >= 2) {
-				User idUser = e.getJDA().retrieveUserById(args[1]).submit().join();
-			
-				if (idUser != null) {
-					statsUser = idUser;
-					try { statsMember = guild.retrieveMember(idUser).submit().join(); } catch (Exception ignored) {}
-				} else {
-					statsUser = author;
-					statsMember = member;
-				}
+				try { Long.parseLong(args[1]); } catch (Exception ex) { channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue(); return; }
+				e.getJDA().retrieveUserById(args[1]).queue(idUser -> {
+					guild.retrieveMember(idUser).queue(mem -> {
+						channel.sendMessage(getUserInfo(author, member, idUser, mem).build()).queue();
+						return;
+					}, (error) -> {
+						channel.sendMessage(getUserInfo(author, member, idUser, null).build()).queue();
+						return;
+					});
+				}, (err) -> {
+					if (err.getMessage().equalsIgnoreCase("10013: Unknown User")) channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue();
+					else channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+					return;
+				});
 			} else {
 				statsUser = author;
 				statsMember = member;
+				channel.sendMessage(getUserInfo(author, member, statsUser, statsMember).build()).queue();
+				return;
 			}
 		}
-		
+	}
+	
+	private static final EmbedBuilder getUserInfo(User author, Member member, User statsUser, Member statsMember) {
 		String[] flags = statsUser.getFlags().stream().map(entry -> entry.getName()).toArray(String[]::new);
+		final Guild guild = member.getGuild();
 		
 		EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
 		builder.setTitle("userinfo");
@@ -64,8 +75,7 @@ public class UserInfoCommand implements Command {
 			builder.addField("joined", statsMember.getTimeJoined().format(pattern), true);
 		if (statsMember != null && statsMember.getTimeBoosted() != null)
 			builder.addField("boosted", statsMember.getTimeBoosted().format(pattern), true);
-		
-		channel.sendMessage(builder.build()).queue();
+		return builder;
 	}
 	
 	@Override
