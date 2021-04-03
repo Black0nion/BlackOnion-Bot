@@ -26,7 +26,7 @@ public class ContentModeratorSystem {
 	
 	public static int profanityFilteredLastTenSecs = 0;
 	
-	private static final File file = new File("resources/logo.png");
+	public static final File file = new File("resources/logo.png");
 	
 	/**
 	 * @param event

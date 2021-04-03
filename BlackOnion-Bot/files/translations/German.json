@@ -187,6 +187,7 @@
     "antiswearis": "AntiSwear ist jetzt %status%.",
     "on": "an",
     "off": "aus",
+    "delete": "löschen",
     "dontexecuteprofanitycommands": "Kommandos können nur ohne unangebrachten Wörtern ausgeführt werden!",
     "pleaseremoveprofanity": "Bitte entferne alle unangebrachten Wörter aus deiner Nachricht!",
     "foundabug": "Du hast einen Bug gefunden?",
@@ -215,5 +216,9 @@
     "commandtohelp": "Um Hilfe zu erhalten, benutze %cmd%!",
     "changelanguage": "Um deine Sprache zu wechseln, benutze %usercmd%!\nUm die Sprache für den ganzen Server zu ändern, benutze %guildcmd%!",
     "defaultjoinmessage": "Willkommen, **%user%** auf **%guild%**! :)",
-    "defaultleavemessage": "Auf Wiedersehen, **%user%**, auf **%guild%** :("
+    "defaultleavemessage": "Auf Wiedersehen, **%user%**, auf **%guild%** :(",
+    "antispoilerstatus": "AntiSpoiler ist gerade %status%",
+    "howtoantispoilertoggle": "Um AntiSpoiler ein oder aus zu schalten, benutze %command%",
+    "antispoilerstatuschanged": "Der AntiSpoiler-Status wurde umgestellt!",
+    "antispoileris": "AntiSpoiler ist jetzt %status%"
 }

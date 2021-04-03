@@ -43,7 +43,7 @@ public class AntiSwearCommand implements Command {
 	}
 	
 	private final void print(GuildMessageReceivedEvent e, MessageChannel channel, User author, Member member, Guild guild) {
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax()), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", "``" + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax() + "``"), false).build()).queue();
 	}
 	
 	@Override
