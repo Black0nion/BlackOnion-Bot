@@ -60,12 +60,12 @@ public class LanguageSystem {
 	
 	public static Language getLanguage(User author, Guild guild) {
 		try {
-			if (userLanguages.get(author.getId()) != null)
-			return userLanguages.get(author.getId());
+			Language userLang = getUserLanguage(author.getId());
+			if (userLang != null) return userLang;
 		} catch (Exception ignored) {}
 		try {
-			if (guildLanguages.get(guild.getId()) != null)
-			return guildLanguages.get(guild.getId());
+			Language guildLang = getGuildLanguage(guild.getId());
+			if (guildLang != null) return guildLang;
 		} catch (Exception ignored) {}
 		try {
 			return defaultLocale;
@@ -110,10 +110,10 @@ public class LanguageSystem {
 	
 	public static String getTranslatedString(String key, User author, Guild guild) {
 		try {
-			return userLanguages.get(author.getId()).getTranslatedString(key);
+			return getUserLanguage(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
-			return guildLanguages.get(guild.getId()).getTranslatedString(key);
+			return getGuildLanguage(guild.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
 			return defaultLocale.getTranslatedString(key);
@@ -123,39 +123,33 @@ public class LanguageSystem {
 	
 	public static String getTranslatedString(String key, User author) {
 		try {
-			return userLanguages.get(author.getId()).getTranslatedString(key);
+			return getUserLanguage(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
 		try {
 			return defaultLocale.getTranslatedString(key);
 		} catch (Exception ignored) {}
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
-	
-	public static String getDefaultTranslatedString(String key) {
+
+	public static String getTranslatedString(String key, Guild guild) {
+		try {
+			return getGuildLanguage(guild.getId()).getTranslatedString(key);
+		} catch (Exception ignored) {}
 		try {
 			return defaultLocale.getTranslatedString(key);
 		} catch (Exception ignored) {}
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
-	
-	public static String getLocaleTranslatedString(String key, String locale) {
-		try {
-			return languages.get(locale).getTranslatedString(key);
-		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
-	}
-	
-	public static String getUserTranslatedString(String key, String user) {
-		try {
-			return userLanguages.get(user).getTranslatedString(key);
-		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
-	}
-	
-	public static String getGuildTranslatedString(String key, String guild) {
-		try {
-			return guildLanguages.get(guild).getTranslatedString(key);
-		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
+	/**
+	 * The replacement will also get translated!
+	 * @param key
+	 * @param author
+	 * @param guild
+	 * @param toReplace
+	 * @param replacement
+	 * @return
+	 */
+	public static String getReplacedTranslation(String key, User author, Guild guild, String toReplace, String replacement) {
+		return getTranslatedString(key, author, guild).replace("%" + toReplace + "%", getTranslatedString(replacement, author, guild));
 	}
 }

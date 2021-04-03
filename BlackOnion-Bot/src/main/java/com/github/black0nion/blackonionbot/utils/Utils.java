@@ -179,6 +179,10 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
+		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getCommandHelp(guild, author, command);
+	}
+	
+	public static String getCommandHelp(Guild guild, User author, Command command) {
+		return BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
 	}
 }

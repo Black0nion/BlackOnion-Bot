@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -59,7 +60,7 @@ public class ConnectFourCommand implements Command {
 				    	  
 				    	  //ANGENOMMEN
 				    	  ConnectFour game = ConnectFourGameManager.createGame(channel, author.getId(), author.getName(), challenged.getId(), challenged.getName());
-				    	  rerun(game, channel);
+				    	  rerun(game, e.getChannel());
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
 				    	  channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setTitle(getTranslatedString("declined", event.getAuthor(), guild)).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("arentyoubraveenough", event.getAuthor(), guild), false).build()).queue();
 				    	  return;
@@ -75,7 +76,7 @@ public class ConnectFourCommand implements Command {
 		}
 	}
 	
-	public void rerun(ConnectFour game, MessageChannel channel) {
+	public void rerun(ConnectFour game, TextChannel channel) {
 		waiter.waitForEvent(MessageReceivedEvent.class, 
 	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
@@ -118,7 +119,7 @@ public class ConnectFourCommand implements Command {
 	  				rerun(game, channel);
 	  				return;
 	  			}, 
-	  		30, TimeUnit.SECONDS, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getDefaultTranslatedString("timeout"), LanguageSystem.getDefaultTranslatedString("tooktoolong"), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
+	  		30, TimeUnit.SECONDS, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getTranslatedString("timeout", channel.getGuild()), LanguageSystem.getTranslatedString("tooktoolong", channel.getGuild()), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
 	}
 	
@@ -126,5 +127,4 @@ public class ConnectFourCommand implements Command {
 	public Category getCategory() {
 		return Category.FUN;
 	}
-
 }

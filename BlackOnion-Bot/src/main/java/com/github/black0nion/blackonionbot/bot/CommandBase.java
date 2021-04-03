@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
+import com.github.black0nion.blackonionbot.commands.bot.AntiSpoilerCommand;
 import com.github.black0nion.blackonionbot.commands.bot.AntiSwearCommand;
 import com.github.black0nion.blackonionbot.commands.bot.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.BugReportCommand;
@@ -51,6 +52,7 @@ import com.github.black0nion.blackonionbot.commands.old.HypixelCommand;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -77,6 +79,7 @@ public class CommandBase extends ListenerAdapter {
 	public static int commandsLastTenSecs = 0;
 	
 	public static void addCommands(EventWaiter newWaiter) {
+		commands.clear();
 		waiter = newWaiter;
 		addCommand(new ActivityCommand());
 		addCommand(new AvatarCommand());
@@ -122,6 +125,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new BanUsageCommand());
 		addCommand(new PollCommand());
 		addCommand(new JoinLeaveMessageCommand());
+		addCommand(new AntiSpoilerCommand());
 	}
 	
 	@Override
@@ -141,6 +145,8 @@ public class CommandBase extends ListenerAdapter {
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
 		
 		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
+		
+		if (AntiSpoilerSystem.removeSpoilers(event)) return;
 		
 		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
 
