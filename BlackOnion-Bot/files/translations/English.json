@@ -50,7 +50,7 @@
     "helppoll": "Creates a poll",
     "helpswearwhitelist": "Adds roles, channels and permissions to not get flagged by the AntiSwear-System",
     "helptantiswear": "Toggles the status of the AntiSwear System",
-    "helpbug": "Gibt Informationen zum Melden von bugs aus",
+    "helpbug": "Displays information on how to report bugs",
     "helpantispoiler": "Changes the status of the AntiSpoiler-System",
     "helpuserinfo": "Displays information about a user",
     "helpguildinfo": "Displays information about this server",
