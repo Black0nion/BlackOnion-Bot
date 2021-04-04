@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.systems;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
@@ -16,6 +17,13 @@ import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AntiSpoilerSystem {
+	/**
+	 * Key: A WebhookInformation Object (containing the Guild ID and Channel ID)
+	 * Value: The Webhook ID coresponding to that Object
+	 */
+	@SuppressWarnings("unused")
+	private static HashMap<WebhookInformation, Long> cachedWebhooks = new HashMap<>();
+	
 	/**
 	 * @param event
 	 * @return if the message contained a spoiler
