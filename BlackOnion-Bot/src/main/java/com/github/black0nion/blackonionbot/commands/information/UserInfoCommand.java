@@ -69,7 +69,7 @@ public class UserInfoCommand implements Command {
 		builder.addField("name", Utils.removeMarkdown(statsUser.getName()), true);
 		builder.addField("discriminator", statsUser.getDiscriminator(), true);
 		builder.addField("userid", statsUser.getId(), true);
-		builder.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "NONE"), false);
+		builder.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false);
 		builder.addField("language", LanguageSystem.getLanguage(author, guild).getName() + " (" + LanguageSystem.getLanguage(author, guild).getLanguageCode() + ")", true);
 		builder.addField("created", statsUser.getTimeCreated().format(pattern), true);
 		if (statsMember != null)
