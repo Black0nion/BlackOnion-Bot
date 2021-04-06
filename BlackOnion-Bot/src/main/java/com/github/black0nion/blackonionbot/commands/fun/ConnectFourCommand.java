@@ -34,7 +34,7 @@ public class ConnectFourCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"connect4"};
+		return new String[] { "connect4", "connectfour", "viergewinnt", "4gewinnt" };
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class ConnectFourCommand implements Command {
 	  				rerun(game, channel);
 	  				return;
 	  			}, 
-	  		30, TimeUnit.SECONDS, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getTranslatedString("timeout", channel.getGuild()), LanguageSystem.getTranslatedString("tooktoolong", channel.getGuild()), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
+	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getTranslatedString("timeout", channel.getGuild()), LanguageSystem.getTranslatedString("tooktoolong", channel.getGuild()), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
 	}
 	
