@@ -16,8 +16,7 @@ public class PrefixInfo extends ListenerAdapter {
 		if (event.getAuthor().isBot() || event.getMessage().getMentionedUsers().size() == 0) return;
 		final User author = event.getAuthor();
 		final Guild guild = event.getGuild();
-		final long botId = BotInformation.botId;
-		if (event.getMessage().getMentionedUsers().stream().filter(user -> {return user.getIdLong() == botId;}).findFirst().orElse(null) != null) {
+		if (event.getMessage().getContentRaw().replace("!", "").startsWith(event.getJDA().getSelfUser().getAsMention())) {
 			final String[] args = event.getMessage().getContentRaw().split(" ");
 			if (event.getMember().hasPermission(Permission.ADMINISTRATOR) && args.length >= 2)
 				BotInformation.setPrefix(guild, args[1]);
