@@ -151,13 +151,13 @@ public class Bot extends ListenerAdapter {
 							e.getJDA().getPresence().setActivity(ActivityCommand.getActivity());
 							Thread.sleep(5000);
 						}
-						e.getJDA().getPresence().setActivity(Activity.listening("dem Prefix " + BotInformation.defaultPrefix));
+						e.getJDA().getPresence().setActivity(Activity.listening("the prefix " + BotInformation.defaultPrefix));
 						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening("dem OS " + os.getName()));
+						e.getJDA().getPresence().setActivity(Activity.listening("the OS " + os.getName()));
 						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening("mit " + os.getAvailableProcessors() + " CPU Kernen"));
+						e.getJDA().getPresence().setActivity(Activity.listening("with " + os.getAvailableProcessors() + " CPU cores"));
 						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " Zeilen code in " + BotInformation.file_count + " Datein"));
+						e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " rows of code in " + BotInformation.file_count + " files"));
 						Thread.sleep(5000);
 //						e.getJDA().getPresence().setActivity(Activity.listening("mit " + Utils.round("#.###", (double) getOsThings(os).get("getProcessCpuLoad")) + "% CPU Load"));
 //						Thread.sleep(5000);
