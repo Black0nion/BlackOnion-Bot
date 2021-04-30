@@ -152,4 +152,8 @@ public class LanguageSystem {
 	public static String getReplacedTranslation(String key, User author, Guild guild, String toReplace, String replacement) {
 		return getTranslatedString(key, author, guild).replace("%" + toReplace + "%", getTranslatedString(replacement, author, guild));
 	}
+	
+	public static String getTranslatedString(String key, Language language) {
+		return language.getTranslatedString(key);
+	}
 }

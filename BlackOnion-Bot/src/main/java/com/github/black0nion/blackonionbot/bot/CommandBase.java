@@ -1,6 +1,14 @@
 package com.github.black0nion.blackonionbot.bot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -49,6 +57,7 @@ import com.github.black0nion.blackonionbot.commands.music.QueueCommand;
 import com.github.black0nion.blackonionbot.commands.music.SkipCommand;
 import com.github.black0nion.blackonionbot.commands.music.StopCommand;
 import com.github.black0nion.blackonionbot.commands.old.HypixelCommand;
+import com.github.black0nion.blackonionbot.enums.Category;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
 import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
@@ -74,9 +83,13 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static HashMap<String[], Command> commands = new HashMap<>();
 	
+	public static HashMap<Category, List<Command>> commandsInCategory = new HashMap<>();
+	
 	public static EventWaiter waiter;
 
 	public static int commandsLastTenSecs = 0;
+	
+	private static JSONObject commandsJSON = new JSONObject();
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
@@ -126,6 +139,18 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new PollCommand());
 		addCommand(new JoinLeaveMessageCommand());
 		addCommand(new AntiSpoilerCommand());
+		
+		for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
+			JSONArray array = new JSONArray();
+			for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN).collect(Collectors.toList())) {				
+				JSONObject commandJSON = new JSONObject();
+				commandJSON.put("command", command.getCommand());
+				commandJSON.put("description", LanguageSystem.getTranslatedString("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
+				array.put(commandJSON);
+			}
+			commandsJSON.put(entry.getKey().name(), array);
+		}
+		System.out.println(commandsJSON.toString(2));
 	}
 	
 	@Override
@@ -175,6 +200,7 @@ public class CommandBase extends ListenerAdapter {
 						channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
 						return;
 					}
+					
 					Bot.executor.submit(() -> {
 						cmd.execute(args, event, message, member, author, guild, channel);
 					});
@@ -186,14 +212,20 @@ public class CommandBase extends ListenerAdapter {
 		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
+	@Deprecated
 	public static void addCommand(Command c, String... command) {
 		if (!commands.containsKey(command))
 			commands.put(command, c);
 	}
 	
 	public static void addCommand(Command c) {
-		if (!commands.containsKey(c.getCommand()))
+		if (!commands.containsKey(c.getCommand())) {
 			commands.put(c.getCommand(), c);
+			final Category category = c.getCategory();
+			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
+			commandsInCat.add(c);
+			commandsInCategory.put(category, commandsInCat);
+		}
 	}
 	
 	public static String getPermissionString(Permission[] permissions) {

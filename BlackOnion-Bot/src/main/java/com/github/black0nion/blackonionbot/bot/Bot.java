@@ -99,6 +99,7 @@ public class Bot extends ListenerAdapter {
 		
 		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
 		
+		LanguageSystem.init();
 		CommandBase.addCommands(waiter);
 		MessageLogSystem.init();
 		builder.setStatus(StatusCommand.getStatusFromFile());
@@ -115,7 +116,6 @@ public class Bot extends ListenerAdapter {
 		InfluxManager.init();
 		GuildManager.init();
 		BotInformation.init();
-		LanguageSystem.init();
 		BirthdaySystem.init();
 		GiveawaysSystem.init();
 		PlayerManager.init();
