@@ -44,4 +44,12 @@ public interface Command {
 	default boolean requiresBotAdmin() {
 		return false;
 	}
+	
+	default boolean isToggleable() {
+		return true;
+	}
+	
+	default boolean isDashboardCommand() {
+		return true;
+	}
 }
