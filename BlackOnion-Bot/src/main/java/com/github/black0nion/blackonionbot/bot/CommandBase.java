@@ -142,10 +142,11 @@ public class CommandBase extends ListenerAdapter {
 		
 		for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
 			JSONArray array = new JSONArray();
-			for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN).collect(Collectors.toList())) {				
+			for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
 				JSONObject commandJSON = new JSONObject();
 				commandJSON.put("command", command.getCommand());
 				commandJSON.put("description", LanguageSystem.getTranslatedString("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
+				commandJSON.put("isToggleable", command.isToggleable());
 				array.put(commandJSON);
 			}
 			commandsJSON.put(entry.getKey().name(), array);
