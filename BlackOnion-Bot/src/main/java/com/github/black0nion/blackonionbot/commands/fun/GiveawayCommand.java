@@ -91,4 +91,9 @@ public class GiveawayCommand implements Command {
 	public String getSyntax() {
 		return "<time in s | date in " + format.toPattern() + "> <winners> <item to give away>";
 	}
+	
+	@Override
+	public boolean isDashboardCommand() {
+		return false;
+	}
 }

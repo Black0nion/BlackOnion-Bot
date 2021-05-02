@@ -161,4 +161,8 @@ public class HelpCommand implements Command {
 		return new String[] {"help"};
 	}
 
+	@Override
+	public boolean isToggleable() {
+		return false;
+	}
 }
