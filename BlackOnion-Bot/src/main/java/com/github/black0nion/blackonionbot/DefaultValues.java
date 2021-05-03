@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.enums.RunMode;
+import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 public class DefaultValues {

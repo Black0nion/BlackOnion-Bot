@@ -16,7 +16,7 @@ import org.jetbrains.annotations.TestOnly;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;

@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.enums.Progress;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.Progress;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

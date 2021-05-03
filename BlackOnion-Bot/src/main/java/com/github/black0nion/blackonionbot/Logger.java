@@ -7,8 +7,8 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import com.github.black0nion.blackonionbot.enums.LogMode;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.LogMode;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 
 public class Logger {
 	public static void log(LogMode mode, LogOrigin origin, String logInput) {
