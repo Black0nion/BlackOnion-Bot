@@ -61,7 +61,7 @@
     "newlanguage": "Neue Sprache:",
     "newactivity": "Neue Aktivität",
     "newstatus": "Neuer Status",
-    "myping": "Mein Ping ist ",
+    "myping": "Mein Ping ist **%ping%ms**",
     "configreload": "Alle Configs wurden reloaded!",
     "messagedelete5": "Diese Nachricht löscht sich in 5 Sekunden!",
     "statussetfail": "Status setzen fehlgeschlagen!",
