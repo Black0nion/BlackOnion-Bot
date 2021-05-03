@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,7 @@ public class CommandBase extends ListenerAdapter {
 
 		for (Class<?> command : annotated) {
 			try {
-				System.out.println(command.getDeclaredAnnotationsByType(DontAutoRegister.class).length);
+				if (command.getDeclaredAnnotationsByType(DontAutoRegister.class).length >= 1) continue;
 				addCommand((Command) command.newInstance());
 			} catch (Exception e) {
 				e.printStackTrace();
