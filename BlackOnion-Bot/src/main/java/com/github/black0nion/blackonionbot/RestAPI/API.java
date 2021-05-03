@@ -19,7 +19,7 @@ import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Login;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.news.CreatePost;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;

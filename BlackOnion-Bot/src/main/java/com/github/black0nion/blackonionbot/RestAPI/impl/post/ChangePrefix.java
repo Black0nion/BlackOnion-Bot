@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 

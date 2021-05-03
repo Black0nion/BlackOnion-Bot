@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
+import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;

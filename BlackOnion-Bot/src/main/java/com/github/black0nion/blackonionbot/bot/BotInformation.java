@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.Logger;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
-import com.github.black0nion.blackonionbot.enums.OS;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.OS;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;

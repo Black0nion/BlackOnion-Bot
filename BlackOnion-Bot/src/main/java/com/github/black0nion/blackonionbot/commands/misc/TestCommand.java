@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 
 import net.dv8tion.jda.api.Permission;

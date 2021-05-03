@@ -1,67 +1,25 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.bot.AdminHelpCommand;
-import com.github.black0nion.blackonionbot.commands.bot.AntiSpoilerCommand;
-import com.github.black0nion.blackonionbot.commands.bot.AntiSwearCommand;
-import com.github.black0nion.blackonionbot.commands.bot.BanUsageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.BugReportCommand;
-import com.github.black0nion.blackonionbot.commands.bot.GuildLanguageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.HelpCommand;
-import com.github.black0nion.blackonionbot.commands.bot.JoinLeaveMessageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.LanguageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.NotifyCommand;
-import com.github.black0nion.blackonionbot.commands.bot.PingCommand;
-import com.github.black0nion.blackonionbot.commands.bot.PrefixCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ShutdownDBCommand;
-import com.github.black0nion.blackonionbot.commands.bot.StatsCommand;
-import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
-import com.github.black0nion.blackonionbot.commands.bot.SupportCommand;
-import com.github.black0nion.blackonionbot.commands.bot.SwearWhitelistCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
-import com.github.black0nion.blackonionbot.commands.fun.AvatarCommand;
-import com.github.black0nion.blackonionbot.commands.fun.BigbrainMemeCommand;
-import com.github.black0nion.blackonionbot.commands.fun.ConnectFourCommand;
-import com.github.black0nion.blackonionbot.commands.fun.GiveawayCommand;
-import com.github.black0nion.blackonionbot.commands.information.GuildInfoCommand;
-import com.github.black0nion.blackonionbot.commands.information.UserInfoCommand;
-import com.github.black0nion.blackonionbot.commands.information.WeatherCommand;
-import com.github.black0nion.blackonionbot.commands.misc.InstagramCommand;
-import com.github.black0nion.blackonionbot.commands.misc.PastebinCommand;
-import com.github.black0nion.blackonionbot.commands.misc.PollCommand;
-import com.github.black0nion.blackonionbot.commands.misc.TestCommand;
-import com.github.black0nion.blackonionbot.commands.misc.VirusCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.AutoRolesCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.BanCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.ClearCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.KickCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.ReactionRolesSetupCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.RenameCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.UnbanCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.joinleave.SetLeaveChannelCommand;
-import com.github.black0nion.blackonionbot.commands.moderation.joinleave.SetWelcomeChannelCommand;
-import com.github.black0nion.blackonionbot.commands.music.PlayCommand;
-import com.github.black0nion.blackonionbot.commands.music.QueueCommand;
-import com.github.black0nion.blackonionbot.commands.music.SkipCommand;
-import com.github.black0nion.blackonionbot.commands.music.StopCommand;
-import com.github.black0nion.blackonionbot.commands.old.HypixelCommand;
-import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.enums.CommandVisibility;
-import com.github.black0nion.blackonionbot.enums.LogMode;
-import com.github.black0nion.blackonionbot.enums.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
+import com.github.black0nion.blackonionbot.misc.LogMode;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
@@ -98,52 +56,18 @@ public class CommandBase extends ListenerAdapter {
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
 		waiter = newWaiter;
-		addCommand(new ActivityCommand());
-		addCommand(new AvatarCommand());
-		addCommand(new ClearCommand());
-		addCommand(new HelpCommand());
-		addCommand(new NotifyCommand());
-		addCommand(new PingCommand());
-		addCommand(new ReloadCommand());
-		addCommand(new StatusCommand());
-		addCommand(new PlayCommand());
-		addCommand(new StopCommand());
-		addCommand(new QueueCommand());
-		addCommand(new ShutdownDBCommand());
-		addCommand(new ReactionRolesSetupCommand());
-		addCommand(new PastebinCommand());
-		addCommand(new HypixelCommand());
-		addCommand(new RenameCommand());
-		addCommand(new StatsCommand());
-		addCommand(new WeatherCommand());
-		addCommand(new InstagramCommand());
-		addCommand(new AdminHelpCommand());
-		addCommand(new TestCommand());
-		addCommand(new ConnectFourCommand(waiter));
-		addCommand(new SupportCommand());
-		addCommand(new LanguageCommand());
-		addCommand(new KickCommand());
-		addCommand(new BanCommand());
-		addCommand(new UnbanCommand());
-		addCommand(new GuildLanguageCommand());
-		addCommand(new BigbrainMemeCommand());
-		addCommand(new GuildInfoCommand());
-		addCommand(new UserInfoCommand());
-		addCommand(new VirusCommand());
-		addCommand(new SkipCommand());
-		addCommand(new AutoRolesCommand());
-		addCommand(new SetWelcomeChannelCommand());
-		addCommand(new SetLeaveChannelCommand());
-		addCommand(new PrefixCommand());
-		addCommand(new GiveawayCommand());
-		addCommand(new AntiSwearCommand());
-		addCommand(new BugReportCommand());
-		addCommand(new SwearWhitelistCommand());
-		addCommand(new BanUsageCommand());
-		addCommand(new PollCommand());
-		addCommand(new JoinLeaveMessageCommand());
-		addCommand(new AntiSpoilerCommand());
-		addCommand(new ToggleCommand());
+		
+		Reflections reflections = new Reflections("com.github.black0nion.blackonionbot.commands");
+		Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
+
+		for (Class<?> command : annotated) {
+			try {
+				System.out.println(command.getDeclaredAnnotationsByType(DontAutoRegister.class).length);
+				addCommand((Command) command.newInstance());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
 			JSONArray array = new JSONArray();

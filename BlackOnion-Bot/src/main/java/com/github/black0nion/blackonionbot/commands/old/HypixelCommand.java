@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.old;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
-import com.github.black0nion.blackonionbot.enums.Progress;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.Progress;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 

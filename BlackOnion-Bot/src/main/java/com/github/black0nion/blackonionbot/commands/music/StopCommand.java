@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
+import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;

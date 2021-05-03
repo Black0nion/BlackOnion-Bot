@@ -5,15 +5,15 @@ import static com.github.black0nion.blackonionbot.systems.language.LanguageSyste
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
+import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -25,13 +25,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ConnectFourCommand implements Command {
-	
-	private final EventWaiter waiter;
-	
-	public ConnectFourCommand(EventWaiter waiter) {
-		this.waiter = waiter;
-	}
-
 	@Override
 	public String[] getCommand() {
 		return new String[] { "connect4", "connectfour", "viergewinnt", "4gewinnt" };
@@ -50,7 +43,7 @@ public class ConnectFourCommand implements Command {
 	    		  return;
 	    	}
 			channel.sendMessage(getTranslatedString("c4_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslatedString("c4_answerwithyes", author, guild)).queue();
-			waiter.waitForEvent(MessageReceivedEvent.class, 
+			CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
 					(event) -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), 
 					event -> {
 				  if (!event.getAuthor().isBot() && event.getAuthor().getId().equals(challenged.getId())) {
@@ -77,7 +70,7 @@ public class ConnectFourCommand implements Command {
 	}
 	
 	public void rerun(ConnectFour game, TextChannel channel) {
-		waiter.waitForEvent(MessageReceivedEvent.class, 
+		CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
 	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
 	  				final String msg = answerEvent.getMessage().getContentRaw();

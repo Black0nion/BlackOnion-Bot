@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.enums.Category;
+import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
