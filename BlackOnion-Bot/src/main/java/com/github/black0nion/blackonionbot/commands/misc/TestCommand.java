@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.enums.CommandVisibility;
+import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,6 +21,8 @@ public class TestCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+		channel.sendMessage(ToggleAPI.setActivated(guild.getId(), args[1], Boolean.valueOf(args[2])) + "").queue();
+		channel.sendMessage(ToggleAPI.disabledCommands.toString()).queue();
 	}
 	
 	@Override

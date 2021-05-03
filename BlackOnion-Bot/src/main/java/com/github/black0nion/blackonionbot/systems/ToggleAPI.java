@@ -18,8 +18,8 @@ public class ToggleAPI {
 	 * @return if it worked
 	 */
 	public static boolean setActivated(String guildId, String command, boolean activated) {
-		if (CommandBase.commands.containsKey(command)) {
-			Command cmd = CommandBase.commands.get(command);
+		if (CommandBase.commands.containsKey(command.toLowerCase())) {
+			Command cmd = CommandBase.commands.get(command.toLowerCase());
 			if (!cmd.isToggleable()) return false;
 			List<Command> disabledCommandsForGuild;
 			if (disabledCommands.containsKey(guildId)) {
@@ -36,6 +36,20 @@ public class ToggleAPI {
 	}
 	
 	public static boolean isActivated(String guildId, String command) {
-		return false;
+		Command cmd = CommandBase.commands.containsKey(command.toLowerCase()) ? CommandBase.commands.get(command.toLowerCase()) : null;
+		if (cmd == null) {
+			try {
+				throw new IllegalArgumentException("Command " + command + " not found!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		}
+		return isActivated(guildId, cmd);
+	}
+	
+	public static boolean isActivated(String guildId, Command command) {
+		if (disabledCommands.containsKey(guildId) && disabledCommands.get(guildId).contains(command)) return false;
+		return true;
 	}
 }
