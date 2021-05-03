@@ -31,6 +31,7 @@ import com.github.black0nion.blackonionbot.commands.bot.StatsCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
 import com.github.black0nion.blackonionbot.commands.bot.SupportCommand;
 import com.github.black0nion.blackonionbot.commands.bot.SwearWhitelistCommand;
+import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.fun.AvatarCommand;
 import com.github.black0nion.blackonionbot.commands.fun.BigbrainMemeCommand;
 import com.github.black0nion.blackonionbot.commands.fun.ConnectFourCommand;
@@ -142,6 +143,7 @@ public class CommandBase extends ListenerAdapter {
 		addCommand(new PollCommand());
 		addCommand(new JoinLeaveMessageCommand());
 		addCommand(new AntiSpoilerCommand());
+		addCommand(new ToggleCommand());
 		
 		for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
 			JSONArray array = new JSONArray();

@@ -18,21 +18,29 @@ public class ToggleAPI {
 	 * @return if it worked
 	 */
 	public static boolean setActivated(String guildId, String command, boolean activated) {
-		if (CommandBase.commands.containsKey(command.toLowerCase())) {
-			Command cmd = CommandBase.commands.get(command.toLowerCase());
-			if (!cmd.isToggleable()) return false;
-			List<Command> disabledCommandsForGuild;
-			if (disabledCommands.containsKey(guildId)) {
-				disabledCommandsForGuild = disabledCommands.get(guildId).stream().collect(Collectors.toList());
-			} else {
-				disabledCommandsForGuild = new ArrayList<>();
-			}
-			if (activated) disabledCommandsForGuild.remove(cmd);
-			else if (!disabledCommandsForGuild.contains(cmd)) disabledCommandsForGuild.add(cmd);
-			disabledCommands.put(guildId, disabledCommandsForGuild);
-			return true;
-		}
+		if (CommandBase.commands.containsKey(command.toLowerCase()))
+			return setActivated(guildId, CommandBase.commands.get(command.toLowerCase()), activated);
 		return false;
+	}
+	
+	/**
+	 * @param guildId
+	 * @param command
+	 * @param activated
+	 * @return if it worked
+	 */
+	public static boolean setActivated(String guildId, Command cmd, boolean activated) {
+		if (!cmd.isToggleable()) return false;
+		List<Command> disabledCommandsForGuild;
+		if (disabledCommands.containsKey(guildId)) {
+			disabledCommandsForGuild = disabledCommands.get(guildId).stream().collect(Collectors.toList());
+		} else {
+			disabledCommandsForGuild = new ArrayList<>();
+		}
+		if (activated) disabledCommandsForGuild.remove(cmd);
+		else if (!disabledCommandsForGuild.contains(cmd)) disabledCommandsForGuild.add(cmd);
+		disabledCommands.put(guildId, disabledCommandsForGuild);
+		return true;
 	}
 	
 	public static boolean isActivated(String guildId, String command) {

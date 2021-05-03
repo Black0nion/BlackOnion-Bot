@@ -28,17 +28,17 @@ public class AntiSpoilerCommand implements Command {
 			if (args[1].equalsIgnoreCase("on")) {
 				GuildManager.save(guild, "antispoiler", true);
 				GuildManager.save(guild, "deletespoiler", false);
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("antispoileris", author, guild, "status", "on"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "on"), false).build()).queue();
 				return;
 			} else if (args[1].equalsIgnoreCase("delete")) {
 				GuildManager.save(guild, "antispoiler", false);
 				GuildManager.save(guild, "deletespoiler", true);
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("antispoileris", author, guild, "status", "delete"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "delete"), false).build()).queue();
 				return;
 			} else if (args[1].equalsIgnoreCase("off")) {
 				GuildManager.save(guild, "antispoiler", false);
 				GuildManager.save(guild, "deletespoiler", false);
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("antispoileris", author, guild, "status", "off"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "off"), false).build()).queue();
 				return;
 			} else {
 				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
