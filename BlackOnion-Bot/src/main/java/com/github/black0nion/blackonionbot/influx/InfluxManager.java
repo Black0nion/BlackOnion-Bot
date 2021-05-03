@@ -25,7 +25,6 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import com.influxdb.exceptions.InfluxException;
 
 public class InfluxManager {
 	
@@ -35,12 +34,12 @@ public class InfluxManager {
 	
 	public static boolean connect(String databaseURL, String token, String org) {
 		if (influxDB != null) influxDB.close();
-		influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
 		try { 
+			influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
 			influxDB.getWriteApiBlocking().writePoint(Point.measurement("startupshutdown").addField("online", true));
 			Logger.logInfo("Connected.", LogOrigin.INFLUX_DB);
 			return true;
-		} catch (InfluxException e) {
+		} catch (Exception e) {
 			Logger.logError("Couldn't connect to InfluxDB!", LogOrigin.INFLUX_DB);
 			influxDB = null;
 		    return false;
