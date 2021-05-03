@@ -227,5 +227,6 @@
     "antispoilerstatus": "AntiSpoiler ist gerade %status%",
     "howtoantispoilertoggle": "Um AntiSpoiler ein oder aus zu schalten, benutze %command%",
     "antispoilerstatuschanged": "Der AntiSpoiler-Status wurde umgestellt!",
-    "antispoileris": "AntiSpoiler ist jetzt %status%"
+    "antispoileris": "AntiSpoiler ist jetzt %status%",
+    "onlyexecutorcancontrol": "Nur der Command-Ausführer kann steuern!"
 }

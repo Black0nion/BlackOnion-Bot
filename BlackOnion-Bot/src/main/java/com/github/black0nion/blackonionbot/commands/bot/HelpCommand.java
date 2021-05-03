@@ -43,7 +43,8 @@ public class HelpCommand implements Command {
 			} else {
 				// start the help system thingy lmao
 				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
-						.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + LanguageSystem.getTranslatedString("modules", author, guild));
+						.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + LanguageSystem.getTranslatedString("modules", author, guild))
+						.setDescription(LanguageSystem.getTranslatedString("onlyexecutorcancontrol", author, guild));
 				
 				final Category[] cats = Category.values();
 				for (int i = 0; i <= cats.length; i++) {
@@ -92,7 +93,8 @@ public class HelpCommand implements Command {
 					final Guild guild = msg.getGuild();
 					final User user = author.getUser();
 					
-					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild);
+					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild)
+							.setDescription(LanguageSystem.getTranslatedString("onlyexecutorcancontrol", author.getUser(), guild));
 					
 					if (emojiReactionNum == 0) {
 						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + LanguageSystem.getTranslatedString("modules", user, guild));
