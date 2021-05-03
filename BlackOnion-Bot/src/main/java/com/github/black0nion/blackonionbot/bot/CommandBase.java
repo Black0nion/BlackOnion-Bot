@@ -63,6 +63,7 @@ import com.github.black0nion.blackonionbot.enums.LogMode;
 import com.github.black0nion.blackonionbot.enums.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
+import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -184,7 +185,11 @@ public class CommandBase extends ListenerAdapter {
 			commandsLastTenSecs++;
 			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
 				return;
-			} else if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
+			}
+			
+			if (!ToggleAPI.isActivated(guild.getId(), cmd)) return;
+			
+			if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
 				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
