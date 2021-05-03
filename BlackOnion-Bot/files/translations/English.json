@@ -61,7 +61,7 @@
     "newlanguage": "New language:",
     "newactivity": "New activity",
     "newstatus": "New status",
-    "myping": "My Ping is ",
+    "myping": "Mein Ping ist **%ping%ms**",
     "configreload": "All configs reloaded!",
     "messagedelete5": "This message deletes itself after 5 seconds!",
     "statussetfail": "Setting the status failed!",
@@ -227,5 +227,6 @@
     "antispoilerstatus": "AntiSpoiler is currently %status%",
     "howtoantispoilertoggle": "To switch the status of AntiSpoiler, use %command%",
     "antispoilerstatuschanged": "The AntiSpoiler status got changed!",
-    "antispoileris": "AntiSpoiler is now %status%"
+    "antispoileris": "AntiSpoiler is now %status%",
+    "onlyexecutorcancontrol": "Nur der Command-Ausführer kann steuern!"
 }
