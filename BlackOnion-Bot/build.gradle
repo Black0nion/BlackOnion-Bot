@@ -49,7 +49,7 @@ dependencies {
     
     implementation group: 'org.menudocs', name: 'paste-client-java', version: '1.0.16'
     
-    implementation 'com.github.HypixelDev.PublicAPI:Java:2.0.0'
+    //implementation 'com.github.HypixelDev.PublicAPI:Java:2.0.0'
     
     compile group: 'org.apache.logging.log4j', name: 'log4j', version: '2.8.2', ext: 'pom'
     
