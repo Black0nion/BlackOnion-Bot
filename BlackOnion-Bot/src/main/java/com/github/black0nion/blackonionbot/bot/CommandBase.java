@@ -153,7 +153,6 @@ public class CommandBase extends ListenerAdapter {
 			}
 			commandsJSON.put(entry.getKey().name(), array);
 		}
-		System.out.println(commandsJSON.toString(2));
 	}
 	
 	@Override
