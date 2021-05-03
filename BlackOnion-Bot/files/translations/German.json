@@ -228,7 +228,7 @@
     "howtoantispoilertoggle": "Um AntiSpoiler ein oder aus zu schalten, benutze %command%",
     "antispoilerstatuschanged": "Der AntiSpoiler-Status wurde umgestellt!",
     "antispoileris": "AntiSpoiler ist jetzt %status%",
-    "onlyexecutorcancontrol": "Nur der Command-Ausführer kann steuern!",
+    "onlyexecutorcancontrol": "Nur der Absender des Befehls kann mit dem Menü interagieren",
     "commandcantbetoggled": "Befehl kann nicht ein / ausgeschalten werden!",
     "thiscommandcantbetoggled": "Dieser Befehl ist immer an!",
     "commandtoggled": "Der Status des Befehls %command% wurde geändert!",
