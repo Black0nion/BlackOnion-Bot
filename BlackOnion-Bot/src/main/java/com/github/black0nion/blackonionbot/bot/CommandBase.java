@@ -81,9 +81,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandBase extends ListenerAdapter {
 	
-	public static HashMap<String[], Command> commands = new HashMap<>();
+	public static HashMap<String[], Command> commandsArray = new HashMap<>();
 	
 	public static HashMap<Category, List<Command>> commandsInCategory = new HashMap<>();
+	
+	public static HashMap<String, Command> commands = new HashMap<>();
 	
 	public static EventWaiter waiter;
 
@@ -175,39 +177,35 @@ public class CommandBase extends ListenerAdapter {
 		if (AntiSpoilerSystem.removeSpoilers(event)) return;
 		
 		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
-
-		for (String[] c : commands.keySet()) {
-			for (String str : c) {
-				if (args[0].equalsIgnoreCase(prefix + str)) {
-					FileUtils.appendToFile("commandLog", log);
-					ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
-					commandsLastTenSecs++;
-					Command cmd = commands.get(c);
-					if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
-						continue;
-					} else if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
-						if (cmd.getVisisbility() != CommandVisibility.SHOWN)
-							return;
-						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-								.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
-						return;
-					} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-								.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
-						return;
-					}
-					
-					if (containsProfanity) {
-						channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
-						return;
-					}
-					
-					Bot.executor.submit(() -> {
-						cmd.execute(args, event, message, member, author, guild, channel);
-					});
+		String str = args[0].replace(prefix, "");
+		if (commands.containsKey(str)) {
+			Command cmd = commands.get(str);
+			FileUtils.appendToFile("commandLog", log);
+			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
+			commandsLastTenSecs++;
+			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
+				return;
+			} else if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
+				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
-				}
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
+						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+				return;
+			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
+						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+				return;
 			}
+			
+			if (containsProfanity) {
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
+				return;
+			}
+			
+			Bot.executor.submit(() -> {
+				cmd.execute(args, event, message, member, author, guild, channel);
+			});
+			return;
 		}
 		
 		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
@@ -215,17 +213,26 @@ public class CommandBase extends ListenerAdapter {
 	
 	@Deprecated
 	public static void addCommand(Command c, String... command) {
-		if (!commands.containsKey(command))
-			commands.put(command, c);
+		for (String s : command) {
+			if (!commands.containsKey(s)) {
+				commands.put(s, c);				
+			}
+		}
 	}
 	
 	public static void addCommand(Command c) {
-		if (!commands.containsKey(c.getCommand())) {
-			commands.put(c.getCommand(), c);
+		if (!commandsArray.containsKey(c.getCommand())) {			
 			final Category category = c.getCategory();
 			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
+			commandsArray.put(c.getCommand(), c);
+			
+			for (String command : c.getCommand()) {
+				if (!commands.containsKey(command)) {
+					commands.put(command, c);
+				}
+			}
 		}
 	}
 	

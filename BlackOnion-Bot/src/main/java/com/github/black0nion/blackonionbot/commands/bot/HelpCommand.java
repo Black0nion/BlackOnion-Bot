@@ -31,7 +31,7 @@ public class HelpCommand implements Command {
 		try {
 			if (args.length >= 2) {
 				// a command
-				for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+				for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
 						final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
@@ -53,7 +53,7 @@ public class HelpCommand implements Command {
 						commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", author, guild);
 					} else {						
 						c = cats[i - 1];
-						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 							if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
 								commandsInCategory += ", " + entry.getValue().getCommand()[0];
 						}
@@ -105,7 +105,7 @@ public class HelpCommand implements Command {
 								commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", user, guild);
 							} else {						
 								c = cats[i - 1];
-								for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+								for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 									if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
 										commandsInCategory += ", " + entry.getValue().getCommand()[0];
 								}
@@ -117,7 +117,7 @@ public class HelpCommand implements Command {
 						emojiReactionNum--;
 						final Category category = Category.values()[emojiReactionNum];
 						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + category.name().toUpperCase());
-						for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 							if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == category)) {
 								if (entry.getValue().getProgress() == Progress.DONE) {
 									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
@@ -130,7 +130,7 @@ public class HelpCommand implements Command {
 						for (Progress pr : Progress.values()) {
 							if (pr == Progress.DONE)
 								continue;
-							for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+							for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 								Command command = entry.getValue();
 								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
 									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);

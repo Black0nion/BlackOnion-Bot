@@ -33,7 +33,7 @@ public class AdminHelpCommand implements Command {
 				.setTitle("Adminhilfe")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
 		
-		for (Map.Entry<String[], Command> entry : CommandBase.commands.entrySet()) {
+		for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 			if (entry.getValue().getVisisbility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
 				builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase()	, false);
 			}
