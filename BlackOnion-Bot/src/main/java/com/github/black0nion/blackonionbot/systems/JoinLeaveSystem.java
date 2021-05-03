@@ -85,7 +85,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		final Guild guild = event.getGuild();
 		final User author = guild.retrieveOwner().submit().join().getUser();
 		final String prefix = BotInformation.getPrefix(guild);
-		author.openPrivateChannel().complete().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslatedString("commandtohelp", author, guild).replace("%cmd%", prefix + "help"), LanguageSystem.getTranslatedString("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
+		author.openPrivateChannel().complete().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslatedString("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslatedString("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
 	}
 	
     @NotNull
