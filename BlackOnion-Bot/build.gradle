@@ -6,9 +6,12 @@
  * User Manual available at https://docs.gradle.org/6.3/userguide/java_library_plugin.html
  */
 
+
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'application'
+	id 'java'
 }
 
 repositories {
@@ -20,6 +23,19 @@ repositories {
 	    name 'm2-dv8tion'
   }
 }
+
+mainClassName = 'com.github.black0nion.blackonionbot.bot.Main'
+
+jar {
+    archiveBaseName = 'blackonion-bot'
+    archiveVersion =  '1.8.7'
+     manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
