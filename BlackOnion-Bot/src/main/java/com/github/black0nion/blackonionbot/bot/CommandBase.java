@@ -62,7 +62,7 @@ public class CommandBase extends ListenerAdapter {
 		for (Class<?> command : annotated) {
 			try {
 				if (command.getDeclaredAnnotationsByType(DontAutoRegister.class).length >= 1) continue;
-				addCommand((Command) command.newInstance());
+				addCommand((Command) command.getConstructor().newInstance());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -109,45 +109,39 @@ public class BotInformation {
 			File[] files = dir.listFiles();
 			line_count = 1337;
 			file_count = 69;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					showFiles(files);
-					ValueManager.save("lines", line_count);
-					ValueManager.save("files", file_count);
-					//Send a request to the servers to update the two counters
-					try {
-						for (String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
-							new Thread(new Runnable() {
-								@Override
-								public void run() {
-									try {
-										String body = "{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}";
-										URL url = new URL(endpoint + "/api/updatefilelinecount");
-										HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-										httpCon.setDoOutput(true);
-										httpCon.setRequestMethod("POST");
-										httpCon.setRequestProperty("token", "updatepls");
-										OutputStream os = httpCon.getOutputStream();
-										OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
-										osw.write(body);
-										osw.flush();
-										osw.close();
-										os.close();
-										httpCon.connect();
-										httpCon.getInputStream();
-									} catch (Exception e) {
-										if (!(e instanceof ConnectException))
-											e.printStackTrace();
-									}
-								}
-							}).start();
-						}
-					} catch (Exception e) {
-						Logger.logWarning("No file \"files/endpoints.txt\"", LogOrigin.API);
+			Bot.executor.submit(() -> {
+				showFiles(files);
+				ValueManager.save("lines", line_count);
+				ValueManager.save("files", file_count);
+				//Send a request to the servers to update the two counters
+				try {
+					for (String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
+						Bot.executor.submit(() -> {
+							try {
+								String body = "{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}";
+								URL url = new URL(endpoint + "/api/updatefilelinecount");
+								HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+								httpCon.setDoOutput(true);
+								httpCon.setRequestMethod("POST");
+								httpCon.setRequestProperty("token", "updatepls");
+								OutputStream os = httpCon.getOutputStream();
+								OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
+								osw.write(body);
+								osw.flush();
+								osw.close();
+								os.close();
+								httpCon.connect();
+								httpCon.getInputStream();
+							} catch (Exception e) {
+								if (!(e instanceof ConnectException))
+									e.printStackTrace();
+							}
+						});
 					}
+				} catch (Exception e) {
+					Logger.logWarning("No file \"files/endpoints.txt\"", LogOrigin.API);
 				}
-			}).start();
+			});
 		}
 	}
 	
