@@ -18,7 +18,6 @@ import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Login;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
-import com.github.black0nion.blackonionbot.RestAPI.impl.post.news.CreatePost;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
@@ -47,7 +46,6 @@ public class API {
 		postRequests.add(new ChangePrefix());
 		postRequests.add(new UpdateLineCount());
 		postRequests.add(new Login());
-		postRequests.add(new CreatePost());
 		//----------------------------------------------
 		
 		//Error handling
