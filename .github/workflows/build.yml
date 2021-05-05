@@ -13,12 +13,11 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - name: Debug
+      - name: Build with Gradle
         run: |
           cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
-          ls
-      - name: Build with Gradle
-        run: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/gradlew shadowJar
+          chmod +x ./gradlew
+          ./gradlew shadowJar
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
