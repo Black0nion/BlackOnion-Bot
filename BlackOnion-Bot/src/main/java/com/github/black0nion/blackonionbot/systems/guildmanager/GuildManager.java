@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.Guild;
 
 public class GuildManager {
 	
-	private static MongoCollection<Document> collection;
+	public static MongoCollection<Document> collection;
 	
 	public static void init() {
 		if (collection == null)
