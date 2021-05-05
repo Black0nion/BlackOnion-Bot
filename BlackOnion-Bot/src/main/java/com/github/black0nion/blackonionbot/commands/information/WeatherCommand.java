@@ -43,7 +43,7 @@ public class WeatherCommand implements Command {
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"))
 					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
-					.addField(LanguageSystem.getTranslatedString("temperature", author, guild), main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField(LanguageSystem.getTranslatedString("temperature", author, guild), main.get("temp_min") + " to " + main.get("temp_max") + "deg", true)
 					.addField(LanguageSystem.getTranslatedString("humidity", author, guild), main.get("humidity") + "%", true)
 					.addField(LanguageSystem.getTranslatedString("windspeed", author, guild), weather.getJSONObject("wind").get("speed") + " km/h", true)
 					.addField(LanguageSystem.getTranslatedString("country", author, guild), Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
