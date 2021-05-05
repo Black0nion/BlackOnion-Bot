@@ -15,10 +15,10 @@ jobs:
           distribution: 'adopt'
       - name: Debug
         run: |
-          cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot
+          cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
           ls
       - name: Build with Gradle
-        run: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/gradlew shadowJar
+        run: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/gradlew shadowJar
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
