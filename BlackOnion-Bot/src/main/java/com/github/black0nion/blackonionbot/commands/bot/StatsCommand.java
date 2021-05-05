@@ -47,7 +47,7 @@ public class StatsCommand implements Command {
 				.addField("Files", String.valueOf(BotInformation.file_count), true)
 				.addField("Commands executed", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
 				.addField("Messages sent", String.valueOf(ValueManager.getInt("messagesSent")), true)
-				.addField("Commands", String.valueOf(CommandBase.commands.size()), true)
+				.addField("Commands", String.valueOf(CommandBase.commandsArray.size()), true)
 				.addField("Ping", e.getJDA().getGatewayPing() + "ms", true)
 				.addField("Uptime", (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : ""), false)
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
