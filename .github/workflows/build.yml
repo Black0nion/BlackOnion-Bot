@@ -42,8 +42,3 @@ jobs:
           asset_path: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/build/libs/BlackOnion-Bot-all.jar
           asset_name: BlackOnion-Bot.jar
           asset_content_type: application/java-archive
-      - uses: eregon/publish-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.create_release.outputs.id }}
