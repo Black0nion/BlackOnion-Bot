@@ -11,17 +11,6 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.Logger;
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetGuildsToManage;
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetTokenFromCode;
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.Paths;
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.RefreshToken;
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.Stats;
-import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
-import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
-import com.github.black0nion.blackonionbot.RestAPI.impl.post.Login;
-import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
