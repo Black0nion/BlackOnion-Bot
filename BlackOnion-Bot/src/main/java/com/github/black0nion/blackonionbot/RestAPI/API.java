@@ -4,9 +4,11 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.RestAPI.impl.get.GetGuildsToManage;
@@ -18,6 +20,8 @@ import com.github.black0nion.blackonionbot.RestAPI.impl.post.Activity;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.ChangePrefix;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.Login;
 import com.github.black0nion.blackonionbot.RestAPI.impl.post.UpdateLineCount;
+import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
@@ -35,17 +39,19 @@ public class API {
 		
 		//Spark.secure("files/keystore.jks", "ahitm20202025", null, null);
 		Spark.port(187);
+		Reflections reflections = new Reflections(API.class.getPackage().getName());
 		//-----------------Get Requests-----------------
-		getRequests.add(new Stats());
-		getRequests.add(new Paths());
-		getRequests.add(new GetTokenFromCode());
-		getRequests.add(new RefreshToken());
-		getRequests.add(new GetGuildsToManage());
+		Set<Class<? extends GetRequest>> getRequestClasses = reflections.getSubTypesOf(GetRequest.class);
+
+		for (Class<?> req : getRequestClasses) {
+			try { getRequests.add((GetRequest) req.getConstructor().newInstance()); } catch (Exception e) { e.printStackTrace(); }
+		}
 		//----------------Post Requests-----------------
-		postRequests.add(new Activity());
-		postRequests.add(new ChangePrefix());
-		postRequests.add(new UpdateLineCount());
-		postRequests.add(new Login());
+		Set<Class<? extends PostRequest>> postRequestClasses = reflections.getSubTypesOf(PostRequest.class);
+
+		for (Class<?> req : postRequestClasses) {
+			try { postRequests.add((PostRequest) req.getConstructor().newInstance()); } catch (Exception e) { e.printStackTrace(); }
+		}
 		//----------------------------------------------
 		
 		//Error handling
