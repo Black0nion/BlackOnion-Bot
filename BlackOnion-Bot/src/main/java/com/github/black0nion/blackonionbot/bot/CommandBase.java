@@ -22,6 +22,8 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
+import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -55,8 +57,7 @@ public class CommandBase extends ListenerAdapter {
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
 		waiter = newWaiter;
-		
-		Reflections reflections = new Reflections("com.github.black0nion.blackonionbot.commands");
+		Reflections reflections = new Reflections(Command.class.getPackage().getName());
 		Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
 
 		for (Class<?> command : annotated) {
@@ -68,17 +69,31 @@ public class CommandBase extends ListenerAdapter {
 			}
 		}
 		
-		for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
-			JSONArray array = new JSONArray();
-			for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
-				JSONObject commandJSON = new JSONObject();
-				commandJSON.put("command", command.getCommand());
-				commandJSON.put("description", LanguageSystem.getTranslatedString("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
-				commandJSON.put("isToggleable", command.isToggleable());
-				array.put(commandJSON);
+		Bot.executor.submit(() -> {
+			Dashboard.init();
+			for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
+				JSONArray array = new JSONArray();
+				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
+					JSONObject commandJSON = new JSONObject();
+					commandJSON.put("command", command.getCommand());
+					commandJSON.put("description", LanguageSystem.getTranslatedString("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
+					commandJSON.put("isToggleable", command.isToggleable());
+					if (Dashboard.hasValues(command)) {
+						JSONArray values = new JSONArray();
+						for (DashboardValue value : Dashboard.getValues(command)) {
+							JSONObject valueObject = new JSONObject();
+							valueObject.put("databaseKey", value.getDatabaseKey());
+							valueObject.put("prettyName", value.getPrettyName());
+							valueObject.put("type", value.getType().name());
+							values.put(valueObject);
+						}
+						commandJSON.put("values", values);
+					}
+					array.put(commandJSON);
+				}
+				commandsJSON.put(entry.getKey().name(), array);
 			}
-			commandsJSON.put(entry.getKey().name(), array);
-		}
+		});
 	}
 	
 	@Override
