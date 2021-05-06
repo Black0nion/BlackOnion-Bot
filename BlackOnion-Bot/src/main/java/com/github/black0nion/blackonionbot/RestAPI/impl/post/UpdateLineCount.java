@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.RestAPI.impl.post;
 
+import java.util.HashMap;
+
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.RestAPI.API;
@@ -14,8 +16,8 @@ import spark.Response;
 public class UpdateLineCount implements PostRequest {
 
 	@Override
-	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
-		if (request.headers("token") == null || !request.headers("token").equals("updatepls")) {
+	public String handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, DiscordUser user) {
+		if (!request.headers("token").equals("updatepls")) {
 			response.status(403);
 			return new JSONObject().put("success", false).toString();
 		}
@@ -34,13 +36,17 @@ public class UpdateLineCount implements PostRequest {
 	}
 	
 	@Override
+	public String[] requiredBodyParameters() {
+		return new String[] { "line_count", "file_count" };
+	}
+	
+	@Override
 	public String[] requiredParameters() {
-		return new String[] {"line_count", "file_count"};
+		return new String[] { "token" };
 	}
 
 	@Override
 	public String url() {
 		return "updatefilelinecount";
 	}
-
 }
