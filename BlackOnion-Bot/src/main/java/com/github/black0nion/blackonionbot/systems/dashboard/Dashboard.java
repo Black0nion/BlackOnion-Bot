@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.BlackHashMap;
+import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
 public class Dashboard {
 	/**
@@ -19,6 +20,7 @@ public class Dashboard {
 	
 	public static void init() {
 		values.put(CommandBase.commands.get("antiswear"), Arrays.asList(new DashboardValue("antiSwear", "AntiSwear", DashboardValueType.MULTIPLE_CHOICE, new BlackHashMap<String, String>().putAndGetSelf("delete", "Delete").putAndGetSelf("resend", "Resend").putAndGetSelf("off", "Off"))));
+		values.put(CommandBase.commands.get("viruscommand"), Arrays.asList(new DashboardValue("moinMeister", "hi", DashboardValueType.BOOLEAN)));
 	}
 	
 	public static boolean hasValues(Command cmd) {
@@ -40,17 +42,34 @@ public class Dashboard {
 		return null;
 	}
 	
-	public static boolean tryParse(DashboardValue dashboardValue, Object value) {
+	public static boolean tryParse(DashboardValue dashboardValue, String value, String guild) {
 		DashboardValueType type = dashboardValue.getType();
 		if (type == DashboardValueType.MULTIPLE_CHOICE) {
-			if (dashboardValue.getMultipleChoice().containsKey(value))
-				System.out.println("yesssir");
+			if (dashboardValue.getMultipleChoice().containsKey(value)) {
+				GuildManager.save(guild, dashboardValue.getDatabaseKey(), value);
+			}
 		} else if (type == DashboardValueType.BOOLEAN) {
-			System.out.println(value);
+			boolean result;
+			if (value.equals("true")) result = true;
+			else if (value.equals("false")) result = false;
+			else return false;
+			
+			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
 		} else if (type == DashboardValueType.STRING) {
-			
-		} else if (type == DashboardValueType.BOOLEAN) {
-			
+			String result = value;
+			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
+		} else if (type == DashboardValueType.DECIMAL_NUMBER) {
+			double result;
+			try {
+				result = Double.parseDouble(value);
+			} catch (Exception e) { return false; }
+			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
+		} else if (type == DashboardValueType.NUMBER) {
+			int result;
+			try {
+				result = Integer.parseInt(value);
+			} catch (Exception e) { return false; }
+			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
 		}
 		return false;
 	}
