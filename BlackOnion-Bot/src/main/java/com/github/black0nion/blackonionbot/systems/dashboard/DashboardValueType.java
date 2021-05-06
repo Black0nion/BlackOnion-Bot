@@ -4,9 +4,10 @@ import com.github.black0nion.blackonionbot.misc.BlackHashMap;
 
 public enum DashboardValueType {
 	STRING(String.class), 
-	BOOLEAN(boolean.class), 
+	BOOLEAN(Boolean.class), 
 	MULTIPLE_CHOICE(BlackHashMap.class), 
-	NUMBER(double.class);
+	DECIMAL_NUMBER(Double.class),
+	NUMBER(Integer.class);
 	
 	private final Class<?> clazz;
 	
