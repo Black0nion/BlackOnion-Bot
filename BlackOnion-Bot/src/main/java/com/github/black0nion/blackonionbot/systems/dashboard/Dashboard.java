@@ -19,8 +19,8 @@ public class Dashboard {
 	private static HashMap<Command, List<DashboardValue>> values = new HashMap<>();
 	
 	public static void init() {
+		values.clear();
 		values.put(CommandBase.commands.get("antiswear"), Arrays.asList(new DashboardValue("antiSwear", "AntiSwear", DashboardValueType.MULTIPLE_CHOICE, new BlackHashMap<String, String>().putAndGetSelf("delete", "Delete").putAndGetSelf("resend", "Resend").putAndGetSelf("off", "Off"))));
-		values.put(CommandBase.commands.get("viruscommand"), Arrays.asList(new DashboardValue("moinMeister", "hi", DashboardValueType.BOOLEAN)));
 	}
 	
 	public static boolean hasValues(Command cmd) {
