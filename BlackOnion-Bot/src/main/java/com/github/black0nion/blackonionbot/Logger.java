@@ -4,19 +4,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 
 public class Logger {
+	
+	private static final SimpleDateFormat dtf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss ");
+	
 	public static void log(LogMode mode, LogOrigin origin, String logInput) {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss ");  
-		LocalDateTime now = LocalDateTime.now();
 		//StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[Thread.currentThread().getStackTrace().length - 1];
 		//String log = dtf.format(now) + "[" + stackTraceElement.getFileName().replace(".java", "") + "." + stackTraceElement.getMethodName() + ":" + stackTraceElement.getLineNumber() + "] [" + mode.name() + "] " + logInput;
-		String log = dtf.format(now) + "[" + origin.name() + "] [" + mode.name() + "] " + logInput;
+		String log = dtf.format(new Date()) + "[" + origin.name() + "] [" + mode.name() + "] " + logInput;
 		if (mode == LogMode.ERROR) {
 			System.err.println(log);
 		} else {
