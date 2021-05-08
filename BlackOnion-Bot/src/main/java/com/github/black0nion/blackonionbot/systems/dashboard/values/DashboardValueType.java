@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.systems.dashboard;
+package com.github.black0nion.blackonionbot.systems.dashboard.values;
 
 import com.github.black0nion.blackonionbot.misc.BlackHashMap;
 

@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardValue;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import net.dv8tion.jda.api.entities.Guild;
