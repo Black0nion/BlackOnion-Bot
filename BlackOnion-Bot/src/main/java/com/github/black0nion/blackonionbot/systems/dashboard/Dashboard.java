@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.BlackHashMap;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
 public class Dashboard {
