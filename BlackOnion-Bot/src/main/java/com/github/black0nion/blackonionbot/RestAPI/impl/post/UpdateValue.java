@@ -26,7 +26,7 @@ public class UpdateValue implements PostRequest {
 		try { guild = Bot.jda.getGuildById(guildId); } catch (Exception e) { return "bing bong request gone"; }
 		DashboardValue value = Dashboard.getDashboardValueFromKey(databaseKey);
 		if (value != null) {
-			Dashboard.tryParse(value, newValue, guildId);
+			value.save(databaseKey, newValue, guildId);
 		}
 		return "ding dong done";
 	}

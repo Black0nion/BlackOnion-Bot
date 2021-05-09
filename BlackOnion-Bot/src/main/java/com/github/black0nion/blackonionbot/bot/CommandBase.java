@@ -27,7 +27,6 @@ import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
-import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -84,16 +83,8 @@ public class CommandBase extends ListenerAdapter {
 					commandJSON.put("isToggleable", command.isToggleable());
 					if (Dashboard.hasValues(command)) {
 						JSONArray values = new JSONArray();
-						for (DashboardValue value : Dashboard.getValues(command)) {
-							JSONObject valueObject = new JSONObject();
-							valueObject.put("databaseKey", value.getDatabaseKey());
-							valueObject.put("prettyName", value.getPrettyName());
-							valueObject.put("type", value.getType().name());
-							if (value.getType() == DashboardValueType.MULTIPLE_CHOICE) {
-								valueObject.put("possibleValues", new JSONObject(value.getMultipleChoice()));
-							}
-							values.put(valueObject);
-						}
+						for (DashboardValue value : Dashboard.getValues(command))
+							values.put(value.toJSON());
 						commandJSON.put("values", values);
 					}
 					array.put(commandJSON);
