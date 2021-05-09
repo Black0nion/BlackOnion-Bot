@@ -10,8 +10,9 @@ import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.BlackHashMap;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
-import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardBoolean;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardMultipleChoice;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardString;
 
 public class Dashboard {
 	/**
@@ -22,7 +23,13 @@ public class Dashboard {
 	
 	public static void init() {
 		values.clear();
-		values.put(CommandBase.commands.get("antiswear"), Arrays.asList(new DashboardValue("antiSwear", "AntiSwear", DashboardValueType.MULTIPLE_CHOICE, new BlackHashMap<String, String>().putAndGetSelf("delete", "Delete").putAndGetSelf("resend", "Resend").putAndGetSelf("off", "Off"))));
+		add("antiswear", new DashboardMultipleChoice("antiSwear", "AntiSwear", new BlackHashMap<String, String>().add("delete", "Delete").add("resend", "Resend").add("off", "Off")),
+						 new DashboardBoolean("antiSwearBoolean", "AntiBoolean", false),
+						 new DashboardString("antiSwearString", "AntiString", "moin"));
+	}
+	
+	private static void add(String commandName, DashboardValue... dashboardValues) {
+		values.put(CommandBase.commands.get(commandName), Arrays.asList(dashboardValues));
 	}
 	
 	public static boolean hasValues(Command cmd) {
@@ -42,37 +49,5 @@ public class Dashboard {
 			}
 		}
 		return null;
-	}
-	
-	public static boolean tryParse(DashboardValue dashboardValue, String value, String guild) {
-		DashboardValueType type = dashboardValue.getType();
-		if (type == DashboardValueType.MULTIPLE_CHOICE) {
-			if (dashboardValue.getMultipleChoice().containsKey(value)) {
-				GuildManager.save(guild, dashboardValue.getDatabaseKey(), value);
-			}
-		} else if (type == DashboardValueType.BOOLEAN) {
-			boolean result;
-			if (value.equals("true")) result = true;
-			else if (value.equals("false")) result = false;
-			else return false;
-			
-			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
-		} else if (type == DashboardValueType.STRING) {
-			String result = value;
-			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
-		} else if (type == DashboardValueType.DECIMAL_NUMBER) {
-			double result;
-			try {
-				result = Double.parseDouble(value);
-			} catch (Exception e) { return false; }
-			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
-		} else if (type == DashboardValueType.NUMBER) {
-			int result;
-			try {
-				result = Integer.parseInt(value);
-			} catch (Exception e) { return false; }
-			GuildManager.save(guild, dashboardValue.getDatabaseKey(), result);
-		}
-		return false;
 	}
 }
