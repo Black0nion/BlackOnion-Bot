@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
@@ -67,6 +68,8 @@ public class Bot extends ListenerAdapter {
 	private static CredentialsManager credentialsManager;
 	
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
+	
+	public static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 	
 	public static final long startTime = System.currentTimeMillis();
 	
