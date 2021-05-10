@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
-import com.github.black0nion.blackonionbot.RestAPI.API;
+import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;

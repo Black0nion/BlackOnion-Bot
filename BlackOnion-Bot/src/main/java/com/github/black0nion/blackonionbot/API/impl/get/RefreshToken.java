@@ -1,10 +1,10 @@
-package com.github.black0nion.blackonionbot.RestAPI.impl.get;
+package com.github.black0nion.blackonionbot.API.impl.get;
 
 import javax.annotation.Nullable;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.RestAPI.GetRequest;
+import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
