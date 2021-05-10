@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.RestAPI.impl.get.RefreshToken;
+import com.github.black0nion.blackonionbot.API.impl.get.RefreshToken;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 

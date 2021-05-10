@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.RestAPI;
+package com.github.black0nion.blackonionbot.API;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -30,7 +30,21 @@ public class API {
 		
 		//Spark.secure("files/keystore.jks", "ahitm20202025", null, null);
 		Spark.port(187);
+		
 		Reflections reflections = new Reflections(API.class.getPackage().getName());
+		//------------------WebSockets------------------
+		Set<Class<? extends WebSocketEndpoint>> websocketsClasses = reflections.getSubTypesOf(WebSocketEndpoint.class);
+
+		for (Class<? extends WebSocketEndpoint> websockets : websocketsClasses) {
+			WebSocketEndpoint endpoint;
+			try {
+				endpoint = websockets.getConstructor().newInstance();
+				Spark.webSocket("/" + endpoint.getRoute(), websockets);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		Spark.init();
 		//-----------------Get Requests-----------------
 		Set<Class<? extends GetRequest>> getRequestClasses = reflections.getSubTypesOf(GetRequest.class);
 

@@ -1,10 +1,10 @@
-package com.github.black0nion.blackonionbot.RestAPI.impl.post;
+package com.github.black0nion.blackonionbot.API.impl.post;
 
 import java.util.HashMap;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
+import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
