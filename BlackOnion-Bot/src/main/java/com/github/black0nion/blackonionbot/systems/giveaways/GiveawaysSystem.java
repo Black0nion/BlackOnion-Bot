@@ -112,7 +112,7 @@ public class GiveawaysSystem {
 					winners[i] = users.get(i).getAsMention();
 				}
 				
-				msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslatedString("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).queue();
+				msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslation("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).queue();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

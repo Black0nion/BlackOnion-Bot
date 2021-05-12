@@ -31,7 +31,7 @@ public class PastebinCommand implements Command {
 		client.createPaste(language, body).async(
 				(id) -> client.getPaste(id).async((paste) -> {
 					EmbedBuilder builder = new EmbedBuilder()
-							.setTitle(LanguageSystem.getTranslatedString("pastecreated", author, guild), paste.getPasteUrl())
+							.setTitle(LanguageSystem.getTranslation("pastecreated", author, guild), paste.getPasteUrl())
 							.setDescription("```")
 							.appendDescription(paste.getLanguage().getId())
 							.appendDescription("\n")

@@ -33,25 +33,25 @@ public class HelpCommand implements Command {
 				// a command
 				for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
-						final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
+						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
 						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
 					}
 				}
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslation("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
 			} else {
 				// start the help system thingy lmao
 				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
-						.setTitle(LanguageSystem.getTranslatedString("help", author, guild) + " | " + LanguageSystem.getTranslatedString("modules", author, guild))
-						.setDescription(LanguageSystem.getTranslatedString("onlyexecutorcancontrol", author, guild));
+						.setTitle(LanguageSystem.getTranslation("help", author, guild) + " | " + LanguageSystem.getTranslation("modules", author, guild))
+						.setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", author, guild));
 				
 				final Category[] cats = Category.values();
 				for (int i = 0; i <= cats.length; i++) {
 					String commandsInCategory = "";
 					Category c = null;
 					if (i == 0) {
-						commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", author, guild);
+						commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", author, guild);
 					} else {						
 						c = cats[i - 1];
 						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
@@ -60,7 +60,7 @@ public class HelpCommand implements Command {
 						}
 					}
 					if (commandsInCategory.length() <= 2) continue;
-					builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
+					builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslation("modules", author, guild)), commandsInCategory.substring(1), false);
 				}
 				channel.sendMessage(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
@@ -94,17 +94,17 @@ public class HelpCommand implements Command {
 					final User user = author.getUser();
 					
 					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild)
-							.setDescription(LanguageSystem.getTranslatedString("onlyexecutorcancontrol", author.getUser(), guild));
+							.setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", author.getUser(), guild));
 					
 					if (emojiReactionNum == 0) {
-						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + LanguageSystem.getTranslatedString("modules", user, guild));
+						builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + LanguageSystem.getTranslation("modules", user, guild));
 
 						final Category[] cats = Category.values();
 						for (int i = 0; i <= cats.length; i++) {
 							String commandsInCategory = "";
 							Category c = null;
 							if (i == 0) {
-								commandsInCategory = ", " + LanguageSystem.getTranslatedString("helpmodules", user, guild);
+								commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", user, guild);
 							} else {						
 								c = cats[i - 1];
 								for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
@@ -113,16 +113,16 @@ public class HelpCommand implements Command {
 								}
 							}
 							
-							builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", user, guild)), commandsInCategory.substring(1), false);
+							builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
 						}
 					} else {
 						emojiReactionNum--;
 						final Category category = Category.values()[emojiReactionNum];
-						builder.setTitle(LanguageSystem.getTranslatedString("help", user, guild) + " | " + category.name().toUpperCase());
+						builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
 						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 							if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == category)) {
 								if (entry.getValue().getProgress() == Progress.DONE) {
-									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
+									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
 									builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
 								}
@@ -135,7 +135,7 @@ public class HelpCommand implements Command {
 							for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 								Command command = entry.getValue();
 								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
-									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
+									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
 									builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
 								}

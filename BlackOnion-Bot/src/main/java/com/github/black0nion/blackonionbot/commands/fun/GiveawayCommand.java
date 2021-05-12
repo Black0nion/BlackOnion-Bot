@@ -52,7 +52,7 @@ public class GiveawayCommand implements Command {
 		}
 		
 		if (duration == -1 || endDate == null || winnersCount == -1) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 			return;
 		}
 		
@@ -67,7 +67,7 @@ public class GiveawayCommand implements Command {
 		}
 		
 		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
-		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).submit().join();
+		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslation("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslation("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).submit().join();
 		msg.addReaction("U+1F389").queue();
 		GiveawaysSystem.createGiveaway(endDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, winnersCount);
 	}

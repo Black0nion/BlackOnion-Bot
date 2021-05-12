@@ -44,10 +44,10 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslatedString("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", LanguageSystem.getTranslation("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslation("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 		
 		e.getJDA().getPresence().setStatus(status);
 	}

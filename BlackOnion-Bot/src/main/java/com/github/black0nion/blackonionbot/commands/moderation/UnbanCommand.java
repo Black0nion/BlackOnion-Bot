@@ -30,15 +30,15 @@ public class UnbanCommand implements Command {
 			try {
 				guild.retrieveBanById(args[1]).queue(success -> {}, 
 				fail -> {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("usernotfound", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("usernotfound", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
 				});
 				Ban ban = guild.retrieveBanById(args[1]).complete();
 				String reason = ban.getReason();
 				guild.unban(ban.getUser()).queue();
-				channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslation("userunbanned", author, guild), LanguageSystem.getTranslation("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
 			} catch (Exception ignored) {}
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + guild.retrieveBan(mentionedMembers.get(0).getUser()).complete().getReason() + "**"), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslation("userunbanned", author, guild), LanguageSystem.getTranslation("bannedfor", author, guild).replace("%reason%", "**" + guild.retrieveBan(mentionedMembers.get(0).getUser()).complete().getReason() + "**"), false).build()).queue();
 			guild.unban(mentionedMembers.get(0).getUser()).queue();
 		}
 	}
