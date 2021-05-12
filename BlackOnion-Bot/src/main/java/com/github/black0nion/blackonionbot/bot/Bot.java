@@ -159,7 +159,7 @@ public class Bot extends ListenerAdapter {
 						Thread.sleep(5000);
 						e.getJDA().getPresence().setActivity(Activity.listening("with " + os.getAvailableProcessors() + " CPU cores"));
 						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " rows of code in " + BotInformation.file_count + " files"));
+						e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
 						Thread.sleep(5000);
 //						e.getJDA().getPresence().setActivity(Activity.listening("mit " + Utils.round("#.###", (double) getOsThings(os).get("getProcessCpuLoad")) + "% CPU Load"));
 //						Thread.sleep(5000);
