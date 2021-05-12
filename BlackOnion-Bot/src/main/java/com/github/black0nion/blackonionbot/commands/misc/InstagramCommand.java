@@ -17,7 +17,7 @@ public class InstagramCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Reason:", LanguageSystem.getTranslation("instasshitapi", author, guild), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Reason:", LanguageSystem.getTranslatedString("instasshitapi", author, guild), false).build()).queue();
 	}
 	
 	@Override

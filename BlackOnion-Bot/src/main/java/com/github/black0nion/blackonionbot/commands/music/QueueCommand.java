@@ -39,7 +39,7 @@ public class QueueCommand implements Command {
         		builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
         	});
     	} else {
-    		builder.setDescription(LanguageSystem.getTranslation("thistracksplus", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
+    		builder.setDescription(LanguageSystem.getTranslatedString("thistracksplus", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
     		for (int i = 0; i < tracks.size(); i++) {
     			final AudioTrack track = tracks.get(i);
     			if (i < 10) builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);

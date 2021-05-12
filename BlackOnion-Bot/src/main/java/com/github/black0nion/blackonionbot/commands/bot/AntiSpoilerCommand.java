@@ -47,7 +47,7 @@ public class AntiSpoilerCommand implements Command {
 		} else {
 			boolean antispoiler = GuildManager.getBoolean(guild, "antispoiler");
 			boolean deletespoiler = GuildManager.getBoolean(guild, "deletespoiler");
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation((antispoiler ? "on" : (!deletespoiler ? "off" : "delete")), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + Utils.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString((antispoiler ? "on" : (!deletespoiler ? "off" : "delete")), author, guild)), LanguageSystem.getTranslatedString("howtoantispoilertoggle", author, guild).replace("%command%", "``" + Utils.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
 			return;
 		}
 	}
