@@ -38,6 +38,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandBase extends ListenerAdapter {
@@ -94,6 +95,11 @@ public class CommandBase extends ListenerAdapter {
 				commandsJSON.put(entry.getKey().name(), array);
 			}
 		});
+	}
+	
+	@Override
+	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+		ContentModeratorSystem.checkMessageForProfanity(event);
 	}
 	
 	@Override
