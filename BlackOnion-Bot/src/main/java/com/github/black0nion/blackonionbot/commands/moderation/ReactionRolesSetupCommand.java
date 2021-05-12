@@ -36,7 +36,7 @@ public class ReactionRolesSetupCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -62,7 +62,7 @@ public class ReactionRolesSetupCommand implements Command {
 						} else {
 							emote = emoteName;
 							tc.addReactionById(messageID, emote).queue(null, fail -> {
-								channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("emotenotfound", author, guild), false).build()).queue();
+								channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("emotenotfound", author, guild), false).build()).queue();
 								return;
 							});
 						}
@@ -83,7 +83,7 @@ public class ReactionRolesSetupCommand implements Command {
 									.append("emote", emote)
 									.append("roleid", role.getIdLong()));
 							
-							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslation("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
+							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslatedString("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
 							return;
 						} else if (finalArgs[1].equalsIgnoreCase("remove") || finalArgs[1].equalsIgnoreCase("delete")) {
 							if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
@@ -112,18 +112,18 @@ public class ReactionRolesSetupCommand implements Command {
 							return;
 						}
 					}, fail -> {
-						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("errorhappened", author, guild), LanguageSystem.getTranslation("somethingwentwrong", author, guild), false).build()).queue();
+						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("errorhappened", author, guild), LanguageSystem.getTranslatedString("somethingwentwrong", author, guild), false).build()).queue();
 						return;
 					});
 				}, fail -> {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("messagenotfound", author, guild), LanguageSystem.getTranslation("messagecouldntbefound", author, guild), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagenotfound", author, guild), LanguageSystem.getTranslatedString("messagecouldntbefound", author, guild), false).build()).queue();
 					return;
 				});
 			} catch (NumberFormatException ex) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax(), false).build()).queue();
 		}
 	}
 	

@@ -35,7 +35,7 @@ public class AvatarCommand implements Command {
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder()
-		.setTitle(LanguageSystem.getTranslation("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
+		.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 			.setImage(mentionedUser.getEffectiveAvatarUrl())
 			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 			.setTimestamp(Instant.now());

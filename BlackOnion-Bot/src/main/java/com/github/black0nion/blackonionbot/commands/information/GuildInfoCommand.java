@@ -25,16 +25,16 @@ public class GuildInfoCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		//TODO: fix shit
 		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild)
-				.setTitle(LanguageSystem.getTranslation("guildinfo", author, guild))
+				.setTitle(LanguageSystem.getTranslatedString("guildinfo", author, guild))
 				.setThumbnail(guild.getIconUrl())
-				.addField(LanguageSystem.getTranslation("name", author, guild), guild.getName(), true)
+				.addField(LanguageSystem.getTranslatedString("name", author, guild), guild.getName(), true)
 				.addField("Owner", guild.retrieveOwner().complete().getUser().getAsMention(), true)
-				.addField(LanguageSystem.getTranslation("serverid", author, guild), guild.getId(), true)
-				.addField(LanguageSystem.getTranslation("rolecount", author, guild), String.valueOf(guild.getRoles().size()), true)
-				.addField(LanguageSystem.getTranslation("membercount", author, guild), String.valueOf(guild.getMemberCount()), true)
-				.addField(LanguageSystem.getTranslation("channelcount", author, guild), String.valueOf(guild.getChannels().size()), true)
-				.addField(LanguageSystem.getTranslation("boostlevel", author, guild), guild.getBoostTier().name(), true)
-				.addField(LanguageSystem.getTranslation("created", author, guild), guild.getTimeCreated().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")), true)
+				.addField(LanguageSystem.getTranslatedString("serverid", author, guild), guild.getId(), true)
+				.addField(LanguageSystem.getTranslatedString("rolecount", author, guild), String.valueOf(guild.getRoles().size()), true)
+				.addField(LanguageSystem.getTranslatedString("membercount", author, guild), String.valueOf(guild.getMemberCount()), true)
+				.addField(LanguageSystem.getTranslatedString("channelcount", author, guild), String.valueOf(guild.getChannels().size()), true)
+				.addField(LanguageSystem.getTranslatedString("boostlevel", author, guild), guild.getBoostTier().name(), true)
+				.addField(LanguageSystem.getTranslatedString("created", author, guild), guild.getTimeCreated().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")), true)
 				.build()).queue();
 	}
 	

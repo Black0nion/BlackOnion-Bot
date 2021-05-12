@@ -27,16 +27,16 @@ public class KickCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final List<Member> mentionedMembers = message.getMentionedMembers();
 		if (mentionedMembers.size() == 0) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
 			guild.kick(mentionedMembers.get(0)).queue();
-			String kickMessage = LanguageSystem.getTranslation("yougotkicked", author);
+			String kickMessage = LanguageSystem.getTranslatedString("yougotkicked", author);
 			if (args.length >= 3) {
 				kickMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 			}
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslation("usergotkicked", author, guild), LanguageSystem.getTranslation("message", author, guild) + ": " + kickMessage, false).build()).queue();
-			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslation("yougotkicked", author), LanguageSystem.getTranslation("message", author) + ": " + kickMessage, false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("usergotkicked", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
+			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("yougotkicked", author), LanguageSystem.getTranslatedString("message", author) + ": " + kickMessage, false).build()).queue();
 		}
 	}
 	

@@ -108,7 +108,7 @@ public class LanguageSystem {
 		return null;
 	}
 	
-	public static String getTranslation(String key, User author, Guild guild) {
+	public static String getTranslatedString(String key, User author, Guild guild) {
 		try {
 			return getUserLanguage(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
@@ -121,7 +121,7 @@ public class LanguageSystem {
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
-	public static String getTranslation(String key, User author) {
+	public static String getTranslatedString(String key, User author) {
 		try {
 			return getUserLanguage(author.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
@@ -131,7 +131,7 @@ public class LanguageSystem {
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 
-	public static String getTranslation(String key, Guild guild) {
+	public static String getTranslatedString(String key, Guild guild) {
 		try {
 			return getGuildLanguage(guild.getId()).getTranslatedString(key);
 		} catch (Exception ignored) {}
@@ -139,10 +139,6 @@ public class LanguageSystem {
 			return defaultLocale.getTranslatedString(key);
 		} catch (Exception ignored) {}
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
-	}
-
-	public static String getTranslation(String key, Language language) {
-		return language.getTranslatedString(key);
 	}
 	/**
 	 * The replacement will also get translated!
@@ -154,6 +150,10 @@ public class LanguageSystem {
 	 * @return
 	 */
 	public static String getReplacedTranslation(String key, User author, Guild guild, String toReplace, String replacement) {
-		return getTranslation(key, author, guild).replace(toReplace, getTranslation(replacement, author, guild));
+		return getTranslatedString(key, author, guild).replace(toReplace, getTranslatedString(replacement, author, guild));
+	}
+	
+	public static String getTranslatedString(String key, Language language) {
+		return language.getTranslatedString(key);
 	}
 }

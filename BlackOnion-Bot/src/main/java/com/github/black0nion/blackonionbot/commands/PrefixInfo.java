@@ -20,7 +20,7 @@ public class PrefixInfo extends ListenerAdapter {
 			final String[] args = event.getMessage().getContentRaw().split(" ");
 			if (event.getMember().hasPermission(Permission.ADMINISTRATOR) && args.length >= 2)
 				BotInformation.setPrefix(guild, args[1]);
-			event.getChannel().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), LanguageSystem.getTranslation("changeprefix", author, guild).replace("%command%", event.getJDA().getSelfUser().getAsMention() + " <prefix>"), false).build()).queue();
+			event.getChannel().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), LanguageSystem.getTranslatedString("changeprefix", author, guild).replace("%command%", event.getJDA().getSelfUser().getAsMention() + " <prefix>"), false).build()).queue();
 		}
 	}
 }

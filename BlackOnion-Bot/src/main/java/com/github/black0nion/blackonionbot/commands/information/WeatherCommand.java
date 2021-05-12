@@ -41,18 +41,18 @@ public class WeatherCommand implements Command {
 			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
 			EmbedBuilder embed = EmbedUtils.getDefaultSuccessEmbed(author, guild)
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"))
-					.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
-					.addField(LanguageSystem.getTranslation("temperature", author, guild), main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
-					.addField(LanguageSystem.getTranslation("humidity", author, guild), main.get("humidity") + "%", true)
-					.addField(LanguageSystem.getTranslation("windspeed", author, guild), weather.getJSONObject("wind").get("speed") + " km/h", true)
-					.addField(LanguageSystem.getTranslation("country", author, guild), Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
-					.addField(LanguageSystem.getTranslation("sunrise", author, guild), sdf.format(sunrise), false)
-					.addField(LanguageSystem.getTranslation("sunset", author, guild), sdf.format(sunset), false);
+					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"))
+					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+					.addField(LanguageSystem.getTranslatedString("temperature", author, guild), main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField(LanguageSystem.getTranslatedString("humidity", author, guild), main.get("humidity") + "%", true)
+					.addField(LanguageSystem.getTranslatedString("windspeed", author, guild), weather.getJSONObject("wind").get("speed") + " km/h", true)
+					.addField(LanguageSystem.getTranslatedString("country", author, guild), Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+					.addField(LanguageSystem.getTranslatedString("sunrise", author, guild), sdf.format(sunrise), false)
+					.addField(LanguageSystem.getTranslatedString("sunset", author, guild), sdf.format(sunset), false);
 			channel.sendMessage(embed.build()).queue();
 			return;
 		} catch (IOException ex) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("unknowncity", author, guild), query, false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("unknowncity", author, guild), query, false).build()).queue();
 			return;
 		}
 	}

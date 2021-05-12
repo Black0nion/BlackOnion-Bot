@@ -27,17 +27,17 @@ public class BanCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final List<Member> mentionedMembers = message.getMentionedMembers();
 		if (mentionedMembers.size() == 0) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
-			String banMessage = LanguageSystem.getTranslation("yougotbanned", author);
+			String banMessage = LanguageSystem.getTranslatedString("yougotbanned", author);
 			if (args.length >= 3) {
 				banMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 				guild.ban(mentionedMembers.get(0), 0, banMessage).queue();
 			} else
 				guild.ban(mentionedMembers.get(0), 0).queue();
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("usergotbanned", author, guild), LanguageSystem.getTranslation("message", author, guild) + ": " + banMessage, false).build()).queue();
-			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("yougotbanned", author), LanguageSystem.getTranslation("message", author) + ": " + banMessage, false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("usergotbanned", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + banMessage, false).build()).queue();
+			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("yougotbanned", author), LanguageSystem.getTranslatedString("message", author) + ": " + banMessage, false).build()).queue();
 		}
 	}
 	
