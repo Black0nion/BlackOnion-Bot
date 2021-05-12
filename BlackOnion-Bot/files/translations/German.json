@@ -232,5 +232,6 @@
     "commandcantbetoggled": "Befehl kann nicht ein / ausgeschalten werden!",
     "thiscommandcantbetoggled": "Dieser Befehl ist immer an!",
     "commandtoggled": "Der Status des Befehls %command% wurde geändert!",
-    "commandisnow": "Der Befehl **%command%** ist jetzt **%status%**!"
+    "commandisnow": "Der Befehl **%command%** ist jetzt **%status%**!",
+    "clickfornewspage": "Klicke hier, um auf die Newsseite zu kommen!"
 }
