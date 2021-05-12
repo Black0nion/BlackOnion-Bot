@@ -18,9 +18,13 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 
 public class ContentModeratorSystem {
 	
@@ -33,8 +37,17 @@ public class ContentModeratorSystem {
 	 * @return true if the message contained unwanted content
 	 */
 	public static boolean checkMessageForProfanity(GuildMessageReceivedEvent event) {
-		final Guild guild = event.getGuild();
-		if (event.getAuthor().isBot()) return false;
+		return check(event.getGuild(), event.getMember(), event.getMessage(), event.getChannel());
+	}
+	
+	public static boolean checkMessageForProfanity(GuildMessageUpdateEvent event) {
+		return check(event.getGuild(), event.getMember(), event.getMessage(), event.getChannel());
+	}
+	
+	private static boolean check(Guild guild, Member author, Message message, TextChannel channel) {
+		final String messageContent = message.getContentRaw();
+		final User user = author.getUser();
+		if (user.isBot()) return false;
 		if (GuildManager.isPremium(guild)) {
 			if (!GuildManager.getBoolean(guild, "antiSwear"))
 				return false;
@@ -44,17 +57,16 @@ public class ContentModeratorSystem {
 			return false;
 		}
 		try {
-			if (event.getMessage().getContentRaw().equalsIgnoreCase("")) return false;
+			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
 			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);
-			if (whitelist != null && (whitelist.contains(event.getChannel().getAsMention()) || event.getMember().getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
-			Message messageRaw = event.getMessage();
-			final String msg = messageRaw.getContentRaw();
+			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
+			//Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
 			HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True")
 			  .header("Content-Type", "text/plain")
 			  .header("Ocp-Apim-Subscription-Key", Bot.getCredentialsManager().getString("content_moderator_key"))
-			  .body(msg)
+			  .body(messageContent)
 			  .asString();
 
 			JSONObject responseJson = new JSONObject(response.getBody());
@@ -65,29 +77,29 @@ public class ContentModeratorSystem {
 				Bot.executor.submit(() -> {
 					profanityFilteredLastTenSecs++;
 					try {
-						event.getMessage().delete().queue();
+						message.delete().queue();
 						WebhookMessageBuilder builder = new WebhookMessageBuilder();
 						final JSONArray terms = responseJson.getJSONArray("Terms");
 						
-						String message = msg;
+						String newMessage = messageContent;
 						
 						for (int i = 0; i < terms.length(); i++) {
 							final String term = terms.getJSONObject(i).getString("Term");
-							message = message.replaceAll("(?i)" + term, term.replaceAll(".", "*"));
+							newMessage = newMessage.replaceAll("(?i)" + term, term.replaceAll(".", "*"));
 						}
 						
-						message = Utils.removeMarkdown(message);
-						builder.setContent(message);
-						builder.setUsername(event.getMember().getEffectiveName() + "#" + event.getAuthor().getDiscriminator());
-						builder.setAvatarUrl(event.getAuthor().getEffectiveAvatarUrl());
-						final List<Webhook> webhooks = event.getChannel().retrieveWebhooks().submit().join();
+						newMessage = Utils.removeMarkdown(newMessage);
+						builder.setContent(newMessage);
+						builder.setUsername(author.getEffectiveName() + "#" + user.getDiscriminator());
+						builder.setAvatarUrl(user.getEffectiveAvatarUrl());
+						final List<Webhook> webhooks = channel.retrieveWebhooks().submit().join();
 						
 						Webhook webhook;
 						
 						if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
 							webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
 						} else {
-							webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+							webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
 						}
 						
 						WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
@@ -111,5 +123,6 @@ public class ContentModeratorSystem {
 			e.printStackTrace();
 		}
 		return false;
+
 	}
 }
