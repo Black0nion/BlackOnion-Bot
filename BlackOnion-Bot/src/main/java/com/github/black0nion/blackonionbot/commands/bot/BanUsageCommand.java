@@ -34,11 +34,11 @@ public class BanUsageCommand implements Command {
 			final String stuffToBan = args[2];
 			if (stuffToBan.startsWith("u:")) {
 				MongoManager.insertOne(collection, new Document().append("userid", stuffToBan.replace("u:", "")));
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslatedString("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslation("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
 				return;
 			} else if (stuffToBan.contains("g:")) {
 				MongoManager.insertOne(collection, new Document().append("guildid", stuffToBan.replace("u:", "")));
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslatedString("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslation("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
 				return;
 			} else {
 				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);

@@ -58,7 +58,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			channel.sendMessage(GuildManager.getString(guild, "joinmessage", LanguageSystem.getTranslatedString("defaultjoinmessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
+			channel.sendMessage(GuildManager.getString(guild, "joinmessage", LanguageSystem.getTranslation("defaultjoinmessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -74,7 +74,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			TextChannel channel = event.getGuild().getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.LEAVE);
-			channel.sendMessage(GuildManager.getString(guild, "leavemessage", LanguageSystem.getTranslatedString("defaultleavemessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
+			channel.sendMessage(GuildManager.getString(guild, "leavemessage", LanguageSystem.getTranslation("defaultleavemessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -85,7 +85,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		final Guild guild = event.getGuild();
 		final User author = guild.retrieveOwner().submit().join().getUser();
 		final String prefix = BotInformation.getPrefix(guild);
-		author.openPrivateChannel().complete().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslatedString("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslatedString("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
+		author.openPrivateChannel().complete().sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
 	}
 	
     @NotNull
@@ -128,7 +128,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
         newGraphics.setColor(Color.DARK_GRAY);
-        String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslatedString("welcome", user, guild) : LanguageSystem.getTranslatedString("goodbye", user, guild);
+        String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslation("welcome", user, guild) : LanguageSystem.getTranslation("goodbye", user, guild);
         newGraphics.drawString(message, 205, 55);
         newGraphics.setFont(new Font("Arial", Font.BOLD, 80));
         newGraphics.setColor(textColor);

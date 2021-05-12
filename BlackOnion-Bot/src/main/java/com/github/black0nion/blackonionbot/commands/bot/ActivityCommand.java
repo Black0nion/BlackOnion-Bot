@@ -32,7 +32,7 @@ public class ActivityCommand implements Command {
 		} else if (args[1].toLowerCase().contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " ``playing``, ``watching`` " + LanguageSystem.getTranslatedString("or", author, guild) + " ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("pleaseuse", author, guild) + " ``playing``, ``watching`` " + LanguageSystem.getTranslation("or", author, guild) + " ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
 			return;
 		}
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).submit().join().delete().queueAfter(3, TimeUnit.SECONDS);

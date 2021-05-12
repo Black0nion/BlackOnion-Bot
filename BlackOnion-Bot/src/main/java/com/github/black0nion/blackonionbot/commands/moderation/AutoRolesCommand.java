@@ -31,7 +31,7 @@ public class AutoRolesCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -44,13 +44,13 @@ public class AutoRolesCommand implements Command {
 					role = roles.get(0);
 					roleID = roles.get(0).getIdLong();
 				} else {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 					return;
 				}
 			} else {
 				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (NumberFormatException ignored) {}
 				if (roleID == null) {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 					return;
 				}
 			}
@@ -61,7 +61,7 @@ public class AutoRolesCommand implements Command {
 				return;
 			} else tempList.add(roleID);
 			GuildManager.saveList(guild.getId(), "autoroles", tempList);
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("autorolecreated", LanguageSystem.getTranslatedString("autorolecreatedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("autorolecreated", LanguageSystem.getTranslation("autorolecreatedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
 			List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;
@@ -71,13 +71,13 @@ public class AutoRolesCommand implements Command {
 					role = roles.get(0);
 					roleID = roles.get(0).getIdLong();
 				} else {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 					return;
 				}
 			} else {
 				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (NumberFormatException ignored) {}
 				if (roleID == null) {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 					return;
 				}
 			}
@@ -88,9 +88,9 @@ public class AutoRolesCommand implements Command {
 				return;
 			} else tempList.remove(roleID);
 			GuildManager.saveList(guild.getId(), "autoroles", tempList);
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("autoroledeleted", LanguageSystem.getTranslatedString("autoroledeletedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("autoroledeleted", LanguageSystem.getTranslation("autoroledeletedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
 		}
 	}
 	

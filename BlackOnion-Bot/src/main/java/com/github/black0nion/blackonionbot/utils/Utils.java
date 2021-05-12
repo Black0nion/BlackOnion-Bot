@@ -179,7 +179,7 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getCommandHelp(guild, author, command);
+		return LanguageSystem.getTranslation("pleaseuse", author, guild) + " " + getCommandHelp(guild, author, command);
 	}
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {

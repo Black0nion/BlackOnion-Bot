@@ -79,7 +79,7 @@ public class CommandBase extends ListenerAdapter {
 				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
 					JSONObject commandJSON = new JSONObject();
 					commandJSON.put("command", command.getCommand());
-					commandJSON.put("description", LanguageSystem.getTranslatedString("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
+					commandJSON.put("description", LanguageSystem.getTranslation("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
 					commandJSON.put("isToggleable", command.isToggleable());
 					if (Dashboard.hasValues(command)) {
 						JSONArray values = new JSONArray();
@@ -135,11 +135,11 @@ public class CommandBase extends ListenerAdapter {
 				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+						.addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						.addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
 				return;
 			}
 			
@@ -154,7 +154,7 @@ public class CommandBase extends ListenerAdapter {
 			return;
 		}
 		
-		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslation("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	@Deprecated
