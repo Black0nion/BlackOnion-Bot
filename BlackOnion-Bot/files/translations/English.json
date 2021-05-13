@@ -232,5 +232,7 @@
     "commandcantbetoggled": "Command can't be toggled on / off!",
     "thiscommandcantbetoggled": "This command is always on!",
     "commandtoggled": "The status of the command %command% got changed!",
-    "commandisnow": "The command **%command%** is now **%status%**!"
+    "commandisnow": "The command **%command%** is now **%status%**!",
+    "catnotfound": "Katze nicht gefunden :(",
+    "catbreednotfound": "Diese Rasse konnte nicht gefunden werden, für eine Liste an möglichen Rassen benutze ``%command%``!"
 }
