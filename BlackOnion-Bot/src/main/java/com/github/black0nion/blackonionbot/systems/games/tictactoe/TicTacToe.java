@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.systems.games.connectfour;
+package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
 import java.util.Map;
 import java.util.Random;
@@ -10,7 +10,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-public class ConnectFour {
+public class TicTacToe {
 	long messageID;
 	String playerX;
 	String playerY;
@@ -20,14 +20,14 @@ public class ConnectFour {
 	public FieldType currentUser;
 	MessageChannel channel;
 	
-	public ConnectFour(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
+	public TicTacToe(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
 		
-		field = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
+		field = new FieldType[TicTacToeGameManager.Y][TicTacToeGameManager.X];
 		
 		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
-		for (int x = 0; x < ConnectFourGameManager.X; x++) {
-			for (int y = 0; y < ConnectFourGameManager.Y; y++) {
+		for (int x = 0; x < TicTacToeGameManager.X; x++) {
+			for (int y = 0; y < TicTacToeGameManager.Y; y++) {
 				field[y][x] = FieldType.EMPTY;
 			}
 		}
@@ -94,31 +94,31 @@ public class ConnectFour {
 	
 	public boolean won(FieldType player) {
 	    // horizontalCheck 
-	    for (int j = 0; j<ConnectFourGameManager.X-3 ; j++ ){
-	        for (int i = 0; i<ConnectFourGameManager.Y; i++){
+	    for (int j = 0; j<TicTacToeGameManager.X-3 ; j++ ){
+	        for (int i = 0; i<TicTacToeGameManager.Y; i++){
 	            if (field[i][j] == player && field[i][j+1] == player && field[i][j+2] == player && field[i][j+3] == player){
 	                return true;
 	            }           
 	        }
 	    }
 	    // verticalCheck
-	    for (int i = 0; i<ConnectFourGameManager.Y-3 ; i++ ){
-	        for (int j = 0; j<ConnectFourGameManager.X; j++){
+	    for (int i = 0; i<TicTacToeGameManager.Y-3 ; i++ ){
+	        for (int j = 0; j<TicTacToeGameManager.X; j++){
 	            if (field[i][j] == player && field[i+1][j] == player && field[i+2][j] == player && field[i+3][j] == player){
 	                return true;
 	            }           
 	        }
 	    }
 	    // ascendingDiagonalCheck 
-	    for (int i=3; i<ConnectFourGameManager.Y; i++){
-	        for (int j=0; j<ConnectFourGameManager.X-3; j++){
+	    for (int i=3; i<TicTacToeGameManager.Y; i++){
+	        for (int j=0; j<TicTacToeGameManager.X-3; j++){
 	            if (field[i][j] == player && field[i-1][j+1] == player && field[i-2][j+2] == player && field[i-3][j+3] == player)
 	                return true;
 	        }
 	    }
 	    // descendingDiagonalCheck
-	    for (int i=3; i<ConnectFourGameManager.Y; i++){
-	        for (int j=3; j<ConnectFourGameManager.X; j++){
+	    for (int i=3; i<TicTacToeGameManager.Y; i++){
+	        for (int j=3; j<TicTacToeGameManager.X; j++){
 	            if (field[i][j] == player && field[i-1][j-1] == player && field[i-2][j-2] == player && field[i-3][j-3] == player)
 	                return true;
 	        }
@@ -158,7 +158,7 @@ public class ConnectFour {
 		char[] charInput = input.toCharArray();
 		try {
 			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
-			if (Utils.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.Y) {
+			if (Utils.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < TicTacToeGameManager.Y) {
 				return true;
 			}
 		} catch (Exception ignored) {}
@@ -174,9 +174,9 @@ public class ConnectFour {
 	
 	public String getField() {
 		String output = "";
-		output += "   A   B   C   D   E   F   G   H   I\n ----------------------------\n";
-		for (int y = 0; y < ConnectFourGameManager.Y; y++) {
-			for (int x = 0; x < ConnectFourGameManager.X; x++) {
+		output += "   A   B   C\n ----------------------------\n";
+		for (int y = 0; y < TicTacToeGameManager.Y; y++) {
+			for (int x = 0; x < TicTacToeGameManager.X; x++) {
 				output += "\\| " + (field[y][x] == FieldType.EMPTY ? "    " : " " + field[y][x].name() + " ");
 			}
 			output += "| (" + y + ")\n----------------------------\n";
