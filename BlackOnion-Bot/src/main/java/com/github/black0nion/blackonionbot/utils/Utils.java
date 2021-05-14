@@ -247,4 +247,19 @@ public class Utils {
 			return true;
 		} catch (Exception e) { return false; }
 	}
+	
+	/**
+	 * @return if the given Object equals to one of the other given Objects
+	 */
+	@SafeVarargs
+	public static <T> boolean equalsOne(T input, T... comparison) {
+		return Arrays.asList(comparison).contains(input);
+	}
+	
+	/**
+	 * @return if the given String equals to one of the other given Strings (ignoring case)
+	 */
+	public static boolean equalsOneIgnoreCase(String input, String... comparison) {
+		return input.matches("(?i)" + String.join("|", comparison));
+	}
 }
