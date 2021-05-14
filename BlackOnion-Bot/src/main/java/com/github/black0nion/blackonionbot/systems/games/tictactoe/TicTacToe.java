@@ -62,6 +62,10 @@ public class TicTacToe {
 		return false;
 	}
 	
+	public int getMoves() {
+		return moves;
+	}
+	
 	public FieldType getWinner(int x, int y) {
 		moves++;
 		if (moves == Math.pow((double) TicTacToeGameManager.SIZE, 2D)) {
