@@ -1,11 +1,11 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -43,7 +43,7 @@ public class AntiSwearCommand implements Command {
 	}
 	
 	private final void print(GuildMessageReceivedEvent e, MessageChannel channel, User author, Member member, Guild guild) {
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", "``" + BotInformation.getPrefix(guild) + getCommand()[0] + " " + getSyntax() + "``"), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", Utils.getCommandHelp(guild, author, this)), false).build()).queue();
 	}
 	
 	@Override

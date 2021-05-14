@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -14,6 +13,7 @@ import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -35,11 +35,11 @@ public class HelpCommand implements Command {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
 						final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false).build()).queue();
+						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(Utils.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
 					}
 				}
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "``" + args[1] + "``"), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "`" + args[1] + "`"), false).build()).queue();
 			} else {
 				// start the help system thingy lmao
 				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
@@ -124,7 +124,7 @@ public class HelpCommand implements Command {
 								if (entry.getValue().getProgress() == Progress.DONE) {
 									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-									builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
+									builder.addField(Utils.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
@@ -137,7 +137,7 @@ public class HelpCommand implements Command {
 								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
 									final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-									builder.addField(pr.name().toUpperCase() + ": " + BotInformation.getPrefix(guild) + entry.getKey()[0] + (command.getSyntax() != null && !command.getSyntax().equalsIgnoreCase("") ? " " + command.getSyntax() : ""), commandHelp != null ? commandHelp : "empty", false);
+									builder.addField(pr.name().toUpperCase() + ": " + Utils.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
@@ -146,11 +146,6 @@ public class HelpCommand implements Command {
 					msg.editMessage(builder.build()).queue();
 					waitForHelpCatSelection(msg, author, catCount);
 		}, 5, TimeUnit.MINUTES, () -> {msg.delete().queue();});
-	}
-
-	@Override
-	public String getSyntax() {
-		return null;
 	}
 	
 	@Override

@@ -162,4 +162,9 @@ public class TicTacToeCommand implements Command {
 	public Category getCategory() {
 		return Category.FUN;
 	}
+	
+	@Override
+	public String getSyntax() {
+		return "<@User / mention me to play against me!>";
+	}
 }

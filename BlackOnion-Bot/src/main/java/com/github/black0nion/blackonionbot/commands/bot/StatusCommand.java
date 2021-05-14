@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
@@ -44,7 +45,7 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " [``online``], [``invisible``, ``offline``], [``idle``, ``afk``] "  + LanguageSystem.getTranslatedString("or", author, guild) + " [``dnd``, ``donotdisturb``]", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", Utils.getPleaseUse(guild, author, this), false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
 			return;
 		}
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
