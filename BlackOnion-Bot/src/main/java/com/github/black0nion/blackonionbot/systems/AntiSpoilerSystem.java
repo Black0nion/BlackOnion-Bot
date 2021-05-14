@@ -1,7 +1,5 @@
 package com.github.black0nion.blackonionbot.systems;
 
-import java.util.List;
-
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
