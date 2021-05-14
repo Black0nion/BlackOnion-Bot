@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToeGameManager {
 	private static ArrayList<TicTacToe> games = new ArrayList<>();
@@ -17,7 +16,7 @@ public class TicTacToeGameManager {
 	 * @param playerY UserID of Player Y
 	 * @return The new created Game
 	 */
-	public static TicTacToe createGame(MessageChannel channel, User playerX, User playerY) {
+	public static TicTacToe createGame(MessageChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
 		TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
 		games.add(newGame);
 		return newGame;
