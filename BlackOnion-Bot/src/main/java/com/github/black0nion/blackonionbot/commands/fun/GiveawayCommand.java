@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.fun;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -24,8 +23,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class GiveawayCommand implements Command {
 	
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
-	
-	Random random = new Random();
 
 	@Override
 	public String[] getCommand() {

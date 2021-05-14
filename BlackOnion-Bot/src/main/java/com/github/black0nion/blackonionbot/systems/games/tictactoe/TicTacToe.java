@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
 import java.util.Map;
-import java.util.Random;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -11,17 +11,18 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class TicTacToe {
-	long messageID;
+	Message message;
 	TicTacToePlayer playerX;
 	TicTacToePlayer playerY;
 	FieldType[][] field;
 	public FieldType currentUser;
 	MessageChannel channel;
+	int moves = 0;
 	
 	public TicTacToe(MessageChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
 		field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		
-		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
+		currentUser = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
@@ -29,22 +30,14 @@ public class TicTacToe {
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", getField(), false).build()).queue(success -> messageID = success.getIdLong());
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", getField(), false).build()).queue(success -> this.message = success);
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;
 	}
 	
 	public Message getMessage() {
-		return channel.retrieveMessageById(messageID).complete();
-	}
-
-	public long getMessageID() {
-		return messageID;
-	}
-	
-	public void setMessageID(long messageID) {
-		this.messageID = messageID;
+		return message;
 	}
 	
 	public TicTacToePlayer getPlayerX() {
@@ -70,12 +63,15 @@ public class TicTacToe {
 	}
 	
 	public FieldType getWinner(int x, int y) {
-		if (won(FieldType.X, x, y)) {
+		moves++;
+		if (moves == Math.pow((double) TicTacToeGameManager.SIZE, 2D)) {
+			return FieldType.EMPTY;
+		} else if (won(FieldType.X, x, y)) {
 			return FieldType.X;
 		} else if (won(FieldType.Y, x, y)) {
 			return FieldType.Y;
 		}
-		return FieldType.EMPTY;
+		return null;
 	}
 	
 	public boolean won(FieldType player, int x, int y) {
@@ -125,7 +121,7 @@ public class TicTacToe {
 		return false;
 	}
 	
-	public Map.Entry<Integer, Integer> getCoordinatesFromString(String input) {
+	public static Map.Entry<Integer, Integer> getCoordinatesFromString(String input) {
 		char[] charInput = input.toCharArray();
 		return new Map.Entry<Integer, Integer>() {
 			@Override
@@ -137,12 +133,7 @@ public class TicTacToe {
 			@Override
 			public Integer getValue() {
 				// the numbers
-				for (int i = 0; i < Utils.alphabet.size(); i++) {
-					if (Utils.alphabet.get(i) == charInput[0])
-						return i;
-				}
-				// should never get called because isValidInput is called first
-				return null;
+				return Utils.alphabet.indexOf(charInput[0]);
 			}
 
 			@Override

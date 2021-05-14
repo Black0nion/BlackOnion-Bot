@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
 import java.util.Map;
-import java.util.Random;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -23,7 +23,7 @@ public class ConnectFour {
 		
 		field = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
 		
-		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
+		currentUser = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
 		for (int x = 0; x < ConnectFourGameManager.X; x++) {
 			for (int y = 0; y < ConnectFourGameManager.Y; y++) {

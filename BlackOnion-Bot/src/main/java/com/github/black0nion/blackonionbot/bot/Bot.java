@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,6 +70,8 @@ public class Bot extends ListenerAdapter {
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
 	
 	public static final long startTime = System.currentTimeMillis();
+	
+	public static final Random random = new Random();
 	
 	@SuppressWarnings("resource")
 	public void startBot() {

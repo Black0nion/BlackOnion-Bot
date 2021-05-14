@@ -23,10 +23,7 @@ public class TicTacToeGameManager {
 	}
 	
 	public static void deleteGame(TicTacToe game) {
-		for (int i = 0; i < games.size(); i++) {
-			if (games.get(i).getMessageID() == game.getMessageID())
-				games.remove(i);
-		}
+		games.remove(game);
 	}
 	
 	public static boolean isIngame(String userID) {
@@ -38,10 +35,6 @@ public class TicTacToeGameManager {
 	}
 	
 	public static TicTacToe getGameByMessageID(long messageID) {
-		for (TicTacToe game : games) {
-			if (game.getMessageID() == messageID)
-				return game;
-		}
-		return null;
+		return games.stream().filter(game -> game.getMessage().getIdLong() == messageID).findFirst().orElse(null);
 	}
 }
