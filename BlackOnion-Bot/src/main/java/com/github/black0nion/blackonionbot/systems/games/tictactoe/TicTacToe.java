@@ -9,18 +9,16 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToe {
 	long messageID;
-	User playerX;
-	User playerY;
+	TicTacToePlayer playerX;
+	TicTacToePlayer playerY;
 	FieldType[][] field;
 	public FieldType currentUser;
 	MessageChannel channel;
 	
-	public TicTacToe(MessageChannel channel, User playerX, User playerY) {
-		
+	public TicTacToe(MessageChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
 		field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		
 		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
@@ -49,11 +47,11 @@ public class TicTacToe {
 		this.messageID = messageID;
 	}
 	
-	public User getPlayerX() {
+	public TicTacToePlayer getPlayerX() {
 		return playerX;
 	}
 	
-	public User getPlayerY() {
+	public TicTacToePlayer getPlayerY() {
 		return playerY;
 	}
 	
@@ -82,12 +80,13 @@ public class TicTacToe {
 	
 	public boolean won(FieldType player, int x, int y) {
 		int n = TicTacToeGameManager.SIZE;
+		
 		//check col
         for(int i = 0; i < n; i++){
             if(field[x][i] != player)
                 break;
             if(i == n-1){
-                //report win for s
+                return true;
             }
         }
 
@@ -96,7 +95,7 @@ public class TicTacToe {
             if(field[i][y] != player)
                 break;
             if(i == n-1){
-                //report win for s
+                return true;
             }
         }
 
@@ -107,7 +106,7 @@ public class TicTacToe {
                 if(field[i][i] != player)
                     break;
                 if(i == n-1){
-                    //report win for s
+                    return true;
                 }
             }
         }
@@ -118,7 +117,7 @@ public class TicTacToe {
                 if(field[i][(n-1)-i] != player)
                     break;
                 if(i == n-1){
-                    //report win for s
+                    return true;
                 }
             }
         }
@@ -132,7 +131,7 @@ public class TicTacToe {
 			@Override
 			public Integer getKey() {
 				// the letters
-				return Integer.parseInt(String.valueOf(charInput[1]));
+				return Integer.parseInt(String.valueOf(charInput[1]))-1;
 			}
 
 			@Override
@@ -156,7 +155,7 @@ public class TicTacToe {
 	public boolean isValidInput(String input) {
 		char[] charInput = input.toCharArray();
 		try {
-			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
+			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]))-1;
 			if (Utils.alphabet.contains(charInput[0]) && Utils.alphabet.indexOf(charInput[0]) < TicTacToeGameManager.SIZE && numbAtOne >= 0 && numbAtOne < TicTacToeGameManager.SIZE) {
 				return true;
 			}
@@ -172,14 +171,19 @@ public class TicTacToe {
 	}
 	
 	public String getField() {
-		String output = "";
-		output += "   A   B   C\n ------\n";
+		String output = "```";
+		output += "    A   B   C\n  ┌───┬───┬───┐\n";
 		for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
+			output += (y+1);
 			for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
-				output += "\\| " + (field[y][x] == FieldType.EMPTY ? "    " : " " + field[y][x].name() + " ");
+				output += " │" + (field[y][x] == FieldType.EMPTY ? "  " :  " " + field[y][x].name());
 			}
-			output += "| (" + y + ")\n-----\n";
+			if (y != TicTacToeGameManager.SIZE-1)
+				output += " │\n  ├───┼───┼───┤\n";
+			else
+				output += " │\n  └───┴───┴───┘";
+				
 		}
-		return output;
+		return output + "```";
 	}
 }
