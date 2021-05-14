@@ -38,7 +38,7 @@ public class TicTacToeCommand implements Command {
 		if (message.getMentionedUsers().size() != 0) {
 			User challenged = message.getMentionedUsers().get(0);
 			if (challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
-				rerun(TicTacToeGameManager.createGame(channel, new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel());
+				rerun(TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel());
 				return;
 			} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslatedString("bot", author, guild) : getTranslatedString("yourself", author, guild))), getTranslatedString("nofriends", author, guild), false).build()).queue();
@@ -57,7 +57,7 @@ public class TicTacToeCommand implements Command {
 				    	  channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(event.getAuthor()).addField(getTranslatedString("challengeaccepted", event.getAuthor(), guild), getTranslatedString("playingagainst", event.getAuthor(), guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 				    	  
 				    	  //ANGENOMMEN
-				    	  TicTacToe game = TicTacToeGameManager.createGame(channel, new TicTacToePlayer(author), new TicTacToePlayer(challenged));
+				    	  TicTacToe game = TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
 				    	  rerun(game, e.getChannel());
 				    	  return;
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
@@ -76,8 +76,8 @@ public class TicTacToeCommand implements Command {
 	}
 	
 	public void rerun(TicTacToe game, TextChannel channel) {
-		CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
-	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
+		CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, 
+	  			(answerEvent) -> answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
 	  				final String msg = answerEvent.getMessage().getContentRaw();
 	  				final User author = answerEvent.getAuthor();
@@ -87,30 +87,30 @@ public class TicTacToeCommand implements Command {
 	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("gaveup", author, guild)).addField(getTranslatedString("usergaveup", author, guild).replace("%user%", Utils.removeMarkdown(author.getName())), getTranslatedString("sadloose", author, guild), false).build()).queue();
 	  					TicTacToeGameManager.deleteGame(game);
 	  					return;
-	  				} else if (!author.getId().equals(game.currentUser == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
-  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wrongturn", author, guild)).build()).queue();
+	  				} else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
+  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("tictactoe", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getFieldString(), false).setDescription(getTranslatedString("wrongturn", author, guild)).build()).queue();
   						rerun(game, channel);
   						return;
   					} else if (game.isValidInput(msg)) {
 	  					@SuppressWarnings("static-access")
 						Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
 	  					FieldType[][] temp = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
-	  					System.arraycopy(game.getfield(), 0, temp, 0, game.getfield().length);
+	  					System.arraycopy(game.getField(), 0, temp, 0, game.getField().length);
 	  					
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
-	  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("fieldoccopied", author, guild)).build()).queue();
+	  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("tictactoe", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getFieldString(), false).setDescription(getTranslatedString("fieldoccopied", author, guild)).build()).queue();
 	  						//game.nextUser();
 	  						rerun(game, channel);
 	  						return;
 	  					}
 	  					
-	  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
-	  					game.setfield(temp);
+	  					temp[coords.getKey()][coords.getValue()] = game.currentPlayer;
+	  					game.setField(temp);
 	  					
 	  					if (handleWin(game, coords)) return;
 	  					
 	  					game.nextUser();
-	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("tictactoe", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getFieldString(), false).build()).queue();
 	  					
 	  					if (game.getPlayerY().isBot()) {
 		  					try {
@@ -120,13 +120,13 @@ public class TicTacToeCommand implements Command {
 							}
 		  					
 		  					coords = TicTacToeBot.move(game);
-		  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
-		  					game.setfield(temp);
+		  					temp[coords.getKey()][coords.getValue()] = game.currentPlayer;
+		  					game.setField(temp);
 		  					
 		  					if (handleWin(game, coords)) return;
 		  					game.nextUser();
 							
-							game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+							game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("tictactoe", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getFieldString(), false).build()).queue();
 							rerun(game, channel);
 							return;
 	  					} else {
@@ -134,10 +134,10 @@ public class TicTacToeCommand implements Command {
 	  						return;
 	  					}
 	  				} else {
-	  					game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wronginput", author, guild)).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("tictactoe", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getFieldString(), false).setDescription(getTranslatedString("wronginput", author, guild)).build()).queue();
+		  				rerun(game, channel);
+		  				return;
 	  				}
-	  				rerun(game, channel);
-	  				return;
 	  			}, 
 	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getTranslatedString("timeout", channel.getGuild()), LanguageSystem.getTranslatedString("tooktoolong", channel.getGuild()), false).build()).queue(); TicTacToeGameManager.deleteGame(game); return;}
 	  	);

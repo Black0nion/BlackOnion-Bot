@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 public class TicTacToeBot {
 	public static Map.Entry<Integer, Integer> move(TicTacToe game) {
-		FieldType[][] board = game.getfield();
+		FieldType[][] board = game.getField();
 	    boolean mademove = false;
 	    final FieldType humanMarker = FieldType.X;
 	    final FieldType botSymbol = FieldType.Y;
