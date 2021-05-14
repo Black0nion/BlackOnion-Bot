@@ -4,25 +4,30 @@ import java.util.Map;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToe {
 	Message message;
 	TicTacToePlayer playerX;
 	TicTacToePlayer playerY;
 	FieldType[][] field;
-	public FieldType currentUser;
-	MessageChannel channel;
+	public FieldType currentPlayer;
+	TextChannel channel;
+	Guild guild;
 	int moves = 0;
 	
-	public TicTacToe(MessageChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
+	public TicTacToe(TextChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
 		field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
+		this.guild = channel.getGuild();
 		
-		currentUser = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
+		currentPlayer = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
@@ -30,7 +35,9 @@ public class TicTacToe {
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", getField(), false).build()).queue(success -> this.message = success);
+		User currentUser = currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser());
+		
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(currentUser, guild).setTitle(LanguageSystem.getTranslatedString("tictactoe", currentUser, guild) + " | " + LanguageSystem.getTranslatedString("currentplayer", currentUser, guild) + " | " + Utils.removeMarkdown((currentPlayer == FieldType.X ? playerX.getName() : playerY.getName()))).addField("currentstate", getFieldString(), false).build()).queue(success -> this.message = success);
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;
@@ -48,11 +55,11 @@ public class TicTacToe {
 		return playerY;
 	}
 	
-	public FieldType[][] getfield() {
+	public FieldType[][] getField() {
 		return field;
 	}
 	
-	public void setfield(FieldType[][] field) {
+	public void setField(FieldType[][] field) {
 		this.field = field;
 	}
 	
@@ -159,13 +166,13 @@ public class TicTacToe {
 	}
 	
 	public void nextUser() {
-		if (currentUser == FieldType.X)
-			currentUser = FieldType.Y;
+		if (currentPlayer == FieldType.X)
+			currentPlayer = FieldType.Y;
 		else 
-			currentUser = FieldType.X;
+			currentPlayer = FieldType.X;
 	}
 	
-	public String getField() {
+	public String getFieldString() {
 		String output = "```";
 		output += "    A   B   C\n  ┌───┬───┬───┐\n";
 		for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
