@@ -211,7 +211,7 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getCommandHelp(guild, author, command);
+		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " `" + getCommandHelp(guild, author, command) + "`";
 	}
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {
@@ -238,5 +238,12 @@ public class Utils {
 				return value;
 			}
 		};
+	}
+	
+	public static boolean isLong(String input) {
+		try {
+			Long.parseLong(input.trim());
+			return true;
+		} catch (Exception e) { return false; }
 	}
 }

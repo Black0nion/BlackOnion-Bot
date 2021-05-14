@@ -20,26 +20,36 @@ public class AvatarCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		User mentionedUser = null;
-		String user = String.join(" ", Utils.removeFirstArg((args)));
-		if (!message.getMentionedUsers().isEmpty()) {
-			mentionedUser = message.getMentionedUsers().get(0);
-		} else if (!e.getGuild().getMembersByEffectiveName(user, true).isEmpty()) {
-			mentionedUser = e.getGuild().getMembersByEffectiveName(user, true).get(0).getUser();
-		} else if (!e.getGuild().getMembersByName(user, true).isEmpty()) {
-			mentionedUser =  e.getGuild().getMembersByName(user, true).get(0).getUser();
-		} else if(!e.getGuild().getMembersByNickname(user, true).isEmpty()) {
-			mentionedUser = e.getGuild().getMembersByNickname(user, true).get(0).getUser();
-		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "tagornameuser", false).build()).queue();
-			return;
+		User mentionedUser = author;
+		if (args.length > 1) {			
+			String user = String.join(" ", Utils.removeFirstArg((args)));
+			if (!message.getMentionedUsers().isEmpty()) {
+				mentionedUser = message.getMentionedUsers().get(0);
+			} else {
+				if (!Utils.isLong(user)) {
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+					return;
+				}
+				
+				e.getJDA().retrieveUserById(user.trim()).queue(uzer -> {
+					print(author, uzer, guild, channel);
+				}, failure -> {
+					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "someerrorhappened", false).build()).queue();
+				});
+				return;
+			}
 		}
+		
+		print(author, mentionedUser, guild, channel);
+	}
+	
+	private static void print(User author, User mentionedUser, Guild guild, MessageChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder()
-		.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
-			.setImage(mentionedUser.getEffectiveAvatarUrl())
-			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-			.setTimestamp(Instant.now());
-		channel.sendMessage(builder.build()).queue();
+			.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
+				.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")
+				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
+				.setTimestamp(Instant.now());
+		channel.sendMessage(builder.build()).queue();	
 	}
 	
 	@Override
@@ -49,16 +59,11 @@ public class AvatarCommand implements Command {
 
 	@Override
 	public String getSyntax() {
-		return "<@User>";
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
+		return "<@User / UserID>";
 	}
 	
 	@Override
 	public String[] getCommand() {
-		return new String[] {"avatar"};
+		return new String[] { "avatar" };
 	}
 }
