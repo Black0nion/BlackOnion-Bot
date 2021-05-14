@@ -9,35 +9,32 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToe {
 	long messageID;
-	String playerX;
-	String playerY;
-	String playerNameX;
-	String playerNameY;
+	User playerX;
+	User playerY;
 	FieldType[][] field;
 	public FieldType currentUser;
 	MessageChannel channel;
 	
-	public TicTacToe(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
+	public TicTacToe(MessageChannel channel, User playerX, User playerY) {
 		
-		field = new FieldType[TicTacToeGameManager.Y][TicTacToeGameManager.X];
+		field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		
 		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
-		for (int x = 0; x < TicTacToeGameManager.X; x++) {
-			for (int y = 0; y < TicTacToeGameManager.Y; y++) {
+		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
+			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
 				field[y][x] = FieldType.EMPTY;
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerNameX : playerNameY))).addField("Current State:", getField(), false).build()).queue(success -> messageID = success.getIdLong());
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", getField(), false).build()).queue(success -> messageID = success.getIdLong());
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;
-		this.playerNameX = playerNameX;
-		this.playerNameY = playerNameY;
 	}
 	
 	public Message getMessage() {
@@ -47,83 +44,85 @@ public class TicTacToe {
 	public long getMessageID() {
 		return messageID;
 	}
+	
 	public void setMessageID(long messageID) {
 		this.messageID = messageID;
 	}
-	public String getPlayerX() {
+	
+	public User getPlayerX() {
 		return playerX;
 	}
-	public void setPlayerX(String playerX) {
-		this.playerX = playerX;
-	}
-	public String getPlayerY() {
+	
+	public User getPlayerY() {
 		return playerY;
 	}
-	public void setPlayerY(String playerY) {
-		this.playerY = playerY;
-	}
+	
 	public FieldType[][] getfield() {
 		return field;
 	}
+	
 	public void setfield(FieldType[][] field) {
 		this.field = field;
 	}
 	
-	public String getPlayerNameX() {
-		return playerNameX;
-	}
-
-	public String getPlayerNameY() {
-		return playerNameY;
-	}
-	
 	public boolean isPlayer(String userId) {
-		if (getPlayerX().equals(userId) || getPlayerY().equals(userId))
+		if (getPlayerX().getId().equals(userId) || getPlayerY().getId().equals(userId))
 			return true;
 		return false;
 	}
 	
-	public FieldType getWinner() {
-		if (won(FieldType.X)) {
+	public FieldType getWinner(int x, int y) {
+		if (won(FieldType.X, x, y)) {
 			return FieldType.X;
-		} else if (won(FieldType.Y)) {
+		} else if (won(FieldType.Y, x, y)) {
 			return FieldType.Y;
 		}
 		return FieldType.EMPTY;
 	}
 	
-	public boolean won(FieldType player) {
-	    // horizontalCheck 
-	    for (int j = 0; j<TicTacToeGameManager.X-3 ; j++ ){
-	        for (int i = 0; i<TicTacToeGameManager.Y; i++){
-	            if (field[i][j] == player && field[i][j+1] == player && field[i][j+2] == player && field[i][j+3] == player){
-	                return true;
-	            }           
-	        }
-	    }
-	    // verticalCheck
-	    for (int i = 0; i<TicTacToeGameManager.Y-3 ; i++ ){
-	        for (int j = 0; j<TicTacToeGameManager.X; j++){
-	            if (field[i][j] == player && field[i+1][j] == player && field[i+2][j] == player && field[i+3][j] == player){
-	                return true;
-	            }           
-	        }
-	    }
-	    // ascendingDiagonalCheck 
-	    for (int i=3; i<TicTacToeGameManager.Y; i++){
-	        for (int j=0; j<TicTacToeGameManager.X-3; j++){
-	            if (field[i][j] == player && field[i-1][j+1] == player && field[i-2][j+2] == player && field[i-3][j+3] == player)
-	                return true;
-	        }
-	    }
-	    // descendingDiagonalCheck
-	    for (int i=3; i<TicTacToeGameManager.Y; i++){
-	        for (int j=3; j<TicTacToeGameManager.X; j++){
-	            if (field[i][j] == player && field[i-1][j-1] == player && field[i-2][j-2] == player && field[i-3][j-3] == player)
-	                return true;
-	        }
-	    }
+	public boolean won(FieldType player, int x, int y) {
+		int n = TicTacToeGameManager.SIZE;
+		//check col
+        for(int i = 0; i < n; i++){
+            if(field[x][i] != player)
+                break;
+            if(i == n-1){
+                //report win for s
+            }
+        }
 
+        //check row
+        for(int i = 0; i < n; i++){
+            if(field[i][y] != player)
+                break;
+            if(i == n-1){
+                //report win for s
+            }
+        }
+
+        //check diag
+        if(x == y){
+            //we're on a diagonal
+            for(int i = 0; i < n; i++){
+                if(field[i][i] != player)
+                    break;
+                if(i == n-1){
+                    //report win for s
+                }
+            }
+        }
+
+        //check anti diag (thanks rampion)
+        if(x + y == n - 1){
+            for(int i = 0; i < n; i++){
+                if(field[i][(n-1)-i] != player)
+                    break;
+                if(i == n-1){
+                    //report win for s
+                }
+            }
+        }
+        
 		return false;
 	}
 	
@@ -158,7 +157,7 @@ public class TicTacToe {
 		char[] charInput = input.toCharArray();
 		try {
 			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
-			if (Utils.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < TicTacToeGameManager.Y) {
+			if (Utils.alphabet.contains(charInput[0]) && Utils.alphabet.indexOf(charInput[0]) < TicTacToeGameManager.SIZE && numbAtOne >= 0 && numbAtOne < TicTacToeGameManager.SIZE) {
 				return true;
 			}
 		} catch (Exception ignored) {}
@@ -174,12 +173,12 @@ public class TicTacToe {
 	
 	public String getField() {
 		String output = "";
-		output += "   A   B   C\n ----------------------------\n";
-		for (int y = 0; y < TicTacToeGameManager.Y; y++) {
-			for (int x = 0; x < TicTacToeGameManager.X; x++) {
+		output += "   A   B   C\n ------\n";
+		for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
+			for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 				output += "\\| " + (field[y][x] == FieldType.EMPTY ? "    " : " " + field[y][x].name() + " ");
 			}
-			output += "| (" + y + ")\n----------------------------\n";
+			output += "| (" + y + ")\n-----\n";
 		}
 		return output;
 	}
