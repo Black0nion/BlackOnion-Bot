@@ -33,9 +33,9 @@ public class ToggleCommand implements Command {
 		}
 		boolean activated;
 		final String activatedUnparsed = args[2];
-		if (activatedUnparsed.equalsIgnoreCase("enabled") || activatedUnparsed.equalsIgnoreCase("true") || activatedUnparsed.equalsIgnoreCase("on")) {
+		if (Utils.equalsOneIgnoreCase(activatedUnparsed, "enabled", "true", "on")) {
 			activated = true;
-		} else if (activatedUnparsed.equalsIgnoreCase("disabled") || activatedUnparsed.equalsIgnoreCase("false") || activatedUnparsed.equalsIgnoreCase("off")) {
+		} else if (Utils.equalsOneIgnoreCase(activatedUnparsed, "disabled", "false", "off")) {
 			activated = false;
 		} else {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
