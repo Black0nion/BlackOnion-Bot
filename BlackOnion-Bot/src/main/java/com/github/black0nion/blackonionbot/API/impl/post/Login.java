@@ -1,8 +1,10 @@
-package com.github.black0nion.blackonionbot.RestAPI.impl.post;
+package com.github.black0nion.blackonionbot.API.impl.post;
+
+import java.util.HashMap;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.RestAPI.PostRequest;
+import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -14,7 +16,7 @@ public class Login implements PostRequest {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
+	public String handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, DiscordUser user) {
 		try {
 			if (request.headers("code") != null) {
 				JSONObject discordResponse = new JSONObject(Utils.getTokenFromCode(request.headers("code")).getBody());

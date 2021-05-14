@@ -1,9 +1,11 @@
-package com.github.black0nion.blackonionbot.RestAPI;
+package com.github.black0nion.blackonionbot.API;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.json.JSONException;
@@ -28,7 +30,21 @@ public class API {
 		
 		//Spark.secure("files/keystore.jks", "ahitm20202025", null, null);
 		Spark.port(187);
+		
 		Reflections reflections = new Reflections(API.class.getPackage().getName());
+		//------------------WebSockets------------------
+		Set<Class<? extends WebSocketEndpoint>> websocketsClasses = reflections.getSubTypesOf(WebSocketEndpoint.class);
+
+		for (Class<? extends WebSocketEndpoint> websockets : websocketsClasses) {
+			WebSocketEndpoint endpoint;
+			try {
+				endpoint = websockets.getConstructor().newInstance();
+				Spark.webSocket("/" + endpoint.getRoute(), websockets);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		Spark.init();
 		//-----------------Get Requests-----------------
 		Set<Class<? extends GetRequest>> getRequestClasses = reflections.getSubTypesOf(GetRequest.class);
 
@@ -69,12 +85,20 @@ public class API {
 				try {
 					response.header("Access-Control-Allow-Origin", "*");
 					JSONObject body = new JSONObject();
-					if (req.requiredParameters().length != 0)
+					if (req.requiredBodyParameters().length != 0)
 						body = new JSONObject(request.body());
-					JSONObject headers = new JSONObject();
+					
+					HashMap<String, String> headers = new HashMap<>();
 					request.headers().forEach(head -> {
 						headers.put(head, request.headers(head));
 					});
+					
+					if (!request.headers().containsAll(Arrays.asList(req.requiredParameters()))) {
+						response.status(400);
+						response.type("application/json");
+						return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "missingParameters").toString();
+					}
+					
 					API.logInfo("Answered POST request (Path: " + url + ") from: " + request.ip() + " with header: "
 							+ body.toString());
 
@@ -82,7 +106,7 @@ public class API {
 					if (req.isJson())
 						response.type("application/json");
 					
-					for (String s : req.requiredParameters()) {
+					for (String s : req.requiredBodyParameters()) {
 						if (!body.has(s)) {
 							response.status(400);
 							return new JSONObject().put("success", false).put("reason", 400).toString();
@@ -97,10 +121,11 @@ public class API {
 						return new JSONObject().put("success", false).put("reason", 401).toString();
 					}
 					
-					return req.handle(request, response, body, user);
+					return req.handle(request, response, body, headers, user);
 				} catch (Exception e) {
 					API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
-					e.printStackTrace();
+					if (!(e instanceof JSONException))
+						e.printStackTrace();
 					response.status(400);
 					response.type("application/json");
 					return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
