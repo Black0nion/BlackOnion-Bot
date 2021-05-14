@@ -39,7 +39,9 @@ public class AdminHelpCommand implements Command {
 			}
 		}
 		
-		channel.sendMessage(builder.build()).submit().join().delete().queueAfter(10, TimeUnit.SECONDS);
+		channel.sendMessage(builder.build()).queue(msg -> { 
+			msg.delete().queueAfter(10, TimeUnit.SECONDS);
+		});
 	}
 	
 	@Override

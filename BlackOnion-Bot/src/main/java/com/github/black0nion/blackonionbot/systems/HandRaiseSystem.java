@@ -2,6 +2,8 @@ package com.github.black0nion.blackonionbot.systems;
 
 import java.util.HashMap;
 
+import com.vdurmont.emoji.EmojiParser;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
@@ -20,9 +22,8 @@ public class HandRaiseSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
 		if (nicked.containsKey(e.getUser().getId())) {
-			e.getMember().modifyNickname("! 🙋 |  " + nicked.get(e.getUser().getId())).complete();
-			e.getUser().openPrivateChannel().queue((channel) ->
-	        {
+			e.getMember().modifyNickname(e.getOldNickname()).queue();
+			e.getUser().openPrivateChannel().queue((channel) -> {
 	            channel.sendMessage("Wenn du deinen Namen ändern möchtest, bitte nimm zuerst deine Hand herunter!").queue();
 	        });
 		}
@@ -35,8 +36,11 @@ public class HandRaiseSystem extends ListenerAdapter {
 		String message = e.getMessageId();
 		
 		if (guild.getId().equals(guildID) && channel.getId().equals(channelID) && message.equals(messageID) && !e.getMember().isOwner() && !e.getMember().getId().equals(e.getJDA().getSelfUser().getId())) {
-			nicked.put(e.getUserId(), e.getMember().getNickname());
-			e.getMember().modifyNickname("! 🙋 |  " + e.getMember().getNickname()).complete();
+			final String previousNick = e.getMember().getNickname();
+			final String newNick = "!" + EmojiParser.parseToUnicode(":raising_hand:") + " | " + previousNick;
+			e.getMember().modifyNickname(newNick.substring(0, newNick.length() > 32 ? 32 : newNick.length())).queue(nothing -> {
+				nicked.put(e.getUserId(), previousNick);
+			});
 		}
 	}
 	
@@ -47,8 +51,9 @@ public class HandRaiseSystem extends ListenerAdapter {
 		String message = e.getMessageId();
 		
 		if (guild.getId().equals(guildID) && channel.getId().equals(channelID) && message.equals(messageID) && nicked.containsKey(e.getUserId())) {
-			e.getMember().modifyNickname(nicked.get(e.getUserId())).complete();
+			final String previousName = nicked.get(e.getUserId());
 			nicked.remove(e.getUserId());
+			e.getMember().modifyNickname(previousName).queue();
 		}
 	}
 }

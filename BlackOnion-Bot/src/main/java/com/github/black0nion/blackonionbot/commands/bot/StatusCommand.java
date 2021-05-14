@@ -45,10 +45,14 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", Utils.getPleaseUse(guild, author, this), false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", Utils.getPleaseUse(guild, author, this), false).build()).queue(msg -> {
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);
+			});
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).queue(msg -> {
+			msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+		});
 		
 		e.getJDA().getPresence().setStatus(status);
 	}

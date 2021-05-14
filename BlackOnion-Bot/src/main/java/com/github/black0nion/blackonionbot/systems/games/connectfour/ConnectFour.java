@@ -38,7 +38,7 @@ public class ConnectFour {
 	}
 	
 	public Message getMessage() {
-		return channel.retrieveMessageById(messageID).complete();
+		return channel.retrieveMessageById(messageID).submit().join();
 	}
 
 	public long getMessageID() {

@@ -58,11 +58,13 @@ public class BigbrainMemeCommand implements Command {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			return;
 		}
-		Message m = channel.sendMessage("Generating your image...").submit().join();
-		final @NotNull File file = generateImage(messages);
-		channel.sendMessage("bigbrian").addFile(file, "bigbrain.png").submit().join();
-		file.delete();
-		m.delete().queue();
+		channel.sendMessage("Generating your image...").queue(m -> {
+			final @NotNull File file = generateImage(messages);
+			channel.sendMessage("bigbrian").addFile(file, "bigbrain.png").queue(msg -> {				
+				file.delete();
+				m.delete().queue();
+			});
+		});
 	}
 	
 	@Override

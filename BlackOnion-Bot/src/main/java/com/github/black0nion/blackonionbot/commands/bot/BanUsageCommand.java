@@ -41,11 +41,15 @@ public class BanUsageCommand implements Command {
 				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslatedString("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
 				return;
 			} else {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).queue(msg -> { 
+					msg.delete().queueAfter(5, TimeUnit.SECONDS);
+				});
 				return;
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).queue(msg -> { 
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);
+			});
 			return;
 		}
 	}

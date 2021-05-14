@@ -94,14 +94,17 @@ public class ReactionRolesSetupCommand implements Command {
 										.append("channelid", tc.getIdLong())
 										.append("messageid", messageID)
 										.append("roleid", role.getIdLong()));
-								final Message msg = tc.retrieveMessageById(messageID).submit().join();
-								final ListedEmote customEmote = guild.retrieveEmoteById(emote.split(":")[2].replace(">", "")).submit().join();
-								if (customEmote != null) {
-									msg.clearReactions(customEmote).queue();
-								} else {
-									msg.clearReactions(emote).queue();
-								}
-								channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("entrydeleted", "reactionroledeleted", false).build()).queue();
+								final String finalEmote = emote;
+								tc.retrieveMessageById(messageID).queue(msg -> {
+									guild.retrieveEmoteById(finalEmote.split(":")[2].replace(">", "")).queue(customEmote -> {										
+										if (customEmote != null) {
+											msg.clearReactions(customEmote).queue();
+										} else {
+											msg.clearReactions(finalEmote).queue();
+										}
+										channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("entrydeleted", "reactionroledeleted", false).build()).queue();
+									});
+								});
 								return;
 							} else {
 								channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "thisnotfound", false).build()).queue();

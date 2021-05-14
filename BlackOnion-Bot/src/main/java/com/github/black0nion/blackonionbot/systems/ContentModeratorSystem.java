@@ -92,27 +92,31 @@ public class ContentModeratorSystem {
 						builder.setContent(newMessage);
 						builder.setUsername(author.getEffectiveName() + "#" + user.getDiscriminator());
 						builder.setAvatarUrl(user.getEffectiveAvatarUrl());
-						final List<Webhook> webhooks = channel.retrieveWebhooks().submit().join();
-						
-						Webhook webhook;
-						
-						if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
-							webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
-						} else {
-							webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
-						}
-						
-						WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
-						clientBuilder.setThreadFactory((job) -> {
-							Thread thread = new Thread(job);
-							thread.setName("ContentModerator");
-							thread.setDaemon(true);
-							return thread;
+						channel.retrieveWebhooks().queue(webhooks -> {
+							try {
+								Webhook webhook;
+								
+								if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
+									webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
+								} else {
+									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+								}
+								
+								WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+								clientBuilder.setThreadFactory((job) -> {
+									Thread thread = new Thread(job);
+									thread.setName("ContentModerator");
+									thread.setDaemon(true);
+									return thread;
+								});
+								
+								WebhookClient client = clientBuilder.build();
+								client.send(builder.build());
+								client.close();
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
 						});
-						
-						WebhookClient client = clientBuilder.build();
-						client.send(builder.build());
-						client.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
