@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -30,6 +31,7 @@ import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardVal
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.vdurmont.emoji.EmojiParser;
@@ -41,6 +43,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandBase extends ListenerAdapter {
@@ -99,6 +102,11 @@ public class CommandBase extends ListenerAdapter {
 	}
 	
 	@Override
+	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+		ContentModeratorSystem.checkMessageForProfanity(event);
+	}
+	
+	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		final User author = event.getAuthor();
 		if (author.isBot()) return;
@@ -139,7 +147,10 @@ public class CommandBase extends ListenerAdapter {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+							if (cmd.getVisisbility() != CommandVisibility.SHOWN)
+								msg.delete().queueAfter(3, TimeUnit.SECONDS);
+						});
 				return;
 			}
 			

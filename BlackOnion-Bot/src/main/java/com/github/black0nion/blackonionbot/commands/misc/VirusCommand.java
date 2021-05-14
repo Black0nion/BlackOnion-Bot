@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -41,13 +41,13 @@ public class VirusCommand implements Command {
 			} else if (args.length >= 2) {
 				url = args[1];
 			} else {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 				return;
 			}
 			final String finalUrl = url;
 			final String urlResult = checkUrl(finalUrl).getBody();
 			if (!new JSONObject(urlResult).has("data")) {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 				return;
 			}
 			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("fileprocessed", "waitforresult", false).build()).queue(msg -> {

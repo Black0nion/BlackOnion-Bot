@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.influx;
 
 import java.lang.management.ManagementFactory;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -86,9 +85,8 @@ public class InfluxManager {
 	
 	@TestOnly
 	public static void testSaving(Document args) {
-		Random random = new Random();
 		for (int i = 0; i < 20; i++) {
-			Point point2 = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("num", random.nextInt(32));
+			Point point2 = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("num", Bot.random.nextInt(32));
 			influxDB.getWriteApi().writePoint(point2);
 			try {
 				Thread.sleep(1000);

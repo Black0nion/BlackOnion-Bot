@@ -1,29 +1,29 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
 import java.util.Map;
-import java.util.Random;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class ConnectFour {
 	long messageID;
-	String playerX;
-	String playerY;
-	String playerNameX;
-	String playerNameY;
+	User playerX;
+	User playerY;
 	FieldType[][] field;
 	public FieldType currentUser;
 	MessageChannel channel;
 	
-	public ConnectFour(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
+	public ConnectFour(MessageChannel channel, User playerX, User playerY) {
 		
 		field = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
 		
-		currentUser = new Random().nextInt(1) == 0 ? FieldType.X : FieldType.Y;
+		currentUser = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
 		for (int x = 0; x < ConnectFourGameManager.X; x++) {
 			for (int y = 0; y < ConnectFourGameManager.Y; y++) {
@@ -31,36 +31,32 @@ public class ConnectFour {
 			}
 		}
 		
-		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerNameX : playerNameY))).addField("Current State:", getField(), false).build()).queue(success -> messageID = success.getIdLong());
+		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.removeMarkdown((currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", getField(), false).build()).queue(success -> messageID = success.getIdLong());
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;
-		this.playerNameX = playerNameX;
-		this.playerNameY = playerNameY;
 	}
 	
 	public Message getMessage() {
-		return channel.retrieveMessageById(messageID).complete();
+		return channel.retrieveMessageById(messageID).submit().join();
 	}
 
 	public long getMessageID() {
 		return messageID;
 	}
+	
 	public void setMessageID(long messageID) {
 		this.messageID = messageID;
 	}
-	public String getPlayerX() {
+	
+	public User getPlayerX() {
 		return playerX;
 	}
-	public void setPlayerX(String playerX) {
-		this.playerX = playerX;
-	}
-	public String getPlayerY() {
+
+	public User getPlayerY() {
 		return playerY;
 	}
-	public void setPlayerY(String playerY) {
-		this.playerY = playerY;
-	}
+
 	public FieldType[][] getfield() {
 		return field;
 	}
@@ -68,16 +64,8 @@ public class ConnectFour {
 		this.field = field;
 	}
 	
-	public String getPlayerNameX() {
-		return playerNameX;
-	}
-
-	public String getPlayerNameY() {
-		return playerNameY;
-	}
-	
 	public boolean isPlayer(String userId) {
-		if (getPlayerX().equals(userId) || getPlayerY().equals(userId))
+		if (getPlayerX().getId().equals(userId) || getPlayerY().getId().equals(userId))
 			return true;
 		return false;
 	}
@@ -138,8 +126,8 @@ public class ConnectFour {
 			@Override
 			public Integer getValue() {
 				// the numbers
-				for (int i = 0; i < ConnectFourGameManager.alphabet.size(); i++) {
-					if (ConnectFourGameManager.alphabet.get(i) == charInput[0])
+				for (int i = 0; i < Utils.alphabet.size(); i++) {
+					if (Utils.alphabet.get(i) == charInput[0])
 						return i;
 				}
 				// should never get called because isValidInput is called first
@@ -157,7 +145,7 @@ public class ConnectFour {
 		char[] charInput = input.toCharArray();
 		try {
 			int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
-			if (ConnectFourGameManager.alphabet.contains(charInput[0]) && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.Y) {
+			if (Utils.alphabet.contains(charInput[0]) && Utils.alphabet.indexOf(charInput[0]) < ConnectFourGameManager.X && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.Y) {
 				return true;
 			}
 		} catch (Exception ignored) {}

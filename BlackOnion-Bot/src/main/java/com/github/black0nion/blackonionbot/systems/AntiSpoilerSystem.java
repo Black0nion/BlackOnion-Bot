@@ -42,32 +42,38 @@ public class AntiSpoilerSystem {
 				count -= 4;
 			}
 			
+			final String finalNewMessage = newMessage;
+			
 			try {
-				final List<Webhook> webhooks = event.getChannel().retrieveWebhooks().submit().join();
-				
-				Webhook webhook;
-				
-				if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
-					webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
-				} else {
-					webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(ContentModeratorSystem.file)).submit().join();
-				}
-				
-				WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
-				clientBuilder.setThreadFactory((job) -> {
-					Thread thread = new Thread(job);
-					thread.setName("ContentModerator");
-					thread.setDaemon(true);
-					return thread;
+				event.getChannel().retrieveWebhooks().queue(webhooks -> {
+					try {
+					Webhook webhook;
+
+					if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
+						webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
+					} else {
+						webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(ContentModeratorSystem.file)).submit().join();
+					}
+					
+					WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+					clientBuilder.setThreadFactory((job) -> {
+						Thread thread = new Thread(job);
+						thread.setName("ContentModerator");
+						thread.setDaemon(true);
+						return thread;
+					});
+					
+					WebhookClient client = clientBuilder.build();
+					WebhookMessageBuilder builder = new WebhookMessageBuilder();
+					builder.setUsername(user.getName() + "#" + user.getDiscriminator());
+					builder.setContent(finalNewMessage);
+					builder.setAvatarUrl(user.getAvatarUrl());
+					client.send(builder.build());
+					client.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				});
-				
-				WebhookClient client = clientBuilder.build();
-				WebhookMessageBuilder builder = new WebhookMessageBuilder();
-				builder.setUsername(user.getName() + "#" + user.getDiscriminator());
-				builder.setContent(newMessage);
-				builder.setAvatarUrl(user.getAvatarUrl());
-				client.send(builder.build());
-				client.close();
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.fun;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -24,8 +23,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class GiveawayCommand implements Command {
 	
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
-	
-	Random random = new Random();
 
 	@Override
 	public String[] getCommand() {
@@ -52,7 +49,7 @@ public class GiveawayCommand implements Command {
 		}
 		
 		if (duration == -1 || endDate == null || winnersCount == -1) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("wrongargument", LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getSyntax(), false).build()).queue();
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("GIVEAWAY").addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			return;
 		}
 		
@@ -67,9 +64,12 @@ public class GiveawayCommand implements Command {
 		}
 		
 		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
-		Message msg = channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).submit().join();
-		msg.addReaction("U+1F389").queue();
-		GiveawaysSystem.createGiveaway(endDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, winnersCount);
+		final Date finalEndDate = endDate;
+		final int finalWinnersCount = winnersCount;
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).queue(msg -> {
+			msg.addReaction("U+1F389").queue();
+			GiveawaysSystem.createGiveaway(finalEndDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, finalWinnersCount);
+		});
 	}
 	
 	@Override

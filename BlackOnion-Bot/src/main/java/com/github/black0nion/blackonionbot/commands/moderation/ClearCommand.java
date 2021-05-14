@@ -28,14 +28,20 @@ public class ClearCommand implements Command {
 				try {
 					int amount = Integer.parseInt(args[1]);
 					textChannel.deleteMessages(get(channel, amount)).queue();
-					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).queue(msg -> {
+						msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+					});
 				} catch (NumberFormatException ex) {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).queue(msg -> {
+		                msg.delete().queueAfter(5, TimeUnit.SECONDS);            
+		            });
 					return;
 				}
 				return;
 			} else {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).queue(msg -> {
+	                msg.delete().queueAfter(5, TimeUnit.SECONDS);            
+	            });
 				return;
 			}
 		}
