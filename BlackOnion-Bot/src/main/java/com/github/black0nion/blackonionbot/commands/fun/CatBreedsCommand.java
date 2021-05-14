@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -87,7 +88,7 @@ public class CatBreedsCommand implements Command {
 					
 					msg.editMessage(builder.build()).queue();
 					waitForPageSwitch(msg, user, pages);
-				});
+				}, 1, TimeUnit.MINUTES, () -> { msg.delete().queue(); });
 	}
 
 	@Override
