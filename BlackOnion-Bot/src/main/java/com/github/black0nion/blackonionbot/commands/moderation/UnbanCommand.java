@@ -26,20 +26,22 @@ public class UnbanCommand implements Command {
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		final List<Member> mentionedMembers = message.getMentionedMembers();
-		if (mentionedMembers.size() == 0) {
+		if (mentionedMembers.size() != 0) {
+			final User bannedUser = mentionedMembers.get(0).getUser();
+			guild.retrieveBan(bannedUser).queue(ban -> {
+				channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + ban.getReason() + "**"), false).build()).queue();
+			});
+			guild.unban(bannedUser).queue();
+		} else {
 			try {
-				guild.retrieveBanById(args[1]).queue(success -> {}, 
-				fail -> {
+				guild.retrieveBanById(args[1]).queue(ban -> {
+					String reason = ban.getReason();
+					guild.unban(ban.getUser()).queue();
+					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
+				}, fail -> {
 					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("usernotfound", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 				});
-				Ban ban = guild.retrieveBanById(args[1]).complete();
-				String reason = ban.getReason();
-				guild.unban(ban.getUser()).queue();
-				channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
 			} catch (Exception ignored) {}
-		} else {
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + guild.retrieveBan(mentionedMembers.get(0).getUser()).complete().getReason() + "**"), false).build()).queue();
-			guild.unban(mentionedMembers.get(0).getUser()).queue();
 		}
 	}
 	

@@ -3,28 +3,13 @@ package com.github.black0nion.blackonionbot.systems.games.connectfour;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class ConnectFourGameManager {
 	private static ArrayList<ConnectFour> games = new ArrayList<>();
 	
-	static ArrayList<Character> alphabet = new ArrayList<>();
-	
 	public static int Y = 8;
 	public static int X = 9;
-	
-	static {
-		alphabet.add('A');
-		alphabet.add('B');
-		alphabet.add('C');
-		alphabet.add('D');
-		alphabet.add('E');
-		alphabet.add('F');
-		alphabet.add('G');
-		alphabet.add('H');
-		alphabet.add('I');
-		alphabet.add('J');
-		alphabet.add('K');
-	}
 	
 	/**
 	 *
@@ -33,8 +18,8 @@ public class ConnectFourGameManager {
 	 * @param playerY UserID of Player Y
 	 * @return The new created Game
 	 */
-	public static ConnectFour createGame(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
-		ConnectFour newGame = new ConnectFour(channel, playerX, playerNameX, playerY, playerNameY);
+	public static ConnectFour createGame(MessageChannel channel, User playerX, User playerY) {
+		ConnectFour newGame = new ConnectFour(channel, playerX, playerY);
 		games.add(newGame);
 		return newGame;
 	}
@@ -48,7 +33,7 @@ public class ConnectFourGameManager {
 	
 	public static boolean isIngame(String userID) {
 		for (ConnectFour game : games) {
-			if (game.getPlayerX().equals(userID) || game.getPlayerY().equals(userID))
+			if (game.getPlayerX().getId().equals(userID) || game.getPlayerY().getId().equals(userID))
 				return true;
 		}
 		return false;

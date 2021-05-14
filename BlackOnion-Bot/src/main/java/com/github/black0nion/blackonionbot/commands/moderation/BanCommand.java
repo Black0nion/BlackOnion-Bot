@@ -36,8 +36,11 @@ public class BanCommand implements Command {
 				guild.ban(mentionedMembers.get(0), 0, banMessage).queue();
 			} else
 				guild.ban(mentionedMembers.get(0), 0).queue();
+			final String finalBanMessage = banMessage;
 			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("usergotbanned", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + banMessage, false).build()).queue();
-			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("yougotbanned", author), LanguageSystem.getTranslatedString("message", author) + ": " + banMessage, false).build()).queue();
+			mentionedMembers.get(0).getUser().openPrivateChannel().queue(c -> {
+				c.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("yougotbanned", author), LanguageSystem.getTranslatedString("message", author) + ": " + finalBanMessage, false).build()).queue();
+			});
 		}
 	}
 	

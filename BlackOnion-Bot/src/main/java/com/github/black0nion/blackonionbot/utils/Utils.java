@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -31,6 +32,37 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
+	
+	public static ArrayList<Character> alphabet = new ArrayList<>();
+	
+	static {
+		alphabet.add('A');
+		alphabet.add('B');
+		alphabet.add('C');
+		alphabet.add('D');
+		alphabet.add('E');
+		alphabet.add('F');
+		alphabet.add('G');
+		alphabet.add('H');
+		alphabet.add('I');
+		alphabet.add('J');
+		alphabet.add('K');
+		alphabet.add('L');
+		alphabet.add('M');
+		alphabet.add('N');
+		alphabet.add('O');
+		alphabet.add('P');
+		alphabet.add('Q');
+		alphabet.add('R');
+		alphabet.add('S');
+		alphabet.add('T');
+		alphabet.add('U');
+		alphabet.add('V');
+		alphabet.add('W');
+		alphabet.add('X');
+		alphabet.add('Y');
+		alphabet.add('Z');
+	}
 
 	private static ArrayList<CachedUserInfo> cachedUserInfo = new ArrayList<>();
 	
@@ -179,10 +211,40 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " " + getCommandHelp(guild, author, command);
+		return LanguageSystem.getTranslatedString("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {
-		return BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
+		final String syntax = command.getSyntax();
+		return "`" + BotInformation.getPrefix(guild) + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
+	}
+	
+	public static <K, V> Map.Entry<K, V> getMapEntry(K key, V value) {
+		return new Map.Entry<K, V>() {
+			V val = value;
+			
+			@Override
+			public V getValue() {
+				return val;
+			}
+			
+			@Override
+			public K getKey() {
+				return key;
+			}
+			
+			@Override
+			public V setValue(V value) {
+				this.val = value;
+				return value;
+			}
+		};
+	}
+	
+	public static boolean isLong(String input) {
+		try {
+			Long.parseLong(input.trim());
+			return true;
+		} catch (Exception e) { return false; }
 	}
 }

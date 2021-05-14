@@ -33,7 +33,9 @@ public class RenameCommand implements Command {
 			member.modifyNickname(String.join(" ", nickname)).queue();
 			return;
 		} else {
-			channel.sendMessage("Doesn't work m8").submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
+			channel.sendMessage("Doesn't work m8").queue(msg -> {
+				msg.delete().queueAfter(3, TimeUnit.SECONDS);
+			});
 			return;
 		}
 	}

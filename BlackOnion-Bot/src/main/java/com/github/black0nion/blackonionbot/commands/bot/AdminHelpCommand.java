@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,18 +28,20 @@ public class AdminHelpCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		message.delete().complete();
+		message.delete().queue();
 		EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
 				.setTitle("Adminhilfe")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
 		
 		for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 			if (entry.getValue().getVisisbility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
-				builder.addField(BotInformation.getPrefix(guild) + entry.getKey()[0] + (entry.getValue().getSyntax() != null && !entry.getValue().getSyntax().equalsIgnoreCase("") ? " " + entry.getValue().getSyntax() : ""), "help" + entry.getValue().getCommand()[0].toLowerCase()	, false);
+				builder.addField(Utils.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
 			}
 		}
 		
-		channel.sendMessage(builder.build()).submit().join().delete().queueAfter(10, TimeUnit.SECONDS);
+		channel.sendMessage(builder.build()).queue(msg -> { 
+			msg.delete().queueAfter(10, TimeUnit.SECONDS);
+		});
 	}
 	
 	@Override
