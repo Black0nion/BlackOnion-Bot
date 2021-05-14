@@ -83,7 +83,7 @@ public class TicTacToeCommand implements Command {
 	  				final User author = answerEvent.getAuthor();
 	  				final Guild guild = answerEvent.getGuild();
 	  				answerEvent.getMessage().delete().queue();
-	  				if (msg.equalsIgnoreCase("exit") || msg.equalsIgnoreCase("stop") || msg.equalsIgnoreCase("cancel") || msg.equalsIgnoreCase("leave")) {
+	  				if (Utils.equalsOneIgnoreCase(msg, "exit", "stop", "cancel", "leave")) {
 	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("gaveup", author, guild)).addField(getTranslatedString("usergaveup", author, guild).replace("%user%", Utils.removeMarkdown(author.getName())), getTranslatedString("sadloose", author, guild), false).build()).queue();
 	  					TicTacToeGameManager.deleteGame(game);
 	  					return;
