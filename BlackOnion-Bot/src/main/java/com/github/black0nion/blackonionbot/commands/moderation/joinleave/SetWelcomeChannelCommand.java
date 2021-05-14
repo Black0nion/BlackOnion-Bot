@@ -27,10 +27,14 @@ public class SetWelcomeChannelCommand implements Command {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 			GuildManager.remove(guild, "welcomechannel");
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);			
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build()).queue(msg -> {
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+			});		
 		} else {
 			GuildManager.save(guild.getId(), "welcomechannel", channel.getId());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).queue(msg -> {
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+			});
 		}
 	}
 	

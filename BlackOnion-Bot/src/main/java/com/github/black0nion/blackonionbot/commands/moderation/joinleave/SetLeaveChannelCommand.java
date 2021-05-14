@@ -27,10 +27,14 @@ public class SetLeaveChannelCommand implements Command {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 			GuildManager.remove(guild, "leavechannel");
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelcleared", "leavechannelclearedinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);			
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelcleared", "leavechannelclearedinfo", false).build()).queue(msg -> {
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+			});
 		} else {
 			GuildManager.save(guild.getId(), "leavechannel", channel.getId());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).submit().join().delete().queueAfter(5, TimeUnit.SECONDS);			
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).queue(msg -> {
+				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
+			});
 		}
 	}
 	
@@ -43,7 +47,7 @@ public class SetLeaveChannelCommand implements Command {
 	public Category getCategory() {
 		return Category.MODERATION;
 	}
-	
+
 	@Override
 	public String getSyntax() {
 		return "[clear / off]";

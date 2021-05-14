@@ -177,15 +177,15 @@ public class Bot extends ListenerAdapter {
 		});
 		status.setName("Status");
 		status.start();
-		/*
-		 * @Deprecated: not working due to not be able to message not cached users on Discord's side (intended)
-			for (Guild g : e.getJDA().getGuilds()) {
-				for (Member user : g.getMembers()) {
-					if (notifyStatusUsers.contains(user.getUser().getId())) {
-						user.getUser().openPrivateChannel().complete().sendMessage("I booted up!").queue();
-					}
-				}
-			}
+		
+		/** @Deprecated: not working due to not be able to message not cached users on Discord's side (intended)
+		notifyStatusUsers.forEach(userId -> {
+			jda.retrieveUserById(userId).queue(user -> {
+				user.openPrivateChannel().queue(channel -> {
+					channel.sendMessage("I booted up!").queue();
+				});
+			});
+		});
 		*/
 	}
 	

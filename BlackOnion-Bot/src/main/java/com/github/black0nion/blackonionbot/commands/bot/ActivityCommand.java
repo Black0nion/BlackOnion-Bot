@@ -38,7 +38,9 @@ public class ActivityCommand implements Command {
 			});
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).submit().join().delete().queueAfter(3, TimeUnit.SECONDS);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).queue(msg -> {
+			msg.delete().queueAfter(3, TimeUnit.SECONDS);
+		});
 		ValueManager.save("activityType", args[1]);
 		ValueManager.save("activity", status);
 	}

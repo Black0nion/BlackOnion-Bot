@@ -23,12 +23,12 @@ public class GuildInfoCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
-		//TODO: fix shit
+		//TODO: switch to new languagesystem
 		channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild)
 				.setTitle(LanguageSystem.getTranslatedString("guildinfo", author, guild))
 				.setThumbnail(guild.getIconUrl())
 				.addField(LanguageSystem.getTranslatedString("name", author, guild), guild.getName(), true)
-				.addField("Owner", guild.retrieveOwner().complete().getUser().getAsMention(), true)
+				.addField("Owner", guild.retrieveOwner().submit().join().getUser().getAsMention(), true)
 				.addField(LanguageSystem.getTranslatedString("serverid", author, guild), guild.getId(), true)
 				.addField(LanguageSystem.getTranslatedString("rolecount", author, guild), String.valueOf(guild.getRoles().size()), true)
 				.addField(LanguageSystem.getTranslatedString("membercount", author, guild), String.valueOf(guild.getMemberCount()), true)

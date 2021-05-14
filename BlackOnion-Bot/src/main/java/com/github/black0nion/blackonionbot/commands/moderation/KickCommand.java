@@ -31,12 +31,11 @@ public class KickCommand implements Command {
 			return;
 		} else {
 			guild.kick(mentionedMembers.get(0)).queue();
-			String kickMessage = LanguageSystem.getTranslatedString("yougotkicked", author);
-			if (args.length >= 3) {
-				kickMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-			}
+			final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : LanguageSystem.getTranslatedString("yougotkicked", author);
 			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("usergotkicked", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
-			mentionedMembers.get(0).getUser().openPrivateChannel().complete().sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("yougotkicked", author), LanguageSystem.getTranslatedString("message", author) + ": " + kickMessage, false).build()).queue();
+			mentionedMembers.get(0).getUser().openPrivateChannel().queue(c -> { 
+				c.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("yougotkicked", author), LanguageSystem.getTranslatedString("message", author) + ": " + kickMessage, false).build()).queue();
+			});
 		}
 	}
 	
