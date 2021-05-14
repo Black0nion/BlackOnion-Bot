@@ -48,11 +48,10 @@ public class ConnectFourCommand implements Command {
 					event -> {
 				  if (!event.getAuthor().isBot() && event.getAuthor().getId().equals(challenged.getId())) {
 				      if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
-				    	  
-				    	  channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(event.getAuthor()).addField(getTranslatedString("challengeaccepted", event.getAuthor(), guild), getTranslatedString("playingagainst", event.getAuthor(), guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
+				    	  channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(event.getAuthor()).addField(getTranslatedString("challengeaccepted", event.getAuthor(), guild), getTranslatedString("playingagainst", event.getAuthor(), guild).replace("%challenger%", author.getName()), false).build()).queue();
 				    	  
 				    	  //ANGENOMMEN
-				    	  ConnectFour game = ConnectFourGameManager.createGame(channel, author.getId(), author.getName(), challenged.getId(), challenged.getName());
+				    	  ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
 				    	  rerun(game, e.getChannel());
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
 				    	  channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setTitle(getTranslatedString("declined", event.getAuthor(), guild)).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("arentyoubraveenough", event.getAuthor(), guild), false).build()).queue();
@@ -74,15 +73,15 @@ public class ConnectFourCommand implements Command {
 	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
 	  				final String msg = answerEvent.getMessage().getContentRaw();
-	  				User author = answerEvent.getAuthor();
-	  				Guild guild = answerEvent.getGuild();
+	  				final User author = answerEvent.getAuthor();
+	  				final Guild guild = answerEvent.getGuild();
 	  				answerEvent.getMessage().delete().queue();
 	  				if (msg.equalsIgnoreCase("exit") || msg.equalsIgnoreCase("stop") || msg.equalsIgnoreCase("cancel") || msg.equalsIgnoreCase("leave")) {
-	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("gaveup", author, guild)).addField(Utils.removeMarkdown(getTranslatedString("usergaveup", author, guild).replace("%user%", answerEvent.getAuthor().getName())), getTranslatedString("sadloose", author, guild), false).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("gaveup", author, guild)).addField(Utils.removeMarkdown(getTranslatedString("usergaveup", author, guild).replace("%user%", author.getAsMention())), getTranslatedString("sadloose", author, guild), false).build()).queue();
 	  					ConnectFourGameManager.deleteGame(game);
 	  					return;
-	  				} else if (!answerEvent.getAuthor().getId().equals(game.currentUser == FieldType.X ? game.getPlayerX() : game.getPlayerY())) {
-  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerNameX() : game.getPlayerNameY()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wrongturn", author, guild)).build()).queue();
+	  				} else if (!author.getId().equals(game.currentUser == FieldType.X ? game.getPlayerX() : game.getPlayerY())) {
+  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wrongturn", author, guild)).build()).queue();
   						rerun(game, channel);
   						return;
   					} else if (game.isValidInput(msg)) {
@@ -90,7 +89,7 @@ public class ConnectFourCommand implements Command {
 	  					FieldType[][] temp = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
 	  					System.arraycopy(game.getfield(), 0, temp, 0, game.getfield().length);
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
-	  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerNameX() : game.getPlayerNameY()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("fieldoccopied", author, guild)).build()).queue();
+	  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("fieldoccopied", author, guild)).build()).queue();
 	  						game.nextUser();
 	  						rerun(game, channel);
 	  						return;
@@ -99,15 +98,15 @@ public class ConnectFourCommand implements Command {
 	  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
 	  					game.setfield(temp);
 	  					game.nextUser();
-	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerNameX() : game.getPlayerNameY()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
 
 		  				if (game.getWinner() != FieldType.EMPTY) {
-		  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((game.getWinner() == FieldType.X ? game.getPlayerNameX() : game.getPlayerNameY())) + "!", false).build()).queue();
+		  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((game.getWinner() == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName())) + "!", false).build()).queue();
 		  					ConnectFourGameManager.deleteGame(game);
 		  					return;
 		  				}
 	  				} else {
-	  					game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerNameX() : game.getPlayerNameY()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wronginput", author, guild)).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wronginput", author, guild)).build()).queue();
 	  				}
 	  				rerun(game, channel);
 	  				return;

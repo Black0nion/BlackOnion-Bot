@@ -3,12 +3,12 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToeGameManager {
 	private static ArrayList<TicTacToe> games = new ArrayList<>();
 	
-	public static int Y = 3;
-	public static int X = 3;
+	public static final int SIZE = 3;
 	
 	/**
 	 *
@@ -17,8 +17,8 @@ public class TicTacToeGameManager {
 	 * @param playerY UserID of Player Y
 	 * @return The new created Game
 	 */
-	public static TicTacToe createGame(MessageChannel channel, String playerX, String playerNameX, String playerY, String playerNameY) {
-		TicTacToe newGame = new TicTacToe(channel, playerX, playerNameX, playerY, playerNameY);
+	public static TicTacToe createGame(MessageChannel channel, User playerX, User playerY) {
+		TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
 		games.add(newGame);
 		return newGame;
 	}
@@ -32,7 +32,7 @@ public class TicTacToeGameManager {
 	
 	public static boolean isIngame(String userID) {
 		for (TicTacToe game : games) {
-			if (game.getPlayerX().equals(userID) || game.getPlayerY().equals(userID))
+			if (game.getPlayerX().getId().equals(userID) || game.getPlayerY().getId().equals(userID))
 				return true;
 		}
 		return false;
