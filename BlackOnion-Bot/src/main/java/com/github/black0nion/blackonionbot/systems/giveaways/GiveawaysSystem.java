@@ -23,7 +23,6 @@ import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.SelfUser;
-import net.dv8tion.jda.api.entities.User;
 
 public class GiveawaysSystem {
 	private static List<Giveaway> giveaways = new ArrayList<>();
