@@ -1,5 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +27,7 @@ import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardValue;
+import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -83,19 +86,18 @@ public class CommandBase extends ListenerAdapter {
 					commandJSON.put("isToggleable", command.isToggleable());
 					if (Dashboard.hasValues(command)) {
 						JSONArray values = new JSONArray();
-						for (DashboardValue value : Dashboard.getValues(command)) {
-							JSONObject valueObject = new JSONObject();
-							valueObject.put("databaseKey", value.getDatabaseKey());
-							valueObject.put("prettyName", value.getPrettyName());
-							valueObject.put("type", value.getType().name());
-							values.put(valueObject);
-						}
+						for (DashboardValue value : Dashboard.getValues(command))
+							values.put(value.toJSON());
 						commandJSON.put("values", values);
 					}
 					array.put(commandJSON);
 				}
 				commandsJSON.put(entry.getKey().name(), array);
 			}
+//			StringSelection stringSelection = new StringSelection(commandsJSON.toString());
+//			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+//			clipboard.setContents(stringSelection, null);
+			System.out.println(commandsJSON);
 		});
 	}
 	

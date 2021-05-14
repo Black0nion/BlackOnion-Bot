@@ -12,10 +12,11 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
-import com.github.black0nion.blackonionbot.RestAPI.API;
+import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
@@ -37,6 +38,7 @@ import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
+import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
@@ -68,6 +70,8 @@ public class Bot extends ListenerAdapter {
 	private static CredentialsManager credentialsManager;
 	
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
+	
+	public static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 	
 	public static final long startTime = System.currentTimeMillis();
 	
@@ -129,6 +133,8 @@ public class Bot extends ListenerAdapter {
 		new API();
 
 		SessionManager.init();
+		
+		Newssystem.init();
 		
 		Executors.newCachedThreadPool().submit(() -> { 
 			while (true) {

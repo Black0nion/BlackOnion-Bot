@@ -1,9 +1,9 @@
-package com.github.black0nion.blackonionbot.RestAPI.impl.get;
+package com.github.black0nion.blackonionbot.API.impl.get;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.RestAPI.API;
-import com.github.black0nion.blackonionbot.RestAPI.GetRequest;
+import com.github.black0nion.blackonionbot.API.API;
+import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
