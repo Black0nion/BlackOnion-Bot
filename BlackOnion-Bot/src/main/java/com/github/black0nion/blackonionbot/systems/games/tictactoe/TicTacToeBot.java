@@ -1,9 +1,12 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
+import java.util.Map;
+
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 public class TicTacToeBot {
-	public static void move(TicTacToe game) {
+	public static Map.Entry<Integer, Integer> move(TicTacToe game) {
 		FieldType[][] board = game.getfield();
 	    boolean mademove = false;
 	    final FieldType humanMarker = FieldType.X;
@@ -15,7 +18,7 @@ public class TicTacToeBot {
 	            if (board[2][i] != humanMarker && board[2][i] != botSymbol) {
 	                board[2][i] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(2, i);
 	            }
 	        }
 	    }
@@ -25,7 +28,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != humanMarker && board[0][i] != botSymbol) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(0, i);
 	            }
 	        }
 	    }
@@ -38,7 +41,7 @@ public class TicTacToeBot {
 	            if (board[i][2] != humanMarker && board[i][2] != botSymbol) {
 	                board[i][2] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(i, 2);
 	            }
 	        }
 	    }
@@ -48,7 +51,7 @@ public class TicTacToeBot {
 	            if (board[i][0] != humanMarker && board[i][0] != botSymbol) {
 	                board[i][0] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(i, 0);
 	            }
 	        }
 	    }
@@ -61,7 +64,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 2);
 	        }
 	    }
 
@@ -69,7 +72,7 @@ public class TicTacToeBot {
 	        if (board[0][0] != humanMarker && board[0][0] != botSymbol) {
 	            board[0][0] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(0, 0);
 	        }
 	    }
 
@@ -77,7 +80,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 2);
 	        }
 	    }
 
@@ -85,7 +88,7 @@ public class TicTacToeBot {
 	        if (board[2][0] != humanMarker && board[2][0] != botSymbol) {
 	            board[2][0] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 0);
 	        }
 	    }
 
@@ -93,7 +96,7 @@ public class TicTacToeBot {
 	        if (board[0][2] != humanMarker && board[0][2] != botSymbol) {
 	            board[0][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(0, 2);
 	        }
 	    }
 
@@ -106,7 +109,7 @@ public class TicTacToeBot {
 	            if (board[2][i] != botSymbol && board[2][i] != humanMarker) {
 	                board[2][i] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(2, i);
 	            }
 	        }
 	    }
@@ -116,7 +119,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(0, i);
 	            }
 	        }
 	    }
@@ -127,7 +130,7 @@ public class TicTacToeBot {
 	            if (board[i][2] != botSymbol && board[i][2] != humanMarker) {
 	                board[i][2] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(i, 2);
 	            }
 	        }
 	    }
@@ -137,7 +140,7 @@ public class TicTacToeBot {
 	            if (board[i][0] != botSymbol && board[i][0] != humanMarker) {
 	                board[i][0] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(i, 0);
 	            }
 	        }
 	    }
@@ -147,7 +150,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return;
+	                return Utils.getMapEntry(0, i);
 	            }
 	        }
 	    }
@@ -157,7 +160,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 2);
 	        }
 	    }
 
@@ -165,7 +168,7 @@ public class TicTacToeBot {
 	        if (board[0][0] != botSymbol && board[0][0] != humanMarker) {
 	            board[0][0] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(0, 0);
 	        }
 	    }
 
@@ -173,7 +176,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 2);
 	        }
 	    }
 
@@ -181,7 +184,7 @@ public class TicTacToeBot {
 	        if (board[2][0] != botSymbol && board[2][0] != humanMarker) {
 	            board[2][0] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(2, 0);
 	        }
 	    }
 
@@ -189,7 +192,7 @@ public class TicTacToeBot {
 	        if (board[0][2] != botSymbol && board[0][2] != humanMarker) {
 	            board[0][2] = botSymbol;
 	            mademove = true;
-	            return;
+	            return Utils.getMapEntry(0, 2);
 	        }
 	    }
 	    
@@ -203,11 +206,11 @@ public class TicTacToeBot {
 
 	        if (board[rand1][rand2] != FieldType.X && board[rand1][rand2] != FieldType.Y) {
 	            board[rand1][rand2] = botSymbol;
-	            mademove = true;        
+	            mademove = true;
+	            return Utils.getMapEntry(rand1, rand2);
 	        }
 	    }
-	    
-	    // moves have been made, update field
-	    game.setfield(board);
+	    // theoretically, this should never get called
+	    return null;
 	}
 }

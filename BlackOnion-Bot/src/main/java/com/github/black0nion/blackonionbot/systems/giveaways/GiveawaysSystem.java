@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,8 +34,6 @@ public class GiveawaysSystem {
 	private static final Collection<String> giveawayKeys = new ArrayList<>();
 	
 	private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-	
-	private static Random random = new Random();
 	
 	static {
 		giveawayKeys.add("endDate");
@@ -106,7 +103,7 @@ public class GiveawaysSystem {
 				users.remove(selfUser);
 				String[] winners = new String[winnas < users.size() ? winnas : users.size()];
 				
-				Collections.shuffle(users, random);
+				Collections.shuffle(users, Bot.random);
 				
 				for (int i = 0; i < winners.length; i++) {
 					winners[i] = users.get(i).getAsMention();

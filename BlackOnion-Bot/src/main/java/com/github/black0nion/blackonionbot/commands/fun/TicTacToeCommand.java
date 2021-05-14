@@ -5,12 +5,13 @@ import static com.github.black0nion.blackonionbot.systems.language.LanguageSyste
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
-import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeBot;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToe;
+import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeBot;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeGameManager;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToePlayer;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -91,9 +92,11 @@ public class TicTacToeCommand implements Command {
   						rerun(game, channel);
   						return;
   					} else if (game.isValidInput(msg)) {
-	  					Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
+	  					@SuppressWarnings("static-access")
+						Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
 	  					FieldType[][] temp = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 	  					System.arraycopy(game.getfield(), 0, temp, 0, game.getfield().length);
+	  					
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
 	  						game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("fieldoccopied", author, guild)).build()).queue();
 	  						//game.nextUser();
@@ -103,16 +106,33 @@ public class TicTacToeCommand implements Command {
 	  					
 	  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
 	  					game.setfield(temp);
-	  					TicTacToeBot.move(game);
-
-		  				final FieldType winner = game.getWinner(coords.getKey(), coords.getValue());
-						if (winner != FieldType.EMPTY) {
-		  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((winner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())) + "!", false).build()).queue();
-		  					TicTacToeGameManager.deleteGame(game);
-		  					return;
-		  				}
-						
-						game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+	  					
+	  					if (handleWin(game, coords)) return;
+	  					
+	  					game.nextUser();
+	  					game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+	  					
+	  					if (game.getPlayerY().isBot()) {
+		  					try {
+								Thread.sleep(Bot.random.nextInt(4500) + 2000);
+							} catch (InterruptedException ex) {
+								ex.printStackTrace();
+							}
+		  					
+		  					coords = TicTacToeBot.move(game);
+		  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
+		  					game.setfield(temp);
+		  					
+		  					if (handleWin(game, coords)) return;
+		  					game.nextUser();
+							
+							game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).build()).queue();
+							rerun(game, channel);
+							return;
+	  					} else {
+	  						rerun(game, channel);
+	  						return;
+	  					}
 	  				} else {
 	  					game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().setTitle(getTranslatedString("connectfour", author, guild) + " | " + getTranslatedString("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslatedString("currentstate", author, guild), game.getField(), false).setDescription(getTranslatedString("wronginput", author, guild)).build()).queue();
 	  				}
@@ -121,6 +141,21 @@ public class TicTacToeCommand implements Command {
 	  			}, 
 	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getDefaultErrorEmbed().addField(LanguageSystem.getTranslatedString("timeout", channel.getGuild()), LanguageSystem.getTranslatedString("tooktoolong", channel.getGuild()), false).build()).queue(); TicTacToeGameManager.deleteGame(game); return;}
 	  	);
+	}
+	
+	private boolean handleWin(TicTacToe game, Map.Entry<Integer, Integer> coords) {
+		final FieldType firstWinner = game.getWinner(coords.getKey(), coords.getValue());
+		if (firstWinner == null) {
+			return false;
+		} else if (firstWinner != FieldType.EMPTY) {
+			game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())) + "!", false).build()).queue();
+			TicTacToeGameManager.deleteGame(game);
+			return true;
+		} else {
+			game.getMessage().editMessage(EmbedUtils.getDefaultSuccessEmbed().addField("WE HAVE NO WINNER!", "u both succ, nobody won, lul", false).build()).queue();
+			TicTacToeGameManager.deleteGame(game);
+			return true;
+		}
 	}
 	
 	@Override

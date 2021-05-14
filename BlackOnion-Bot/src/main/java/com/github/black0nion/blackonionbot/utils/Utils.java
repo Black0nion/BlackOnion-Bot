@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -215,5 +216,27 @@ public class Utils {
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {
 		return BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
+	}
+	
+	public static <K, V> Map.Entry<K, V> getMapEntry(K key, V value) {
+		return new Map.Entry<K, V>() {
+			V val = value;
+			
+			@Override
+			public V getValue() {
+				return val;
+			}
+			
+			@Override
+			public K getKey() {
+				return key;
+			}
+			
+			@Override
+			public V setValue(V value) {
+				this.val = value;
+				return value;
+			}
+		};
 	}
 }
