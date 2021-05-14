@@ -114,7 +114,7 @@ public class TicTacToeCommand implements Command {
 	  					
 	  					if (game.getPlayerY().isBot()) {
 		  					try {
-								Thread.sleep(Bot.random.nextInt(4500) + 2000);
+								Thread.sleep(Bot.random.nextInt(1500) + 1000 * (game.getMoves() / 2 + 1));
 							} catch (InterruptedException ex) {
 								ex.printStackTrace();
 							}
