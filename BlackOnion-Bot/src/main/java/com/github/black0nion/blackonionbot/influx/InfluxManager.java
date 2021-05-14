@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.influx;
 
 import java.lang.management.ManagementFactory;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 

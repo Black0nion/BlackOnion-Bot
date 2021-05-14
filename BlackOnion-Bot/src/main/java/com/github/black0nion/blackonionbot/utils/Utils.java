@@ -211,11 +211,12 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " `" + getCommandHelp(guild, author, command) + "`";
+		return LanguageSystem.getTranslatedString("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {
-		return BotInformation.getPrefix(guild) + command.getCommand()[0] + " " + command.getSyntax();
+		final String syntax = command.getSyntax();
+		return "`" + BotInformation.getPrefix(guild) + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
 	}
 	
 	public static <K, V> Map.Entry<K, V> getMapEntry(K key, V value) {

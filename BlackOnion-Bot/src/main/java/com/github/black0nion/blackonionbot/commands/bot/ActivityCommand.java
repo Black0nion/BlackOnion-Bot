@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.entities.Activity;
@@ -32,7 +33,9 @@ public class ActivityCommand implements Command {
 		} else if (args[1].toLowerCase().contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("pleaseuse", author, guild) + " ``playing``, ``watching`` " + LanguageSystem.getTranslatedString("or", author, guild) + " ``listening``!", false).build()).complete().delete().queueAfter(3, TimeUnit.SECONDS);
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue(msg -> {
+				msg.delete().queueAfter(3, TimeUnit.SECONDS);
+			});
 			return;
 		}
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).submit().join().delete().queueAfter(3, TimeUnit.SECONDS);

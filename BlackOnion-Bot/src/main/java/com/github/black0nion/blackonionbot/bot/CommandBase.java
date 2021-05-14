@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -27,6 +28,7 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.vdurmont.emoji.EmojiParser;
@@ -143,7 +145,10 @@ public class CommandBase extends ListenerAdapter {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), "Syntax: " + prefix + str + (cmd.getSyntax().equals("") ? "" : " " + cmd.getSyntax()), false).build()).queue();
+						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+							if (cmd.getVisisbility() != CommandVisibility.SHOWN)
+								msg.delete().queueAfter(3, TimeUnit.SECONDS);
+						});
 				return;
 			}
 			
