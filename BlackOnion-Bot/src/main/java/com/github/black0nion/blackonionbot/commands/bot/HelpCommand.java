@@ -11,7 +11,6 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -60,11 +59,11 @@ public class HelpCommand implements Command {
 						}
 					}
 					if (commandsInCategory.length() <= 2) continue;
-					builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
+					builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
 				}
 				channel.sendMessage(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
-						msg.addReaction(PlayerManager.numbersUnicode.get(i)).queue();
+						msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 					waitForHelpCatSelection(msg, member, cats.length+1);
 				});
 			}
@@ -85,9 +84,9 @@ public class HelpCommand implements Command {
 				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUserIdLong() == author.getIdLong(), 
 				(event) -> {
 					event.getReaction().removeReaction(event.getUser()).queue();
-					Integer emojiReactionNum = PlayerManager.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
+					Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
 					
-					if (!event.getReactionEmote().isEmoji() || !PlayerManager.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || catCount < emojiReactionNum)
+					if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || catCount < emojiReactionNum)
 						waitForHelpCatSelection(msg, author, catCount);
 					
 					final Guild guild = msg.getGuild();
@@ -113,7 +112,7 @@ public class HelpCommand implements Command {
 								}
 							}
 							
-							builder.addField(PlayerManager.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", user, guild)), commandsInCategory.substring(1), false);
+							builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", user, guild)), commandsInCategory.substring(1), false);
 						}
 					} else {
 						emojiReactionNum--;

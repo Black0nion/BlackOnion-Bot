@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -40,28 +41,6 @@ public class PlayerManager {
     
     private static Api spotifyApi;
 
-    /**
-     * WARNING: ONLY UNTIL 10 (inclusive)
-     */
-	public static final HashMap<Integer, String> numbersUnicode = new HashMap<>();
-	
-	static {
-		numbersUnicode.put(0, "U+30U+fe0fU+20e3");
-		numbersUnicode.put(1, "U+31U+fe0fU+20e3");
-		numbersUnicode.put(2, "U+32U+fe0fU+20e3");
-		numbersUnicode.put(3, "U+33U+fe0fU+20e3"); 
-		numbersUnicode.put(4, "U+34U+fe0fU+20e3");
-		numbersUnicode.put(5, "U+35U+fe0fU+20e3");
-		numbersUnicode.put(6, "U+36U+fe0fU+20e3");
-		numbersUnicode.put(7, "U+37U+fe0fU+20e3");
-		numbersUnicode.put(8, "U+38U+fe0fU+20e3");
-		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
-		numbersUnicode.put(10,"U+1F51F");
-	};
-
-	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
-
-	
 	public static void init() {
 		if (!Bot.getCredentialsManager().has("spotify_client_id") || !Bot.getCredentialsManager().has("spotify_client_secret")) {
 			System.out.println("No Spotify API Key specified! You won't be able to play spotify tracks!");
@@ -137,9 +116,9 @@ public class PlayerManager {
         			List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
         			for (int i = 0; i < trackz.size(); i++) {
         				AudioTrack track = trackz.get(i);
-        				builder.addField(emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
+        				builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
         			}
-        			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
+        			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(Utils.numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
                 } else {
                 	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, channel.getGuild());
                 	
@@ -181,11 +160,11 @@ public class PlayerManager {
 			(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
 			event -> {
 				event.getReaction().removeReaction(event.getUser()).queue();
-				if (!event.getReactionEmote().isEmoji() || !numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey()) {
+				if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey()) {
 					retry(author, msg, tracks, musicManager, manager, vc);
 					return;
 				}
-				final AudioTrack track = tracks.get(numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey());
+				final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey());
 				musicManager.scheduler.queue(track, manager, vc);
 		}, 1, TimeUnit.MINUTES, () -> msg.editMessage(EmbedUtils.getErrorEmbed(author, msg.getGuild()).addField("timeout", "tooktoolong", false).build()).queue());
 	}

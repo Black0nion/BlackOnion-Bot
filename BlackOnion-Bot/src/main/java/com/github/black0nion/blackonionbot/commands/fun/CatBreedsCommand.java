@@ -9,8 +9,8 @@ import org.json.JSONObject;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -60,7 +60,7 @@ public class CatBreedsCommand implements Command {
 			
 			channel.sendMessage(builder.build()).queue((msg) -> {
 				for (int i = 0; i < pages.size(); i++)
-					msg.addReaction(PlayerManager.numbersUnicode.get(i)).queue();
+					msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 				waitForPageSwitch(msg, author, pages);
 			});
 		} catch (Exception ex) {
@@ -75,9 +75,9 @@ public class CatBreedsCommand implements Command {
 				(event) -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
 				(event) -> {
 					event.getReaction().removeReaction(event.getUser()).queue();
-					Integer emojiReactionNum = PlayerManager.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
+					Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
 					
-					if (!event.getReactionEmote().isEmoji() || !PlayerManager.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || pages.size() < emojiReactionNum)
+					if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || pages.size() < emojiReactionNum)
 						waitForPageSwitch(msg, user, pages);
 					
 					// all fine, we can switch page
