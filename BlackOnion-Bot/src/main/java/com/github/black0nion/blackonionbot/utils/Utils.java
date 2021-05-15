@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +35,7 @@ import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
 	
-	public static ArrayList<Character> alphabet = new ArrayList<>();
+	public static List<Character> alphabet = new ArrayList<>();
 	
 	static {
 		alphabet.add('A');
@@ -70,15 +72,10 @@ public class Utils {
 		return text.replace("_", "\\_").replace("*", "\\*");
 	}
 
-	//TODO: overarbeit
-	public static CharSequence removeFirstArg(String[] args) {
-		String str = "";
-		ArrayList<String> argsArray = new ArrayList<>(Arrays.asList(args));
-		argsArray.remove(0);
-		for (String s : argsArray) {
-			str += s + " ";
-		}
-		return str;
+	public static String[] removeFirstArg(String[] input) {
+		String[] result = new String[input.length-1];
+		System.arraycopy(input, 1, result, 0, input.length-1);
+		return result;
 	}
 	
 	public static String round(String decimal, double number) {
@@ -261,5 +258,25 @@ public class Utils {
 	 */
 	public static boolean equalsOneIgnoreCase(String input, String... comparison) {
 		return input.matches("(?i)" + String.join("|", comparison));
+	}
+
+	/**
+	 * WARNING: ONLY UNTIL 10 (inclusive)
+	 */
+	public static final HashMap<Integer, String> numbersUnicode = new HashMap<>();
+	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
+
+    static {
+		numbersUnicode.put(0, "U+30U+fe0fU+20e3");
+		numbersUnicode.put(1, "U+31U+fe0fU+20e3");
+		numbersUnicode.put(2, "U+32U+fe0fU+20e3");
+		numbersUnicode.put(3, "U+33U+fe0fU+20e3"); 
+		numbersUnicode.put(4, "U+34U+fe0fU+20e3");
+		numbersUnicode.put(5, "U+35U+fe0fU+20e3");
+		numbersUnicode.put(6, "U+36U+fe0fU+20e3");
+		numbersUnicode.put(7, "U+37U+fe0fU+20e3");
+		numbersUnicode.put(8, "U+38U+fe0fU+20e3");
+		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
+		numbersUnicode.put(10,"U+1F51F");
 	}
 }
