@@ -236,6 +236,7 @@
     "thiscommandcantbetoggled": "Dieser Befehl ist immer an!",
     "commandtoggled": "Der Status des Befehls %command% wurde geändert!",
     "commandisnow": "Der Befehl **%command%** ist jetzt **%status%**!",
+    "clickfornewspage": "Klicke hier, um auf die Newsseite zu kommen!",
     "catnotfound": "Katze nicht gefunden :(",
     "catbreednotfound": "Diese Rasse konnte nicht gefunden werden, für eine Liste an möglichen Rassen benutze ``%command%``!"
 }
