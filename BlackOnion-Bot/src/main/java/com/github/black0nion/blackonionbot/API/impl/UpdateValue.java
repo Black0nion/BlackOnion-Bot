@@ -34,7 +34,7 @@ public class UpdateValue implements WebSocketEndpoint {
 		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
 		futures.put(session, Bot.scheduledExecutor.schedule(() -> {
 			Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
-			session.close(4408, "Missed Heartbeat");
+			session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
 		}, 1, TimeUnit.MINUTES));
 	}
 	
@@ -52,7 +52,7 @@ public class UpdateValue implements WebSocketEndpoint {
 			send(session, "heartbeat");
 			futures.put(session, Bot.scheduledExecutor.schedule(() -> {
 				Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
-				session.close(4408, "Missed Heartbeat");
+				session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
 			}, 1, TimeUnit.MINUTES));
 			return;
 		}
