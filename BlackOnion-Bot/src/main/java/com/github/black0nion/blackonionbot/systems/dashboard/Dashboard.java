@@ -13,6 +13,7 @@ import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardVal
 import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardBoolean;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardMultipleChoice;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardString;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 public class Dashboard {
 	/**
@@ -25,7 +26,8 @@ public class Dashboard {
 		values.clear();
 		add("antiswear", new DashboardMultipleChoice("antiSwear", "AntiSwear", new BlackHashMap<String, String>().add("delete", "Delete").add("resend", "Resend").add("off", "Off")),
 						 new DashboardBoolean("antiSwearBoolean", "AntiBoolean", false),
-						 new DashboardString("antiSwearString", "AntiString", "moin"));
+						 new DashboardString("antiSwearString", "AntiString", "moin"),
+						 new DashboardBoolean("test", "moin meister", false));
 	}
 	
 	private static void add(String commandName, DashboardValue... dashboardValues) {
@@ -49,5 +51,16 @@ public class Dashboard {
 			}
 		}
 		return null;
+	}
+	
+	public static boolean tryUpdateValue(String message) {
+		// should be only "updatevalue"
+		final String[] input = message.split(" ");
+		// syntax: guildid databasekey newvalue
+		final String[] args = Utils.removeFirstArg(input);
+		if (args.length < 3) return false;
+		DashboardValue value = getDashboardValueFromKey(input[2]);
+		if (value == null) return false;
+		return value.save(args[1], args[2], args[0]);
 	}
 }

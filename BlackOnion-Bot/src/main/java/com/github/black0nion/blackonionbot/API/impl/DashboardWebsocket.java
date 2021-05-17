@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +16,11 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.API.WebSocketEndpoint;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 @WebSocket
-public class UpdateValue implements WebSocketEndpoint {
+public class DashboardWebsocket implements WebSocketEndpoint {
 	
 	private static boolean logHeartbeats = ValueManager.getBoolean("logHeartbeats");
 	
@@ -55,20 +55,16 @@ public class UpdateValue implements WebSocketEndpoint {
 				session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
 			}, 1, TimeUnit.MINUTES));
 			return;
+		} else if (message.startsWith("updatevalue")) {
+			if (Dashboard.tryUpdateValue(message)) send(session, "success");
+			else send(session, "failure");
 		}
+		
 		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + message.replace("\n", "\\n"), LogOrigin.DASHBOARD);
-	}
-	
-	private static final void send(Session session, String message) {
-		try {
-			session.getRemote().sendString(message);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	public String getRoute() {
-		return "echo";
+		return "dashboard";
 	}
 }
