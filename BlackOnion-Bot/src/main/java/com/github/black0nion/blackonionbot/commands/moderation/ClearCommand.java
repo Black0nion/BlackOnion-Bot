@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -28,20 +28,14 @@ public class ClearCommand implements Command {
 				try {
 					int amount = Integer.parseInt(args[1]);
 					textChannel.deleteMessages(get(channel, amount)).queue();
-					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).queue(msg -> {
-						msg.delete().queueAfter(5, TimeUnit.SECONDS);			
-					});
+					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 				} catch (NumberFormatException ex) {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).queue(msg -> {
-		                msg.delete().queueAfter(5, TimeUnit.SECONDS);            
-		            });
+					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 					return;
 				}
 				return;
 			} else {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).queue(msg -> {
-	                msg.delete().queueAfter(5, TimeUnit.SECONDS);            
-	            });
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 				return;
 			}
 		}

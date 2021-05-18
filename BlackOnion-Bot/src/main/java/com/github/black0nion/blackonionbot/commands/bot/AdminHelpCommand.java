@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import java.awt.Color;
+import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -39,9 +39,7 @@ public class AdminHelpCommand implements Command {
 			}
 		}
 		
-		channel.sendMessage(builder.build()).queue(msg -> { 
-			msg.delete().queueAfter(10, TimeUnit.SECONDS);
-		});
+		channel.sendMessage(builder.build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
 	}
 	
 	@Override

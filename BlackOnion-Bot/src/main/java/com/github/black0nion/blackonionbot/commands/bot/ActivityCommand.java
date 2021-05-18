@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -33,14 +33,10 @@ public class ActivityCommand implements Command {
 		} else if (args[1].toLowerCase().contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue(msg -> {
-				msg.delete().queueAfter(3, TimeUnit.SECONDS);
-			});
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).queue(msg -> {
-			msg.delete().queueAfter(3, TimeUnit.SECONDS);
-		});
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 		ValueManager.save("activityType", args[1]);
 		ValueManager.save("activity", status);
 	}

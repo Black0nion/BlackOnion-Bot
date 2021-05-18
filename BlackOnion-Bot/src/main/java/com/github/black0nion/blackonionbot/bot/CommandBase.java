@@ -1,8 +1,5 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,8 +143,7 @@ public class CommandBase extends ListenerAdapter {
 						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
 							if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 								msg.delete().queueAfter(3, TimeUnit.SECONDS);
 						});

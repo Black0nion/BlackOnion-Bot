@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.bot.Bot;
@@ -30,10 +30,8 @@ public class ReloadCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
 		message.delete().queue();
 		//e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID, "k").queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("configreload", "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		reload();
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("configreload", "messagedelete5", false).build()).queue(msg -> {
-			msg.delete().queueAfter(5, TimeUnit.SECONDS);
-		});
 	}
 	
 	public static void reload() {
