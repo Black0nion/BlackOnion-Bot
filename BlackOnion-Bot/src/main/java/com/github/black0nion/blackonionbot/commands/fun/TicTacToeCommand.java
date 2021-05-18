@@ -18,6 +18,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -165,5 +166,10 @@ public class TicTacToeCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<@User / mention me to play against me!>";
+	}
+	
+	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.MESSAGE_MANAGE };
 	}
 }

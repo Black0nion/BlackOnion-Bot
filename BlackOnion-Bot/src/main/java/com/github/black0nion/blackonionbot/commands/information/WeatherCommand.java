@@ -29,6 +29,7 @@ public class WeatherCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+		//TODO: switch to new language system
 		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		try {
 			JSONObject weather = getWeather(query);

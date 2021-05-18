@@ -35,18 +35,12 @@ public class AntiSpoilerSystem {
 			long count = message.chars().filter(c -> c == '|').count();
 			if (count < 4) return false;
 			
-			if (!guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE)) {
-				channel.sendMessage(Utils.noRights(guild, author, Permission.MESSAGE_MANAGE)).queue();
-				return true;
-			}
+			if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_MANAGE)) return false;
 			
 			msg.delete().queue();
 			if (deletespoiler) return true;
 			
-			if (!guild.getSelfMember().hasPermission(channel, Permission.MANAGE_WEBHOOKS)) {
-				channel.sendMessage(Utils.noRights(guild, author, Permission.MANAGE_WEBHOOKS)).queue();
-				return true;
-			}
+			if (Utils.handleRights(guild, author, channel, Permission.MANAGE_WEBHOOKS)) return true;
 			
 			while (count >= 4) {
 				newMessage = newMessage.replaceFirst("\\|\\|", "");
