@@ -25,6 +25,14 @@ public class Embed extends EmbedBuilder {
 	}
 	
 	@Override
+	public EmbedBuilder setTitle(String title) {
+		String tempTitle = LanguageSystem.getTranslatedString(title, user, guild);
+		if (tempTitle != null)
+			title = tempTitle;
+		return super.setTitle(title);
+	}
+	
+	@Override
 	public EmbedBuilder setTitle(String title, String url) {
 		String tempTitle = LanguageSystem.getTranslatedString(title, user, guild);
 		if (tempTitle != null)

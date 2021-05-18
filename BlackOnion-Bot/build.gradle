@@ -87,4 +87,6 @@ dependencies {
     implementation group: 'com.vdurmont', name: 'emoji-java', version: '5.1.1'
     
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
+    
+    implementation 'commons-validator:commons-validator:1.7'
 }

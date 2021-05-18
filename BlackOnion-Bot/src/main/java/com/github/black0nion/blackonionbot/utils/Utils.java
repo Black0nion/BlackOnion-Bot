@@ -31,6 +31,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
@@ -214,6 +215,10 @@ public class Utils {
 	public static String getCommandHelp(Guild guild, User author, Command command) {
 		final String syntax = command.getSyntax();
 		return "`" + BotInformation.getPrefix(guild) + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
+	}
+	
+	public static MessageEmbed getWrongArgument(User author, Guild guild, Command command) {
+		return EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, command), false).build();
 	}
 	
 	public static <K, V> Map.Entry<K, V> getMapEntry(K key, V value) {
