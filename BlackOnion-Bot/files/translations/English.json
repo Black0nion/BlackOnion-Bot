@@ -214,7 +214,7 @@
     "antiswearwhitelist": "The AntiSwearWhitelist currently contains those elements:",
     "empty": "Empty!",
     "poll": "Poll",
-    "polltutorial": "React with the emojis to vote!",
+    "polltutorial": "React with a emoji to vote!",
     "success": "Success",
     "error": "Error",
     "loading": "Loading...",
