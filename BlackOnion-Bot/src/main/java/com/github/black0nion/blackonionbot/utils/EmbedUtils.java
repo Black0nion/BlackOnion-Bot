@@ -81,4 +81,13 @@ public class EmbedUtils {
 		if (author != null) builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
 		return builder;
 	}
+	
+	public static EmbedBuilder getLoadingEmbed(User author, Guild guild) {
+		EmbedBuilder builder = new Embed(author, guild)
+				.setTitle("loading")
+				.setColor(Color.getHSBColor(0.16F, 1F, 1F))
+				.setTimestamp(Instant.now());
+		if (author != null) builder.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+		return builder;
+	}
 }
