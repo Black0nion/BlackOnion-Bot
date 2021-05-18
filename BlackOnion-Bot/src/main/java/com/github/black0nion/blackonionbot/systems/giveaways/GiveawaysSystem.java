@@ -23,6 +23,7 @@ import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.SelfUser;
+import net.dv8tion.jda.api.entities.User;
 
 public class GiveawaysSystem {
 	private static List<Giveaway> giveaways = new ArrayList<>();
@@ -99,15 +100,19 @@ public class GiveawaysSystem {
 						}
 						
 						users.remove(selfUser);
-						String[] winners = new String[winnas < users.size() ? winnas : users.size()];
+						final int winnerCount = winnas < users.size() ? winnas : users.size();
+						final String[] winners = new String[winnerCount];
+						final long[] winnersIds = new long[winnerCount];
 						
 						Collections.shuffle(users, Bot.random);
 						
 						for (int i = 0; i < winners.length; i++) {
-							winners[i] = users.get(i).getAsMention();
+							final User currentWinner = users.get(i);
+							winners[i] = currentWinner.getAsMention();
+							winnersIds[i] = currentWinner.getIdLong(); 
 						}
 						
-						msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslatedString("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).queue();
+						msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslatedString("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).mentionUsers(winnersIds).queue();
 					});
 				} catch (Exception ex) {
 					ex.printStackTrace();
