@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -30,8 +31,11 @@ import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
@@ -283,5 +287,59 @@ public class Utils {
 		numbersUnicode.put(8, "U+38U+fe0fU+20e3");
 		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
 		numbersUnicode.put(10,"U+1F51F");
+	}
+    
+    /**
+     * @param guild
+     * @param author
+     * @param channel
+     * @param permissions
+     * @return missing permissions?
+     */
+    public static boolean handleRights(Guild guild, User author, TextChannel channel, Permission... permissions) {
+    	if (!guild.getSelfMember().hasPermission(channel, permissions)) {
+			channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+			return true;
+		}
+    	return false;
+    }
+    
+    /**
+     * @param guild
+     * @param author
+     * @param channel
+     * @param permissions
+     * @return missing permissions?
+     */
+    public static boolean handleRights(Guild guild, User author, MessageChannel channel, Permission... permissions) {
+    	if (!guild.getSelfMember().hasPermission(guild.getTextChannelById(channel.getIdLong()), permissions)) {
+			channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+			return true;
+		}
+    	return false;
+    }
+
+	public static MessageEmbed noRights(Guild guild, User author, Permission... missingPermissions) {
+		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	}
+
+	public static String getPermissionString(Permission[] permissions) {
+		String output = "```";
+		for (int i = 0; i  < permissions.length; i++) {
+			output += "- " + permissions[i].getName() + (i == permissions.length-1 ? "```" : "\n");
+		}
+		return output;
+	}
+	
+	public static <T> T[] concatenate(T[] a, T[] b) {
+	    int aLen = a.length;
+	    int bLen = b.length;
+
+	    @SuppressWarnings("unchecked")
+	    T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+	    System.arraycopy(a, 0, c, 0, aLen);
+	    System.arraycopy(b, 0, c, aLen, bLen);
+
+	    return c;
 	}
 }

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -19,7 +19,7 @@ public interface Command {
 	
 	String[] getCommand();
 
-	void execute(String[] args, final GuildMessageReceivedEvent e, final Message message, final Member member, final User author, final Guild guild, final MessageChannel channel);
+	void execute(String[] args, final GuildMessageReceivedEvent e, final Message message, final Member member, final User author, final Guild guild, final TextChannel channel);
 	
 	default String getSyntax() {
 		return "";
@@ -38,6 +38,10 @@ public interface Command {
 	}
 	
 	default Permission[] getRequiredPermissions() {
+		return null;
+	}
+	
+	default Permission[] getRequiredBotPermissions() {
 		return null;
 	}
 	
