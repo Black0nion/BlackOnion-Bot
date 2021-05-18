@@ -15,7 +15,7 @@ import com.mongodb.client.MongoCollection;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -29,7 +29,7 @@ public class BanUsageCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		if (args.length >= 2) {
 			final String stuffToBan = args[2];
 			if (stuffToBan.startsWith("u:")) {

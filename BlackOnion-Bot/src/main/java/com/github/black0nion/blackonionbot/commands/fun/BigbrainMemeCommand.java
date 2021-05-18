@@ -24,7 +24,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -52,7 +52,7 @@ public class BigbrainMemeCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", Utils.getPleaseUse(guild, author, this), false).build()).queue();

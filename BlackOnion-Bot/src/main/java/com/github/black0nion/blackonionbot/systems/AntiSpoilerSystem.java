@@ -2,13 +2,16 @@ package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -22,7 +25,8 @@ public class AntiSpoilerSystem {
 		final Guild guild = event.getGuild();
 		final Message msg = event.getMessage();
 		final String message = msg.getContentRaw();
-		final User user = event.getAuthor();
+		final User author = event.getAuthor();
+		final TextChannel channel = event.getChannel();
 		String newMessage = message;
 		boolean deletespoiler = GuildManager.getBoolean(guild, "deletespoiler", false);
 		boolean antispoiler = GuildManager.getBoolean(guild, "antispoiler", false);
@@ -31,8 +35,18 @@ public class AntiSpoilerSystem {
 			long count = message.chars().filter(c -> c == '|').count();
 			if (count < 4) return false;
 			
+			if (!guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE)) {
+				channel.sendMessage(Utils.noRights(guild, author, Permission.MESSAGE_MANAGE)).queue();
+				return true;
+			}
+			
 			msg.delete().queue();
 			if (deletespoiler) return true;
+			
+			if (!guild.getSelfMember().hasPermission(channel, Permission.MANAGE_WEBHOOKS)) {
+				channel.sendMessage(Utils.noRights(guild, author, Permission.MANAGE_WEBHOOKS)).queue();
+				return true;
+			}
 			
 			while (count >= 4) {
 				newMessage = newMessage.replaceFirst("\\|\\|", "");
@@ -43,14 +57,14 @@ public class AntiSpoilerSystem {
 			final String finalNewMessage = newMessage;
 			
 			try {
-				event.getChannel().retrieveWebhooks().queue(webhooks -> {
+				channel.retrieveWebhooks().queue(webhooks -> {
 					try {
 					Webhook webhook;
 
 					if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
 						webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
 					} else {
-						webhook = event.getChannel().createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(ContentModeratorSystem.file)).submit().join();
+						webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(ContentModeratorSystem.file)).submit().join();
 					}
 					
 					WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
@@ -63,9 +77,9 @@ public class AntiSpoilerSystem {
 					
 					WebhookClient client = clientBuilder.build();
 					WebhookMessageBuilder builder = new WebhookMessageBuilder();
-					builder.setUsername(user.getName() + "#" + user.getDiscriminator());
+					builder.setUsername(author.getName() + "#" + author.getDiscriminator());
 					builder.setContent(finalNewMessage);
-					builder.setAvatarUrl(user.getAvatarUrl());
+					builder.setAvatarUrl(author.getAvatarUrl());
 					client.send(builder.build());
 					client.close();
 					} catch (Exception e) {

@@ -5,18 +5,21 @@ import java.util.List;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RenameCommand implements Command {
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member sentmember, User author, Guild guild, MessageChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member sentmember, User author, Guild guild, TextChannel channel) {
+		if (Utils.handleRights(guild, author, e.getChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
 		message.delete().queue();
 		final Member mem = guild.getMemberById(args[1]);
 		final List<Member> members = e.getGuild().retrieveMembersByPrefix(args[1], 99).get();

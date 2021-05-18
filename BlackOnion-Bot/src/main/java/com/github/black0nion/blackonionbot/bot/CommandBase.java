@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.reflections.Reflections;
@@ -125,6 +126,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
 		String str = args[0].replace(prefix, "");
+		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
 			FileUtils.appendToFile("commandLog", log);
@@ -134,13 +136,19 @@ public class CommandBase extends ListenerAdapter {
 				return;
 			}
 			
+			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
+			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
+			if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
+			
 			if (!ToggleAPI.isActivated(guild.getId(), cmd)) return;
 			
-			if (cmd.getRequiredPermissions() != null && !member.hasPermission(cmd.getRequiredPermissions())) {
+			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+				return;
+			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
@@ -187,13 +195,5 @@ public class CommandBase extends ListenerAdapter {
 				}
 			}
 		}
-	}
-	
-	public static String getPermissionString(Permission[] permissions) {
-		String output = "```";
-		for (int i = 0; i  < permissions.length; i++) {
-			output += "- " + permissions[i].getName() + (i == permissions.length-1 ? "```" : "\n");
-		}
-		return output;
 	}
 }

@@ -16,6 +16,7 @@ import com.mashape.unirest.http.Unirest;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Member;
@@ -56,6 +57,7 @@ public class ContentModeratorSystem {
 				GuildManager.save(guild, "antiSwear", false);
 			return false;
 		}
+		if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS, Permission.MESSAGE_MANAGE)) return false;
 		try {
 			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
