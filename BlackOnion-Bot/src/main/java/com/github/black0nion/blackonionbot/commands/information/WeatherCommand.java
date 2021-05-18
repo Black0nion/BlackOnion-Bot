@@ -29,7 +29,6 @@ public class WeatherCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		//TODO: switch to new language system
 		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		try {
 			JSONObject weather = getWeather(query);
@@ -40,20 +39,20 @@ public class WeatherCommand implements Command {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
 			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			EmbedBuilder embed = EmbedUtils.getDefaultSuccessEmbed(author, guild)
+			EmbedBuilder embed = EmbedUtils.getSuccessEmbed(author, guild)
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"))
 					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
-					.addField(LanguageSystem.getTranslatedString("temperature", author, guild), main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
-					.addField(LanguageSystem.getTranslatedString("humidity", author, guild), main.get("humidity") + "%", true)
-					.addField(LanguageSystem.getTranslatedString("windspeed", author, guild), weather.getJSONObject("wind").get("speed") + " km/h", true)
-					.addField(LanguageSystem.getTranslatedString("country", author, guild), Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
-					.addField(LanguageSystem.getTranslatedString("sunrise", author, guild), sdf.format(sunrise), false)
-					.addField(LanguageSystem.getTranslatedString("sunset", author, guild), sdf.format(sunset), false);
+					.addField("temperature",  main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField("humidity",  main.get("humidity") + "%", true)
+					.addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
+					.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+					.addField("sunrise", sdf.format(sunrise), false)
+					.addField("sunset", sdf.format(sunset), false);
 			channel.sendMessage(embed.build()).queue();
 			return;
 		} catch (IOException ex) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("unknowncity", author, guild), query, false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
 			return;
 		}
 	}
