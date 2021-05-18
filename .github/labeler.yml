@@ -1,3 +1,3 @@
 translation:
-  - any: ['./BlackOnion-Bot/files/translations/*']
-    all: ['!./BlackOnion-Bot/files/translations/German.json']
+  - any: ['BlackOnion-Bot/files/translations/*']
+    all: ['!BlackOnion-Bot/files/translations/German.json']
