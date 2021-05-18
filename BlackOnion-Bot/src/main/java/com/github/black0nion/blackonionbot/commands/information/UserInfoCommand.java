@@ -83,5 +83,4 @@ public class UserInfoCommand implements Command {
 	public Category getCategory() {
 		return Category.INFORMATION;
 	}
-
 }
