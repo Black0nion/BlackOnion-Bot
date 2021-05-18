@@ -27,7 +27,7 @@ public class PrefixCommand implements Command {
 			return;
 		}
 		BotInformation.setPrefix(guild, args[1]);
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("\u1F44B", "My Prefix is: " + BotInformation.getPrefix(guild), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(":wave:", "My Prefix is: " + BotInformation.getPrefix(guild), false).build()).queue();
 	}
 	
 	@Override
