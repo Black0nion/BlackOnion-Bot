@@ -239,5 +239,8 @@
     "clickfornewspage": "Klicke hier, um auf die Newsseite zu kommen!",
     "catnotfound": "Katze nicht gefunden :(",
     "catbreednotfound": "Diese Rasse konnte nicht gefunden werden, für eine Liste an möglichen Rassen benutze ``%command%``!",
-    "bytronalddump": "Zitate von TronaldDump: https://tronalddump.io"
+    "bytronalddump": "Zitate von TronaldDump: https://tronalddump.io",
+    "ipnotpublic": "Diese IP ist nicht öffentlich!",
+    "pleaseentervalidip": "Bitte gebe eine valide IP ein!",
+    "notavalidip": "Das ist keine IP!"
 }
