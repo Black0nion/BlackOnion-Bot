@@ -1,6 +1,7 @@
 {
     "missingpermissions": "Fehlende Permissions!",
     "requiredpermissions": "Benötigte Permissions:",
+    "idonthavepermissions": "Mir fehlen Permissions!",
     "commandnotfound": "Dieser Befehl wurde nicht gefunden!",
     "thecommandnotfound": "Der Befehl %command% wurde nicht gefunden!",
     "didyoumean": "Meintest du %command%?",
