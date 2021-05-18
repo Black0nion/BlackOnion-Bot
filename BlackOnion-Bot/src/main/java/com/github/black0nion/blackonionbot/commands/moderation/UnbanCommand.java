@@ -50,6 +50,11 @@ public class UnbanCommand implements Command {
 	}
 	
 	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.BAN_MEMBERS };
+	}
+	
+	@Override
 	public int getRequiredArgumentCount() {
 		return 1;
 	}
@@ -63,5 +68,4 @@ public class UnbanCommand implements Command {
 	public Category getCategory() {
 		return Category.MODERATION;
 	}
-
 }

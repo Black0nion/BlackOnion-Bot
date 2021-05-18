@@ -149,8 +149,12 @@ public class ReactionRolesSetupCommand implements Command {
 	}
 	
 	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION };
+	}
+	
+	@Override
 	public String[] getCommand() {
 		return new String[] {"reactionrole", "rr"};
 	}
-
 }

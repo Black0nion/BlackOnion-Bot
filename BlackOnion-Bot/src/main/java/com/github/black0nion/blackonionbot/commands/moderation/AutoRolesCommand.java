@@ -114,4 +114,9 @@ public class AutoRolesCommand implements Command {
 	public Permission[] getRequiredPermissions() {
 		return new Permission[] { Permission.MANAGE_ROLES };
 	}
+	
+	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.MANAGE_ROLES };
+	}
 }

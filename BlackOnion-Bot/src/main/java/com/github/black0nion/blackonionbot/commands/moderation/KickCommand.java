@@ -32,9 +32,9 @@ public class KickCommand implements Command {
 		} else {
 			guild.kick(mentionedMembers.get(0)).queue();
 			final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : LanguageSystem.getTranslatedString("yougotkicked", author);
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("usergotkicked", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
+			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField("usergotkicked", LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			mentionedMembers.get(0).getUser().openPrivateChannel().queue(c -> { 
-				c.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Kick").addField(LanguageSystem.getTranslatedString("yougotkicked", author), LanguageSystem.getTranslatedString("message", author) + ": " + kickMessage, false).build()).queue();
+				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Kick").addField("yougotkicked", LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			});
 		}
 	}
@@ -59,4 +59,8 @@ public class KickCommand implements Command {
 		return Category.MODERATION;
 	}
 
+	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.KICK_MEMBERS };
+	}
 }

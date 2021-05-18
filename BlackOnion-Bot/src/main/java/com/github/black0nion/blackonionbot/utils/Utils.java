@@ -33,7 +33,6 @@ import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -298,22 +297,7 @@ public class Utils {
      */
     public static boolean handleRights(Guild guild, User author, TextChannel channel, Permission... permissions) {
     	if (!guild.getSelfMember().hasPermission(channel, permissions)) {
-			channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
-			return true;
-		}
-    	return false;
-    }
-    
-    /**
-     * @param guild
-     * @param author
-     * @param channel
-     * @param permissions
-     * @return missing permissions?
-     */
-    public static boolean handleRights(Guild guild, User author, MessageChannel channel, Permission... permissions) {
-    	if (!guild.getSelfMember().hasPermission(guild.getTextChannelById(channel.getIdLong()), permissions)) {
-			channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
 			return true;
 		}
     	return false;

@@ -40,6 +40,11 @@ public class SetWelcomeChannelCommand implements Command {
 	}
 	
 	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.MESSAGE_MANAGE };
+	}
+	
+	@Override
 	public Category getCategory() {
 		return Category.MODERATION;
 	}

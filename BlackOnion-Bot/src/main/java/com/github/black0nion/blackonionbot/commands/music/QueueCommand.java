@@ -53,5 +53,4 @@ public class QueueCommand implements Command {
 	public Category getCategory() {
 		return Category.MUSIC;
 	}
-
 }

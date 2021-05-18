@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class BanCommand implements Command {
-
 	@Override
 	public String[] getCommand() {
 		return new String[] {"ban", "permayeet"};
@@ -46,7 +45,12 @@ public class BanCommand implements Command {
 	
 	@Override
 	public Permission[] getRequiredPermissions() {
-		return new Permission[] {Permission.BAN_MEMBERS};
+		return new Permission[] { Permission.BAN_MEMBERS };
+	}
+	
+	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.BAN_MEMBERS };
 	}
 	
 	@Override
@@ -63,5 +67,4 @@ public class BanCommand implements Command {
 	public Category getCategory() {
 		return Category.MODERATION;
 	}
-
 }
