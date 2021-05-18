@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
@@ -33,9 +33,7 @@ public class RenameCommand implements Command {
 			member.modifyNickname(String.join(" ", nickname)).queue();
 			return;
 		} else {
-			channel.sendMessage("Doesn't work m8").queue(msg -> {
-				msg.delete().queueAfter(3, TimeUnit.SECONDS);
-			});
+			channel.sendMessage("Doesn't work m8").delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
 	}

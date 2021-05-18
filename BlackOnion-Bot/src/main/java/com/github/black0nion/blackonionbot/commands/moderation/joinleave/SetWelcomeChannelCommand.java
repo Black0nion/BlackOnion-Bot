@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.moderation.joinleave;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -27,14 +27,10 @@ public class SetWelcomeChannelCommand implements Command {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 			GuildManager.remove(guild, "welcomechannel");
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build()).queue(msg -> {
-				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
-			});		
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} else {
 			GuildManager.save(guild.getId(), "welcomechannel", channel.getId());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).queue(msg -> {
-				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
-			});
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}
 	}
 	

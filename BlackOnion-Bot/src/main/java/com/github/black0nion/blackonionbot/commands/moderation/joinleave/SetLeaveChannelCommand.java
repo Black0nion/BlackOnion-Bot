@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.moderation.joinleave;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -27,14 +27,10 @@ public class SetLeaveChannelCommand implements Command {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 			GuildManager.remove(guild, "leavechannel");
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelcleared", "leavechannelclearedinfo", false).build()).queue(msg -> {
-				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
-			});
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelcleared", "leavechannelclearedinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} else {
 			GuildManager.save(guild.getId(), "leavechannel", channel.getId());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).queue(msg -> {
-				msg.delete().queueAfter(5, TimeUnit.SECONDS);			
-			});
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}
 	}
 	

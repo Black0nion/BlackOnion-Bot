@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.bson.Document;
 
@@ -41,16 +41,11 @@ public class BanUsageCommand implements Command {
 				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslatedString("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
 				return;
 			} else {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).queue(msg -> { 
-					msg.delete().queueAfter(5, TimeUnit.SECONDS);
-				});
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 				return;
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).queue(msg -> { 
-				msg.delete().queueAfter(5, TimeUnit.SECONDS);
-			});
-			return;
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();			return;
 		}
 	}
 
