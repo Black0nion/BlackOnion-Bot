@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.fun;
+package com.github.black0nion.blackonionbot.commands.misc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,7 +57,7 @@ public class QrCodeCommand implements Command {
 
 	@Override
 	public Category getCategory() {
-		return Category.FUN;
+		return Category.MISC;
 	}
 
 	@Override
