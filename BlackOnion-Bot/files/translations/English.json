@@ -1,7 +1,7 @@
 {
     "missingpermissions": "Missing Permissions!",
     "requiredpermissions": "Required Permissions:",
-    "idonthavepermissions": "I'm missing permissions!",
+    "idonthavepermissions": "I'm missing out on permissions!",
     "commandnotfound": "Command not found!",
     "thecommandnotfound": "The command %command% couldn't be found!",
     "didyoumean": "Did you mean %command%?",
@@ -45,8 +45,8 @@
     "helpbigbrain": "Generates a \"Big Brain\" meme picture",
     "helpviruscheck": "Checks a file for a virus",
     "helpautoroles": "Creates a autorole",
-    "helpsetwelcomechannel": "Sets the channel for the welcome messages",
-    "helpsetleavechannel": "Sets the channel for the goodbye messages",
+    "helpsetwelcomechannel": "Sets a channel for the welcome messages",
+    "helpsetleavechannel": "Sets a channel for the goodbye messages",
     "helpjoinleavemessage": "Sets the message sent on join / leave of a user\n**Placeholders**\n``%user%`` -> the user that joined / left\n``%guild%`` -> the name of the server",
     "helppoll": "Creates a poll",
     "helpswearwhitelist": "Adds roles, channels and permissions to not get flagged by the AntiSwear-System",
@@ -214,7 +214,7 @@
     "antiswearwhitelist": "The AntiSwearWhitelist currently contains those elements:",
     "empty": "Empty!",
     "poll": "Poll",
-    "polltutorial": "React with a emoji to vote!",
+    "polltutorial": "React with the emojis to vote!",
     "success": "Success",
     "error": "Error",
     "loading": "Loading...",
@@ -244,5 +244,7 @@
     "bytronalddump": "Quotes from TronaldDump: https://tronalddump.io",
     "ipnotpublic": "This IP isn't public!",
     "pleaseentervalidip": "Please enter a valid IP!",
-    "notavalidip": "This isn't a IP!"
+    "notavalidip": "This isn't a IP!",
+    "qrcode": "QR Code",
+    "qrresult": "Decodierter QR-Code:"
 }
