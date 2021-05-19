@@ -307,7 +307,7 @@ public class Utils {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
-	public static String getPermissionString(Permission[] permissions) {
+	public static String getPermissionString(Permission... permissions) {
 		String output = "```";
 		for (int i = 0; i  < permissions.length; i++) {
 			output += "- " + permissions[i].getName() + (i == permissions.length-1 ? "```" : "\n");

@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -27,7 +28,7 @@ public class PrefixCommand implements Command {
 			return;
 		}
 		BotInformation.setPrefix(guild, args[1]);
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(":wave:", "My Prefix is: " + BotInformation.getPrefix(guild), false).build()).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
 	}
 	
 	@Override
