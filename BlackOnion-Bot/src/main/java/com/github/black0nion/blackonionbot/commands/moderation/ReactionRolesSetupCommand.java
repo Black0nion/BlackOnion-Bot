@@ -24,6 +24,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ReactionRolesSetupCommand implements Command {
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"reactionrole", "rr"};
+	}
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
@@ -151,10 +156,5 @@ public class ReactionRolesSetupCommand implements Command {
 	@Override
 	public Permission[] getRequiredBotPermissions() {
 		return new Permission[] { Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION };
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"reactionrole", "rr"};
 	}
 }

@@ -20,7 +20,7 @@ public class KickCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"kick", "yeet"};
+		return new String[] { "kick", "yeet" };
 	}
 
 	@Override

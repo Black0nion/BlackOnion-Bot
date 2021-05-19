@@ -16,6 +16,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RenameCommand implements Command {
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] { "rename", "rn" };
+	}
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member sentmember, User author, Guild guild, TextChannel channel) {
@@ -54,10 +59,5 @@ public class RenameCommand implements Command {
 	@Override
 	public CommandVisibility getVisisbility() {
 		return CommandVisibility.HIDDEN;
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"rename", "rn"};
 	}
 }

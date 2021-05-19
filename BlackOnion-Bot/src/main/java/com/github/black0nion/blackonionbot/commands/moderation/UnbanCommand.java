@@ -19,7 +19,7 @@ public class UnbanCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"unban", "unyeet"};
+		return new String[] { "unban", "unyeet" };
 	}
 
 	@Override
