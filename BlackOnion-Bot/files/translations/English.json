@@ -192,6 +192,7 @@
     "length": "Length: ",
     "myprefixis": "My prefix is: %prefix%",
     "changeprefix": "To change the prefix, use %command%",
+    "prefixchanged": "Prefix erfolgreich geändert!",
     "notpremium": "This server isn't a premium-server!",
     "premiumrequired": "Premium is required for this feature!",
     "antiswearstatuschanged": "The AntiSwear-status got changed!",
