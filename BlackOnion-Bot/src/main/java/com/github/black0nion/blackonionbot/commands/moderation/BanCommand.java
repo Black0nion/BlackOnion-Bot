@@ -17,9 +17,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class BanCommand implements Command {
+	
 	@Override
 	public String[] getCommand() {
-		return new String[] {"ban", "permayeet"};
+		return new String[] { "ban", "permayeet" };
 	}
 
 	@Override

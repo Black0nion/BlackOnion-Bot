@@ -21,6 +21,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class ClearCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "clear" };
+	}
+
+	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		try {
 			int amount = Integer.parseInt(args[1]);
@@ -66,11 +71,6 @@ public class ClearCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.MODERATION;
-	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[] {"clear"};
 	}
 	
 	@Override
