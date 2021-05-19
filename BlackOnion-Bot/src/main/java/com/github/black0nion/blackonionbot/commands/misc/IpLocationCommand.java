@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class IpLocationCommand implements Command {
+	
 	private static final InetAddressValidator validator = InetAddressValidator.getInstance();
 	
 	@Override

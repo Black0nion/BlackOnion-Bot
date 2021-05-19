@@ -26,6 +26,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ReloadCommand implements Command {
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] { "reload", "rl" };
+	}
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
@@ -61,10 +66,4 @@ public class ReloadCommand implements Command {
 	public CommandVisibility getVisisbility() {
 		return CommandVisibility.HIDDEN;
 	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"reload", "rl"};
-	}
-
 }

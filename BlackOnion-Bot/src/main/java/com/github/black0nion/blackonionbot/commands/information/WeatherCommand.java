@@ -28,6 +28,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class WeatherCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "weather" };
+	}
+
+	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		try {
@@ -86,10 +91,5 @@ public class WeatherCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.INFORMATION;
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"weather"};
 	}
 }

@@ -16,6 +16,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class InstagramCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "instagram", "insta" };
+	}
+
+	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Reason:", LanguageSystem.getTranslatedString("instasshitapi", author, guild), false).build()).queue();
 	}
@@ -28,10 +33,5 @@ public class InstagramCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.MISC;
-	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[]{"instagram", "insta"};
 	}
 }

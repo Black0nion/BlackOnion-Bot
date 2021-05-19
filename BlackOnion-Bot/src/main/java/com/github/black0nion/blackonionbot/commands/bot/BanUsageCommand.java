@@ -30,6 +30,7 @@ public class BanUsageCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+		message.delete().queue();
 		if (args.length >= 2) {
 			final String stuffToBan = args[2];
 			if (stuffToBan.startsWith("u:")) {
@@ -45,7 +46,8 @@ public class BanUsageCommand implements Command {
 				return;
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();			return;
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			return;
 		}
 	}
 

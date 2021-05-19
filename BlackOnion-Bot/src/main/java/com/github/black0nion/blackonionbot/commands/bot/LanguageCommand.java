@@ -20,7 +20,7 @@ public class LanguageCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"language", "lang", "locale", "sprache"};
+		return new String[] { "language", "lang", "locale", "sprache" };
 	}
 
 	@Override
@@ -64,5 +64,4 @@ public class LanguageCommand implements Command {
 	public String getSyntax() {
 		return "<language code>";
 	}
-
 }

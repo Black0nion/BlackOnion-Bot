@@ -19,7 +19,12 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class StatusCommand implements Command {
-
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] {"status"};
+	}
+	
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		message.delete().queue();
@@ -87,11 +92,6 @@ public class StatusCommand implements Command {
 			System.out.println("Could not read Status from File!");
 			return OnlineStatus.DO_NOT_DISTURB;
 		}
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"status"};
 	}
 	
 	@Override

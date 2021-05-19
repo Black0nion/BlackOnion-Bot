@@ -23,7 +23,7 @@ public class AdminHelpCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"adminhelp"};
+		return new String[] { "adminhelp" };
 	}
 
 	@Override

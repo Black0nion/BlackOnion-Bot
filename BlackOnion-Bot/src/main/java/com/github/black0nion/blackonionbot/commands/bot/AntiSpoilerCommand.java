@@ -24,6 +24,7 @@ public class AntiSpoilerCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+		if (Utils.handleRights(guild, author, null, Permission.MESSAGE_MANAGE)) return;
 		if (args.length >= 2) {
 			if (args[1].equalsIgnoreCase("on")) {
 				GuildManager.save(guild, "antispoiler", true);

@@ -178,5 +178,4 @@ public class BigbrainMemeCommand implements Command {
 			return null;
 		}
     }
-
 }

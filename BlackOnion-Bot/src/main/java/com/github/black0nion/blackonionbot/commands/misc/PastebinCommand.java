@@ -16,6 +16,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class PastebinCommand implements Command {
+
+	@Override
+	public String[] getCommand() {
+		return new String[] { "pastebin" };
+	}
 	
 	private final PasteClient client = new PasteClientBuilder()
 			.setUserAgent("BlackOnion-Bot")
@@ -57,10 +62,4 @@ public class PastebinCommand implements Command {
 	public Category getCategory() {
 		return Category.MISC;
 	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"pastebin"};
-	}
-
 }

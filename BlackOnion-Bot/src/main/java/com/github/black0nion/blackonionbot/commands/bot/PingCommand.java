@@ -15,6 +15,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class PingCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "ping" };
+	}
+
+	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ping").addField("Pong :D", LanguageSystem.getTranslatedString("myping", author, guild).replace("%ping%", String.valueOf(e.getJDA().getGatewayPing())), false).build()).queue();
 	}
@@ -22,10 +27,5 @@ public class PingCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.BOT;
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"ping"};
 	}
 }

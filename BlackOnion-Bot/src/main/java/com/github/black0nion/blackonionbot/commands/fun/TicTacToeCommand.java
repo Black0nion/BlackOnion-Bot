@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class TicTacToeCommand implements Command {
+	
 	@Override
 	public String[] getCommand() {
 		return new String[] { "tictactoe", "ttt" };

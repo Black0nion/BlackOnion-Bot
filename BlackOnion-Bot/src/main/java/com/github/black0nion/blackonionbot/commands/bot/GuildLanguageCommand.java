@@ -22,7 +22,7 @@ public class GuildLanguageCommand implements Command {
 
 	@Override
 	public String[] getCommand() {
-		return new String[] {"guildlanguage", "guildlang", "guildlocale", "guildsprache"};
+		return new String[] { "guildlanguage", "guildlang", "guildlocale", "guildsprache", "serverlang", "serverlanguage", "serversprache" };
 	}
 
 	@Override
@@ -68,5 +68,4 @@ public class GuildLanguageCommand implements Command {
 	public String getSyntax() {
 		return "<language code>";
 	}
-
 }
