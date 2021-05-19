@@ -4,7 +4,6 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,10 +39,8 @@ public class PlayCommand implements Command {
 			final AudioManager audioManager = e.getGuild().getAudioManager();
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
 			
-			if (!guild.getSelfMember().hasPermission(memberChannel, Permission.VOICE_SPEAK)) {
-				Utils.noRights(guild, author, Permission.VOICE_CONNECT);
-				return;
-			}
+			audioManager.openAudioConnection(memberChannel);
+			System.out.println(audioManager.getConnectionStatus());
 			
 			PlayerManager.getInstance().loadAndPlay(author, e.getChannel(), url, audioManager, memberChannel);
 		} else {
@@ -64,5 +61,10 @@ public class PlayCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<url / search term>";
+	}
+	
+	@Override
+	public Permission[] getRequiredBotPermissions() {
+		return new Permission[] { Permission.VOICE_SPEAK };
 	}
 }

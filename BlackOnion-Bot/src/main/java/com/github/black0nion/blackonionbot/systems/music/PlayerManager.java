@@ -176,5 +176,4 @@ public class PlayerManager {
 
         return INSTANCE;
     }
-
 }
