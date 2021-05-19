@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ConnectFourCommand implements Command {
+	
 	@Override
 	public String[] getCommand() {
 		return new String[] { "connect4", "connectfour", "viergewinnt", "4gewinnt" };

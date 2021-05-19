@@ -19,6 +19,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class NotifyCommand implements Command {
 
 	@Override
+	public String[] getCommand() {
+		return new String[] { "notify" };
+	}
+
+	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		if (Bot.notifyStatusUsers.contains(author.getId())) {
 			Bot.notifyStatusUsers.remove(author.getId());
@@ -46,10 +51,5 @@ public class NotifyCommand implements Command {
 	@Override
 	public Progress getProgress() {
 		return Progress.PAUSED;
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"notify"};
 	}
 }

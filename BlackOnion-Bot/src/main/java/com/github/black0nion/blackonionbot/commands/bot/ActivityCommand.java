@@ -19,6 +19,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class ActivityCommand implements Command {
+
+	@Override
+	public String[] getCommand() {
+		return new String[] { "activity" };
+	}
 	
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
@@ -80,10 +85,5 @@ public class ActivityCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.BOT;
-	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[] {"activity"};
 	}
 }

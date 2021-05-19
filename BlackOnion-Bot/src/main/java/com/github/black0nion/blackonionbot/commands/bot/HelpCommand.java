@@ -24,7 +24,12 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class HelpCommand implements Command {
-
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] { "help", "hilfe" };
+	}
+	
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		try {
@@ -150,11 +155,6 @@ public class HelpCommand implements Command {
 	@Override
 	public Category getCategory() {
 		return Category.BOT;
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"help"};
 	}
 
 	@Override

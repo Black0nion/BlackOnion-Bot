@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class GuildInfoCommand implements Command {
+	
 	@Override
 	public String[] getCommand() {
 		return new String[] { "guildinfo", "serverinfo" };

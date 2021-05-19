@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class BugReportCommand implements Command {
-
+	
 	@Override
 	public String[] getCommand() {
 		return new String[] { "bug", "bugreport" };

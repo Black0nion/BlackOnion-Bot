@@ -18,6 +18,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AvatarCommand implements Command {
+	
+	@Override
+	public String[] getCommand() {
+		return new String[] { "avatar" };
+	}
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
@@ -61,10 +66,5 @@ public class AvatarCommand implements Command {
 	@Override
 	public String getSyntax() {
 		return "<@User / UserID>";
-	}
-	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "avatar" };
 	}
 }
