@@ -91,4 +91,7 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
     
     implementation 'commons-validator:commons-validator:1.7'
+    
+    implementation 'com.google.zxing:core:3.4.1'
+    implementation 'com.google.zxing:javase:3.4.1'
 }
