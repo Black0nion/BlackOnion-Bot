@@ -2,6 +2,11 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,18 +44,18 @@ public class QrDecodeCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		final List<Attachment> attachments = message.getAttachments();
 		if (attachments.size() == 0) {
-			channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
-			return;
-		} else {
-			Result result = readQR(attachments.get(0));
-			if (result == null) {
+			if (args.length >= 2) {
+				final String url = args[1];
+				if (url.endsWith(".png") || url.endsWith(".jpg")) {
+					send(readQR(url), channel, author, guild, url);
+				}
+			} else {
 				channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
 				return;
-			} else {
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
-						.setThumbnail(attachments.get(0).getUrl())
-						.addField("result", result.getText(), false).build()).queue();
 			}
+		} else {
+			final Attachment path = attachments.get(0);
+			send(readQR(path), channel, author, guild, path.getUrl());
 		}
 	}
 
@@ -61,7 +66,45 @@ public class QrDecodeCommand implements Command {
 
 	@Override
 	public String getSyntax() {
-		return "<attach files>";
+		return "<attach file / url to a public image";
+	}
+	
+	private void send(Result result, TextChannel channel, User author, Guild guild, String imageUrl) {
+		if (result == null) {
+			channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
+		} else {
+			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
+					.setThumbnail(imageUrl)
+					.addField("result", result.getText(), false).build()).queue();
+		}
+	}
+	
+	private static Result readQR(String url) {
+		try {
+			InputStream in = new URL(url).openStream();
+			final String[] split = url.split("/");
+			Files.copy(in, Paths.get(split[split.length-1]), StandardCopyOption.REPLACE_EXISTING);
+			File file = new File(split[split.length-1] + System.currentTimeMillis());
+			
+			Map<EncodeHintType, ErrorCorrectionLevel> map
+	        = new HashMap<EncodeHintType,
+	                      ErrorCorrectionLevel>();
+			map.put(EncodeHintType.ERROR_CORRECTION,
+	                ErrorCorrectionLevel.L);
+			
+			BinaryBitmap binaryBitmap
+            = new BinaryBitmap(new HybridBinarizer(
+                new BufferedImageLuminanceSource(
+                    ImageIO.read(
+                        new FileInputStream(file)))));
+	
+			Result result = new MultiFormatReader().decode(binaryBitmap);
+			file.delete();
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static Result readQR(Attachment path) {
