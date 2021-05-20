@@ -1,12 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +43,8 @@ public class QrDecodeCommand implements Command {
 				final String url = args[1];
 				if (url.endsWith(".png") || url.endsWith(".jpg")) {
 					send(readQR(url), channel, author, guild, message, url);
+				} else {
+					message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 				}
 			} else {
 				message.reply(Utils.getWrongArgument(author, guild, this)).queue();
@@ -55,6 +52,7 @@ public class QrDecodeCommand implements Command {
 			}
 		} else {
 			final Attachment path = attachments.get(0);
+			if (path.isImage())
 			send(readQR(path), channel, author, guild, message, path.getUrl());
 		}
 	}
@@ -73,7 +71,6 @@ public class QrDecodeCommand implements Command {
 		if (result == null || result.getBarcodeFormat() == null) {
 			message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 		} else {
-			
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
 					.setThumbnail(imageUrl)
 					.addField("qrresult", result.getText(), false).build()).queue();
@@ -82,11 +79,6 @@ public class QrDecodeCommand implements Command {
 	
 	private static Result readQR(String url) {
 		try {
-			InputStream in = new URL(url).openStream();
-			final String[] split = url.split("/");
-			Files.copy(in, Paths.get(split[split.length-1]), StandardCopyOption.REPLACE_EXISTING);
-			File file = new File(split[split.length-1] + System.currentTimeMillis());
-			
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
 	                      ErrorCorrectionLevel>();
@@ -97,10 +89,9 @@ public class QrDecodeCommand implements Command {
             = new BinaryBitmap(new HybridBinarizer(
                 new BufferedImageLuminanceSource(
                     ImageIO.read(
-                        new FileInputStream(file)))));
+                        new URL(url).openStream()))));
 	
 			Result result = new MultiFormatReader().decode(binaryBitmap);
-			file.delete();
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,22 +101,21 @@ public class QrDecodeCommand implements Command {
 
 	private static Result readQR(Attachment path) {
 		try {
-			File file = path.downloadToFile().join();
-			
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
 	                      ErrorCorrectionLevel>();
 			map.put(EncodeHintType.ERROR_CORRECTION,
 	                ErrorCorrectionLevel.L);
 			
+			final InputStream is = path.retrieveInputStream().join();
 			BinaryBitmap binaryBitmap
             = new BinaryBitmap(new HybridBinarizer(
                 new BufferedImageLuminanceSource(
                     ImageIO.read(
-                        new FileInputStream(file)))));
+                        is))));
+			is.close();
 	
 			Result result = new MultiFormatReader().decode(binaryBitmap);
-			//file.delete();
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
