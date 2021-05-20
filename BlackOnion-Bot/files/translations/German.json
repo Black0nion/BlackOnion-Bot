@@ -247,5 +247,9 @@
     "pleaseentervalidip": "Bitte gebe eine valide IP ein!",
     "notavalidip": "Das ist keine IP!",
     "qrcode": "QR Code",
-    "qrresult": "Decodierter QR-Code:"
+    "qrresult": "Decodierter QR-Code:",
+    "qrdecodefail": "QR-Code decodieren fehlgeschlagen!",
+    "qrnotfound": "Es wurde kein QR-Code gefunden!",
+    "privateqr": "Dieser QR-Code ist privat!",
+    "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!"
 }
