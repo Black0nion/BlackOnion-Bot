@@ -58,14 +58,14 @@ public class CatBreedsCommand implements Command {
 				builder.addField(name, value, false);
 			});
 			
-			channel.sendMessage(builder.build()).queue((msg) -> {
+			message.reply(builder.build()).queue((msg) -> {
 				for (int i = 0; i < pages.size(); i++)
 					msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 				waitForPageSwitch(msg, author, pages);
 			});
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 			return;
 		}
 	}

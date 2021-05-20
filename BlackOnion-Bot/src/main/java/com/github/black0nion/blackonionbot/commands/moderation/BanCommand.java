@@ -27,7 +27,7 @@ public class BanCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		final List<Member> mentionedMembers = message.getMentionedMembers();
 		if (mentionedMembers.size() == 0) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
 			String banMessage = LanguageSystem.getTranslatedString("yougotbanned", author);
@@ -37,7 +37,7 @@ public class BanCommand implements Command {
 			} else
 				guild.ban(mentionedMembers.get(0), 0).queue();
 			final String finalBanMessage = banMessage;
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("usergotbanned", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + banMessage, false).build()).queue();
+			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("usergotbanned", author, guild), LanguageSystem.getTranslatedString("message", author, guild) + ": " + banMessage, false).build()).queue();
 			mentionedMembers.get(0).getUser().openPrivateChannel().queue(c -> {
 				c.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslatedString("yougotbanned", author), LanguageSystem.getTranslatedString("message", author) + ": " + finalBanMessage, false).build()).queue();
 			});

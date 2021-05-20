@@ -27,12 +27,12 @@ public class KickCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		final List<Member> mentionedMembers = message.getMentionedMembers();
 		if (mentionedMembers.size() == 0) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
 			guild.kick(mentionedMembers.get(0)).queue();
 			final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : LanguageSystem.getTranslatedString("yougotkicked", author);
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField("usergotkicked", LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
+			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField("usergotkicked", LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			mentionedMembers.get(0).getUser().openPrivateChannel().queue(c -> { 
 				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Kick").addField("yougotkicked", LanguageSystem.getTranslatedString("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			});

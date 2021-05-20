@@ -57,7 +57,7 @@ public class StatsCommand implements Command {
 				.addField("Uptime", (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : ""), false)
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
-			channel.sendMessage(builder.build()).queue();
+			message.reply(builder.build()).queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

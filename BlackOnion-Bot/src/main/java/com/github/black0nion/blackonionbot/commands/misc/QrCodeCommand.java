@@ -40,7 +40,7 @@ public class QrCodeCommand implements Command {
 				.setImage("attachment://qr.png");
 		
 		try {
-			channel.sendFile(new FileInputStream(file), "qr.png").embed(builder.build()).queue(msg -> {
+			channel.sendFile(new FileInputStream(file), "qr.png").reference(message).embed(builder.build()).queue(msg -> {
 				if (!file.delete())
 					file.deleteOnExit();
 			}, error -> {
@@ -51,7 +51,7 @@ public class QrCodeCommand implements Command {
 			if (!file.delete())
 				file.deleteOnExit();
 			ex.printStackTrace();
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 		}
 	}
 

@@ -41,16 +41,16 @@ public class VirusCommand implements Command {
 			} else if (args.length >= 2) {
 				url = args[1];
 			} else {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 				return;
 			}
 			final String finalUrl = url;
 			final String urlResult = checkUrl(finalUrl).getBody();
 			if (!new JSONObject(urlResult).has("data")) {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 				return;
 			}
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("fileprocessed", "waitforresult", false).build()).queue(msg -> {
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("fileprocessed", "waitforresult", false).build()).queue(msg -> {
 				JSONObject analyse = null;
 				do  { 
 					try { Thread.sleep(5000); } catch (InterruptedException ex) { ex.printStackTrace(); }

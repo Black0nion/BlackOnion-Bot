@@ -29,7 +29,7 @@ public class QueueCommand implements Command {
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.queue.size() == 0) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("queueempty", "addsomethingtoqueue", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("queueempty", "addsomethingtoqueue", false).build()).queue();
 			return;
 		}
 		List<AudioTrack> tracks = PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.queue.stream().collect(Collectors.toList());
@@ -46,7 +46,7 @@ public class QueueCommand implements Command {
     		}
     	}
 		
-		channel.sendMessage(builder.build()).queue();
+		message.reply(builder.build()).queue();
 	}
 	
 	@Override

@@ -33,29 +33,29 @@ public class AvatarCommand implements Command {
 				mentionedUser = message.getMentionedUsers().get(0);
 			} else {
 				if (!Utils.isLong(user)) {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 					return;
 				}
 				
 				e.getJDA().retrieveUserById(user.trim()).queue(uzer -> {
-					print(author, uzer, guild, channel);
+					print(author, uzer, guild, channel, message);
 				}, failure -> {
-					channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "someerrorhappened", false).build()).queue();
+					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "someerrorhappened", false).build()).queue();
 				});
 				return;
 			}
 		}
 		
-		print(author, mentionedUser, guild, channel);
+		print(author, mentionedUser, guild, channel, message);
 	}
 	
-	private static void print(User author, User mentionedUser, Guild guild, MessageChannel channel) {
+	private static void print(User author, User mentionedUser, Guild guild, MessageChannel channel, Message message) {
 		EmbedBuilder builder = new EmbedBuilder()
 			.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 				.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.setTimestamp(Instant.now());
-		channel.sendMessage(builder.build()).queue();	
+		message.reply(builder.build()).queue();	
 	}
 	
 	@Override

@@ -30,10 +30,10 @@ public class IpLocationCommand implements Command {
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 			if (!validator.isValid(args[1])) {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notavalidip", "pleaseentervalidip", false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notavalidip", "pleaseentervalidip", false).build()).queue();
 				return;
 			}
-			MessageAction action = channel.sendMessage(EmbedUtils.getLoadingEmbed(author, guild).build());
+			MessageAction action = message.reply(EmbedUtils.getLoadingEmbed(author, guild).build());
 			action.queue(msg -> {				
 				try {
 					Unirest.setTimeouts(0, 0);
@@ -41,10 +41,10 @@ public class IpLocationCommand implements Command {
 					JSONObject object = new JSONObject(response.getBody());
 					if (object.has("error") && object.getBoolean("error")) {
 						if (object.getBoolean("reserved")) {
-							channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("ipnotpublic", "pleaseentervalidip", false).build()).queue();
+							message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("ipnotpublic", "pleaseentervalidip", false).build()).queue();
 							return;
 						} else {					
-							channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
+							message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 							return;
 						}
 					}

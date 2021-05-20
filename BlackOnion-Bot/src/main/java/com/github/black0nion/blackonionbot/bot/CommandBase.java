@@ -144,15 +144,17 @@ public class CommandBase extends ListenerAdapter {
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild)
+				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild)
 						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
-							if (cmd.getVisisbility() != CommandVisibility.SHOWN)
+				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+							if (cmd.getVisisbility() != CommandVisibility.SHOWN) {
 								msg.delete().queueAfter(3, TimeUnit.SECONDS);
+								message.delete().queueAfter(3, TimeUnit.SECONDS);
+							}
 						});
 				return;
 			}
@@ -168,7 +170,7 @@ public class CommandBase extends ListenerAdapter {
 			return;
 		}
 		
-		channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
+		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	@Deprecated

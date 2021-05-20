@@ -35,10 +35,10 @@ public class JokeCommand implements Command {
 				langString = "&lang=" + lang.getLanguageCode().toLowerCase();
 			HttpResponse<String> response = Unirest.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langString != null ? langString : "")).asString();
 			JSONObject object = new JSONObject(response.getBody());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Joke", "https://jokeapi.dev").addField(object.getString("setup"), object.getString("delivery"), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Joke", "https://jokeapi.dev").addField(object.getString("setup"), object.getString("delivery"), false).build()).queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 		}
 	}
 

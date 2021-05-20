@@ -28,10 +28,10 @@ public class TronaldDumpCommand implements Command {
 			Unirest.setTimeouts(0, 0);
 			HttpResponse<String> response = Unirest.get("https://tronalddump.io/random/quote").header("Accept", "application/json").asString();
 			JSONObject object = new JSONObject(response.getBody());
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setThumbnail("https://www.tronalddump.io/img/tronalddump_850x850.png").setTitle("TronaldDump", "https://tronalddump.io").addField(object.getString("value"), "bytronalddump", false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setThumbnail("https://www.tronalddump.io/img/tronalddump_850x850.png").setTitle("TronaldDump", "https://tronalddump.io").addField(object.getString("value"), "bytronalddump", false).build()).queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 		}
 	}
 	

@@ -22,7 +22,7 @@ public class InstagramCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Reason:", LanguageSystem.getTranslatedString("instasshitapi", author, guild), false).build()).queue();
+		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("Reason:", LanguageSystem.getTranslatedString("instasshitapi", author, guild), false).build()).queue();
 	}
 	
 	@Override

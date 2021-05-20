@@ -55,12 +55,12 @@ public class BigbrainMemeCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			return;
 		}
-		channel.sendMessage("Generating your image...").queue(m -> {
+		message.reply("Generating your image...").queue(m -> {
 			final @NotNull File file = generateImage(messages);
-			channel.sendMessage("bigbrian").addFile(file, "bigbrain.png").queue(msg -> {				
+			message.reply("bigbrian").addFile(file, "bigbrain.png").queue(msg -> {				
 				file.delete();
 				m.delete().queue();
 			});

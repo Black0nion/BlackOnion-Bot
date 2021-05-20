@@ -48,16 +48,16 @@ public class WeatherCommand implements Command {
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
 					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
-					.addField("temperature",  main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField("temperature",  main.get("temp_min") + "ï¿½ to " + main.get("temp_max") + "ï¿½", true)
 					.addField("humidity",  main.get("humidity") + "%", true)
 					.addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
 					.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
 					.addField("sunrise", sdf.format(sunrise), false)
 					.addField("sunset", sdf.format(sunset), false);
-			channel.sendMessage(embed.build()).queue();
+			message.reply(embed.build()).queue();
 			return;
 		} catch (IOException ex) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
 			return;
 		}
 	}

@@ -28,7 +28,7 @@ public class ToggleCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		Command command = CommandBase.commands.get(args[1]);
 		if (command == null || command.getVisisbility() == CommandVisibility.HIDDEN) {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "commandnotfound", false).build()).queue();;
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "commandnotfound", false).build()).queue();;
 			return;
 		}
 		boolean activated;
@@ -38,16 +38,16 @@ public class ToggleCommand implements Command {
 		} else if (Utils.equalsOneIgnoreCase(activatedUnparsed, "disabled", "false", "off")) {
 			activated = false;
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			return;
 		}
 		
 		if (ToggleAPI.setActivated(guild.getId(), command, activated)) {
 			final String commandName = command.getCommand()[0].toUpperCase();
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("commandtoggled", author, guild).replace("%command%", commandName), LanguageSystem.getTranslatedString("commandisnow", author, guild).replace("%command%", commandName).replace("%status%", LanguageSystem.getTranslatedString(activated ? "on" : "off", author, guild)), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("commandtoggled", author, guild).replace("%command%", commandName), LanguageSystem.getTranslatedString("commandisnow", author, guild).replace("%command%", commandName).replace("%status%", LanguageSystem.getTranslatedString(activated ? "on" : "off", author, guild)), false).build()).queue();
 			return;
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandcantbetoggled", "thiscommandcantbetoggled", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandcantbetoggled", "thiscommandcantbetoggled", false).build()).queue();
 			return;
 		}
 	}

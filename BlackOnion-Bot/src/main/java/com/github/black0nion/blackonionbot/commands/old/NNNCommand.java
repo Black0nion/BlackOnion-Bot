@@ -44,7 +44,7 @@ public class NNNCommand implements Command {
 		final String hms = String.format("%02d Tage, %02d Stunden und %02d Minuten", TimeUnit.MILLISECONDS.toDays(millis),
 						TimeUnit.MILLISECONDS.toHours(millis) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis)),
 						TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)));
-		channel.sendMessage("Zeit bis zum Ende des NoNutNovembers: " + hms + ", bereits geschafft sind " + percentComplete + "% der gesamten Zeit!").queue();
+		message.reply("Zeit bis zum Ende des NoNutNovembers: " + hms + ", bereits geschafft sind " + percentComplete + "% der gesamten Zeit!").queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

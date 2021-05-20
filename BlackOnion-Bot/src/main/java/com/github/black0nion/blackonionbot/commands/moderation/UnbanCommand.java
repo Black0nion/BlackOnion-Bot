@@ -28,7 +28,7 @@ public class UnbanCommand implements Command {
 		if (mentionedMembers.size() != 0) {
 			final User bannedUser = mentionedMembers.get(0).getUser();
 			guild.retrieveBan(bannedUser).queue(ban -> {
-				channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + ban.getReason() + "**"), false).build()).queue();
+				message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + ban.getReason() + "**"), false).build()).queue();
 			});
 			guild.unban(bannedUser).queue();
 		} else {
@@ -36,9 +36,9 @@ public class UnbanCommand implements Command {
 				guild.retrieveBanById(args[1]).queue(ban -> {
 					String reason = ban.getReason();
 					guild.unban(ban.getUser()).queue();
-					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
+					message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslatedString("userunbanned", author, guild), LanguageSystem.getTranslatedString("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
 				}, fail -> {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("usernotfound", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
+					message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("usernotfound", author, guild), LanguageSystem.getTranslatedString("tagornameuser", author, guild), false).build()).queue();
 				});
 			} catch (Exception ignored) {}
 		}

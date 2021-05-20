@@ -47,15 +47,15 @@ public class QrDecodeCommand implements Command {
 			if (args.length >= 2) {
 				final String url = args[1];
 				if (url.endsWith(".png") || url.endsWith(".jpg")) {
-					send(readQR(url), channel, author, guild, url);
+					send(readQR(url), channel, author, guild, message, url);
 				}
 			} else {
-				channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
+				message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 				return;
 			}
 		} else {
 			final Attachment path = attachments.get(0);
-			send(readQR(path), channel, author, guild, path.getUrl());
+			send(readQR(path), channel, author, guild, message, path.getUrl());
 		}
 	}
 
@@ -69,13 +69,14 @@ public class QrDecodeCommand implements Command {
 		return "<attach file / url to a public image";
 	}
 	
-	private void send(Result result, TextChannel channel, User author, Guild guild, String imageUrl) {
-		if (result == null) {
-			channel.sendMessage(Utils.getWrongArgument(author, guild, this)).queue();
+	private void send(Result result, TextChannel channel, User author, Guild guild, Message message, String imageUrl) {
+		if (result == null || result.getBarcodeFormat() == null) {
+			message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 		} else {
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
+			
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
 					.setThumbnail(imageUrl)
-					.addField("result", result.getText(), false).build()).queue();
+					.addField("qrresult", result.getText(), false).build()).queue();
 		}
 	}
 	
@@ -124,7 +125,7 @@ public class QrDecodeCommand implements Command {
                         new FileInputStream(file)))));
 	
 			Result result = new MultiFormatReader().decode(binaryBitmap);
-			file.delete();
+			//file.delete();
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
