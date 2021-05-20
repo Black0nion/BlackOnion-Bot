@@ -77,9 +77,7 @@ public class Utils {
 	}
 
 	public static String[] removeFirstArg(String[] input) {
-		String[] result = new String[input.length-1];
-		System.arraycopy(input, 1, result, 0, input.length-1);
-		return result;
+		return Arrays.copyOfRange(input, 1, input.length);
 	}
 	
 	public static String round(String decimal, double number) {

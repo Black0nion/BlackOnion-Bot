@@ -34,26 +34,26 @@ public class UserInfoCommand implements Command {
 		if (message.getMentionedMembers().size() > 0) {
 			statsMember = message.getMentionedMembers().get(0);
 			statsUser = statsMember.getUser();
-			channel.sendMessage(getUserInfo(author, member, statsUser, statsMember).build()).queue();
+			message.reply(getUserInfo(author, member, statsUser, statsMember).build()).queue();
 		} else {
 			if (args.length >= 2) {
-				try { Long.parseLong(args[1]); } catch (Exception ex) { channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue(); return; }
+				try { Long.parseLong(args[1]); } catch (Exception ex) { message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue(); return; }
 				e.getJDA().retrieveUserById(args[1]).queue(idUser -> {
 					guild.retrieveMember(idUser).queue(mem -> {
-						channel.sendMessage(getUserInfo(author, member, idUser, mem).build()).queue();
+						message.reply(getUserInfo(author, member, idUser, mem).build()).queue();
 						return;
 					}, (error) -> {
-						channel.sendMessage(getUserInfo(author, member, idUser, null).build()).queue();
+						message.reply(getUserInfo(author, member, idUser, null).build()).queue();
 						return;
 					});
 				}, new ErrorHandler()
-						.handle(ErrorResponse.UNKNOWN_USER, (errr) -> channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue())
-						.handle(Throwable.class, (err) -> channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue())
+						.handle(ErrorResponse.UNKNOWN_USER, (errr) -> message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "usernotfound", false).build()).queue())
+						.handle(Throwable.class, (err) -> message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue())
 				);
 			} else {
 				statsUser = author;
 				statsMember = member;
-				channel.sendMessage(getUserInfo(author, member, statsUser, statsMember).build()).queue();
+				message.reply(getUserInfo(author, member, statsUser, statsMember).build()).queue();
 				return;
 			}
 		}

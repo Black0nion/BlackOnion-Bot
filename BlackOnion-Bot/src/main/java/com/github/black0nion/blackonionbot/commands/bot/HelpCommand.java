@@ -39,11 +39,11 @@ public class HelpCommand implements Command {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
 						final String commandHelp = LanguageSystem.getTranslatedString("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-						channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(Utils.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
+						message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(Utils.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
 					}
 				}
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "`" + args[1] + "`"), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslatedString("thecommandnotfound", author, guild).replace("%command%", "`" + args[1] + "`"), false).build()).queue();
 			} else {
 				// start the help system thingy lmao
 				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
@@ -66,7 +66,7 @@ public class HelpCommand implements Command {
 					if (commandsInCategory.length() <= 2) continue;
 					builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslatedString("modules", author, guild)), commandsInCategory.substring(1), false);
 				}
-				channel.sendMessage(builder.build()).queue((msg) -> {
+				message.reply(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
 						msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 					waitForHelpCatSelection(msg, member, cats.length+1);
@@ -78,7 +78,7 @@ public class HelpCommand implements Command {
 				ex.printStackTrace();
 			} else {
 				ex.printStackTrace();
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("What just happend?", 
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("What just happend?", 
 						"hau did u do that???", false).build()).queue();
 			}
 		}

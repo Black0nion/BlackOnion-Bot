@@ -33,7 +33,7 @@ public class NewsCommand implements Command {
 			Newspost post = news.get(i);
 			builder.addField(post.title, "`" + post.date + "`\n" + post.content + (i != news.size()-1 ? "\n​" : ""), false);
 		}
-		channel.sendMessage(builder.build()).queue();
+		message.reply(builder.build()).queue();
 	}
 	
 	@Override

@@ -30,16 +30,16 @@ public class GuildLanguageCommand implements Command {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
 				LanguageSystem.updateGuildLocale(guild.getId(), args[1]);
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("languageupdated", LanguageSystem.getTranslatedString("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("languageupdated", LanguageSystem.getTranslatedString("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
 			} else {
 				String validLanguages = "\n";
 				for (Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {
 					validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
 				}
 				if (args[1].equalsIgnoreCase("list")) {
-					channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Valid Languages", validLanguages, false).build()).queue();
+					message.reply(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Valid Languages", validLanguages, false).build()).queue();
 				} else {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).setTitle("Language doesn't exist").addField("Valid languages:", validLanguages, false).build()).queue();
+					message.reply(EmbedUtils.getDefaultErrorEmbed(author).setTitle("Language doesn't exist").addField("Valid languages:", validLanguages, false).build()).queue();
 				}
 			}
 		} else {
@@ -50,7 +50,7 @@ public class GuildLanguageCommand implements Command {
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + Utils.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + BotInformation.getPrefix(guild) + "language list`", false).build()).queue();
+			message.reply(EmbedUtils.getDefaultSuccessEmbed(author).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + Utils.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + BotInformation.getPrefix(guild) + "language list`", false).build()).queue();
 		}
 	}
 	

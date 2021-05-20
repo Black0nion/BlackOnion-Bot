@@ -39,7 +39,7 @@ public class ReactionRolesSetupCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -65,7 +65,7 @@ public class ReactionRolesSetupCommand implements Command {
 						} else {
 							emote = emoteName;
 							tc.addReactionById(messageID, emote).queue(null, fail -> {
-								channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("emotenotfound", author, guild), false).build()).queue();
+								message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("emotenotfound", author, guild), false).build()).queue();
 								return;
 							});
 						}
@@ -75,7 +75,7 @@ public class ReactionRolesSetupCommand implements Command {
 									.append("channelid", tc.getIdLong())
 									.append("messageid", messageID)
 									.append("roleid", role.getIdLong())).first() != null) {
-								channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
+								message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
 								return;
 							}
 							
@@ -86,7 +86,7 @@ public class ReactionRolesSetupCommand implements Command {
 									.append("emote", emote)
 									.append("roleid", role.getIdLong()));
 							
-							channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslatedString("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
+							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("reactionrolecreated", LanguageSystem.getTranslatedString("reactionrolecreatedinfo", author, guild).replace("%emote%", emote).replace("%role%", role.getAsMention()), false).build()).queue();
 							return;
 						} else if (finalArgs[1].equalsIgnoreCase("remove") || finalArgs[1].equalsIgnoreCase("delete")) {
 							if (ReactionRoleSystem.collection.find(new BasicDBObject().append("guildid", e.getGuild().getIdLong())
@@ -105,31 +105,31 @@ public class ReactionRolesSetupCommand implements Command {
 										} else {
 											msg.clearReactions(finalEmote).queue();
 										}
-										channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("entrydeleted", "reactionroledeleted", false).build()).queue();
+										message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("entrydeleted", "reactionroledeleted", false).build()).queue();
 									});
 								});
 								return;
 							} else {
-								channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "thisnotfound", false).build()).queue();
+								message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "thisnotfound", false).build()).queue();
 								return;
 							}
 						} else {
-							channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+							message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 							return;
 						}
 					}, fail -> {
-						channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("errorhappened", author, guild), LanguageSystem.getTranslatedString("somethingwentwrong", author, guild), false).build()).queue();
+						message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("errorhappened", author, guild), LanguageSystem.getTranslatedString("somethingwentwrong", author, guild), false).build()).queue();
 						return;
 					});
 				}, fail -> {
-					channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagenotfound", author, guild), LanguageSystem.getTranslatedString("messagecouldntbefound", author, guild), false).build()).queue();
+					message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagenotfound", author, guild), LanguageSystem.getTranslatedString("messagecouldntbefound", author, guild), false).build()).queue();
 					return;
 				});
 			} catch (NumberFormatException ex) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			}
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
 		}
 	}
 	

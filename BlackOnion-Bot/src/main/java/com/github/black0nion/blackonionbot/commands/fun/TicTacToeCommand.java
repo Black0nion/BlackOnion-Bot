@@ -42,36 +42,36 @@ public class TicTacToeCommand implements Command {
 				rerun(TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel());
 				return;
 			} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
-				channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslatedString("bot", author, guild) : getTranslatedString("yourself", author, guild))), getTranslatedString("nofriends", author, guild), false).build()).queue();
+				message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslatedString("bot", author, guild) : getTranslatedString("yourself", author, guild))), getTranslatedString("nofriends", author, guild), false).build()).queue();
 				return;
 			} else if (TicTacToeGameManager.isIngame(author.getId()) || TicTacToeGameManager.isIngame(challenged.getId())) {
-	    		  channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("alreadyingame", author, guild), getTranslatedString("nomultitasking", author, guild), false).build()).queue();
+	    		  message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("alreadyingame", author, guild), getTranslatedString("nomultitasking", author, guild), false).build()).queue();
 	    		  return;
 	    	}
-			channel.sendMessage(getTranslatedString("ttt_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslatedString("answerwithyes", author, guild)).queue();
+			message.reply(getTranslatedString("ttt_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslatedString("answerwithyes", author, guild)).queue();
 			CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
 					(event) -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), 
 					event -> {
 				  if (!event.getAuthor().isBot() && event.getAuthor().getId().equals(challenged.getId())) {
 				      if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 				    	  
-				    	  channel.sendMessage(EmbedUtils.getDefaultSuccessEmbed(event.getAuthor()).addField(getTranslatedString("challengeaccepted", event.getAuthor(), guild), getTranslatedString("playingagainst", event.getAuthor(), guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
+				    	  message.reply(EmbedUtils.getDefaultSuccessEmbed(event.getAuthor()).addField(getTranslatedString("challengeaccepted", event.getAuthor(), guild), getTranslatedString("playingagainst", event.getAuthor(), guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 				    	  
 				    	  //ANGENOMMEN
 				    	  TicTacToe game = TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
 				    	  rerun(game, e.getChannel());
 				    	  return;
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
-				    	  channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setTitle(getTranslatedString("declined", event.getAuthor(), guild)).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("arentyoubraveenough", event.getAuthor(), guild), false).build()).queue();
+				    	  message.reply(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).setTitle(getTranslatedString("declined", event.getAuthor(), guild)).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("arentyoubraveenough", event.getAuthor(), guild), false).build()).queue();
 				    	  return;
 				      } else {
-				    	  channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("answerwithyes", event.getAuthor(), guild), false).build()).queue();
+				    	  message.reply(EmbedUtils.getDefaultErrorEmbed(event.getAuthor()).addField(getTranslatedString("challengedeclined", event.getAuthor(), guild), getTranslatedString("answerwithyes", event.getAuthor(), guild), false).build()).queue();
 				    	  return;
 				      }
 				  }
-				}, 1, TimeUnit.MINUTES, () -> channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(challenged).addField(getTranslatedString("timeout", challenged, guild), getTranslatedString("tooktoolong", author, guild), false).build()).queue());
+				}, 1, TimeUnit.MINUTES, () -> message.reply(EmbedUtils.getDefaultErrorEmbed(challenged).addField(getTranslatedString("timeout", challenged, guild), getTranslatedString("tooktoolong", author, guild), false).build()).queue());
 		} else {
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("nousermentioned", author, guild), getTranslatedString("inputusertoplayagainst", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslatedString("nousermentioned", author, guild), getTranslatedString("inputusertoplayagainst", author, guild), false).build()).queue();
 			return;
 		}
 	}

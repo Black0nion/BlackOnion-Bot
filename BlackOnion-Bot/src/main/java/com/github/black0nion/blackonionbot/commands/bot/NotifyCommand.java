@@ -32,14 +32,14 @@ public class NotifyCommand implements Command {
 			users.remove(author.getId());
 			ValueManager.save("notifyUsers", users);
 			Bot.notifyStatusUsers.remove(author.getId());
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfügbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfï¿½gbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
 		} else {
 			ArrayList<String> users = new ArrayList<String>();
 			users.addAll(ValueManager.getArrayAsList("notifyUsers"));
 			users.add(author.getId());
 			ValueManager.save("notifyUsers", users);
 			Bot.notifyStatusUsers.add(author.getId());
-			channel.sendMessage(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfügbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField("Dieses Feature ist derzeit leider nicht verfï¿½gbar!", "Discord erlaubt dies seit der neuesten API Version nicht mehr :(", false).build()).queue();
 		}
 	}
 	

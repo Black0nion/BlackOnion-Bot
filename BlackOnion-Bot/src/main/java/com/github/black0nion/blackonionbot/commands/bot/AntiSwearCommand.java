@@ -31,21 +31,21 @@ public class AntiSwearCommand implements Command {
 			if (args[1].equalsIgnoreCase("on")) on = true;
 			else if (args[1].equalsIgnoreCase("off")) on = false;
 			else {
-				print(e, channel, author, member, guild);
+				print(e, channel, author, member, guild, message);
 				return;
 			}
 			
 			if (!GuildManager.isPremium(guild)) {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notpremium", "premiumrequired", false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notpremium", "premiumrequired", false).build()).queue();
 				return;
 			}
 			GuildManager.save(guild, "antiSwear", on);
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearstatuschanged", LanguageSystem.getTranslatedString("antiswearis", author, guild).replace("%status%", LanguageSystem.getTranslatedString(on ? "on" : "off", author, guild)), false).build()).queue();
-		} else print(e, channel, author, member, guild);
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearstatuschanged", LanguageSystem.getTranslatedString("antiswearis", author, guild).replace("%status%", LanguageSystem.getTranslatedString(on ? "on" : "off", author, guild)), false).build()).queue();
+		} else print(e, channel, author, member, guild, message);
 	}
 	
-	private final void print(GuildMessageReceivedEvent e, MessageChannel channel, User author, Member member, Guild guild) {
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", Utils.getCommandHelp(guild, author, this)), false).build()).queue();
+	private final void print(GuildMessageReceivedEvent e, MessageChannel channel, User author, Member member, Guild guild, Message message) {
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", Utils.getCommandHelp(guild, author, this)), false).build()).queue();
 	}
 	
 	@Override

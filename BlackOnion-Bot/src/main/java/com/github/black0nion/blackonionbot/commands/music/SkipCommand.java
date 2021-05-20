@@ -30,15 +30,15 @@ public class SkipCommand implements Command {
 			final AudioPlayer player = musicManager.audioPlayer;
 			
 			if (player.getPlayingTrack() == null) {
-				channel.sendMessage("nomusic").queue();
+				message.reply("nomusic").queue();
 				return;
 			}
 			
 			musicManager.scheduler.nextTrack();
 			
-			channel.sendMessage("skipped lmao").queue();
+			message.reply("skipped lmao").queue();
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
 		}
 	}
 	

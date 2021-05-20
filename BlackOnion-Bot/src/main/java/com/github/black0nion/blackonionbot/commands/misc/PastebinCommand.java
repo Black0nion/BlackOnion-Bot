@@ -43,7 +43,7 @@ public class PastebinCommand implements Command {
 							.appendDescription(paste.getBody())
 							.appendDescription("```");
 					
-					channel.sendMessage(builder.build()).queue();
+					message.reply(builder.build()).queue();
 				})
 		);
 	}

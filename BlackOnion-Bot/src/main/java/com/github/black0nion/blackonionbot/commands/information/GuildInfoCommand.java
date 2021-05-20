@@ -22,7 +22,7 @@ public class GuildInfoCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild)
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild)
 				.setTitle("guildinfo")
 				.setThumbnail(guild.getIconUrl())
 				.addField("name", guild.getName(), true)

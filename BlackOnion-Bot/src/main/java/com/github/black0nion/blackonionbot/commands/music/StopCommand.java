@@ -30,9 +30,9 @@ public class StopCommand implements Command {
 			musicManager.scheduler.queue.clear();
 			e.getGuild().getAudioManager().closeAudioConnection();
 			
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("musicstopped", "leftvc", false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("musicstopped", "leftvc", false).build()).queue();
 		} else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
 		}
 	}
 	

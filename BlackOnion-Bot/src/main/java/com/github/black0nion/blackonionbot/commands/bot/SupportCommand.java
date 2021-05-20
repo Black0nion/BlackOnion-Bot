@@ -20,7 +20,7 @@ public class SupportCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Support").addField("Discord Server:", "[Invite Link](https://discord.gg/ZzGKy9RCBY)", false)
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Support").addField("Discord Server:", "[Invite Link](https://discord.gg/ZzGKy9RCBY)", false)
 				.addField("Creators", "[SIMULATAN](https://github.com/SIMULATAN), [ManuelP](https://github.com/ManuelPuchner), [MatseCrafter_304](https://github.com/MatseCrafter-304), [blaumeise](https://github.com/blaumeise20)", false)
 				.build()).queue();
 	}

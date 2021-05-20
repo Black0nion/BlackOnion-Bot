@@ -36,15 +36,15 @@ public class CatCommand implements Command {
 			  .asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
 				// cat breed not found
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslatedString("catbreednotfound", author, guild).replace("%command%", BotInformation.getPrefix(guild) + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslatedString("catbreednotfound", author, guild).replace("%command%", BotInformation.getPrefix(guild) + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
 				return;
 			}
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());
 			final JSONObject responseAsJSON = responseAsJSONArray.getJSONObject(0);
-			channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("UwU").setImage(responseAsJSON.getString("url")).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("UwU").setImage(responseAsJSON.getString("url")).build()).queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 			return;
 		}
 	}
