@@ -78,8 +78,6 @@ public class Bot extends ListenerAdapter {
 	
 	@SuppressWarnings("resource")
 	public void startBot() {
-		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
-		System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 		new File("files").mkdir();
 		isJarFile = JarUtils.runningFromJar();
 		
