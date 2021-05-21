@@ -34,7 +34,12 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void nextTrack() {
-        player.startTrack(queue.poll(), false);
+        final AudioTrack poll = queue.poll();
+        if (poll == null) {
+        	this.guild.getAudioManager().closeAudioConnection();
+        } else {        	
+        	player.startTrack(poll, false);
+        }
     }
     
     @Override

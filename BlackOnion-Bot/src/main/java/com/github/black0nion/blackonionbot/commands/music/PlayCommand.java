@@ -27,7 +27,6 @@ public class PlayCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
 		GuildVoiceState state = member.getVoiceState();
 		if (state != null && state.getChannel() != null) {
-			
 			StringBuilder builder = new StringBuilder();
 			for (int i = 1; i < args.length; i++) builder.append(args[i] + " ");
 			
@@ -40,7 +39,6 @@ public class PlayCommand implements Command {
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
 			
 			audioManager.openAudioConnection(memberChannel);
-			System.out.println(audioManager.getConnectionStatus());
 			
 			PlayerManager.getInstance().loadAndPlay(author, e.getChannel(), url, audioManager, memberChannel);
 		} else {
