@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -34,9 +35,8 @@ public class SkipCommand implements Command {
 				return;
 			}
 			
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("songskipped", LanguageSystem.getTranslatedString("songgotskipped", author, guild).replace("%song%", musicManager.audioPlayer.getPlayingTrack().getInfo().title), false).build()).queue();
 			musicManager.scheduler.nextTrack();
-			
-			message.reply("skipped lmao").queue();
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();
 		}
