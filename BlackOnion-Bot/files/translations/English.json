@@ -160,6 +160,8 @@
     "thistracksplus": "Those tracks and %tracks% more are in the queue.",
     "queueempty": "The queue is empty!",
     "addsomethingtoqueue": "Add something to the queue to view it!",
+    "songskipped": "Song übersprungen!",
+    "songgotskipped": "%song% wurde übersprungen!",
     "entrydeleted": "Entry deleted!",
     "reactionroledeleted": "The ReactionRole got deleted!",
     "reactionrolecreated": "ReactionRole created!",
