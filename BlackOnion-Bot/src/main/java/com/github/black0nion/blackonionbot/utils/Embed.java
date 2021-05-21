@@ -18,7 +18,7 @@ public class Embed extends EmbedBuilder {
 	
 	@Override
 	public EmbedBuilder setFooter(String text) {
-		String tempText = LanguageSystem.getTranslatedString(text, user, guild);
+		String tempText = LanguageSystem.getTranslation(text, user, guild);
 		if (tempText != null)
 			text = tempText;
 		return super.setFooter(text);
@@ -26,7 +26,7 @@ public class Embed extends EmbedBuilder {
 	
 	@Override
 	public EmbedBuilder setTitle(String title) {
-		String tempTitle = LanguageSystem.getTranslatedString(title, user, guild);
+		String tempTitle = LanguageSystem.getTranslation(title, user, guild);
 		if (tempTitle != null)
 			title = tempTitle;
 		return super.setTitle(title);
@@ -34,7 +34,7 @@ public class Embed extends EmbedBuilder {
 	
 	@Override
 	public EmbedBuilder setTitle(String title, String url) {
-		String tempTitle = LanguageSystem.getTranslatedString(title, user, guild);
+		String tempTitle = LanguageSystem.getTranslation(title, user, guild);
 		if (tempTitle != null)
 			title = tempTitle;
 		return super.setTitle(title, url);
@@ -42,8 +42,8 @@ public class Embed extends EmbedBuilder {
 	
 	@Override
 	public EmbedBuilder addField(String name, String value, boolean inline) {
-		String tempName = LanguageSystem.getTranslatedString(name, user, guild);
-		String tempValue = LanguageSystem.getTranslatedString(value, user, guild);
+		String tempName = LanguageSystem.getTranslation(name, user, guild);
+		String tempValue = LanguageSystem.getTranslation(value, user, guild);
 		if (tempName != null)
 			name = tempName;
 		if (tempValue != null)

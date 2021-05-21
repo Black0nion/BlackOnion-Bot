@@ -37,7 +37,7 @@ public class TicTacToe {
 		
 		User currentUser = currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser());
 		
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(currentUser, guild).setTitle(LanguageSystem.getTranslatedString("tictactoe", currentUser, guild) + " | " + LanguageSystem.getTranslatedString("currentplayer", currentUser, guild) + " | " + Utils.removeMarkdown((currentPlayer == FieldType.X ? playerX.getName() : playerY.getName()))).addField("currentstate", getFieldString(), false).build()).queue(success -> this.message = success);
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(currentUser, guild).setTitle(LanguageSystem.getTranslation("tictactoe", currentUser, guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, guild) + " | " + Utils.removeMarkdown((currentPlayer == FieldType.X ? playerX.getName() : playerY.getName()))).addField("currentstate", getFieldString(), false).build()).queue(success -> this.message = success);
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;

@@ -46,8 +46,8 @@ public class WeatherCommand implements Command {
 			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
 			EmbedBuilder embed = EmbedUtils.getSuccessEmbed(author, guild)
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-					.setTitle(LanguageSystem.getTranslatedString("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
-					.addField(LanguageSystem.getTranslatedString("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
+					.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
 					.addField("temperature",  main.get("temp_min") + "� to " + main.get("temp_max") + "�", true)
 					.addField("humidity",  main.get("humidity") + "%", true)
 					.addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)

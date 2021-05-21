@@ -54,7 +54,7 @@ public class SwearWhitelistCommand implements Command {
 					newWhitelist.addAll(mentionedStuff);
 				} else newWhitelist.removeAll(mentionedStuff);
 				GuildManager.saveList(guild, "whitelist", newWhitelist);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("whitelistupdated", (add ? LanguageSystem.getTranslatedString("addedtowhitelist", author, guild).replace("%add%", mentionedStuff.toString()) : LanguageSystem.getTranslatedString("removedfromwhitelist", author, guild).replace("%removed%", mentionedStuff.toString())), false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("whitelistupdated", (add ? LanguageSystem.getTranslation("addedtowhitelist", author, guild).replace("%add%", mentionedStuff.toString()) : LanguageSystem.getTranslation("removedfromwhitelist", author, guild).replace("%removed%", mentionedStuff.toString())), false).build()).queue();
 			}
 		} else {
 			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);

@@ -52,7 +52,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		long hours = minutes / 60;
 		minutes %= 60;
 		seconds %= 60;
-		guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())).sendMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle(LanguageSystem.getTranslatedString("nowplaying", null, guild) + info.title, info.uri).addField("By: " + info.author, info.isStream ? "STREAM" : LanguageSystem.getTranslatedString("length", null, guild) + (hours > 0 ? hours + "h " : "") + minutes + "min " + seconds + "s", false).build()).queue();
+		guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())).sendMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle(LanguageSystem.getTranslation("nowplaying", null, guild) + info.title, info.uri).addField("By: " + info.author, info.isStream ? "STREAM" : LanguageSystem.getTranslation("length", null, guild) + (hours > 0 ? hours + "h " : "") + minutes + "min " + seconds + "s", false).build()).queue();
     }
 
     @Override

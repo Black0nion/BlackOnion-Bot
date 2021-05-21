@@ -29,7 +29,7 @@ public class PrefixInfo extends ListenerAdapter {
 						return;
 					}
 					BotInformation.setPrefix(guild, args[2]);
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
+					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
 					return;
 				} else if (args.length >= 2 && msgContent.replace("!", "").startsWith(event.getJDA().getSelfUser().getAsMention() + "prefix")) {
 					if (args[1].toCharArray().length > 10) {
@@ -37,15 +37,15 @@ public class PrefixInfo extends ListenerAdapter {
 						return;
 					}
 					BotInformation.setPrefix(guild, args[1]);
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
+					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
 					return;
 				}
 			} else {
 				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslatedString("missingpermissions", author, guild), LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(Permission.ADMINISTRATOR), false).build()).queue();
+						.addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(Permission.ADMINISTRATOR), false).build()).queue();
 				return;
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), LanguageSystem.getTranslatedString("changeprefix", author, guild).replace("%command%", event.getJDA().getSelfUser().getAsMention() + " prefix <prefix>"), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), LanguageSystem.getTranslation("changeprefix", author, guild).replace("%command%", event.getJDA().getSelfUser().getAsMention() + " prefix <prefix>"), false).build()).queue();
 		}
 	}
 }

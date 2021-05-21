@@ -210,7 +210,7 @@ public class Utils {
 	}
 	 
 	public static String getPleaseUse(Guild guild, User author, Command command) {
-		return LanguageSystem.getTranslatedString("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
+		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 	
 	public static String getCommandHelp(Guild guild, User author, Command command) {
@@ -302,7 +302,7 @@ public class Utils {
     }
 
 	public static MessageEmbed noRights(Guild guild, User author, Permission... missingPermissions) {
-		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslatedString("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
 	public static String getPermissionString(Permission... permissions) {
