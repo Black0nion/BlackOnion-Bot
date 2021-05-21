@@ -21,7 +21,7 @@ public class BugReportCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("foundabug").addField("plsreportbug", LanguageSystem.getTranslatedString("inourgitrepo", author, guild).replace("%repo%", "[BlackOnion-Bugreports](https://github.com/Black0nion/BlackOnion-Bugreports)"), false).build()).queue();
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("foundabug").addField("plsreportbug", LanguageSystem.getTranslation("inourgitrepo", author, guild).replace("%repo%", "[BlackOnion-Bugreports](https://github.com/Black0nion/BlackOnion-Bugreports)"), false).build()).queue();
 	}
 
 	@Override

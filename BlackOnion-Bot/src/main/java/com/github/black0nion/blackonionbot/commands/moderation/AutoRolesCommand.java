@@ -32,7 +32,7 @@ public class AutoRolesCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("invalidrole", author, guild), LanguageSystem.getTranslatedString("iseveryone", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -62,7 +62,7 @@ public class AutoRolesCommand implements Command {
 				return;
 			} else tempList.add(roleID);
 			GuildManager.saveList(guild.getId(), "autoroles", tempList);
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autorolecreated", LanguageSystem.getTranslatedString("autorolecreatedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autorolecreated", LanguageSystem.getTranslation("autorolecreatedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
 			List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;
@@ -89,7 +89,7 @@ public class AutoRolesCommand implements Command {
 				return;
 			} else tempList.remove(roleID);
 			GuildManager.saveList(guild.getId(), "autoroles", tempList);
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autoroledeleted", LanguageSystem.getTranslatedString("autoroledeletedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autoroledeleted", LanguageSystem.getTranslation("autoroledeletedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
 		}

@@ -30,7 +30,7 @@ public class GuildLanguageCommand implements Command {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
 				LanguageSystem.updateGuildLocale(guild.getId(), args[1]);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("languageupdated", LanguageSystem.getTranslatedString("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("languageupdated", LanguageSystem.getTranslation("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
 			} else {
 				String validLanguages = "\n";
 				for (Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {

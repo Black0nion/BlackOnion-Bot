@@ -53,7 +53,7 @@ public class StatusCommand implements Command {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", Utils.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		}
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslatedString("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		
 		e.getJDA().getPresence().setStatus(status);
 	}

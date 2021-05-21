@@ -28,7 +28,7 @@ public class PrefixCommand implements Command {
 			return;
 		}
 		BotInformation.setPrefix(guild, args[1]);
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslatedString("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
 	}
 	
 	@Override

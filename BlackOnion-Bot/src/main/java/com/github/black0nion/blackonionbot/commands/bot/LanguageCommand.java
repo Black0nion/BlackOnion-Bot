@@ -28,7 +28,7 @@ public class LanguageCommand implements Command {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
 				LanguageSystem.updateUserLocale(author.getId(), args[1]);
-				message.reply(EmbedUtils.getDefaultSuccessEmbed(author, e.getGuild()).addField(LanguageSystem.getTranslatedString("languageupdated", author, e.getGuild()), LanguageSystem.getTranslatedString("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
+				message.reply(EmbedUtils.getDefaultSuccessEmbed(author, e.getGuild()).addField(LanguageSystem.getTranslation("languageupdated", author, e.getGuild()), LanguageSystem.getTranslation("newlanguage", author, e.getGuild()) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
 			} else {
 				String validLanguages = "\n";
 				for (Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {

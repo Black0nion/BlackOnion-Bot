@@ -30,10 +30,10 @@ public class ClearCommand implements Command {
 		try {
 			int amount = Integer.parseInt(args[1]);
 			channel.deleteMessages(get(channel, amount)).queue();
-			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslatedString("msgsgotdeleted", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("messagesdeleted", author, guild), amount + " " + LanguageSystem.getTranslation("msgsgotdeleted", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslatedString("wrongargument", author, guild), LanguageSystem.getTranslatedString("numberofdeletedmessages", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("numberofdeletedmessages", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		}
 		return;

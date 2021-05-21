@@ -51,7 +51,7 @@ public class AvatarCommand implements Command {
 	
 	private static void print(User author, User mentionedUser, Guild guild, MessageChannel channel, Message message) {
 		EmbedBuilder builder = new EmbedBuilder()
-			.setTitle(LanguageSystem.getTranslatedString("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
+			.setTitle(LanguageSystem.getTranslation("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 				.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.setTimestamp(Instant.now());

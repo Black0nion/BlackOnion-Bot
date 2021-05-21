@@ -35,7 +35,7 @@ public class SkipCommand implements Command {
 				return;
 			}
 			
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("songskipped", LanguageSystem.getTranslatedString("songgotskipped", author, guild).replace("%song%", musicManager.audioPlayer.getPlayingTrack().getInfo().title), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("songskipped", LanguageSystem.getTranslation("songgotskipped", author, guild).replace("%song%", musicManager.audioPlayer.getPlayingTrack().getInfo().title), false).build()).queue();
 			musicManager.scheduler.nextTrack();
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notconnected", "startmusictostop", false).build()).queue();

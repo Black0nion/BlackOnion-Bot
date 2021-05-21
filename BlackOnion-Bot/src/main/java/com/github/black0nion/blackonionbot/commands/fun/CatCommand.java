@@ -36,7 +36,7 @@ public class CatCommand implements Command {
 			  .asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
 				// cat breed not found
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslatedString("catbreednotfound", author, guild).replace("%command%", BotInformation.getPrefix(guild) + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslation("catbreednotfound", author, guild).replace("%command%", BotInformation.getPrefix(guild) + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
 				return;
 			}
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());

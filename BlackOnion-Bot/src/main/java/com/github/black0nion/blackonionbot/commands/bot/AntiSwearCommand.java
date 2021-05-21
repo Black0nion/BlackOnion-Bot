@@ -40,12 +40,12 @@ public class AntiSwearCommand implements Command {
 				return;
 			}
 			GuildManager.save(guild, "antiSwear", on);
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearstatuschanged", LanguageSystem.getTranslatedString("antiswearis", author, guild).replace("%status%", LanguageSystem.getTranslatedString(on ? "on" : "off", author, guild)), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearstatuschanged", LanguageSystem.getTranslation("antiswearis", author, guild).replace("%status%", LanguageSystem.getTranslation(on ? "on" : "off", author, guild)), false).build()).queue();
 		} else print(e, channel, author, member, guild, message);
 	}
 	
 	private final void print(GuildMessageReceivedEvent e, MessageChannel channel, User author, Member member, Guild guild, Message message) {
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslatedString(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslatedString("howtoantiswearstatustoggle", author, guild).replace("%command%", Utils.getCommandHelp(guild, author, this)), false).build()).queue();
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(GuildManager.getBoolean(guild, "antiSwear") ? "on" : "off", author, guild)), LanguageSystem.getTranslation("howtoantiswearstatustoggle", author, guild).replace("%command%", Utils.getCommandHelp(guild, author, this)), false).build()).queue();
 	}
 	
 	@Override

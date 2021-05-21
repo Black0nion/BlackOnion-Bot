@@ -44,7 +44,7 @@ public class ToggleCommand implements Command {
 		
 		if (ToggleAPI.setActivated(guild.getId(), command, activated)) {
 			final String commandName = command.getCommand()[0].toUpperCase();
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslatedString("commandtoggled", author, guild).replace("%command%", commandName), LanguageSystem.getTranslatedString("commandisnow", author, guild).replace("%command%", commandName).replace("%status%", LanguageSystem.getTranslatedString(activated ? "on" : "off", author, guild)), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("commandtoggled", author, guild).replace("%command%", commandName), LanguageSystem.getTranslation("commandisnow", author, guild).replace("%command%", commandName).replace("%status%", LanguageSystem.getTranslation(activated ? "on" : "off", author, guild)), false).build()).queue();
 			return;
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandcantbetoggled", "thiscommandcantbetoggled", false).build()).queue();

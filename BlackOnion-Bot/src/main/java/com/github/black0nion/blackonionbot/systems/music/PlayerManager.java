@@ -130,7 +130,7 @@ public class PlayerManager {
 		                	musicManager.scheduler.queue(track, manager, vc);
 	                	});
                 	} else {
-                		builder.setDescription(LanguageSystem.getTranslatedString("thistracksplusadded", author, channel.getGuild()).replace("%tracks%", String.valueOf(tracks.size() - 10)));
+                		builder.setDescription(LanguageSystem.getTranslation("thistracksplusadded", author, channel.getGuild()).replace("%tracks%", String.valueOf(tracks.size() - 10)));
                 		for (int i = 0; i < tracks.size(); i++) {
                 			final AudioTrack track = tracks.get(i);
 							musicManager.scheduler.queue(track, manager, vc);

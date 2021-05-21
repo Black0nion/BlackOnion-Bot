@@ -66,7 +66,7 @@ public class GiveawayCommand implements Command {
 		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
 		final Date finalEndDate = endDate;
 		final int finalWinnersCount = winnersCount;
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslatedString("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslatedString("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).queue(msg -> {
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("GIVEAWAY").addField(LanguageSystem.getTranslation("giveawayfor", author, guild).replace("%item%", item).replace("%winners%", String.valueOf(winnersCount)), LanguageSystem.getTranslation("giveawayend", author, guild).replace("%end%", format.format(endDate).replace("_", " ")), false).build()).queue(msg -> {
 			msg.addReaction("U+1F389").queue();
 			GiveawaysSystem.createGiveaway(finalEndDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, finalWinnersCount);
 		});
