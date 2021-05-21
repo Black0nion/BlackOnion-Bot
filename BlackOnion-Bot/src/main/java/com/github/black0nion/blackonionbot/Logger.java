@@ -24,9 +24,8 @@ public class Logger {
 			System.out.println(log);
 		}
 		try {
-			File dir = new File("files/logs/log." + origin.name().toLowerCase());
 			File file = new File("files/logs/log." + origin.name().toLowerCase() + "/" + origin.name().toLowerCase() + "." + mode.name().toLowerCase() + ".log");
-			dir.mkdirs();
+			file.getParentFile().mkdirs();
 			file.createNewFile();
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("files/logs/log." + origin.name().toLowerCase() + "/" + origin.name().toLowerCase() + "." + mode.name().toLowerCase() + ".log", true)));
 		    out.println(log);

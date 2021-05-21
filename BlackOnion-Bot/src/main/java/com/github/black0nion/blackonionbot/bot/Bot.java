@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -151,38 +150,22 @@ public class Bot extends ListenerAdapter {
 	public void onReady(ReadyEvent e) {
 		BotInformation.botId = e.getJDA().getSelfUser().getIdLong();
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
-		Thread status = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-				while (true) {
-					try {
-						String activityType = ValueManager.getString("activityType");
-						if (activityType != null && (!activityType.equalsIgnoreCase("") && !(activityType.equalsIgnoreCase("none")))) {
-							e.getJDA().getPresence().setActivity(ActivityCommand.getActivity());
-							Thread.sleep(5000);
-						}
-						e.getJDA().getPresence().setActivity(Activity.listening("the prefix " + BotInformation.defaultPrefix));
-						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening("the OS " + os.getName()));
-						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening("with " + os.getAvailableProcessors() + " CPU cores"));
-						Thread.sleep(5000);
-						e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
-						Thread.sleep(5000);
-//						e.getJDA().getPresence().setActivity(Activity.listening("mit " + Utils.round("#.###", (double) getOsThings(os).get("getProcessCpuLoad")) + "% CPU Load"));
-//						Thread.sleep(5000);
-//						e.getJDA().getPresence().setActivity(Activity.listening("mit " + Utils.round("#.##", (double) getOsThings(os).get("getSystemCpuLoad")).substring(2) +"% insgesamtem CPU Load"));
-//						Thread.sleep(5000);
-					} catch (Exception e) {
-						if (runMode == RunMode.PRODUCTION)
-							e.printStackTrace();
+		executor.submit(() -> {
+			while (true) {
+				try {
+					String activityType = ValueManager.getString("activityType");
+					if (activityType != null && (!activityType.equalsIgnoreCase("") && !(activityType.equalsIgnoreCase("none")))) {
+						e.getJDA().getPresence().setActivity(ActivityCommand.getActivity());
+						Thread.sleep(60000);
 					}
+					e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
+					Thread.sleep(60000);
+				} catch (Exception ex) {
+					if (runMode == RunMode.PRODUCTION)
+						ex.printStackTrace();
 				}
 			}
 		});
-		status.setName("Status");
-		status.start();
 		
 		/** @Deprecated: not working due to not be able to message not cached users on Discord's side (intended)
 		notifyStatusUsers.forEach(userId -> {
