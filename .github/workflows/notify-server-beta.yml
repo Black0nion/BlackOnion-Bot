@@ -1,0 +1,24 @@
+name: NotifyServerBETA
+
+on:
+  push:
+    tags: 'b*'
+
+jobs:
+  check-for-changes:
+    runs-on: ubuntu-latest
+    steps:
+    - shell: bash
+      env:
+        API_KEY: ${{ secrets.API_KEY_BETA }}
+        API_ENDPOINT: ${{ secrets.API_ENDPOINT_BETA }}
+      run: |
+        answer=$(curl --location --request POST 'https://www.black-onion.com'"${API_ENDPOINT}"'' --header 't0k3n: '"${API_KEY}"'')
+        if [[ $answer == *"Successfully started the script!"* ]];
+        then
+          echo Successfully connected and started the script!
+          exit 0
+        else
+          echo Could not connect!
+          exit 1
+        fi
