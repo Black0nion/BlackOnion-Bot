@@ -324,4 +324,22 @@ public class Utils {
 
 	    return c;
 	}
+	
+	/**
+	 * Shortcut for {@link getOrDefault}
+	 */
+	public static <T> T gOD(T value, T defaultValue) {
+		return getOrDefault(value, defaultValue);
+	}
+	
+	/**
+	 * If value isn't null, return value, else, return defaultValue
+	 * @param <T>
+	 * @param value
+	 * @param defaultValue
+	 * @return value if value isn't null, else defaultValue
+	 */
+	public static <T> T getOrDefault(T value, T defaultValue) {
+		return (value != null ? value : defaultValue);
+	}
 }
