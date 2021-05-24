@@ -6,9 +6,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.misc.BlackHashMap;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardBoolean;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.types.DashboardMultipleChoice;

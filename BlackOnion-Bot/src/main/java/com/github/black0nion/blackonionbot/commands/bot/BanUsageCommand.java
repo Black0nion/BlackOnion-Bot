@@ -4,6 +4,10 @@ import java.time.Duration;
 
 import org.bson.Document;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -12,11 +16,8 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mongodb.client.MongoCollection;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class BanUsageCommand implements Command {
@@ -29,7 +30,7 @@ public class BanUsageCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		message.delete().queue();
 		if (args.length >= 2) {
 			final String stuffToBan = args[2];

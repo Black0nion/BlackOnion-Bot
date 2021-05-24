@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.misc;
+package com.github.black0nion.blackonionbot.blackobjects;
 
 import java.util.HashMap;
 

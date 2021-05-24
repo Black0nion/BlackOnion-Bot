@@ -3,16 +3,16 @@ package com.github.black0nion.blackonionbot.commands.misc;
 import org.menudocs.paste.PasteClient;
 import org.menudocs.paste.PasteClientBuilder;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class PastebinCommand implements Command {
@@ -27,7 +27,7 @@ public class PastebinCommand implements Command {
 			.build();
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final String language = args[1];
 		final String contentRaw = e.getMessage().getContentRaw();
 		final int index = contentRaw.indexOf(language) + language.length();

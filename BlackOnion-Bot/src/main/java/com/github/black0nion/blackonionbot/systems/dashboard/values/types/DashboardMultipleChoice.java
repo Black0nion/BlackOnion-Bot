@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems.dashboard.values.types;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.misc.BlackHashMap;
+import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
 import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;

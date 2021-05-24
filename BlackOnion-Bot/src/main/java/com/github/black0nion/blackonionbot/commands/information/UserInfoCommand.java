@@ -2,6 +2,10 @@ package com.github.black0nion.blackonionbot.commands.information;
 
 import java.time.format.DateTimeFormatter;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -11,7 +15,6 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -28,11 +31,11 @@ public class UserInfoCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		Member statsMember = null;
 		User statsUser = null;
-		if (message.getMentionedMembers().size() > 0) {
-			statsMember = message.getMentionedMembers().get(0);
+		if (message.getMentionedBlackMembers().size() > 0) {
+			statsMember = message.getMentionedBlackMembers().get(0);
 			statsUser = statsMember.getUser();
 			message.reply(getUserInfo(author, member, statsUser, statsMember).build()).queue();
 		} else {
