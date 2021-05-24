@@ -3,11 +3,15 @@ package com.github.black0nion.blackonionbot.blackobjects;
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Category;
@@ -34,18 +38,23 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.ReactionPaginationAction;
 
 public class BlackMessage implements Message {
+	
 	private final Message message;
 	private final BlackMember blackMember;
 	private final BlackUser blackUser;
 	private final BlackGuild blackGuild;
 	
-	private static final HashMap<Message, BlackMessage> cachedMessages = new HashMap<>();
+	private static final LoadingCache<Message, BlackMessage> messages = CacheBuilder.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build(new CacheLoader<Message, BlackMessage>() {
+                @Override
+                public BlackMessage load(final Message message) {
+                    return new BlackMessage(message);
+                }
+            });
 	
 	public static BlackMessage from(@NotNull final Message message) {
-		if (cachedMessages.containsKey(message))
-			return cachedMessages.get(message);
-		else
-			return new BlackMessage(message);
+		return messages.getUnchecked(message);
 	}
 	
 	private BlackMessage(@NotNull final Message message) {
