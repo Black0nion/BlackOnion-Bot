@@ -5,6 +5,10 @@ import static com.github.black0nion.blackonionbot.systems.language.LanguageSyste
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -16,8 +20,6 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -31,9 +33,9 @@ public class ConnectFourCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
-		if (message.getMentionedUsers().size() != 0) {
-			User challenged = message.getMentionedUsers().get(0);
+	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		if (message.getMentionedBlackUsers().size() != 0) {
+			BlackUser challenged = message.getMentionedBlackUsers().get(0);
 			if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
 				message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
 				return;

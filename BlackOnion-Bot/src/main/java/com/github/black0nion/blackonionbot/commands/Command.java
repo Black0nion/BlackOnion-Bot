@@ -1,15 +1,15 @@
 package com.github.black0nion.blackonionbot.commands;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.Progress;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public interface Command {
@@ -19,7 +19,7 @@ public interface Command {
 	
 	String[] getCommand();
 
-	void execute(String[] args, final GuildMessageReceivedEvent e, final Message message, final Member member, final User author, final Guild guild, final TextChannel channel);
+	void execute(String[] args, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
 	
 	default String getSyntax() {
 		return "";

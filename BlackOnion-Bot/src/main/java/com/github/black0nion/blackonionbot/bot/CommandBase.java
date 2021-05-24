@@ -14,6 +14,10 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
@@ -34,11 +38,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.vdurmont.emoji.EmojiParser;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -105,14 +105,14 @@ public class CommandBase extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		final User author = event.getAuthor();
+		final BlackUser author = BlackUser.from(event.getAuthor());
 		if (author.isBot()) return;
 		
-		final Guild guild = event.getGuild();
+		final BlackGuild guild = BlackGuild.from(event.getGuild());
+		final BlackMember member = BlackMember.from(event.getMember());
 		final String prefix = BotInformation.getPrefix(guild);
 		final TextChannel channel = event.getChannel();
-		final Member member = event.getMember();
-		final Message message = event.getMessage();
+		final BlackMessage message = BlackMessage.from(event.getMessage());
 		final String msgContent = message.getContentRaw();
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n"));
 		final String[] args = msgContent.split(" ");

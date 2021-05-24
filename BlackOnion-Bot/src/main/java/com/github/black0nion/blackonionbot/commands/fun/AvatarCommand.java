@@ -1,7 +1,12 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.time.Instant;
+import java.util.List;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -10,7 +15,6 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -25,12 +29,13 @@ public class AvatarCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, Message message, Member member, User author, Guild guild, TextChannel channel) {
+	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		User mentionedUser = author;
 		if (args.length > 1) {			
 			String user = String.join(" ", Utils.removeFirstArg((args)));
-			if (!message.getMentionedUsers().isEmpty()) {
-				mentionedUser = message.getMentionedUsers().get(0);
+			final List<BlackUser> mentionedBlackUsers = message.getMentionedBlackUsers();
+			if (!mentionedBlackUsers.isEmpty()) {
+				mentionedUser = mentionedBlackUsers.get(0);
 			} else {
 				if (!Utils.isLong(user)) {
 					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
