@@ -102,6 +102,7 @@ public class LanguageSystem {
 	}
 	
 	public static Language getLanguageFromName(String name) {
+		if (name == null) return null;
 		try {
 			return languages.get(name.toUpperCase());
 		} catch (Exception ignored) {}

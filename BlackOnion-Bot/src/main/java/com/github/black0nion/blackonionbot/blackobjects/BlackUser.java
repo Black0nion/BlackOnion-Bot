@@ -7,11 +7,18 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.systems.language.Language;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,9 +27,15 @@ import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
+import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
+
 public class BlackUser implements User {
 	
 	private final User user;
+	
+	private Language language;
+	
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.botDatabase);
 
 	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
@@ -45,8 +58,21 @@ public class BlackUser implements User {
 		return users.stream().map(user -> from(user)).collect(Collectors.toList());
 	}
 	
-	private BlackUser(User user) {
+	private BlackUser(final User user) {
 		this.user = user;
+		
+		Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
+		
+		gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+	}
+	
+	public Language getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(Language language) {
+		this.language = language;
+		// TODO: make method to save something to the user's config
 	}
 
 	@Override
