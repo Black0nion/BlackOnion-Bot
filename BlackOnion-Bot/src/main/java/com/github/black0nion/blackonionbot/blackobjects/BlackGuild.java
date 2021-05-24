@@ -3,14 +3,18 @@ package com.github.black0nion.blackonionbot.blackobjects;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
@@ -47,15 +51,20 @@ import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 
 public class BlackGuild implements Guild {
+	
 	private final Guild guild;
 	
-	private static final HashMap<Guild, BlackGuild> cachedGuilds = new HashMap<>();
+	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build(new CacheLoader<Guild, BlackGuild>() {
+                @Override
+                public BlackGuild load(final Guild guild) {
+                    return new BlackGuild(guild);
+                }
+            });
 	
 	public static BlackGuild from(@NotNull final Guild guild) {
-		if (cachedGuilds.containsKey(guild))
-			return cachedGuilds.get(guild);
-		else
-			return new BlackGuild(guild);
+		return guilds.getUnchecked(guild);
 	}
 	
 	private BlackGuild(@NotNull final Guild guild) {

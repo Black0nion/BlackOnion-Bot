@@ -5,11 +5,15 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -27,16 +31,21 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 
 public class BlackMember implements Member {
+	
 	private final Member member;
 	private final BlackGuild blackGuild;
 	
-	private static final HashMap<Member, BlackMember> cachedMembers = new HashMap<>();
+	private static final LoadingCache<Member, BlackMember> guilds = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build(new CacheLoader<Member, BlackMember>() {
+                @Override
+                public BlackMember load(final Member member) {
+                    return new BlackMember(member, BlackGuild.from(member.getGuild()));
+                }
+            });
 	
-	public static BlackMember from(@NotNull final Member member) {
-		if (cachedMembers.containsKey(member))
-			return cachedMembers.get(member);
-		else
-			return new BlackMember(member, BlackGuild.from(member.getGuild()));
+	public static BlackMember from(final Member member) {
+		return guilds.getUnchecked(member);
 	}
 	
 	public static List<BlackMember> from(@NotNull final List<Member> members) {

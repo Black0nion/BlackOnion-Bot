@@ -3,11 +3,15 @@ package com.github.black0nion.blackonionbot.blackobjects;
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,23 +21,24 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
 public class BlackUser implements User {
+	
 	private final User user;
 
-	private static final HashMap<User, BlackUser> cachedUsers = new HashMap<>();
+	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build(new CacheLoader<User, BlackUser>() {
+                @Override
+                public BlackUser load(final User user) {
+                    return new BlackUser(user);
+                }
+            });
 	
 	public static BlackUser from(@NotNull final Member member) {
-		final User user = member.getUser();
-		if (cachedUsers.containsKey(user))
-			return cachedUsers.get(user);
-		else
-			return new BlackUser(user);
+		return from(member.getUser());
 	}
 
 	public static BlackUser from(@NotNull final User user) {
-		if (cachedUsers.containsKey(user))
-			return cachedUsers.get(user);
-		else
-			return new BlackUser(user);
+		return users.getUnchecked(user);
 	}
 	
 	public static List<BlackUser> from(final List<User> users) {
