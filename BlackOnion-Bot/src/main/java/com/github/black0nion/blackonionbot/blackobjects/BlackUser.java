@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
+import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
+
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Formatter;
@@ -27,13 +29,9 @@ import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
-import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
-
 public class BlackUser implements User {
 	
 	private final User user;
-	
-	private Language language;
 	
 	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.botDatabase);
 
@@ -42,7 +40,8 @@ public class BlackUser implements User {
             .build(new CacheLoader<User, BlackUser>() {
                 @Override
                 public BlackUser load(final User user) {
-                    return new BlackUser(user);
+                	BlackUser blacc = new BlackUser(user);
+                    return blacc;
                 }
             });
 	
@@ -58,12 +57,20 @@ public class BlackUser implements User {
 		return users.stream().map(user -> from(user)).collect(Collectors.toList());
 	}
 	
+	private Language language;
+	
 	private BlackUser(final User user) {
 		this.user = user;
 		
-		Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
+		try {
+			Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
+			
+			if (config == null) config = new Document();
 		
-		gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public Language getLanguage() {
@@ -72,7 +79,11 @@ public class BlackUser implements User {
 	
 	public void setLanguage(Language language) {
 		this.language = language;
-		// TODO: make method to save something to the user's config
+		save("language", language.getLanguageCode());
+	}
+	
+	private void save(String key, Object toSave) {
+		configs.updateOne(Filters.eq("userid", this.user.getIdLong()), new Document("$set", new Document(key, toSave)));
 	}
 
 	@Override

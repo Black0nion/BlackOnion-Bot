@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.entities.User;
 public class LanguageSystem {
 	
 	static HashMap<String, Language> languages = new HashMap<>();
-	static HashMap<String, Language> userLanguages = new HashMap<>();
-	static HashMap<String, Language> guildLanguages = new HashMap<>();
+	static HashMap<Long, Language> userLanguages = new HashMap<>();
+	static HashMap<Long, Language> guildLanguages = new HashMap<>();
 	
 	static ArrayList<Language> allLanguages = new ArrayList<>();
 	
@@ -94,7 +94,7 @@ public class LanguageSystem {
 		reloadUserGuildLanguages();
 	}
 	
-	public static void updateGuildLocale(String guild, String locale) {
+	public static void updateGuildLocale(long guild, String locale) {
 		locale = locale.toUpperCase();
 		GuildManager.save(guild, "language", locale);
 		guildLanguages.remove(guild);
