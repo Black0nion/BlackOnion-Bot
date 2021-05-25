@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
+import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
+
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -10,11 +12,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
@@ -54,6 +62,8 @@ public class BlackGuild implements Guild {
 	
 	private final Guild guild;
 	
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.botDatabase);
+	
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build(new CacheLoader<Guild, BlackGuild>() {
@@ -69,6 +79,16 @@ public class BlackGuild implements Guild {
 	
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
+		
+		try {
+			Document config = configs.find(Filters.eq("userid", guild.getIdLong())).first();
+			
+			if (config == null) config = new Document();
+		
+			gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@NotNull

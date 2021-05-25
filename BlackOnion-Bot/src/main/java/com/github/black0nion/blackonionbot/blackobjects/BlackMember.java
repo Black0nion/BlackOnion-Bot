@@ -51,6 +51,7 @@ public class BlackMember implements Member {
 	public static List<BlackMember> from(@NotNull final List<Member> members) {
 		return members.stream().map(mem -> from(mem)).collect(Collectors.toList());
 	}
+	
 	private BlackMember(@NotNull final Member member, BlackGuild blackGuild) {
 		this.member = member;
 		this.blackGuild = blackGuild;
