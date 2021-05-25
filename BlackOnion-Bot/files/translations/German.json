@@ -202,6 +202,7 @@
     "on": "an",
     "off": "aus",
     "delete": "löschen",
+    "remove": "entfernen und neu senden",
     "dontexecuteprofanitycommands": "Kommandos können nur ohne unangebrachten Wörtern ausgeführt werden!",
     "pleaseremoveprofanity": "Bitte entferne alle unangebrachten Wörter aus deiner Nachricht!",
     "foundabug": "Du hast einen Bug gefunden?",
