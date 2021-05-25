@@ -32,6 +32,7 @@ public class ReactionRolesSetupCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		// TODO: switch to new system
 		args = message.getContentDisplay().split(" ");
 		List<TextChannel> channels = message.getMentionedChannels();
 		List<Role> roles = message.getMentionedRoles();
@@ -39,7 +40,7 @@ public class ReactionRolesSetupCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -65,7 +66,7 @@ public class ReactionRolesSetupCommand implements Command {
 						} else {
 							emote = emoteName;
 							tc.addReactionById(messageID, emote).queue(null, fail -> {
-								message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("emotenotfound", author, guild), false).build()).queue();
+								message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("emotenotfound", author, guild), false).build()).queue();
 								return;
 							});
 						}
@@ -75,7 +76,7 @@ public class ReactionRolesSetupCommand implements Command {
 									.append("channelid", tc.getIdLong())
 									.append("messageid", messageID)
 									.append("roleid", role.getIdLong())).first() != null) {
-								message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
+								message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
 								return;
 							}
 							
@@ -118,18 +119,18 @@ public class ReactionRolesSetupCommand implements Command {
 							return;
 						}
 					}, fail -> {
-						message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("errorhappened", author, guild), LanguageSystem.getTranslation("somethingwentwrong", author, guild), false).build()).queue();
+						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("errorhappened", author, guild), LanguageSystem.getTranslation("somethingwentwrong", author, guild), false).build()).queue();
 						return;
 					});
 				}, fail -> {
-					message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("messagenotfound", author, guild), LanguageSystem.getTranslation("messagecouldntbefound", author, guild), false).build()).queue();
+					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("messagenotfound", author, guild), LanguageSystem.getTranslation("messagecouldntbefound", author, guild), false).build()).queue();
 					return;
 				});
 			} catch (NumberFormatException ex) {
-				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
 			}
 		} else {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).queue();
 		}
 	}
 	

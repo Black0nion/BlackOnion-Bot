@@ -14,11 +14,8 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AvatarCommand implements Command {
@@ -30,7 +27,7 @@ public class AvatarCommand implements Command {
 
 	@Override
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		User mentionedUser = author;
+		BlackUser mentionedUser = BlackUser.from(author);
 		if (args.length > 1) {			
 			String user = String.join(" ", Utils.removeFirstArg((args)));
 			final List<BlackUser> mentionedBlackUsers = message.getMentionedBlackUsers();
@@ -43,7 +40,7 @@ public class AvatarCommand implements Command {
 				}
 				
 				e.getJDA().retrieveUserById(user.trim()).queue(uzer -> {
-					print(author, uzer, guild, channel, message);
+					print(author, BlackUser.from(uzer), guild, channel, message);
 				}, failure -> {
 					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "someerrorhappened", false).build()).queue();
 				});
@@ -54,7 +51,7 @@ public class AvatarCommand implements Command {
 		print(author, mentionedUser, guild, channel, message);
 	}
 	
-	private static void print(User author, User mentionedUser, Guild guild, MessageChannel channel, Message message) {
+	private static void print(BlackUser author, BlackUser mentionedUser, BlackGuild guild, MessageChannel channel, BlackMessage message) {
 		EmbedBuilder builder = new EmbedBuilder()
 			.setTitle(LanguageSystem.getTranslation("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 				.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")

@@ -19,11 +19,7 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
@@ -41,7 +37,7 @@ public class HelpCommand implements Command {
 				// a command
 				for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
-						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), e.getAuthor(), e.getGuild());
+						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), author, guild);
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
 						message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(Utils.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
@@ -73,7 +69,7 @@ public class HelpCommand implements Command {
 				message.reply(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
 						msg.addReaction(Utils.numbersUnicode.get(i)).queue();
-					waitForHelpCatSelection(msg, member, cats.length+1);
+					waitForHelpCatSelection(BlackMessage.from(msg), member, cats.length+1);
 				});
 			}
 		} catch (Exception ex) {
@@ -88,7 +84,7 @@ public class HelpCommand implements Command {
 		}
 	}
 	
-	private static final void waitForHelpCatSelection(Message msg, Member author, int catCount) {
+	private static final void waitForHelpCatSelection(BlackMessage msg, BlackMember author, int catCount) {
 		CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class, 
 				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUserIdLong() == author.getIdLong(), 
 				(event) -> {
@@ -98,11 +94,11 @@ public class HelpCommand implements Command {
 					if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || catCount < emojiReactionNum)
 						waitForHelpCatSelection(msg, author, catCount);
 					
-					final Guild guild = msg.getGuild();
-					final User user = author.getUser();
+					final BlackGuild guild = msg.getBlackGuild();
+					final BlackUser user = author.getBlackUser();
 					
 					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild)
-							.setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", author.getUser(), guild));
+							.setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", user, guild));
 					
 					if (emojiReactionNum == 0) {
 						builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + LanguageSystem.getTranslation("modules", user, guild));

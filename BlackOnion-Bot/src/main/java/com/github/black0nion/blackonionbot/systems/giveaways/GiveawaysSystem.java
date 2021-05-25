@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.bson.Document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -21,7 +22,6 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 
@@ -82,7 +82,7 @@ public class GiveawaysSystem {
 	
 	public static void scheduleGiveaway(Giveaway giveaway) {
 		Date endDate = giveaway.getEndDate();
-		Guild guild = Bot.jda.getGuildById(giveaway.getGuildId());
+		BlackGuild guild = BlackGuild.from(Bot.jda.getGuildById(giveaway.getGuildId()));
 		guild.getTextChannelById(giveaway.getChannelId()).retrieveMessageById(giveaway.getMessageId()).queue(msg -> {
 			final int winnas = giveaway.getWinners();
 			if (msg == null) {

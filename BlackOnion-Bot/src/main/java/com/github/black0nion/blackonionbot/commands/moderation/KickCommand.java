@@ -27,12 +27,12 @@ public class KickCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
 		if (mentionedMembers.size() == 0) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
 			guild.kick(mentionedMembers.get(0)).queue();
 			final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : LanguageSystem.getTranslation("yougotkicked", author);
-			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Kick").addField("usergotkicked", LanguageSystem.getTranslation("message", author, guild) + ": " + kickMessage, false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Kick").addField("usergotkicked", LanguageSystem.getTranslation("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			mentionedMembers.get(0).getBlackUser().openPrivateChannel().queue(c -> { 
 				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Kick").addField("yougotkicked", LanguageSystem.getTranslation("message", author, guild) + ": " + kickMessage, false).build()).queue();
 			});

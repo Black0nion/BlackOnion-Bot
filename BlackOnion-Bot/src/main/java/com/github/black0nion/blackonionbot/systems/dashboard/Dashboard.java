@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -58,9 +59,10 @@ public class Dashboard {
 		final String[] input = message.split(" ");
 		// syntax: guildid databasekey newvalue
 		final String[] args = Utils.removeFirstArg(input);
-		if (args.length < 3) return false;
+		final String guildid = args[0];
+		if (args.length < 3 || !Utils.isLong(guildid)) return false;
 		DashboardValue value = getDashboardValueFromKey(input[2]);
 		if (value == null) return false;
-		return value.save(args[1], args[2], args[0]);
+		return value.save(args[1], args[2], BlackGuild.from(Long.parseLong(guildid)));
 	}
 }

@@ -6,7 +6,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -26,19 +26,17 @@ public class AntiSpoilerCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (Utils.handleRights(guild, author, null, Permission.MESSAGE_MANAGE)) return;
 		if (args.length >= 2) {
-			if (args[1].equalsIgnoreCase("on")) {
-				GuildManager.save(guild, "antispoiler", true);
-				GuildManager.save(guild, "deletespoiler", false);
+			final String type = args[1];
+			if (type.equalsIgnoreCase("remove")) {
+				guild.setAntiSpoilerType(AntiSpoilerType.REMOVE);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "on"), false).build()).queue();
 				return;
-			} else if (args[1].equalsIgnoreCase("delete")) {
-				GuildManager.save(guild, "antispoiler", false);
-				GuildManager.save(guild, "deletespoiler", true);
+			} else if (type.equalsIgnoreCase("delete")) {
+				guild.setAntiSpoilerType(AntiSpoilerType.DELETE);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "delete"), false).build()).queue();
 				return;
-			} else if (args[1].equalsIgnoreCase("off")) {
-				GuildManager.save(guild, "antispoiler", false);
-				GuildManager.save(guild, "deletespoiler", false);
+			} else if (type.equalsIgnoreCase("off")) {
+				guild.setAntiSpoilerType(AntiSpoilerType.OFF);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "off"), false).build()).queue();
 				return;
 			} else {
@@ -46,9 +44,7 @@ public class AntiSpoilerCommand implements Command {
 				return;
 			}
 		} else {
-			boolean antispoiler = GuildManager.getBoolean(guild, "antispoiler");
-			boolean deletespoiler = GuildManager.getBoolean(guild, "deletespoiler");
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation((antispoiler ? "on" : (!deletespoiler ? "off" : "delete")), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + Utils.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSpoilerType().name(), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + Utils.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
 			return;
 		}
 	}

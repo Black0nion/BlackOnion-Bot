@@ -5,17 +5,27 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
+import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -77,8 +87,22 @@ public class BlackGuild extends BlackObject implements Guild {
 		return guilds.getUnchecked(guild);
 	}
 	
+	@Nullable
+	public static BlackGuild from(@NotNull final long guildid) {
+		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
+		return first.isPresent() ? first.get().getValue() : null;
+	}
+	
 	private Language language;
 	private boolean isPremium;
+	private AntiSpoilerType antiSpoilerType;
+	private AntiSwearType antiSwearType;
+	private String prefix;
+	private String joinMessage;
+	private long joinChannel;
+	private String leaveMessage;
+	private long leaveChannel;
+	private List<Command> disabledCommands;
 	
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
@@ -88,8 +112,19 @@ public class BlackGuild extends BlackObject implements Guild {
 			
 			if (config == null) config = new Document();
 		
-			language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
-			isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
+			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
+			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
+			this.antiSpoilerType = gOD(AntiSpoilerType.valueOf(config.getString("antiSpoiler").toUpperCase()), AntiSpoilerType.OFF);
+			this.antiSwearType = gOD(AntiSwearType.valueOf(config.getString("antiSwear").toUpperCase()), AntiSwearType.NONE);
+			this.joinMessage = gOD(config.getString("joinmessage"), this.language.getTranslatedString("defaultjoinmessage"));
+			this.joinChannel = gOD(config.getLong("joinchannel"), -1L);
+			this.leaveMessage = gOD(config.getString("leavemessage"), this.language.getTranslatedString("defaultleavemessage"));
+			this.leaveChannel = gOD(config.getLong("leavechannel"), -1L);
+			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
+			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
+				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -108,6 +143,81 @@ public class BlackGuild extends BlackObject implements Guild {
 		return isPremium;
 	}
 	
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+		save("prefix", prefix);
+	}
+	
+	public String getJoinMessage() {
+		return joinMessage;
+	}
+	
+	public void setJoinMessage(String newMessage) {
+		this.joinMessage = newMessage;
+		save("joinmessage", this.joinMessage);
+	}
+	
+	public long getJoinChannel() {
+		return joinChannel;
+	}
+	
+	public void setJoinChannel(long joinChannel) {
+		this.joinChannel = joinChannel;
+		save("joinchannel", joinChannel);
+	}
+	
+	public String getLeaveMessage() {
+		return leaveMessage;
+	}
+	
+	public void setLeaveMessage(String leaveMessage) {
+		this.leaveMessage = leaveMessage;
+		save("leavemessage", leaveMessage);
+	}
+	
+	public long getLeaveChannel() {
+		return leaveChannel;
+	}
+	
+	public void setLeaveChannel(long leaveChannel) {
+		this.leaveChannel = leaveChannel;
+		if (leaveChannel == -1)
+			clear("leavechannel");
+		save("leaveChannel", leaveChannel);
+	}
+	
+	public List<Command> getDisabledCommands() {
+		return this.disabledCommands;
+	}
+	
+	public void setDisabledCommands(List<Command> disabledCommands) {
+		this.disabledCommands = disabledCommands;
+		saveList("disabledCommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
+	}
+		
+	public AntiSpoilerType getAntiSpoilerType() {
+		return antiSpoilerType;
+	}
+	
+	public void setAntiSpoilerType(AntiSpoilerType antiSpoilerType) {
+		this.antiSpoilerType = antiSpoilerType;
+		save("antiSpoiler", antiSpoilerType.name());
+	}
+	
+	public AntiSwearType getAntiSwearType() {
+		return antiSwearType;
+	}
+	
+	public void setAntiSwearType(AntiSwearType antiSwearType) {
+		this.antiSwearType = antiSwearType;
+		save("antiSwear", antiSwearType.name());
+	}
+	
+	// override methods
 	@Override
 	public Bson getFilter() {
 		return Filters.eq("userid", this.guild.getIdLong());

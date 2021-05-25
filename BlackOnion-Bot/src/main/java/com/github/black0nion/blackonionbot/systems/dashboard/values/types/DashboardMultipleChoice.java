@@ -2,10 +2,10 @@ package com.github.black0nion.blackonionbot.systems.dashboard.values.types;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
 public class DashboardMultipleChoice extends DashboardValue {
 	
@@ -30,9 +30,9 @@ public class DashboardMultipleChoice extends DashboardValue {
 	}
 
 	@Override
-	public boolean save(String key, String value, String guild) {
+	public boolean save(String key, String value, BlackGuild guild) {
 		if (possibleValues.containsKey(value)) {			
-			GuildManager.save(guild, key, value);
+			guild.save(key, value);
 			return true;
 		}
 		return false;

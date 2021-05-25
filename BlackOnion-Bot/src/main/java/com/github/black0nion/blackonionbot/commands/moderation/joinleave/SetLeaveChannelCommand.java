@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -27,10 +26,10 @@ public class SetLeaveChannelCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
-			GuildManager.remove(guild, "leavechannel");
+			guild.setLeaveChannel(-1);
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelcleared", "leavechannelclearedinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} else {
-			GuildManager.save(guild.getId(), "leavechannel", channel.getId());
+			guild.setLeaveChannel(channel.getIdLong());
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("leavechannelset", "leavechannelsetinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}
 	}
