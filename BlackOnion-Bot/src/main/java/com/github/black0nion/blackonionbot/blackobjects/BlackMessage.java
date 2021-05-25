@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.Bag;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -17,7 +16,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Category;
@@ -76,8 +74,8 @@ public class BlackMessage extends BlackObject implements Message {
 
 	// override methods
 	@Override
-	public Bson getFilter() {
-		return Filters.and(Filters.eq("guildid", this.blackGuild.getIdLong()), Filters.eq(this.channel.getIdLong()), Filters.eq("messageid", this.message.getIdLong()));
+	public Document getIdentifier() {
+		return new Document().append("guildid", this.blackGuild.getIdLong()).append("channelid", this.channel.getIdLong()).append("messageid", this.message.getIdLong());
 	}
 	
 	@Override

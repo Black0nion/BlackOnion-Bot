@@ -7,27 +7,29 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import com.mongodb.client.MongoCollection;
 
 public abstract class BlackObject {
 		
-	abstract Bson getFilter();
+	abstract Document getIdentifier();
 	
 	abstract MongoCollection<Document> getCollection();
 	
+	@Nonnull
 	public final <T> T gOS(String key, T value, T defaultValue) {
 		if (value == null) save(key, defaultValue);
 		return (value != null ? value : defaultValue);
 	}
 	
+	@Nonnull
 	public final <T> T gOD(T value, T defaultValue) {
 		return (value != null ? value : defaultValue);
 	}
 	
+	@Nullable
 	public Document getConfig() {
-		return getCollection().find(getFilter()).first();
+		return getCollection().find(getIdentifier()).first();
 	}
 	
 	@Nonnull
@@ -58,7 +60,11 @@ public abstract class BlackObject {
 	}
 	
 	private void save(Document doc) {
-		getCollection().updateOne(getFilter(), new Document("$set", doc));
+		if (getCollection().find(getIdentifier()).first() == null) {
+			doc.putAll(getIdentifier());
+			getCollection().insertOne(doc);
+		} else
+			getCollection().updateOne(getIdentifier(), new Document("$set", doc));
 	}
 	
 	public void clear(String... keys) {
@@ -68,6 +74,6 @@ public abstract class BlackObject {
 	}
 	
 	public void clear(Document doc) {
-		getCollection().updateOne(getFilter(), new Document("$unset", doc));
+		getCollection().updateOne(getIdentifier(), new Document("$unset", doc));
 	}
 }

@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
@@ -122,7 +121,7 @@ public class BlackGuild extends BlackObject implements Guild {
 			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
 			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
 			this.antiSpoilerType = gOD(AntiSpoilerType.valueOf(config.getString("antiSpoiler").toUpperCase()), AntiSpoilerType.OFF);
-			this.antiSwearType = gOD(AntiSwearType.valueOf(config.getString("antiSwear").toUpperCase()), AntiSwearType.NONE);
+			this.antiSwearType = gOD(AntiSwearType.valueOf(config.getString("antiSwear").toUpperCase()), AntiSwearType.OFF);
 			this.joinMessage = gOD(config.getString("joinmessage"), this.language.getTranslatedString("defaultjoinmessage"));
 			this.joinChannel = gOD(config.getLong("joinchannel"), -1L);
 			this.leaveMessage = gOD(config.getString("leavemessage"), this.language.getTranslatedString("defaultleavemessage"));
@@ -225,8 +224,8 @@ public class BlackGuild extends BlackObject implements Guild {
 	
 	// override methods
 	@Override
-	public Bson getFilter() {
-		return Filters.eq("guildid", this.guild.getIdLong());
+	public Document getIdentifier() {
+		return new Document("guildid", this.guild.getIdLong());
 	}
 	
 	@Override

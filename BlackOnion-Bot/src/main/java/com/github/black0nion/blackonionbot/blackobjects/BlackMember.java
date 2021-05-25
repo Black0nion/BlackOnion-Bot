@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -19,7 +18,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -71,8 +69,8 @@ public class BlackMember extends BlackObject implements Member {
 	
 	// override methods
 	@Override
-	public Bson getFilter() {
-		return Filters.and(Filters.eq("guildid", this.blackGuild.getIdLong()), Filters.eq("userid", this.member.getIdLong()));
+	public Document getIdentifier() {
+		return new Document().append("guildid", this.blackGuild.getIdLong()).append("userid", this.member.getIdLong());
 	}
 	
 	@Override

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -83,8 +82,8 @@ public class BlackUser extends BlackObject implements User {
 	
 	// override methods
 	@Override
-	public Bson getFilter() {
-		return Filters.eq("userid", this.user.getIdLong());
+	public Document getIdentifier() {
+		return new Document("userid", this.user.getIdLong());
 	}
 	
 	@Override

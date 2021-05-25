@@ -53,11 +53,11 @@ public class AntiSwearSystem {
 		if (user.isBot()) return false;
 		final AntiSwearType type = guild.getAntiSwearType();
 		if (guild.isPremium()) {
-			if (type == NONE)
+			if (type == OFF)
 				return false;
 		} else {
-			if (type != NONE)
-				guild.setAntiSwearType(NONE);
+			if (type != OFF)
+				guild.setAntiSwearType(OFF);
 			return false;
 		}
 		

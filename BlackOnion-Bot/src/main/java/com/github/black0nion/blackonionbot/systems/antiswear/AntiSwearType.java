@@ -15,7 +15,7 @@ package com.github.black0nion.blackonionbot.systems.antiswear;
 public enum AntiSwearType {
 	DELETE("Deletes the message, never to be seen again."),
 	REMOVE("Removes the profanity from the message and resends the message without it."),
-	NONE;
+	OFF;
 	
 	private String description;
 	
