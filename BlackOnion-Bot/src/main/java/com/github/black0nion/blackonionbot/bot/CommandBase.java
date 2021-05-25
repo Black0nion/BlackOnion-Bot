@@ -110,7 +110,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackMember member = BlackMember.from(event.getMember());
-		final String prefix = BotInformation.getPrefix(guild);
+		final String prefix =  guild.getPrefix();
 		final TextChannel channel = event.getChannel();
 		final BlackMessage message = BlackMessage.from(event.getMessage());
 		final String msgContent = message.getContentRaw();
@@ -123,7 +123,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		if (AntiSpoilerSystem.removeSpoilers(event)) return;
 		
-		if (!args[0].startsWith(BotInformation.getPrefix(guild))) return;
+		if (!args[0].startsWith(prefix)) return;
 		String str = args[0].replace(prefix, "");
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 		if (commands.containsKey(str)) {

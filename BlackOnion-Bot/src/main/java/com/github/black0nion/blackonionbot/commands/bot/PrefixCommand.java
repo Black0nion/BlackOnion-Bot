@@ -4,7 +4,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -27,8 +26,8 @@ public class PrefixCommand implements Command {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();
 			return;
 		}
-		BotInformation.setPrefix(guild, args[1]);
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", BotInformation.getPrefix(guild)), false).build()).queue();
+		guild.setPrefix(args[1]);
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", guild.getPrefix()), false).build()).queue();
 	}
 	
 	@Override

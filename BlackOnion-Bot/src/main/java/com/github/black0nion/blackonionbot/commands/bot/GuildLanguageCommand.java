@@ -6,7 +6,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -51,7 +50,7 @@ public class GuildLanguageCommand implements Command {
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + Utils.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + BotInformation.getPrefix(guild) + "language list`", false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + Utils.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false).build()).queue();
 		}
 	}
 	

@@ -7,7 +7,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -36,7 +35,7 @@ public class CatCommand implements Command {
 			  .asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
 				// cat breed not found
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslation("catbreednotfound", author, guild).replace("%command%", BotInformation.getPrefix(guild) + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslation("catbreednotfound", author, guild).replace("%command%", guild.getPrefix() + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
 				return;
 			}
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());

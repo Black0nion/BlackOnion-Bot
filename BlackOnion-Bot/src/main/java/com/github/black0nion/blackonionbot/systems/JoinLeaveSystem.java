@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.misc.DrawType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -82,7 +81,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		final String prefix = BotInformation.getPrefix(guild);
+		final String prefix = guild.getPrefix();
 		guild.retrieveOwner().queue(user -> {
 			final BlackUser author = BlackUser.from(user.getUser());
 			author.openPrivateChannel().queue(channel -> {

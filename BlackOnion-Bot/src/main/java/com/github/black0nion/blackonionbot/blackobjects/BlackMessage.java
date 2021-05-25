@@ -7,11 +7,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.Bag;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Category;
@@ -37,12 +43,15 @@ import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.ReactionPaginationAction;
 
-public class BlackMessage implements Message {
+public class BlackMessage extends BlackObject implements Message {
+	
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
 	
 	private final Message message;
 	private final BlackMember blackMember;
 	private final BlackUser blackUser;
 	private final BlackGuild blackGuild;
+	private final TextChannel channel;
 	
 	private static final LoadingCache<Message, BlackMessage> messages = CacheBuilder.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
@@ -62,8 +71,21 @@ public class BlackMessage implements Message {
 		this.blackMember = BlackMember.from(message.getMember());
 		this.blackUser = BlackUser.from(this.blackMember);
 		this.blackGuild = BlackGuild.from(message.getGuild());
+		this.channel = message.getTextChannel();
 	}
 
+	// override methods
+	@Override
+	public Bson getFilter() {
+		return Filters.and(Filters.eq("guildid", this.blackGuild.getIdLong()), Filters.eq(this.channel.getIdLong()), Filters.eq("messageid", this.message.getIdLong()));
+	}
+	
+	@Override
+	MongoCollection<Document> getCollection() {
+		return configs;
+	}
+	
+	// built in methods
 	@Override
 	public long getIdLong() {
 		return this.message.getIdLong();

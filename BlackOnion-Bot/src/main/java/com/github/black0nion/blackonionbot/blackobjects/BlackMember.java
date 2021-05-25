@@ -9,11 +9,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,12 +36,14 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 
-public class BlackMember implements Member {
+public class BlackMember extends BlackObject implements Member {
+	
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
 	
 	private final Member member;
 	private final BlackGuild blackGuild;
 	
-	private static final LoadingCache<Member, BlackMember> guilds = CacheBuilder.newBuilder()
+	private static final LoadingCache<Member, BlackMember> members = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build(new CacheLoader<Member, BlackMember>() {
                 @Override
@@ -45,7 +53,7 @@ public class BlackMember implements Member {
             });
 	
 	public static BlackMember from(final Member member) {
-		return guilds.getUnchecked(member);
+		return members.getUnchecked(member);
 	}
 	
 	public static List<BlackMember> from(@NotNull final List<Member> members) {
@@ -60,7 +68,19 @@ public class BlackMember implements Member {
 	public Member getMember() {
         return this.member;
     }
-
+	
+	// override methods
+	@Override
+	public Bson getFilter() {
+		return Filters.and(Filters.eq("guildid", this.blackGuild.getIdLong()), Filters.eq("userid", this.member.getIdLong()));
+	}
+	
+	@Override
+	MongoCollection<Document> getCollection() {
+		return configs;
+	}
+	
+	// built in methods
     @Override
     @NotNull
     @Deprecated
