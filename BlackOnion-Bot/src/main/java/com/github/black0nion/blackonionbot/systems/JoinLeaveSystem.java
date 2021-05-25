@@ -36,7 +36,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
     
     public JoinLeaveSystem() {
     	try {
-    		InputStream inputstream = new FileInputStream(new File("files/background.png"));
+    		InputStream inputstream = new FileInputStream(new File("resources/background.png"));
 
         	defaultBackGround = ImageIO.read(inputstream);
         	return;
