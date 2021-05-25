@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -86,10 +85,10 @@ public class BlackGuild extends BlackObject implements Guild {
 	public static BlackGuild from(@NotNull final Guild guild) {
 		try {
 			return guilds.get(guild);
-		} catch (ExecutionException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 	
 	@Nullable
@@ -120,8 +119,8 @@ public class BlackGuild extends BlackObject implements Guild {
 			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
 			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
-			this.antiSpoilerType = gOD(AntiSpoilerType.valueOf(config.getString("antiSpoiler").toUpperCase()), AntiSpoilerType.OFF);
-			this.antiSwearType = gOD(AntiSwearType.valueOf(config.getString("antiSwear").toUpperCase()), AntiSwearType.OFF);
+			this.antiSpoilerType = gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
+			this.antiSwearType = gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
 			this.joinMessage = gOD(config.getString("joinmessage"), this.language.getTranslatedString("defaultjoinmessage"));
 			this.joinChannel = gOD(config.getLong("joinchannel"), -1L);
 			this.leaveMessage = gOD(config.getString("leavemessage"), this.language.getTranslatedString("defaultleavemessage"));

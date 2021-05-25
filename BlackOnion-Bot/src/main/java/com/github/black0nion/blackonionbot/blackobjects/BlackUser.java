@@ -48,7 +48,12 @@ public class BlackUser extends BlackObject implements User {
 	}
 
 	public static BlackUser from(@NotNull final User user) {
-		return users.getUnchecked(user);
+		try {
+			return users.get(user);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static List<BlackUser> from(final List<User> users) {

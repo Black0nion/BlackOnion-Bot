@@ -61,7 +61,12 @@ public class BlackMessage extends BlackObject implements Message {
             });
 	
 	public static BlackMessage from(@NotNull final Message message) {
-		return messages.getUnchecked(message);
+		try {
+			return messages.get(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	private BlackMessage(@NotNull final Message message) {
