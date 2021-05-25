@@ -30,4 +30,9 @@ public enum AntiSwearType {
 	public String getDescription() {
 		return description;
 	}
+	
+	public static AntiSwearType parse(String input) {
+		if (input == null || input == "") return null;
+		return valueOf(input.toUpperCase());
+	}
 }

@@ -51,7 +51,12 @@ public class BlackMember extends BlackObject implements Member {
             });
 	
 	public static BlackMember from(final Member member) {
-		return members.getUnchecked(member);
+		try {
+			return members.get(member);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static List<BlackMember> from(@NotNull final List<Member> members) {

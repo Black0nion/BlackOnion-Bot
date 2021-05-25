@@ -30,4 +30,9 @@ public enum AntiSpoilerType {
 	public String getDescription() {
 		return description;
 	}
+	
+	public static AntiSpoilerType parse(String input) {
+		if (input == null || input == "") return null;
+		return valueOf(input.toUpperCase());
+	}
 }
