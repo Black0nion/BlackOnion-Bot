@@ -61,8 +61,9 @@ public abstract class BlackObject {
 	
 	private void save(Document doc) {
 		if (getCollection().find(getIdentifier()).first() == null) {
-			doc.putAll(getIdentifier());
-			getCollection().insertOne(doc);
+			Document newDoc = getIdentifier();
+			newDoc.putAll(doc);
+			getCollection().insertOne(newDoc);
 		} else
 			getCollection().updateOne(getIdentifier(), new Document("$set", doc));
 	}
