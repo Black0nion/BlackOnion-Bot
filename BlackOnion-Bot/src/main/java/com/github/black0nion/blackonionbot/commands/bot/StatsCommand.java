@@ -42,7 +42,7 @@ public class StatsCommand implements Command {
 			EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
 				.setTitle("Bot Stats")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-				.addField("Prefix", "``" + BotInformation.getPrefix(guild) + "``", true)
+				.addField("Prefix", "``" + guild.getPrefix() + "``", true)
 				.addField("RunMode", Bot.runMode.name().toUpperCase(), true)
 				.addField("OS", osName, true)
 				.addField("CPU Name", cpuName, true)

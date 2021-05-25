@@ -23,7 +23,6 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.LogMode;
@@ -34,10 +33,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 
 public class Utils {
 	
@@ -215,9 +212,9 @@ public class Utils {
 		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 	
-	public static String getCommandHelp(Guild guild, User author, Command command) {
+	public static String getCommandHelp(BlackGuild guild, BlackUser author, Command command) {
 		final String syntax = command.getSyntax();
-		return "`" + BotInformation.getPrefix(guild) + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
+		return "`" + guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
 	}
 	
 	public static MessageEmbed getWrongArgument(BlackUser author, BlackGuild guild, Command command) {
