@@ -1,7 +1,5 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
-import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
-
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -13,10 +11,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -58,11 +58,11 @@ import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 
-public class BlackGuild implements Guild {
+public class BlackGuild extends BlackObject implements Guild {
 	
 	private final Guild guild;
 	
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.botDatabase);
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
 	
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
@@ -77,6 +77,9 @@ public class BlackGuild implements Guild {
 		return guilds.getUnchecked(guild);
 	}
 	
+	private Language language;
+	private boolean isPremium;
+	
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
 		
@@ -85,12 +88,37 @@ public class BlackGuild implements Guild {
 			
 			if (config == null) config = new Document();
 		
-			gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public Language getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(Language language) {
+		this.language = language;
+		save("language", language.getLanguageCode());
+	}
+	
+	public boolean isPremium() {
+		return isPremium;
+	}
+	
+	@Override
+	public Bson getFilter() {
+		return Filters.eq("userid", this.guild.getIdLong());
+	}
+	
+	@Override
+	MongoCollection<Document> getCollection() {
+		return configs;
+	}
+	
+	// built in methods
 	@NotNull
 	@Override
 	public RestAction<EnumSet<Region>> retrieveRegions(final boolean b) {

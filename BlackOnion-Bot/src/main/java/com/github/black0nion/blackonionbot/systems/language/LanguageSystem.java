@@ -2,20 +2,33 @@ package com.github.black0nion.blackonionbot.systems.language;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
-import org.bson.Document;
-
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.utils.CustomManager;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.managers.GuildManager;
 
 public class LanguageSystem {
 	
 	static HashMap<String, Language> languages = new HashMap<>();
 	static HashMap<Long, Language> userLanguages = new HashMap<>();
 	static HashMap<Long, Language> guildLanguages = new HashMap<>();
+	
+	private static final LoadingCache<BlackGuild, Language> guildsLanguages = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build(new CacheLoader<BlackGuild, Language>() {
+                @Override
+                public Language load(final BlackGuild guild) {
+                    return guild.getLanguage();
+                }
+            });
 	
 	static ArrayList<Language> allLanguages = new ArrayList<>();
 	
@@ -35,36 +48,19 @@ public class LanguageSystem {
 		allLanguages.add(german);
 		languages.put("EN", english);
 		languages.put("DE", german);
-		
-		reloadUserGuildLanguages();
-	}
-	
-	public static void reloadUserGuildLanguages() {
-		userLanguages.clear();
-		guildLanguages.clear();
-		
-		for (String user : userManager.getKeys()) {
-			userLanguages.put(user, getLanguageFromName(userManager.getString(user)));
-		}
-		
-		GuildManager.init();
-		
-		for (Document doc : GuildManager.getAllConfigs()) {
-			guildLanguages.put(doc.getString("guildid"), getLanguageFromName(doc.getString("language")));
-		}
 	}
 	
 	public static HashMap<String, Language> getLanguages() {
 		return languages;
 	}
 	
-	public static Language getLanguage(User author, Guild guild) {
+	public static Language getLanguage(BlackUser author, BlackGuild guild) {
 		try {
-			Language userLang = getUserLanguage(author.getId());
+			Language userLang = author.getLanguage();
 			if (userLang != null) return userLang;
 		} catch (Exception ignored) {}
 		try {
-			Language guildLang = getGuildLanguage(guild.getId());
+			Language guildLang = guild.getLanguage();
 			if (guildLang != null) return guildLang;
 		} catch (Exception ignored) {}
 		try {
@@ -77,24 +73,11 @@ public class LanguageSystem {
 		return defaultLocale;
 	}
 	
-	public static Language getUserLanguage(String user) {
-		try {
-			return userLanguages.get(user);
-		} catch (Exception ignored) {return null;}
+	public static void updateUserLocale(BlackUser user, String locale) {
+		user.setLanguage(getLanguageFromName(locale));
 	}
 	
-	public static Language getGuildLanguage(String guild) {
-		try {
-			return guildLanguages.get(guild);
-		} catch (Exception ignored) {return null;}
-	}
-	
-	public static void updateUserLocale(String user, String locale) {
-		userManager.save(user, locale.toUpperCase());
-		reloadUserGuildLanguages();
-	}
-	
-	public static void updateGuildLocale(long guild, String locale) {
+	public static void updateGuildLocale(BlackGuild guild, String locale) {
 		locale = locale.toUpperCase();
 		GuildManager.save(guild, "language", locale);
 		guildLanguages.remove(guild);
