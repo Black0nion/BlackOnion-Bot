@@ -27,7 +27,7 @@ public class BanCommand implements Command {
 	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
 		if (mentionedMembers.size() == 0) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
 			return;
 		} else {
 			String banMessage = LanguageSystem.getTranslation("yougotbanned", author);
@@ -37,9 +37,9 @@ public class BanCommand implements Command {
 			} else
 				guild.ban(mentionedMembers.get(0), 0).queue();
 			final String finalBanMessage = banMessage;
-			message.reply(EmbedUtils.getDefaultSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("usergotbanned", author, guild), LanguageSystem.getTranslation("message", author, guild) + ": " + banMessage, false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("usergotbanned", author, guild), LanguageSystem.getTranslation("message", author, guild) + ": " + banMessage, false).build()).queue();
 			mentionedMembers.get(0).getBlackUser().openPrivateChannel().queue(c -> {
-				c.sendMessage(EmbedUtils.getDefaultErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("yougotbanned", author), LanguageSystem.getTranslation("message", author) + ": " + finalBanMessage, false).build()).queue();
+				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("yougotbanned", author), LanguageSystem.getTranslation("message", author) + ": " + finalBanMessage, false).build()).queue();
 			});
 		}
 	}

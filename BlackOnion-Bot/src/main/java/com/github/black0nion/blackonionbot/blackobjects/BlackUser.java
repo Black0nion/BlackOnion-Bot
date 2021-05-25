@@ -1,7 +1,5 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
-import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
-
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Formatter;
@@ -10,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -29,7 +28,7 @@ import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
-public class BlackUser implements User {
+public class BlackUser extends BlackObject implements User {
 	
 	private final User user;
 	
@@ -82,10 +81,18 @@ public class BlackUser implements User {
 		save("language", language.getLanguageCode());
 	}
 	
-	private void save(String key, Object toSave) {
-		configs.updateOne(Filters.eq("userid", this.user.getIdLong()), new Document("$set", new Document(key, toSave)));
+	// override methods
+	@Override
+	public Bson getFilter() {
+		return Filters.eq("userid", this.user.getIdLong());
 	}
-
+	
+	@Override
+	MongoCollection<Document> getCollection() {
+		return configs;
+	}
+	
+	// built in methods
 	@Override
 	@NotNull
 	public String getName() {

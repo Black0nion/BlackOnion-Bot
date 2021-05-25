@@ -19,9 +19,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
@@ -60,7 +58,8 @@ public class CatBreedsCommand implements Command {
 				builder.addField(name, value, false);
 			});
 			
-			message.reply(builder.build()).queue((msg) -> {
+			message.reply(builder.build()).queue((msgg) -> {
+				BlackMessage msg = BlackMessage.from(msgg);
 				for (int i = 0; i < pages.size(); i++)
 					msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 				waitForPageSwitch(msg, author, pages);
@@ -72,7 +71,7 @@ public class CatBreedsCommand implements Command {
 		}
 	}
 	
-	private static void waitForPageSwitch(Message msg, User user, HashMap<Integer, HashMap<String, String>> pages) {
+	private static void waitForPageSwitch(BlackMessage msg, BlackUser user, HashMap<Integer, HashMap<String, String>> pages) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class,
 				(event) -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
 				(event) -> {
@@ -83,7 +82,7 @@ public class CatBreedsCommand implements Command {
 						waitForPageSwitch(msg, user, pages);
 					
 					// all fine, we can switch page
-					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, msg.getGuild()).setTitle("UwU");
+					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, msg.getBlackGuild()).setTitle("UwU");
 					pages.get(emojiReactionNum).forEach((name, value) -> {
 						builder.addField(name, value, false);
 					});

@@ -25,11 +25,8 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class QrDecodeCommand implements Command {
@@ -73,7 +70,7 @@ public class QrDecodeCommand implements Command {
 		return "<attach file / url to a public image";
 	}
 	
-	private void send(Result result, TextChannel channel, User author, Guild guild, Message message, String imageUrl) {
+	private void send(Result result, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage message, String imageUrl) {
 		if (result == null || result.getBarcodeFormat() == null) {
 			message.reply(Utils.getWrongArgument(author, guild, this)).queue();
 		} else {
@@ -83,7 +80,7 @@ public class QrDecodeCommand implements Command {
 		}
 	}
 	
-	private void readQR(String url, TextChannel channel, User author, Guild guild, Message msg) {
+	private void readQR(String url, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
 		try {
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
@@ -102,22 +99,22 @@ public class QrDecodeCommand implements Command {
 			return;
 		} catch (Exception e) {
 			if (e instanceof NotFoundException) {
-				msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
+				msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
 				return;
 			} else {
 				if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("privateqr", "uploadasattachment", false).build()).queue();
+					msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("privateqr", "uploadasattachment", false).build()).queue();
 					return;
 				} else {					
 					e.printStackTrace();
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+					msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 					return;
 				}
 			}
 		}
 	}
 
-	private void readQR(Attachment path, TextChannel channel, User author, Guild guild, Message msg) {
+	private void readQR(Attachment path, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
 		try {
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
@@ -138,15 +135,15 @@ public class QrDecodeCommand implements Command {
 			return;
 		} catch (Exception e) {
 			if (e instanceof NotFoundException) {
-				msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
+				msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
 				return;
 			} else {
 				if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("privateqr", "uploadasattachment", false).build()).queue();
+					msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("privateqr", "uploadasattachment", false).build()).queue();
 					return;
 				} else {					
 					e.printStackTrace();
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getAuthor(), guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+					msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 					return;
 				}
 			}

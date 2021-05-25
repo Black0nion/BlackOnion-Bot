@@ -39,7 +39,7 @@ public class ActivityCommand implements Command {
 		} else if (args[1].toLowerCase().contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), Utils.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
 		message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();

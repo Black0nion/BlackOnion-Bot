@@ -7,6 +7,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -19,19 +22,16 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
-
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.TrackRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
@@ -76,7 +76,7 @@ public class PlayerManager {
 
     public GuildMusicManager getMusicManager(TextChannel channel) {
         return this.musicManagers.computeIfAbsent(channel.getGuild().getIdLong(), (guildId) -> {
-            final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, channel.getGuild());
+            final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, BlackGuild.from(channel.getGuild()));
 
             channel.getGuild().getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
 
@@ -84,9 +84,10 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(User author, TextChannel channel, String trackUrl, AudioManager manager, VoiceChannel vc) {
+    public void loadAndPlay(BlackUser author, TextChannel channel, String trackUrl, AudioManager manager, VoiceChannel vc) {
         final GuildMusicManager musicManager = this.getMusicManager(channel);
-        MusicSystem.channels.put(channel.getGuild().getIdLong(), channel.getIdLong());
+        final BlackGuild guild = BlackGuild.from(channel.getGuild());
+        MusicSystem.channels.put(guild.getIdLong(), channel.getIdLong());
 
         if (trackUrl.contains("spotify.com")) {
         	String[] parsed = trackUrl.split("/track/");
@@ -104,7 +105,7 @@ public class PlayerManager {
             @Override
             public void trackLoaded(AudioTrack track) {
                 musicManager.scheduler.queue(track, manager, vc);
-                channel.sendMessage(EmbedUtils.getSuccessEmbed(author, channel.getGuild()).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
+                channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
             }
 
             @Override
@@ -112,15 +113,15 @@ public class PlayerManager {
                 final List<AudioTrack> tracks = playlist.getTracks();
                 
                 if (playlist.isSearchResult()) {
-                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, channel.getGuild());
+                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
         			List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
         			for (int i = 0; i < trackz.size(); i++) {
         				AudioTrack track = trackz.get(i);
         				builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
         			}
-        			channel.sendMessage(builder.build()).queue((msg) -> {for (int i=0;i<trackz.size();i++) msg.addReaction(Utils.numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
+        			channel.sendMessage(builder.build()).queue((msgg) -> { BlackMessage msg = BlackMessage.from(msgg); for (int i=0;i<trackz.size();i++) msg.addReaction(Utils.numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
                 } else {
-                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, channel.getGuild());
+                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
                 	
                 	builder.setTitle("addedtoqueue");
                 	
@@ -130,7 +131,7 @@ public class PlayerManager {
 		                	musicManager.scheduler.queue(track, manager, vc);
 	                	});
                 	} else {
-                		builder.setDescription(LanguageSystem.getTranslation("thistracksplusadded", author, channel.getGuild()).replace("%tracks%", String.valueOf(tracks.size() - 10)));
+                		builder.setDescription(LanguageSystem.getTranslation("thistracksplusadded", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
                 		for (int i = 0; i < tracks.size(); i++) {
                 			final AudioTrack track = tracks.get(i);
 							musicManager.scheduler.queue(track, manager, vc);
@@ -144,18 +145,18 @@ public class PlayerManager {
 
             @Override
             public void noMatches() {
-            	channel.sendMessage(EmbedUtils.getErrorEmbed(author, channel.getGuild()).addField("notfound", "musicnotfound", false).build()).queue();
+            	channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "musicnotfound", false).build()).queue();
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-            	channel.sendMessage(EmbedUtils.getErrorEmbed(author, channel.getGuild()).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
                 exception.printStackTrace();
             }
         });
     }
     
-    private void retry(User author, Message msg, List<AudioTrack> tracks, GuildMusicManager musicManager, AudioManager manager, VoiceChannel vc) {
+    private void retry(BlackUser author, BlackMessage msg, List<AudioTrack> tracks, GuildMusicManager musicManager, AudioManager manager, VoiceChannel vc) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class, 
 			(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
 			event -> {
@@ -166,7 +167,7 @@ public class PlayerManager {
 				}
 				final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey());
 				musicManager.scheduler.queue(track, manager, vc);
-		}, 1, TimeUnit.MINUTES, () -> msg.editMessage(EmbedUtils.getErrorEmbed(author, msg.getGuild()).addField("timeout", "tooktoolong", false).build()).queue());
+		}, 1, TimeUnit.MINUTES, () -> msg.editMessage(EmbedUtils.getErrorEmbed(author, msg.getBlackGuild()).addField("timeout", "tooktoolong", false).build()).queue());
 	}
 
     public static PlayerManager getInstance() {

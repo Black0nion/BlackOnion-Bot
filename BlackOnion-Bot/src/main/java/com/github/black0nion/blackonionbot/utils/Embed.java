@@ -1,19 +1,24 @@
 package com.github.black0nion.blackonionbot.utils;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 
 public class Embed extends EmbedBuilder {
 	
-	User user;
-	Guild guild;
+	private BlackUser user;
+	private BlackGuild guild;
 	
-	public Embed(User user, Guild guild) {
+	public Embed(BlackUser user, BlackGuild guild) {
 		this.user = user;
 		this.guild = guild;
+	}
+	
+	public Embed() {
+		this.user = null;
+		this.guild = null;
 	}
 	
 	@Override

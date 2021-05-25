@@ -2,9 +2,9 @@ package com.github.black0nion.blackonionbot.systems.dashboard.values.types;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValueType;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 
 public class DashboardBoolean extends DashboardValue {
 	
@@ -29,12 +29,12 @@ public class DashboardBoolean extends DashboardValue {
 	}
 
 	@Override
-	public boolean save(String key, String value, String guild) {
+	public boolean save(String key, String value, BlackGuild guild) {
 		boolean result;
 		if (value.equals("true")) result = true;
 		else if (value.equals("false")) result = false;
 		else return false;
-		GuildManager.save(guild, key, result);
+		guild.save(key, result);
 		return true;
 	}
 

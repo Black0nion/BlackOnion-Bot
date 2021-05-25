@@ -57,7 +57,7 @@ public class WeatherCommand implements Command {
 			message.reply(embed.build()).queue();
 			return;
 		} catch (IOException ex) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
 			return;
 		}
 	}

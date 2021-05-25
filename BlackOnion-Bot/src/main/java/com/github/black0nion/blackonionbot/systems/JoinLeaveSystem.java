@@ -17,16 +17,15 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.misc.DrawType;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -51,14 +50,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		try {
-			final Guild guild = event.getGuild();
-			final User author = event.getUser();
-			String id = GuildManager.getString(guild, "welcomechannel");
-			if (id == null) return;
+			final BlackGuild guild = BlackGuild.from(event.getGuild());
+			final BlackUser author = BlackUser.from(event.getUser());
+			long id = guild.getJoinChannel();
+			if (id == -1) return;
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			channel.sendMessage(GuildManager.getString(guild, "joinmessage", LanguageSystem.getTranslation("defaultjoinmessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
+			channel.sendMessage(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,14 +66,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		try {
-			final Guild guild = event.getGuild();
-			final User author = event.getUser();
-			String id = GuildManager.getString(event.getGuild(), "leavechannel");
-			if (id == null) return;
-			TextChannel channel = event.getGuild().getTextChannelById(id);
+			final BlackGuild guild = BlackGuild.from(event.getGuild());
+			final BlackUser author = BlackUser.from(event.getUser());
+			long id = guild.getLeaveChannel();
+			if (id == -1) return;
+			TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
-			final File file = generateImage(Color.BLACK, event.getUser(), event.getGuild(), DrawType.LEAVE);
-			channel.sendMessage(GuildManager.getString(guild, "leavemessage", LanguageSystem.getTranslation("defaultleavemessage", author, guild)).replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
+			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
+			channel.sendMessage(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,10 +81,10 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
-		final Guild guild = event.getGuild();
+		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final String prefix = BotInformation.getPrefix(guild);
 		guild.retrieveOwner().queue(user -> {
-			User author = user.getUser();
+			final BlackUser author = BlackUser.from(user.getUser());
 			author.openPrivateChannel().queue(channel -> {
 				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
 			});
@@ -93,7 +92,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 	
     @NotNull
-	public static File generateImage(@NotNull final Color textColor, final @NotNull User user, final @NotNull Guild guild, final DrawType drawType) throws Exception {
+	public static File generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
         final double separatorTransparency = 1;
 
         BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);

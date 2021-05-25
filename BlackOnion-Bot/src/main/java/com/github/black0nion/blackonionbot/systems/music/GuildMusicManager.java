@@ -1,9 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.music;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-
-import net.dv8tion.jda.api.entities.Guild;
 
 public class GuildMusicManager {
     public final AudioPlayer audioPlayer;
@@ -12,9 +11,9 @@ public class GuildMusicManager {
     
     public final AudioPlayerSendHandler sendHandler;
     
-    public final Guild guild;
+    public final BlackGuild guild;
     
-    public GuildMusicManager(AudioPlayerManager manager, Guild guild) {
+    public GuildMusicManager(AudioPlayerManager manager, BlackGuild guild) {
         this.audioPlayer = manager.createPlayer();
         this.scheduler = new TrackScheduler(this.audioPlayer, guild);
         this.audioPlayer.addListener(this.scheduler);

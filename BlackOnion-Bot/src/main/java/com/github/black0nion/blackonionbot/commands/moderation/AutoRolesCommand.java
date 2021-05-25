@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.managers.GuildManager;
 
 public class AutoRolesCommand implements Command {
 
@@ -32,7 +30,7 @@ public class AutoRolesCommand implements Command {
 		List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
-			message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
+			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("invalidrole", author, guild), LanguageSystem.getTranslation("iseveryone", author, guild), false).build()).queue();
 			return;
 		}
 		
@@ -56,12 +54,12 @@ public class AutoRolesCommand implements Command {
 				}
 			}
 			
-			List<Long> tempList = GuildManager.getList(guild.getId(), "autoroles", new ArrayList<Long>(), Long.class);
+			List<Long> tempList = guild.getList("autoroles", Long.class);
 			if (tempList.contains(roleID)) {
 				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
 				return;
 			} else tempList.add(roleID);
-			GuildManager.saveList(guild.getId(), "autoroles", tempList);
+			guild.saveList("autoroles", tempList);
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autorolecreated", LanguageSystem.getTranslation("autorolecreatedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
 			List<Role> roles = message.getMentionedRoles();
@@ -83,12 +81,12 @@ public class AutoRolesCommand implements Command {
 				}
 			}
 			
-			List<Long> tempList = GuildManager.getList(guild.getId(), "autoroles", new ArrayList<Long>(), Long.class);
+			List<Long> tempList = guild.getList("autoroles", Long.class);
 			if (!tempList.contains(roleID)) {
 				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notfound", "thisnotfound", false).build()).queue();
 				return;
 			} else tempList.remove(roleID);
-			GuildManager.saveList(guild.getId(), "autoroles", tempList);
+			guild.saveList("autoroles", tempList);
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("autoroledeleted", LanguageSystem.getTranslation("autoroledeletedinfo", author, guild).replace("%role%", role.getAsMention()), false).build()).queue();
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();

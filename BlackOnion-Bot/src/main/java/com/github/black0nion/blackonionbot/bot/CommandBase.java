@@ -24,9 +24,9 @@ import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.AntiSpoilerSystem;
-import com.github.black0nion.blackonionbot.systems.ContentModeratorSystem;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
+import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -100,7 +100,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-		ContentModeratorSystem.checkMessageForProfanity(event);
+		AntiSwearSystem.checkMessageForProfanity(event);
 	}
 	
 	@Override
@@ -119,7 +119,7 @@ public class CommandBase extends ListenerAdapter {
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
 		
-		final boolean containsProfanity = ContentModeratorSystem.checkMessageForProfanity(event);
+		final boolean containsProfanity = AntiSwearSystem.checkMessageForProfanity(event);
 		
 		if (AntiSpoilerSystem.removeSpoilers(event)) return;
 		
@@ -144,13 +144,13 @@ public class CommandBase extends ListenerAdapter {
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
 					return;
-				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild)
+				message.reply(EmbedUtils.getErrorEmbed(author, guild)
 						.addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-				message.reply(EmbedUtils.getDefaultErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
 							if (cmd.getVisisbility() != CommandVisibility.SHOWN) {
 								msg.delete().queueAfter(3, TimeUnit.SECONDS);
 								message.delete().queueAfter(3, TimeUnit.SECONDS);

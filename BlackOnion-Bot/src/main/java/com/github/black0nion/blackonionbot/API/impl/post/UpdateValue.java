@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.PostRequest;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
@@ -21,12 +22,11 @@ public class UpdateValue implements PostRequest {
 		String newValue = headers.get("newValue");
 		String databaseKey = headers.get("databaseKey");
 		String guildId = headers.get("guild");
-		@SuppressWarnings("unused")
 		Guild guild;
 		try { guild = Bot.jda.getGuildById(guildId); } catch (Exception e) { return "bing bong request gone"; }
 		DashboardValue value = Dashboard.getDashboardValueFromKey(databaseKey);
 		if (value != null) {
-			value.save(databaseKey, newValue, guildId);
+			value.save(databaseKey, newValue, BlackGuild.from(guild));
 		}
 		return "ding dong done";
 	}

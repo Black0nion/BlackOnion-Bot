@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
@@ -45,7 +44,7 @@ public class SwearWhitelistCommand implements Command {
 			boolean add = args[1].equalsIgnoreCase("add");
 			
 			if (mentionedStuff.size() != 0) {
-				List<String> newWhitelist = GuildManager.getList(guild, "whitelist", String.class);
+				List<String> newWhitelist = guild.getList("whitelist", String.class);
 				if (newWhitelist == null) newWhitelist = new ArrayList<>();
 				List<String> temp = new ArrayList<String>(newWhitelist);
 				if (add) {
@@ -53,11 +52,11 @@ public class SwearWhitelistCommand implements Command {
 					newWhitelist.removeAll(temp);
 					newWhitelist.addAll(mentionedStuff);
 				} else newWhitelist.removeAll(mentionedStuff);
-				GuildManager.saveList(guild, "whitelist", newWhitelist);
+				guild.saveList("whitelist", newWhitelist);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("whitelistupdated", (add ? LanguageSystem.getTranslation("addedtowhitelist", author, guild).replace("%add%", mentionedStuff.toString()) : LanguageSystem.getTranslation("removedfromwhitelist", author, guild).replace("%removed%", mentionedStuff.toString())), false).build()).queue();
 			}
 		} else {
-			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);
+			final List<String> whitelist = guild.getList("whitelist", String.class);
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"), false).build()).queue();
 		}
 	}

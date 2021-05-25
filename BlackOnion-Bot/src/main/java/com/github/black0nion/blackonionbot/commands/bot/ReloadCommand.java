@@ -16,7 +16,6 @@ import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
@@ -49,7 +48,6 @@ public class ReloadCommand implements Command {
 		BotInformation.init();
 		BirthdaySystem.reload();
 		LanguageSystem.init();
-		GuildManager.init();
 		SessionManager.init();
 	}
 	

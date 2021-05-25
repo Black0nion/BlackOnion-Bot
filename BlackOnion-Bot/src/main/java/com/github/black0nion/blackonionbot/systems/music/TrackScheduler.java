@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.systems.music;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -11,16 +12,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 public class TrackScheduler extends AudioEventAdapter {
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
-    public final Guild guild;
+    public final BlackGuild guild;
 
-    public TrackScheduler(AudioPlayer player, Guild guild) {
+    public TrackScheduler(AudioPlayer player, BlackGuild guild) {
     	this.guild = guild;
         this.player = player;
         this.queue = new LinkedBlockingQueue<>();

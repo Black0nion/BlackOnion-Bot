@@ -17,10 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.OS;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -39,14 +38,10 @@ public class BotInformation {
 	public static String cpuMhz = "N/A";
 	
 	public static String defaultPrefix;
-	private static HashMap<Long, String> guildPrefixes = new HashMap<>();
 	
 	public static long botId;
 
 	public static void init() {
-		
-		guildPrefixes.clear();
-		for (org.bson.Document doc : GuildManager.getAllConfigs()) if (doc.containsKey("prefix")) guildPrefixes.put(doc.getLong("guildid"), doc.getString("prefix"));
 		
 		try {
 			calculateCodeLines();
@@ -172,23 +167,18 @@ public class BotInformation {
 	}
 	
 	public static String getPrefix(Guild guild) {
-		return getPrefix(guild.getId());
+		return getPrefix(BlackGuild.from(guild));
 	}
 	
-	public static String getPrefix(String guildID) {
-		if (!Utils.isLong(guildID)) return "?";
-		long guildIdLong = Long.parseLong(guildID);
-		if (guildPrefixes.containsKey(guildIdLong))
-			return guildPrefixes.get(guildIdLong);
-		return defaultPrefix;
+	public static String getPrefix(BlackGuild guild) {
+		return guild.getPrefix();
 	}
 	
 	public static void setPrefix(Guild guild, String prefix) {
-		setPrefix(guild.getIdLong(), prefix);
+		setPrefix(BlackGuild.from(guild), prefix);
 	}
 
-	public static void setPrefix(long guildId, String prefix) {
-		guildPrefixes.put(guildId, prefix);
-		GuildManager.save(guildId, "prefix", prefix);
+	public static void setPrefix(BlackGuild guild, String prefix) {
+		guild.setPrefix(prefix);
 	}
 }

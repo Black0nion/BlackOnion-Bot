@@ -1,4 +1,6 @@
-package com.github.black0nion.blackonionbot.systems;
+package com.github.black0nion.blackonionbot.systems.antiswear;
+
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.*;
 
 import java.io.File;
 import java.util.List;
@@ -6,9 +8,13 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.systems.guildmanager.GuildManager;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -17,17 +23,13 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 
-public class ContentModeratorSystem {
+public class AntiSwearSystem {
 	
 	public static int profanityFilteredLastTenSecs = 0;
 	
@@ -38,30 +40,33 @@ public class ContentModeratorSystem {
 	 * @return true if the message contained unwanted content
 	 */
 	public static boolean checkMessageForProfanity(GuildMessageReceivedEvent event) {
-		return check(event.getGuild(), event.getMember(), event.getMessage(), event.getChannel());
+		return check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
 	}
 	
 	public static boolean checkMessageForProfanity(GuildMessageUpdateEvent event) {
-		return check(event.getGuild(), event.getMember(), event.getMessage(), event.getChannel());
+		return check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
 	}
 	
-	private static boolean check(Guild guild, Member author, Message message, TextChannel channel) {
+	private static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
 		final String messageContent = message.getContentRaw();
-		final User user = author.getUser();
+		final BlackUser user = author.getBlackUser();
 		if (user.isBot()) return false;
-		if (GuildManager.isPremium(guild)) {
-			if (!GuildManager.getBoolean(guild, "antiSwear"))
+		final AntiSwearType type = guild.getAntiSwearType();
+		if (guild.isPremium()) {
+			if (type == NONE)
 				return false;
 		} else {
-			if (GuildManager.getBoolean(guild, "antiSwear"))
-				GuildManager.save(guild, "antiSwear", false);
+			if (type != NONE)
+				guild.setAntiSwearType(NONE);
 			return false;
 		}
-		if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS, Permission.MESSAGE_MANAGE)) return false;
+		
+		if (Utils.handleRights(guild, user, channel, Permission.MESSAGE_MANAGE)) return false;
+			
 		try {
 			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
-			final List<String> whitelist = GuildManager.getList(guild, "whitelist", String.class);
+			final List<String> whitelist = guild.getList("whitelist", String.class);
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
 			//Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
@@ -70,16 +75,23 @@ public class ContentModeratorSystem {
 			  .header("Ocp-Apim-Subscription-Key", Bot.getCredentialsManager().getString("content_moderator_key"))
 			  .body(messageContent)
 			  .asString();
-
+	
 			JSONObject responseJson = new JSONObject(response.getBody());
 			// check for profanity
 			if (responseJson.has("Terms")) {
 				// this will happen if it doesn't contain any profanity
 				if (!(responseJson.get("Terms") instanceof JSONArray)) return false;
-				Bot.executor.submit(() -> {
-					profanityFilteredLastTenSecs++;
-					try {
-						message.delete().queue();
+				profanityFilteredLastTenSecs++;
+				try {
+					message.delete().queue();
+					
+					// if shit fuck it here
+					if (type == DELETE) return true;
+					
+					if (type == REMOVE) {
+						
+						if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS)) return true;
+						
 						WebhookMessageBuilder builder = new WebhookMessageBuilder();
 						final JSONArray terms = responseJson.getJSONArray("Terms");
 						
@@ -119,16 +131,17 @@ public class ContentModeratorSystem {
 								ex.printStackTrace();
 							}
 						});
-					} catch (Exception e) {
-						e.printStackTrace();
+					} else {
+						channel.sendMessage(EmbedUtils.getErrorEmbed(user, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 					}
-				});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				return true;
 			} else throw new RuntimeException("Some error happened while contacting the Microsoft API. Response: \n" + response.getBody());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
-
 	}
 }

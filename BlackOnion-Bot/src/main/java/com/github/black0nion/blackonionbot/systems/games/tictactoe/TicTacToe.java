@@ -2,16 +2,16 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
 import java.util.Map;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToe {
 	Message message;
@@ -20,12 +20,12 @@ public class TicTacToe {
 	FieldType[][] field;
 	public FieldType currentPlayer;
 	TextChannel channel;
-	Guild guild;
+	BlackGuild guild;
 	int moves = 0;
 	
 	public TicTacToe(TextChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
 		field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
-		this.guild = channel.getGuild();
+		this.guild = BlackGuild.from(channel.getGuild());
 		
 		currentPlayer = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.Y;
 		
@@ -35,7 +35,7 @@ public class TicTacToe {
 			}
 		}
 		
-		User currentUser = currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser());
+		BlackUser currentUser = BlackUser.from(currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser()));
 		
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(currentUser, guild).setTitle(LanguageSystem.getTranslation("tictactoe", currentUser, guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, guild) + " | " + Utils.removeMarkdown((currentPlayer == FieldType.X ? playerX.getName() : playerY.getName()))).addField("currentstate", getFieldString(), false).build()).queue(success -> this.message = success);
 		this.channel = channel;

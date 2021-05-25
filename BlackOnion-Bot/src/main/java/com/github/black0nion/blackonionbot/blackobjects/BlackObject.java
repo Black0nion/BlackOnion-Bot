@@ -60,4 +60,14 @@ public abstract class BlackObject {
 	private void save(Document doc) {
 		getCollection().updateOne(getFilter(), new Document("$set", doc));
 	}
+	
+	public void clear(String... keys) {
+		Document doc = new Document();
+		for (String key : keys) doc.put(key, "");
+		clear(doc);
+	}
+	
+	public void clear(Document doc) {
+		getCollection().updateOne(getFilter(), new Document("$unset", doc));
+	}
 }

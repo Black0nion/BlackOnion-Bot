@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
@@ -209,7 +211,7 @@ public class Utils {
 	       return Arrays.copyOfRange(array, beg, end + 1);
 	}
 	 
-	public static String getPleaseUse(Guild guild, User author, Command command) {
+	public static String getPleaseUse(BlackGuild guild, BlackUser author, Command command) {
 		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 	
@@ -218,7 +220,7 @@ public class Utils {
 		return "`" + BotInformation.getPrefix(guild) + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
 	}
 	
-	public static MessageEmbed getWrongArgument(User author, Guild guild, Command command) {
+	public static MessageEmbed getWrongArgument(BlackUser author, BlackGuild guild, Command command) {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, command), false).build();
 	}
 	
@@ -293,7 +295,7 @@ public class Utils {
      * @param permissions
      * @return missing permissions?
      */
-    public static boolean handleRights(Guild guild, User author, TextChannel channel, Permission... permissions) {
+    public static boolean handleRights(BlackGuild guild, BlackUser author, TextChannel channel, Permission... permissions) {
     	if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
 			return true;
@@ -301,7 +303,7 @@ public class Utils {
     	return false;
     }
 
-	public static MessageEmbed noRights(Guild guild, User author, Permission... missingPermissions) {
+	public static MessageEmbed noRights(BlackGuild guild, BlackUser author, Permission... missingPermissions) {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
