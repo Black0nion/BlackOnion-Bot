@@ -35,7 +35,7 @@ public class AntiSwearCommand implements Command {
 			final String type = args[1];
 			if (type.equalsIgnoreCase("remove")) {
 				guild.setAntiSpoilerType(AntiSpoilerType.REMOVE);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "on"), false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "remove"), false).build()).queue();
 				return;
 			} else if (type.equalsIgnoreCase("delete")) {
 				guild.setAntiSpoilerType(AntiSpoilerType.DELETE);
@@ -57,7 +57,7 @@ public class AntiSwearCommand implements Command {
 	
 	@Override
 	public String getSyntax() {
-		return "<on | off>";
+		return "<remove | delete | off>";
 	}
 	
 	@Override
