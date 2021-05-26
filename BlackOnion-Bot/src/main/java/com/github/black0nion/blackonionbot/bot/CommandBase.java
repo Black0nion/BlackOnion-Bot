@@ -170,7 +170,8 @@ public class CommandBase extends ListenerAdapter {
 			return;
 		}
 		
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslation("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
+		// np blaumeise
+		// message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslation("thecommandnotfound", author, guild).replace("%command%", args[0]), false).build()).queue();
 	}
 	
 	@Deprecated
