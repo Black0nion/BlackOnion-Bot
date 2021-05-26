@@ -8,11 +8,8 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
@@ -20,11 +17,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class StatusCommand implements Command {
+public class StatusCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] {"status"};
+	public StatusCommand() {
+		this.setCommand("status")
+			.setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]")
+			.botAdminRequired()
+			.setHidden()
+			.setRequiredArgumentCount(1);
 	}
 	
 	@Override
@@ -52,32 +52,13 @@ public class StatusCommand implements Command {
 			status = OnlineStatus.DO_NOT_DISTURB;
 			break;
 		default:
-			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", Utils.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			// TODO: delete after x seconds
+			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		}
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		
 		e.getJDA().getPresence().setStatus(status);
-	}
-
-	@Override
-	public String getSyntax() {
-		return "[online | invisible, offline | idle, afk | dnd, donotdisturb]";
-	}
-
-	@Override
-	public boolean requiresBotAdmin() {
-		return true;
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
-	}
-	
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
 	}
 	
 	public static OnlineStatus getStatusFromFile() {
@@ -94,10 +75,5 @@ public class StatusCommand implements Command {
 			System.out.println("Could not read Status from File!");
 			return OnlineStatus.DO_NOT_DISTURB;
 		}
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
 	}
 }

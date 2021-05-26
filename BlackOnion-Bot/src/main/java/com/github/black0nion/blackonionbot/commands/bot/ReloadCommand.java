@@ -12,8 +12,6 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
@@ -26,11 +24,12 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class ReloadCommand implements Command {
+public class ReloadCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "reload", "rl" };
+	public ReloadCommand() {
+		this.setCommand("reload", "rl")
+			.botAdminRequired()
+			.setHidden();
 	}
 
 	@Override
@@ -38,6 +37,7 @@ public class ReloadCommand implements Command {
 		if (!guild.getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE)) return;
 		message.delete().queue();
 		//e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID, "k").queue();
+		// TODO: delete after x seconds
 		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("configreload", "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		reload();
 	}
@@ -50,20 +50,5 @@ public class ReloadCommand implements Command {
 		BirthdaySystem.reload();
 		LanguageSystem.init();
 		SessionManager.init();
-	}
-	
-	@Override
-	public boolean requiresBotAdmin() {
-		return true;
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-	
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
 	}
 }

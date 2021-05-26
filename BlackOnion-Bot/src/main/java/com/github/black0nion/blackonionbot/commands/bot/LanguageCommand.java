@@ -1,67 +1,48 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.Map;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class LanguageCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "language", "lang", "locale", "sprache" };
+public class LanguageCommand extends Command {
+	
+	public LanguageCommand() {
+		this.setCommand("language", "lang", "locale", "sprache")
+			.setSyntax("[language code]");
 	}
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
-				author.setLanguage(LanguageSystem.getLanguageFromName(args[1]));
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("languageupdated", author, guild), LanguageSystem.getTranslation("newlanguage", author, guild) + " " + LanguageSystem.getLanguageFromName(args[1]).getName() + " (" + args[1].toUpperCase() + ")", false).build()).queue();
+				final Language newLang = LanguageSystem.getLanguageFromName(args[1]);
+				author.setLanguage(newLang);
+				cmde.success("languageupdated", "newlanguage", new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
 			} else {
-				String validLanguages = "\n";
-				for (Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {
-					validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
-				}
 				if (args[1].equalsIgnoreCase("list")) {
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Valid Languages", validLanguages, false).build()).queue();
+					cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
 				} else {
-					message.reply(EmbedUtils.getErrorEmbed(author, guild).setTitle("Language doesn't exist").addField("Valid languages:", validLanguages, false).build()).queue();
+					cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
 				}
 			}
 		} else {
 			String language = "";
 			final Language userLanguage = author.getLanguage();
-			final Language guildLanguage = author.getLanguage();
 			if (userLanguage != null) {
 				language = userLanguage.getName() + " (" + userLanguage.getLanguageCode() + ")";
-			} else if (guildLanguage != null) {
-				language = guildLanguage.getName() + " (" + guildLanguage.getLanguageCode() + ")";
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Your Language: " + language, "To change your language, use ``" + guild.getPrefix() + getCommand()[0] + " " + getSyntax() + "``\nTo get a list of all valid language codes use ``" + guild.getPrefix() + "language list``", false).build()).queue();
+			cmde.success("Languages", "Your Language: " + language, "To change your language, use " + CommandEvent.getPleaseUse(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list" + "`");
 		}
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<language code>";
 	}
 }
