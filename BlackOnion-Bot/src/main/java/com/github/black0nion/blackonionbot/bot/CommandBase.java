@@ -94,7 +94,7 @@ public class CommandBase extends ListenerAdapter {
 //			StringSelection stringSelection = new StringSelection(commandsJSON.toString());
 //			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 //			clipboard.setContents(stringSelection, null);
-			System.out.println(commandsJSON);
+//			System.out.println(commandsJSON);
 		});
 	}
 	
