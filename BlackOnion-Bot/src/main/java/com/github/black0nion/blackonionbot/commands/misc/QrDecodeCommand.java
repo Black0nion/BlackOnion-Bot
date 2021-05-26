@@ -14,9 +14,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatReader;
@@ -30,11 +28,11 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class QrDecodeCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "qrdecode", "qrd" };
+public class QrDecodeCommand extends Command {
+	
+	public QrDecodeCommand() {
+		this.setCommand("qrdecode", "qrd")
+			.setSyntax("<attach file / url to a public image");
 	}
 
 	@Override
@@ -44,44 +42,34 @@ public class QrDecodeCommand implements Command {
 			if (args.length >= 2) {
 				final String url = args[1];
 				if (url.endsWith(".png") || url.endsWith(".jpg")) {
-					readQR(url, channel, author, guild, message);
+					readQR(cmde, url, channel, author, guild, message);
 				} else {
-					message.reply(Utils.getWrongArgument(author, guild, this)).queue();
+					cmde.sendPleaseUse();
 				}
 			} else {
-				message.reply(Utils.getWrongArgument(author, guild, this)).queue();
+				cmde.sendPleaseUse();
 			}
 		} else {
 			final Attachment path = attachments.get(0);
 			if (path.isImage()) {
-				readQR(path, channel, author, guild, message);
+				readQR(cmde, path, channel, author, guild, message);
 			} else {
-				message.reply(Utils.getWrongArgument(author, guild, this)).queue();
+				cmde.sendPleaseUse();
 			}
 		}
 	}
-
-	@Override
-	public Category getCategory() {
-		return Category.MISC;
-	}
-
-	@Override
-	public String getSyntax() {
-		return "<attach file / url to a public image";
-	}
 	
-	private void send(Result result, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage message, String imageUrl) {
+	private void send(CommandEvent cmde, Result result, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage message, String imageUrl) {
 		if (result == null || result.getBarcodeFormat() == null) {
-			message.reply(Utils.getWrongArgument(author, guild, this)).queue();
+			cmde.sendPleaseUse();
 		} else {
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing")
+			cmde.reply(cmde.success().setTitle("qrcode", "https://zxing.github.io/zxing")
 					.setThumbnail(imageUrl)
-					.addField("qrresult", result.getText(), false).build()).queue();
+					.addField("qrresult", result.getText(), false));
 		}
 	}
 	
-	private void readQR(String url, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
+	private void readQR(CommandEvent cmde, String url, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
 		try {
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
@@ -96,7 +84,7 @@ public class QrDecodeCommand implements Command {
                         new URL(url).openStream()))));
 	
 			Result result = new MultiFormatReader().decode(binaryBitmap);
-			send(result, channel, author, guild, msg, url);
+			send(cmde, result, channel, author, guild, msg, url);
 			return;
 		} catch (Exception e) {
 			if (e instanceof NotFoundException) {
@@ -115,7 +103,7 @@ public class QrDecodeCommand implements Command {
 		}
 	}
 
-	private void readQR(Attachment path, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
+	private void readQR(CommandEvent cmde, Attachment path, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
 		try {
 			Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
@@ -132,7 +120,7 @@ public class QrDecodeCommand implements Command {
 			is.close();
 	
 			Result result = new MultiFormatReader().decode(binaryBitmap);
-			send(result, channel, author, guild, msg, path.getUrl());
+			send(cmde, result, channel, author, guild, msg, path.getUrl());
 			return;
 		} catch (Exception e) {
 			if (e instanceof NotFoundException) {

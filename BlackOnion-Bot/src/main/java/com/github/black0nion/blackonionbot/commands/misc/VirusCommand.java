@@ -11,8 +11,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -20,11 +18,11 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class VirusCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "viruscheck", "virus" };
+public class VirusCommand extends Command {
+	
+	public VirusCommand() {
+		this.setCommand("viruscheck", "virus")
+			.setSyntax("<url / attachement>");
 	}
 
 	@Override
@@ -42,23 +40,23 @@ public class VirusCommand implements Command {
 			} else if (args.length >= 2) {
 				url = args[1];
 			} else {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				cmde.sendPleaseUse();
 				return;
 			}
 			final String finalUrl = url;
 			final String urlResult = checkUrl(finalUrl).getBody();
 			if (!new JSONObject(urlResult).has("data")) {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				cmde.sendPleaseUse();
 				return;
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("fileprocessed", "waitforresult", false).build()).queue(msg -> {
+			cmde.loading("fileprocessed", "waitforresult", msg -> {
 				JSONObject analyse = null;
 				do  { 
 					try { Thread.sleep(5000); } catch (InterruptedException ex) { ex.printStackTrace(); }
 					analyse = new JSONObject(checkAnalyse(new JSONObject(urlResult).getJSONObject("data").getString("id")).getBody()); 
 				} while (!analyse.has("data"));
 				final JSONObject result = analyse.getJSONObject("data").getJSONObject("attributes").getJSONObject("stats");
-				msg.editMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("Result: " + (result.getInt("malicious") == 0 ? "No Virus." : "Virus!"), "Malicious: " + result.getInt("malicious") + "\nUndetected: " + result.getInt("undetected") + "\nSuspicious: " + result.getInt("suspicious") + "\nHarmless: " + result.getInt("harmless"), false).build()).queue();
+				msg.editMessage(cmde.success().addField("Result: " + (result.getInt("malicious") == 0 ? "No Virus." : "Virus!"), "Malicious: " + result.getInt("malicious") + "\nUndetected: " + result.getInt("undetected") + "\nSuspicious: " + result.getInt("suspicious") + "\nHarmless: " + result.getInt("harmless"), false).build()).queue();
 				return;
 			});
 		});
@@ -108,10 +106,5 @@ public class VirusCommand implements Command {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<url / attachement>";
 	}
 }

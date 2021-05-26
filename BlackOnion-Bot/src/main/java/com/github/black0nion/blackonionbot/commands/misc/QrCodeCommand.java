@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.zxing.BarcodeFormat;
@@ -21,11 +20,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class QrCodeCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "qrcode", "qr" };
+public class QrCodeCommand extends Command {
+	
+	public QrCodeCommand() {
+		this.setCommand("qrcode", "qr")
+			.setRequiredArgumentCount(1)
+			.setSyntax("<input>");
 	}
 
 	@Override
@@ -54,21 +54,6 @@ public class QrCodeCommand implements Command {
 			ex.printStackTrace();
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 		}
-	}
-
-	@Override
-	public Category getCategory() {
-		return Category.MISC;
-	}
-
-	@Override
-	public String getSyntax() {
-		return "<input>";
-	}
-
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
 	}
 	
 	public static void createQR(String data, String path, String charset, int height, int width) {
