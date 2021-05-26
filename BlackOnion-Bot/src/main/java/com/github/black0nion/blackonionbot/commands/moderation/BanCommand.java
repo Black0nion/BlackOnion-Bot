@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
@@ -17,11 +16,14 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class BanCommand implements Command {
+public class BanCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "ban", "permayeet" };
+	public BanCommand() {
+		this.setCommand("ban", "permayeet")
+			.setSyntax("<@User> [reason]")
+			.setRequiredArgumentCount(1)
+			.setRequiredPermissions(Permission.BAN_MEMBERS)
+			.setRequiredBotPermissions(Permission.BAN_MEMBERS);
 	}
 
 	@Override
@@ -43,30 +45,5 @@ public class BanCommand implements Command {
 				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(LanguageSystem.getTranslation("yougotbanned", author), LanguageSystem.getTranslation("message", author) + ": " + finalBanMessage, false).build()).queue();
 			});
 		}
-	}
-	
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] { Permission.BAN_MEMBERS };
-	}
-	
-	@Override
-	public Permission[] getRequiredBotPermissions() {
-		return new Permission[] { Permission.BAN_MEMBERS };
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<@User> [reason]";
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MODERATION;
 	}
 }

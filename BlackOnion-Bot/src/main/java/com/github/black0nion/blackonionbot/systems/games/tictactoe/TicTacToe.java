@@ -1,13 +1,12 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
-import java.util.Map;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -132,26 +131,9 @@ public class TicTacToe {
 		return false;
 	}
 	
-	public static Map.Entry<Integer, Integer> getCoordinatesFromString(String input) {
+	public static Pair<Integer, Integer> getCoordinatesFromString(String input) {
 		char[] charInput = input.toCharArray();
-		return new Map.Entry<Integer, Integer>() {
-			@Override
-			public Integer getKey() {
-				// the letters
-				return Integer.parseInt(String.valueOf(charInput[1]))-1;
-			}
-
-			@Override
-			public Integer getValue() {
-				// the numbers
-				return Utils.alphabet.indexOf(charInput[0]);
-			}
-
-			@Override
-			public Integer setValue(Integer value) {
-				return null;
-			}
-		};
+		return new Pair<Integer, Integer>(Integer.parseInt(String.valueOf(charInput[1]))-1, Utils.alphabet.indexOf(charInput[0]));
 	}
 	
 	public boolean isValidInput(String input) {

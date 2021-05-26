@@ -69,11 +69,13 @@ public class CommandBase extends ListenerAdapter {
 				final String[] packageName = command.getPackage().getName().split(".");
 				final Category parsedCategory = Category.parse(packageName[packageName.length-1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
-				if (newInstance.getCommand() != null) {
-					if (newInstance.shouldAutoRegister())
+				
+				if (newInstance.shouldAutoRegister()) {					
+					if (newInstance.getCommand() != null) {
 						addCommand(newInstance);
-				} else
-					System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
+					} else
+						System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

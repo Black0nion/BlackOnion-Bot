@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -20,6 +19,7 @@ import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeGame
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToePlayer;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
@@ -95,8 +95,7 @@ public class TicTacToeCommand extends Command {
   						rerun(game, channel);
   						return;
   					} else if (game.isValidInput(msg)) {
-	  					@SuppressWarnings("static-access")
-						Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
+						Pair<Integer, Integer> coords = TicTacToe.getCoordinatesFromString(msg);
 	  					FieldType[][] temp = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 	  					System.arraycopy(game.getField(), 0, temp, 0, game.getField().length);
 	  					
@@ -146,7 +145,7 @@ public class TicTacToeCommand extends Command {
 	  	);
 	}
 	
-	private boolean handleWin(TicTacToe game, Map.Entry<Integer, Integer> coords) {
+	private boolean handleWin(TicTacToe game, Pair<Integer, Integer> coords) {
 		final FieldType firstWinner = game.getWinner(coords.getKey(), coords.getValue());
 		if (firstWinner == null) {
 			return false;

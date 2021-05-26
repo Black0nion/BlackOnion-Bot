@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -16,11 +15,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class SetWelcomeChannelCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "setwelcomechannel", "setwelcomechat" };
+public class SetWelcomeChannelCommand extends Command {
+	
+	public SetWelcomeChannelCommand() {
+		this.setCommand("setwelcomechannel", "setwelcomechat")
+			.setSyntax("[clear / off]")
+			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE)
+			.setRequiredPermissions(Permission.MANAGE_SERVER);
 	}
 
 	@Override
@@ -33,25 +34,5 @@ public class SetWelcomeChannelCommand implements Command {
 			guild.setJoinChannel(channel.getIdLong());
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("welcomechannelset", "welcomechannelsetinfo", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}
-	}
-	
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] { Permission.MANAGE_SERVER };
-	}
-	
-	@Override
-	public Permission[] getRequiredBotPermissions() {
-		return new Permission[] { Permission.MESSAGE_MANAGE };
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MODERATION;
-	}
-
-	@Override
-	public String getSyntax() {
-		return "[clear / off]";
 	}
 }

@@ -1,12 +1,12 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
-import java.util.Map;
-
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.Pair;
 
 public class TicTacToeBot {
-	public static Map.Entry<Integer, Integer> move(TicTacToe game) {
+	
+	public static Pair<Integer, Integer> move(TicTacToe game) {
+		
 		FieldType[][] board = game.getField();
 	    boolean mademove = false;
 	    final FieldType humanMarker = FieldType.X;
@@ -18,7 +18,7 @@ public class TicTacToeBot {
 	            if (board[2][i] != humanMarker && board[2][i] != botSymbol) {
 	                board[2][i] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(2, i);
+	                return new Pair<Integer, Integer>(2, i);
 	            }
 	        }
 	    }
@@ -28,7 +28,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != humanMarker && board[0][i] != botSymbol) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(0, i);
+	                return new Pair<Integer, Integer>(0, i);
 	            }
 	        }
 	    }
@@ -41,7 +41,7 @@ public class TicTacToeBot {
 	            if (board[i][2] != humanMarker && board[i][2] != botSymbol) {
 	                board[i][2] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(i, 2);
+	                return new Pair<Integer, Integer>(i, 2);
 	            }
 	        }
 	    }
@@ -51,7 +51,7 @@ public class TicTacToeBot {
 	            if (board[i][0] != humanMarker && board[i][0] != botSymbol) {
 	                board[i][0] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(i, 0);
+	                return new Pair<Integer, Integer>(i, 0);
 	            }
 	        }
 	    }
@@ -64,7 +64,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 2);
+	            return new Pair<Integer, Integer>(2, 2);
 	        }
 	    }
 
@@ -72,7 +72,7 @@ public class TicTacToeBot {
 	        if (board[0][0] != humanMarker && board[0][0] != botSymbol) {
 	            board[0][0] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(0, 0);
+	            return new Pair<Integer, Integer>(0, 0);
 	        }
 	    }
 
@@ -80,7 +80,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 2);
+	            return new Pair<Integer, Integer>(2, 2);
 	        }
 	    }
 
@@ -88,7 +88,7 @@ public class TicTacToeBot {
 	        if (board[2][0] != humanMarker && board[2][0] != botSymbol) {
 	            board[2][0] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 0);
+	            return new Pair<Integer, Integer>(2, 0);
 	        }
 	    }
 
@@ -96,7 +96,7 @@ public class TicTacToeBot {
 	        if (board[0][2] != humanMarker && board[0][2] != botSymbol) {
 	            board[0][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(0, 2);
+	            return new Pair<Integer, Integer>(0, 2);
 	        }
 	    }
 
@@ -109,7 +109,7 @@ public class TicTacToeBot {
 	            if (board[2][i] != botSymbol && board[2][i] != humanMarker) {
 	                board[2][i] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(2, i);
+	                return new Pair<Integer, Integer>(2, i);
 	            }
 	        }
 	    }
@@ -119,7 +119,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(0, i);
+	                return new Pair<Integer, Integer>(0, i);
 	            }
 	        }
 	    }
@@ -130,7 +130,7 @@ public class TicTacToeBot {
 	            if (board[i][2] != botSymbol && board[i][2] != humanMarker) {
 	                board[i][2] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(i, 2);
+	                return new Pair<Integer, Integer>(i, 2);
 	            }
 	        }
 	    }
@@ -140,7 +140,7 @@ public class TicTacToeBot {
 	            if (board[i][0] != botSymbol && board[i][0] != humanMarker) {
 	                board[i][0] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(i, 0);
+	                return new Pair<Integer, Integer>(i, 0);
 	            }
 	        }
 	    }
@@ -150,7 +150,7 @@ public class TicTacToeBot {
 	            if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
 	                board[0][i] = botSymbol;
 	                mademove = true;
-	                return Utils.getMapEntry(0, i);
+	                return new Pair<Integer, Integer>(0, i);
 	            }
 	        }
 	    }
@@ -160,7 +160,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 2);
+	            return new Pair<Integer, Integer>(2, 2);
 	        }
 	    }
 
@@ -168,7 +168,7 @@ public class TicTacToeBot {
 	        if (board[0][0] != botSymbol && board[0][0] != humanMarker) {
 	            board[0][0] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(0, 0);
+	            return new Pair<Integer, Integer>(0, 0);
 	        }
 	    }
 
@@ -176,7 +176,7 @@ public class TicTacToeBot {
 	        if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
 	            board[2][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 2);
+	            return new Pair<Integer, Integer>(2, 2);
 	        }
 	    }
 
@@ -184,7 +184,7 @@ public class TicTacToeBot {
 	        if (board[2][0] != botSymbol && board[2][0] != humanMarker) {
 	            board[2][0] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(2, 0);
+	            return new Pair<Integer, Integer>(2, 0);
 	        }
 	    }
 
@@ -192,7 +192,7 @@ public class TicTacToeBot {
 	        if (board[0][2] != botSymbol && board[0][2] != humanMarker) {
 	            board[0][2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(0, 2);
+	            return new Pair<Integer, Integer>(0, 2);
 	        }
 	    }
 	    
@@ -207,7 +207,7 @@ public class TicTacToeBot {
 	        if (board[rand1][rand2] != FieldType.X && board[rand1][rand2] != FieldType.Y) {
 	            board[rand1][rand2] = botSymbol;
 	            mademove = true;
-	            return Utils.getMapEntry(rand1, rand2);
+	            return new Pair<Integer, Integer>(rand1, rand2);
 	        }
 	    }
 	    // theoretically, this should never get called

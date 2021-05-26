@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
@@ -18,13 +17,15 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class RenameCommand implements Command {
+public class RenameCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "rename", "rn" };
+	public RenameCommand() {
+		this.setCommand("rename", "rn")
+			.setSyntax("<old name> <new name>")
+			.botAdminRequired()
+			.setHidden();
 	}
-
+	
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember sentmember, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (Utils.handleRights(guild, author, e.getChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
@@ -47,20 +48,5 @@ public class RenameCommand implements Command {
 			channel.sendMessage("Doesn't work m8").delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<old name> <new name>";
-	}
-	
-	@Override
-	public boolean requiresBotAdmin() {
-		return true;
-	}
-
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
 	}
 }

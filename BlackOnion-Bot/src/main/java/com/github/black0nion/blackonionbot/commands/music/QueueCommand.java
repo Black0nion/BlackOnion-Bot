@@ -9,32 +9,30 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class QueueCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "queue", "playlist" };
+public class QueueCommand extends Command {
+	
+	public QueueCommand() {
+		this.setCommand("queue", "playlist");
 	}
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.queue.size() == 0) {
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("queueempty", "addsomethingtoqueue", false).build()).queue();
+			cmde.error("queueempty", "addsomethingtoqueue");
 			return;
 		}
+		
 		List<AudioTrack> tracks = PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.queue.stream().collect(Collectors.toList());
-		EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
+		EmbedBuilder builder = cmde.success();
 		if (tracks.size() <= 10) {
         	tracks.forEach(track -> {
         		builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
@@ -48,10 +46,5 @@ public class QueueCommand implements Command {
     	}
 		
 		message.reply(builder.build()).queue();
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MUSIC;
 	}
 }

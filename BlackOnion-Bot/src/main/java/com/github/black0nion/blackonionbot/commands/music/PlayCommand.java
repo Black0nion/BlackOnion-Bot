@@ -6,9 +6,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -17,11 +15,13 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-public class PlayCommand implements Command {
+public class PlayCommand extends Command {
 
-	@Override
-	public String[] getCommand() {
-		return new String[] { "play" };
+	public PlayCommand() {
+		this.setCommand("play")
+			.setSyntax("<url / search term>")
+			.setRequiredArgumentCount(1)
+			.setRequiredBotPermissions(Permission.VOICE_SPEAK);
 	}
 
 	@Override
@@ -43,27 +43,7 @@ public class PlayCommand implements Command {
 			
 			PlayerManager.getInstance().loadAndPlay(author, e.getChannel(), url, audioManager, memberChannel);
 		} else {
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notinvc", "goinvc", false).build()).queue();
+			cmde.error("notinvc", "goinvc");
 		}
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
-	}
-
-	@Override
-	public Category getCategory() {
-		return Category.MUSIC;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<url / search term>";
-	}
-	
-	@Override
-	public Permission[] getRequiredBotPermissions() {
-		return new Permission[] { Permission.VOICE_SPEAK };
 	}
 }

@@ -15,14 +15,19 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 @DontAutoRegister
-public class NNNCommand implements Command {
+public class NNNCommand extends Command {
+	
+	public NNNCommand() {
+		this.setCommand("nnn", "nonutnovember")
+			.setHidden()
+			.dontAutoRegister();
+	}
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
@@ -50,15 +55,4 @@ public class NNNCommand implements Command {
 			ex.printStackTrace();
 		}
 	}
-	
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
-	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[] {"nnn", "nonutnovember"};
-	}
-	
 }
