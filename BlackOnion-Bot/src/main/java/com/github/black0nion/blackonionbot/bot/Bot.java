@@ -111,8 +111,8 @@ public class Bot extends ListenerAdapter {
 			jda = builder.build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("[BOT] Failed to connect to the bot! Please make sure to have a file named \"token.ahitm\" with the bot's token in the files folder!");
-			System.out.println("Terminating bot.");
+			Logger.log(LogMode.FATAL, LogOrigin.BOT, "Failed to connect to the bot! Please make sure to have the token saved in the file \"credentials." + runMode.name() + ".json\" in the folder \"files\" with the bot's token saved under the key \"token\"!");
+			Logger.log(LogMode.ERROR, LogOrigin.BOT, "Terminating bot.");
 			System.exit(-1);
 		}
 
