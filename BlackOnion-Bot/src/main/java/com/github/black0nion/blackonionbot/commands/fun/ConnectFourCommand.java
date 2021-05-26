@@ -12,7 +12,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
@@ -24,11 +23,10 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class ConnectFourCommand implements Command {
+public class ConnectFourCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "connect4", "connectfour", "viergewinnt", "4gewinnt" };
+	public ConnectFourCommand() {
+		this.setCommand("connect4", "connectfour", "viergewinnt", "4gewinnt");
 	}
 
 	@Override
@@ -115,10 +113,5 @@ public class ConnectFourCommand implements Command {
 	  			}, 
 	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed(null, BlackGuild.from(channel.getGuild())).addField(LanguageSystem.getTranslation("timeout", BlackGuild.from(channel.getGuild())), LanguageSystem.getTranslation("tooktoolong", BlackGuild.from(channel.getGuild())), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.FUN;
 	}
 }

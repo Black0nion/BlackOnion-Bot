@@ -23,19 +23,20 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class BigbrainMemeCommand implements Command {
+public class BigbrainMemeCommand extends Command {
 	
 	private static BufferedImage defaultBackGround;
 	
 	final static int maxWidth = 420;
 	
 	public BigbrainMemeCommand() {
+		this.setCommand("bigbrain")
+			.setSyntax("<smul brain text>,<medium brain text>,<big brain text>,<thicc brain text>");
 		try {
 			InputStream inputstream = new FileInputStream(new File("resources/bigbrain-meme.jpg"));
 
@@ -48,15 +49,10 @@ public class BigbrainMemeCommand implements Command {
 	}
 
 	@Override
-	public String[] getCommand() {
-		return new String[] { "bigbrain" };
-	}
-
-	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargumentcount", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+			cmde.sendPleaseUse();
 			return;
 		}
 		message.reply("Generating your image...").queue(m -> {
@@ -66,11 +62,6 @@ public class BigbrainMemeCommand implements Command {
 				m.delete().queue();
 			});
 		});
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<smul brain text>,<medium brain text>,<big brain text>,<thicc brain text>";
 	}
 	
 	@NotNull

@@ -13,8 +13,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -24,11 +22,10 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
-public class CatBreedsCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "catbreeds", "catexamples" };
+public class CatBreedsCommand extends Command {
+	
+	public CatBreedsCommand() {
+		this.setCommand("catbreeds", "catexamples");
 	}
 
 	@Override
@@ -52,27 +49,24 @@ public class CatBreedsCommand implements Command {
 				pages.put(i, entrysOnThisPage);
 			}
 			
-			System.out.println(pages);
-			
-			EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild).setTitle("UwU");
+			EmbedBuilder builder = cmde.success().setTitle("UwU");
 			pages.get(0).forEach((name, value) -> {
 				builder.addField(name, value, false);
 			});
 			
-			message.reply(builder.build()).queue((msgg) -> {
-				BlackMessage msg = BlackMessage.from(msgg);
+			cmde.reply(builder, msg -> {
 				for (int i = 0; i < pages.size(); i++)
 					msg.addReaction(Utils.numbersUnicode.get(i)).queue();
-				waitForPageSwitch(msg, author, pages);
+				waitForPageSwitch(cmde, msg, author, pages);
 			});
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			cmde.exception();
 			return;
 		}
 	}
 	
-	private static void waitForPageSwitch(BlackMessage msg, BlackUser user, HashMap<Integer, HashMap<String, String>> pages) {
+	private static void waitForPageSwitch(CommandEvent cmde, BlackMessage msg, BlackUser user, HashMap<Integer, HashMap<String, String>> pages) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class,
 				(event) -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
 				(event) -> {
@@ -80,21 +74,16 @@ public class CatBreedsCommand implements Command {
 					Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
 					
 					if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || pages.size() < emojiReactionNum)
-						waitForPageSwitch(msg, user, pages);
+						waitForPageSwitch(cmde, msg, user, pages);
 					
 					// all fine, we can switch page
-					EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, msg.getBlackGuild()).setTitle("UwU");
+					EmbedBuilder builder = cmde.success().setTitle("UwU");
 					pages.get(emojiReactionNum).forEach((name, value) -> {
 						builder.addField(name, value, false);
 					});
 					
 					msg.editMessage(builder.build()).queue();
-					waitForPageSwitch(msg, user, pages);
+					waitForPageSwitch(cmde, msg, user, pages);
 				}, 1, TimeUnit.MINUTES, () -> { msg.delete().queue(); });
-	}
-
-	@Override
-	public Category getCategory() {
-		return Category.FUN;
 	}
 }
