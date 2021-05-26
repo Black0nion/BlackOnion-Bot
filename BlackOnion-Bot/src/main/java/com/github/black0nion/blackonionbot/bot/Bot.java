@@ -155,8 +155,7 @@ public class Bot extends ListenerAdapter {
 					e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
 					Thread.sleep(60000);
 				} catch (Exception ex) {
-					if (runMode == RunMode.PRODUCTION)
-						ex.printStackTrace();
+					ex.printStackTrace();
 				}
 			}
 		});
