@@ -10,16 +10,19 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class CatCommand implements Command {
+public class CatCommand extends Command {
+	
+	public CatCommand() {
+		this.setCommand("cat", "uwucat")
+			.setSyntax("[cat breed]");
+	}
 
 	@Override
 	public String[] getCommand() {
@@ -36,26 +39,16 @@ public class CatCommand implements Command {
 			  .asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
 				// cat breed not found
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("catnotfound", LanguageSystem.getTranslation("catbreednotfound", author, guild).replace("%command%", guild.getPrefix() + CommandBase.commands.get("catbreeds").getCommand()[0]), false).build()).queue();
+				cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", guild.getPrefix() + CommandBase.commands.get("catbreeds").getCommand()[0]));
 				return;
 			}
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());
 			final JSONObject responseAsJSON = responseAsJSONArray.getJSONObject(0);
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("UwU").setImage(responseAsJSON.getString("url")).build()).queue();
+			cmde.reply(cmde.success().setTitle("UwU").setImage(responseAsJSON.getString("url")));
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			cmde.exception();
 			return;
 		}
-	}
-
-	@Override
-	public Category getCategory() {
-		return Category.FUN;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "[cat breed]";
 	}
 }
