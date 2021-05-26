@@ -66,7 +66,7 @@ public class CommandBase extends ListenerAdapter {
 		for (Class<?> command : annotated) {
 			try {
 				final Command newInstance = (Command) command.getConstructor().newInstance();
-				final String[] packageName = command.getPackage().getName().split(".");
+				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length-1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 				

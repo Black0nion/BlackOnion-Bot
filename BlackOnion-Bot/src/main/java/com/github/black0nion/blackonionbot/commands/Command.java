@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.commands;
 
+import java.util.Arrays;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
@@ -17,7 +19,7 @@ public abstract class Command {
 	private String[] command = null;
 	private String syntax = null;
 	private Category category = Category.OTHER;
-	private Progress progress;
+	private Progress progress = Progress.DONE;
 	private CommandVisibility visibility = CommandVisibility.SHOWN;
 	private int requiredArgumentCount = 0;
 	private Permission[] requiredPermissions = new Permission[] {};
@@ -163,5 +165,15 @@ public abstract class Command {
 	
 	public void dontAutoRegister() {
 		this.shouldAutoRegister = false;
+	}
+
+	@Override
+	public String toString() {
+		return "Command [command=" + Arrays.toString(command) + ", syntax=" + syntax + ", category=" + category
+				+ ", progress=" + progress + ", visibility=" + visibility + ", requiredArgumentCount="
+				+ requiredArgumentCount + ", requiredPermissions=" + Arrays.toString(requiredPermissions)
+				+ ", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) + ", requiresBotAdmin="
+				+ requiresBotAdmin + ", isToggleable=" + isToggleable + ", isDashboardCommand=" + isDashboardCommand
+				+ ", shouldAutoRegister=" + shouldAutoRegister + "]";
 	}
 }

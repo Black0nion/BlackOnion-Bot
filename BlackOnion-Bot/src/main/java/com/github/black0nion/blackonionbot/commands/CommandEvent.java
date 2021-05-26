@@ -92,6 +92,8 @@ public class CommandEvent {
 	}
 	
 	public void success(String title, String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+		name = language.getTranslatedString(name);
+		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
 			title = placeholder.process(title);
 			name = placeholder.process(name);
@@ -102,6 +104,8 @@ public class CommandEvent {
 	}
 	
 	public void success(String name, String value, final Placeholder... placeholders) {
+		name = language.getTranslatedString(name);
+		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -111,6 +115,8 @@ public class CommandEvent {
 	}
 	
 	public void success(String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+		name = language.getTranslatedString(name);
+		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -140,6 +146,9 @@ public class CommandEvent {
 	}
 	
 	public void error(String title, String name, String value, final Placeholder... placeholders) {
+		title = language.getTranslatedString(title);
+		name = language.getTranslatedString(name);
+		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
 			title = placeholder.process(title);
 			name = placeholder.process(name);
@@ -150,6 +159,8 @@ public class CommandEvent {
 	}
 	
 	public void error(String name, String value, final Placeholder... placeholders) {
+		name = language.getTranslatedString(name);
+		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -171,7 +182,7 @@ public class CommandEvent {
 	}
 	
 	public void reply(EmbedBuilder builder, Consumer<? super BlackMessage> success, Consumer<? super Throwable> error) {
-		message.reply(builder.build()).queue(msg -> success.accept(BlackMessage.from(msg)), error);
+		message.reply(builder.build()).queue(msg -> { if (success != null) success.accept(BlackMessage.from(msg)); }, error);
 	}
 	
 	public void sendPleaseUse() {
@@ -192,7 +203,7 @@ public class CommandEvent {
 
 	public static String getCommandHelp(BlackGuild guild, BlackUser author, Command command) {
 		final String syntax = command.getSyntax();
-		return "`" + guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
+		return guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "");
 	}
 
 	public EmbedBuilder getWrongArgument() {
