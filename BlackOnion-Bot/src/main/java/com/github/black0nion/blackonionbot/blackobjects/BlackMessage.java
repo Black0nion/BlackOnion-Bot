@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.requests.restaction.pagination.ReactionPaginationActi
 
 public class BlackMessage extends BlackObject implements Message {
 	
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("messages", MongoDB.botDatabase);
 	
 	private final Message message;
 	private final BlackMember blackMember;
