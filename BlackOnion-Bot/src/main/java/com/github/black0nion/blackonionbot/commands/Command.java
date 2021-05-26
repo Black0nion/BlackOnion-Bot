@@ -72,6 +72,10 @@ public abstract class Command {
 		return visibility;
 	}
 	
+	public boolean isVisible() {
+		return visibility == CommandVisibility.SHOWN;
+	}
+	
 	public Command setVisibility(CommandVisibility visibility) {
 		if (visibility == null) this.visibility = CommandVisibility.HIDDEN;
 		else this.visibility = visibility;
@@ -134,8 +138,13 @@ public abstract class Command {
 		return isToggleable;
 	}
 
-	public Command setToggleable(boolean isToggleable) {
-		this.isToggleable = isToggleable;
+	public Command toggleable() {
+		this.isToggleable = true;
+		return this;
+	}
+	
+	public Command notToggleable() {
+		this.isToggleable = true;
 		return this;
 	}
 

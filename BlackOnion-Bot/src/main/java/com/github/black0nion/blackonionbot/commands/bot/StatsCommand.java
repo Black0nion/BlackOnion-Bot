@@ -16,19 +16,16 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class StatsCommand implements Command {
+public class StatsCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "stats" };
+	public StatsCommand() {
+		this.setCommand("stats", "botstats");
 	}
 
 	@Override
@@ -40,7 +37,7 @@ public class StatsCommand implements Command {
             long diffHours = diff / (60 * 60 * 1000) % 24;
             long diffDays = diff / (24 * 60 * 60 * 1000);
 			
-			EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
+			EmbedBuilder builder = cmde.success()
 				.setTitle("Bot Stats")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.addField("Prefix", "``" + guild.getPrefix() + "``", true)
@@ -58,14 +55,9 @@ public class StatsCommand implements Command {
 				.addField("Uptime", (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : ""), false)
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
-			message.reply(builder.build()).queue();
+			cmde.reply(builder);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
 	}
 }

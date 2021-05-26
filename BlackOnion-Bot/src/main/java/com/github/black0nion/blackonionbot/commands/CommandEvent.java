@@ -16,6 +16,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
@@ -42,6 +43,7 @@ public class CommandEvent {
 	private EmbedBuilder successEmbed;
 	private EmbedBuilder loadingEmbed;
 	private EmbedBuilder errorEmbed;
+	private Language language;
 	
 	@Deprecated
 	public CommandEvent(Command cmd, GuildMessageReceivedEvent e) {
@@ -59,6 +61,18 @@ public class CommandEvent {
 		this.successEmbed = getSuccessEmbed(this.user, this.guild);
 		this.loadingEmbed = getLoadingEmbed(this.user, this.guild);
 		this.errorEmbed = getErrorEmbed(this.user, this.guild);
+		this.language = LanguageSystem.getLanguage(user, guild);
+	}
+	
+	/**
+	 * @return the language, user -> guild -> default
+	 */
+	public Language getLanguage() {
+		return language;
+	}
+	
+	public EmbedBuilder success() {
+		return this.successEmbed;
 	}
 	
 	public void success(String name, String value) {
@@ -69,14 +83,40 @@ public class CommandEvent {
 		reply(successEmbed.setTitle(title).addField(name, value, false));
 	}
 	
+	public void success(String title, String url, String name, String value) {
+		reply(successEmbed.setTitle(title, url).addField(name, value, false));
+	}
+	
 	public void success(String title, String name, String value, final Placeholder... placeholders) {
+		success(title, name, value, null, placeholders);
+	}
+	
+	public void success(String title, String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
 		for (final Placeholder placeholder : placeholders) {
 			title = placeholder.process(title);
 			name = placeholder.process(name);
 			value = placeholder.process(value);
 		}
 		
-		success(title, name, value);
+		reply(successEmbed.setTitle(title).addField(name, value, false), success);
+	}
+	
+	public void success(String name, String value, final Placeholder... placeholders) {
+		for (final Placeholder placeholder : placeholders) {
+			name = placeholder.process(name);
+			value = placeholder.process(value);
+		}
+		
+		reply(successEmbed.addField(name, value, false), null);
+	}
+	
+	public void success(String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+		for (final Placeholder placeholder : placeholders) {
+			name = placeholder.process(name);
+			value = placeholder.process(value);
+		}
+		
+		reply(successEmbed.addField(name, value, false), success);
 	}
 	
 	public void loading(String name, String value) {
@@ -85,6 +125,33 @@ public class CommandEvent {
 	
 	public void error(String name, String value) {
 		reply(errorEmbed.addField(name, value, false));
+	}
+	
+	public void error(String title, String name, String value) {
+		reply(errorEmbed.setTitle(title).addField(name, value, false));
+	}
+	
+	public void error(String title, String name, String value, final Placeholder... placeholders) {
+		for (final Placeholder placeholder : placeholders) {
+			title = placeholder.process(title);
+			name = placeholder.process(name);
+			value = placeholder.process(value);
+		}
+		
+		error(title, name, value);
+	}
+	
+	public void error(String name, String value, final Placeholder... placeholders) {
+		for (final Placeholder placeholder : placeholders) {
+			name = placeholder.process(name);
+			value = placeholder.process(value);
+		}
+		
+		error(name, value);
+	}
+	
+	public void exception() {
+		error("errorhappened", "somethingwentwrong");
 	}
 	
 	public void reply(EmbedBuilder builder) {
@@ -122,5 +189,9 @@ public class CommandEvent {
 
 	public EmbedBuilder getWrongArgument() {
 		return errorEmbed.addField("wrongargument", getPleaseUse(this.guild, this.user, this.command), false);
+	}
+	
+	public String getTranslation(String key) {
+		return language.getTranslatedString(key);
 	}
 }

@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -13,10 +12,10 @@ import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,11 +23,11 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
-public class HelpCommand implements Command {
+public class HelpCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "help", "hilfe" };
+	public HelpCommand() {
+		this.setCommand("help")
+			.notToggleable();
 	}
 	
 	@Override
@@ -37,35 +36,35 @@ public class HelpCommand implements Command {
 			if (args.length >= 2) {
 				// a command
 				for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
+					if (entry.getValue().isVisible() && Arrays.asList(entry.getKey()).contains(args[1])) {
 						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), author, guild);
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-						message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
+						cmde.success("help", CommandEvent.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty");
 						return;
 					}
 				}
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("commandnotfound", LanguageSystem.getTranslation("thecommandnotfound", author, guild).replace("%command%", "`" + args[1] + "`"), false).build()).queue();
+				cmde.error("commandnotfound", "thecommandnotfound", new Placeholder("command", "`" + args[1] + "`"));
 			} else {
 				// start the help system thingy lmao
-				EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
-						.setTitle(LanguageSystem.getTranslation("help", author, guild) + " | " + LanguageSystem.getTranslation("modules", author, guild))
-						.setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", author, guild));
+				EmbedBuilder builder = cmde.success()
+						.setTitle(cmde.getTranslation("help") + " | " + cmde.getTranslation("modules"))
+						.setDescription(cmde.getTranslation("onlyexecutorcancontrol"));
 				
 				final Category[] cats = Category.values();
 				for (int i = 0; i <= cats.length; i++) {
 					String commandsInCategory = "";
 					Category c = null;
 					if (i == 0) {
-						commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", author, guild);
+						commandsInCategory = ", " + cmde.getTranslation("helpmodules");
 					} else {						
 						c = cats[i - 1];
 						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-							if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
+							if (entry.getValue().getCategory() == c && entry.getValue().isVisible())
 								commandsInCategory += ", " + entry.getValue().getCommand()[0];
 						}
 					}
 					if (commandsInCategory.length() <= 2) continue;
-					builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslation("modules", author, guild)), commandsInCategory.substring(1), false);
+					builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + cmde.getTranslation("modules")), commandsInCategory.substring(1), false);
 				}
 				message.reply(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
@@ -85,8 +84,8 @@ public class HelpCommand implements Command {
 		}
 	}
 	
-	private static final void waitForHelpCatSelection(BlackMessage msg, BlackMember author, int catCount) {
-		CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class, 
+	private final void waitForHelpCatSelection(BlackMessage msg, BlackMember author, int catCount) {
+		CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class,
 				(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUserIdLong() == author.getIdLong(), 
 				(event) -> {
 					event.getReaction().removeReaction(event.getUser()).queue();
@@ -113,7 +112,7 @@ public class HelpCommand implements Command {
 							} else {						
 								c = cats[i - 1];
 								for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-									if (entry.getValue().getCategory() == c && entry.getValue().getVisisbility() == CommandVisibility.SHOWN)
+									if (entry.getValue().getCategory() == c && entry.getValue().isVisible())
 										commandsInCategory += ", " + entry.getValue().getCommand()[0];
 								}
 							}
@@ -125,7 +124,7 @@ public class HelpCommand implements Command {
 						final Category category = Category.values()[emojiReactionNum];
 						builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
 						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-							if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && (entry.getValue().getCategory() == category)) {
+							if (entry.getValue().isVisible() && (entry.getValue().getCategory() == category)) {
 								if (entry.getValue().getProgress() == Progress.DONE) {
 									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
@@ -139,7 +138,7 @@ public class HelpCommand implements Command {
 								continue;
 							for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 								Command command = entry.getValue();
-								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
+								if (command.isVisible() && (command.getCategory() == category) && command.getProgress() == pr) {
 									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
 									builder.addField(pr.name().toUpperCase() + ": " + CommandEvent.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
@@ -151,15 +150,5 @@ public class HelpCommand implements Command {
 					msg.editMessage(builder.build()).queue();
 					waitForHelpCatSelection(msg, author, catCount);
 		}, 5, TimeUnit.MINUTES, () -> {msg.delete().queue();});
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-
-	@Override
-	public boolean isToggleable() {
-		return false;
 	}
 }

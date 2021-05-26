@@ -8,17 +8,21 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class GuildLanguageCommand extends Command {
+	
+	public GuildLanguageCommand() {
+		this.setCommand("guildlanguage", "guildlang", "guildlocale", "guildsprache", "serverlang", "serverlanguage", "serersprache")
+			.setRequiredPermissions(Permission.ADMINISTRATOR)
+			.setSyntax("[language code]");
+	}
 
 	@Override
 	public String[] getCommand() {
@@ -31,16 +35,16 @@ public class GuildLanguageCommand extends Command {
 			final Language newLanguage = LanguageSystem.getLanguageFromName(args[1].toUpperCase());
 			if (newLanguage != null) {
 				guild.setLanguage(newLanguage);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("languageupdated", LanguageSystem.getTranslation("newlanguage", author, guild) + " " + newLanguage.getName() + " (" + newLanguage.getLanguageCode().toUpperCase() + ")", false).build()).queue();
+				cmde.success("languageupdated", "newlanguage", new Placeholder("newlang", newLanguage.getName() + " (" + newLanguage.getLanguageCode().toUpperCase() + ")"));
 			} else {
 				String validLanguages = "\n";
 				for (Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {
 					validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
 				}
 				if (args[1].equalsIgnoreCase("list")) {
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Valid Languages", validLanguages, false).build()).queue();
+					cmde.success("Languages", "Valid Languages:", validLanguages);
 				} else {
-					message.reply(EmbedUtils.getErrorEmbed(author, guild).setTitle("Language doesn't exist").addField("Valid languages:", validLanguages, false).build()).queue();
+					cmde.error("Language doesn't exist!", "Valid Languages:", validLanguages);
 				}
 			}
 		} else {
@@ -51,22 +55,7 @@ public class GuildLanguageCommand extends Command {
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + Utils.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false).build()).queue();
+			cmde.reply(cmde.success().setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + CommandEvent.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false));
 		}
-	}
-	
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] {Permission.ADMINISTRATOR};
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<language code>";
 	}
 }

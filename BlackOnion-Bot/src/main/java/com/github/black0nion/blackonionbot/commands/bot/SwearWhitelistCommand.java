@@ -17,11 +17,12 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class SwearWhitelistCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "swearwhitelist", "antiswearwhitelist", "asw" };
+public class SwearWhitelistCommand extends Command {
+	
+	public SwearWhitelistCommand() {
+		this.setCommand("swearwhitelist", "sw", "antiswearwhitelist", "asw")
+			.setSyntax("<add | remove> <@role | #channel | Permission Name>")
+			.setRequiredPermissions(Permission.ADMINISTRATOR);
 	}
 
 	@Override
@@ -58,17 +59,8 @@ public class SwearWhitelistCommand implements Command {
 			}
 		} else {
 			final List<String> whitelist = guild.getList("whitelist", String.class);
+			// TODO: whitelist into the new system
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"), false).build()).queue();
 		}
-	}
-
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] { Permission.ADMINISTRATOR };
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<add | remove> <@role | #channel | Permission Name>";
 	}
 }

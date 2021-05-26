@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.systems.language;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -26,7 +27,14 @@ public class LanguageSystem {
 		allLanguages.add(german);
 		languages.put("EN", english);
 		languages.put("DE", german);
+		
+		for (Map.Entry<String, Language> entry : languages.entrySet()) {
+			validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
+		}
+		validLanguages += "```";
 	}
+	
+	public static String validLanguages = "\n```";
 	
 	public static HashMap<String, Language> getLanguages() {
 		return languages;
