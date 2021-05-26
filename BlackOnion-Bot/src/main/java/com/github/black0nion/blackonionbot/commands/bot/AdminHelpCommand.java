@@ -10,17 +10,24 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class AdminHelpCommand implements Command {
+public class AdminHelpCommand extends Command {
+	
+	public AdminHelpCommand() {
+		this.setCommand("adminhelp")
+			.botAdminRequired()
+			.setHidden()
+			.setCategory(Category.BOT);
+	}
 
 	@Override
 	public String[] getCommand() {
@@ -28,34 +35,18 @@ public class AdminHelpCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		message.delete().queue();
 		EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
 				.setTitle("Adminhilfe")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
 		
 		for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-			if (entry.getValue().getVisisbility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
-				builder.addField(Utils.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
+			if (entry.getValue().getVisibility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
+				builder.addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
 			}
 		}
 		
 		channel.sendMessage(builder.build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
 	}
-	
-	@Override
-	public boolean requiresBotAdmin() {
-		return true;
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-	
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
-	}
-
 }

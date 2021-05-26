@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -24,7 +23,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotSecrets;
-import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -205,42 +203,7 @@ public class Utils {
 	}
 	
 	public static<T> T[] subArray(T[] array, int beg, int end) {
-	       return Arrays.copyOfRange(array, beg, end + 1);
-	}
-	 
-	public static String getPleaseUse(BlackGuild guild, BlackUser author, Command command) {
-		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
-	}
-	
-	public static String getCommandHelp(BlackGuild guild, BlackUser author, Command command) {
-		final String syntax = command.getSyntax();
-		return "`" + guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "") + "`";
-	}
-	
-	public static MessageEmbed getWrongArgument(BlackUser author, BlackGuild guild, Command command) {
-		return EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, command), false).build();
-	}
-	
-	public static <K, V> Map.Entry<K, V> getMapEntry(K key, V value) {
-		return new Map.Entry<K, V>() {
-			V val = value;
-			
-			@Override
-			public V getValue() {
-				return val;
-			}
-			
-			@Override
-			public K getKey() {
-				return key;
-			}
-			
-			@Override
-			public V setValue(V value) {
-				this.val = value;
-				return value;
-			}
-		};
+		return Arrays.copyOfRange(array, beg, end + 1);
 	}
 	
 	public static boolean isLong(String input) {

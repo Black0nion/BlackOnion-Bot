@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.Progress;
@@ -31,7 +32,7 @@ public class HelpCommand implements Command {
 	}
 	
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		try {
 			if (args.length >= 2) {
 				// a command
@@ -39,7 +40,7 @@ public class HelpCommand implements Command {
 					if (entry.getValue().getVisisbility() == CommandVisibility.SHOWN && new ArrayList<String>(Arrays.asList(entry.getKey())).contains(args[1])) {
 						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), author, guild);
 						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-						message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(Utils.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
+						message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("help").addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty", false).build()).queue();
 						return;
 					}
 				}
@@ -128,7 +129,7 @@ public class HelpCommand implements Command {
 								if (entry.getValue().getProgress() == Progress.DONE) {
 									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-									builder.addField(Utils.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
+									builder.addField(CommandEvent.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
@@ -141,7 +142,7 @@ public class HelpCommand implements Command {
 								if (command.getVisisbility() == CommandVisibility.SHOWN && (command.getCategory() == category) && command.getProgress() == pr) {
 									final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
 									if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-									builder.addField(pr.name().toUpperCase() + ": " + Utils.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
+									builder.addField(pr.name().toUpperCase() + ": " + CommandEvent.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
 								}
 							}
 						}
