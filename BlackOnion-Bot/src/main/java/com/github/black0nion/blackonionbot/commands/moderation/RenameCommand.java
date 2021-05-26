@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -25,7 +26,7 @@ public class RenameCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember sentmember, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember sentmember, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (Utils.handleRights(guild, author, e.getChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
 		message.delete().queue();
 		final Member mem = guild.getMemberById(args[1]);

@@ -9,7 +9,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -20,17 +20,19 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class BanUsageCommand implements Command {
+public class BanUsageCommand extends Command {
+	
+	public BanUsageCommand() {
+		this.setCommand("banusage", "usageban")
+		.botAdminRequired()
+		.setHidden()
+		.setSyntax("<u:(userid) | g:(guildid)>");
+	}
 	
 	public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("usagebans");
 
 	@Override
-	public String[] getCommand() {
-		return new String[] { "banusage", "usageban" };
-	}
-
-	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		message.delete().queue();
 		if (args.length >= 2) {
 			final String stuffToBan = args[2];
@@ -50,20 +52,5 @@ public class BanUsageCommand implements Command {
 			channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		}
-	}
-
-	@Override
-	public boolean requiresBotAdmin() {
-		return true;
-	}
-	
-	@Override
-	public CommandVisibility getVisisbility() {
-		return CommandVisibility.HIDDEN;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<u:(userid) | g:(guildid)>";
 	}
 }

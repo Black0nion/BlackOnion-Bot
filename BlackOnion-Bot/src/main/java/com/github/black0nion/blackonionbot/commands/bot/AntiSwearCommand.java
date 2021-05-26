@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -15,15 +15,16 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class AntiSwearCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "antiswear" };
+public class AntiSwearCommand extends Command {
+	
+	public AntiSwearCommand() {
+		this.setCommand("antiswear")
+			.setSyntax("<remove | delete | off>")
+			.setRequiredPermissions(Permission.ADMINISTRATOR);
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		
 		if (!guild.isPremium()) {
 			channel.sendMessage(EmbedUtils.premiumRequired(author, guild)).queue();
@@ -46,27 +47,12 @@ public class AntiSwearCommand implements Command {
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "off"), false).build()).queue();
 				return;
 			} else {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", Utils.getPleaseUse(guild, author, this), false).build()).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", CommandEvent.getPleaseUse(guild, author, this), false).build()).queue();
 				return;
 			}
 		} else {
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSpoilerType().name(), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + Utils.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSpoilerType().name(), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + CommandEvent.getCommandHelp(guild, author, this) + "``"), false).build()).queue();
 			return;
 		}
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<remove | delete | off>";
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT;
-	}
-	
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] { Permission.ADMINISTRATOR };
 	}
 }

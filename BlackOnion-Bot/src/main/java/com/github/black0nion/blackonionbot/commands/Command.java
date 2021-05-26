@@ -12,48 +12,147 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public interface Command {
-	default CommandVisibility getVisisbility() {
-		return CommandVisibility.SHOWN;
-	}
+public abstract class Command {
 	
-	String[] getCommand();
+	private String[] command = null;
+	private String syntax = null;
+	private Category category = Category.OTHER;
+	private Progress progress;
+	private CommandVisibility visibility = CommandVisibility.SHOWN;
+	private int requiredArgumentCount = 0;
+	private Permission[] requiredPermissions = new Permission[] {};
+	private Permission[] requiredBotPermissions = new Permission[] {};
+	private boolean requiresBotAdmin = false;
+	private boolean isToggleable = true;
+	private boolean isDashboardCommand = true;
+	private boolean shouldAutoRegister = true;
 
-	void execute(String[] args, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
-	
-	default String getSyntax() {
-		return "";
+	public abstract void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
+
+	public String[] getCommand() {
+		return command;
+	}
+
+	public Command setCommand(String... command) {
+		this.command = command;
+		return this;
+	}
+
+	public String getSyntax() {
+		return syntax;
+	}
+
+	public Command setSyntax(String syntax) {
+		if (syntax == null) this.syntax = "";
+		else this.syntax = syntax;
+		return this;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public Command setCategory(Category category) {
+		if (category == null) this.category = Category.OTHER;
+		else this.category = category;
+		return this;
+	}
+
+	public Progress getProgress() {
+		return progress;
+	}
+
+	public Command setProgress(Progress progress) {
+		if (progress == null) this.progress = Progress.DONE;
+		else this.progress = progress;
+		return this;
 	}
 	
-	default Category getCategory() {
-		return Category.OTHER;
+	public CommandVisibility getVisibility() {
+		return visibility;
 	}
 	
-	default Progress getProgress() {
-		return Progress.DONE;
+	public Command setVisibility(CommandVisibility visibility) {
+		if (visibility == null) this.visibility = CommandVisibility.HIDDEN;
+		else this.visibility = visibility;
+		return this;
 	}
 	
-	default int getRequiredArgumentCount() {
-		return 0;
+	public Command setHidden() {
+		this.visibility = CommandVisibility.HIDDEN;
+		return this;
+	}
+
+	public int getRequiredArgumentCount() {
+		return requiredArgumentCount;
+	}
+
+	public Command setRequiredArgumentCount(int requiredArgumentCount) {
+		this.requiredArgumentCount = requiredArgumentCount;
+		return this;
+	}
+
+	public Permission[] getRequiredPermissions() {
+		return requiredPermissions;
+	}
+
+	public Command setRequiredPermissions(Permission... requiredPermissions) {
+		if (requiredPermissions == null) this.requiredPermissions = new Permission[] {};
+		else this.requiredPermissions = requiredPermissions;
+		return this;
+	}
+
+	public Permission[] getRequiredBotPermissions() {
+		return requiredBotPermissions;
+	}
+
+	public Command setRequiredBotPermissions(Permission... requiredBotPermissions) {
+		if (requiredBotPermissions == null) this.requiredBotPermissions = new Permission[] {};
+		else this.requiredBotPermissions = requiredBotPermissions;
+		return this;
+	}
+
+	public boolean requiresBotAdmin() {
+		return requiresBotAdmin;
+	}
+
+	public Command requiresBotAdmin(boolean requiresBotAdmin) {
+		this.requiresBotAdmin = requiresBotAdmin;
+		return this;
 	}
 	
-	default Permission[] getRequiredPermissions() {
-		return null;
+	/**
+	 * Sets requiredBotAdmin to true
+	 * @return self
+	 */
+	public Command botAdminRequired() {
+		this.requiresBotAdmin(true);
+		return this;
+	}
+
+	public boolean isToggleable() {
+		return isToggleable;
+	}
+
+	public Command setToggleable(boolean isToggleable) {
+		this.isToggleable = isToggleable;
+		return this;
+	}
+
+	public boolean isDashboardCommand() {
+		return isDashboardCommand;
+	}
+
+	public Command setDashboardCommand(boolean isDashboardCommand) {
+		this.isDashboardCommand = isDashboardCommand;
+		return this;
 	}
 	
-	default Permission[] getRequiredBotPermissions() {
-		return null;
+	public boolean shouldAutoRegister() {
+		return this.shouldAutoRegister;
 	}
 	
-	default boolean requiresBotAdmin() {
-		return false;
-	}
-	
-	default boolean isToggleable() {
-		return true;
-	}
-	
-	default boolean isDashboardCommand() {
-		return true;
+	public void dontAutoRegister() {
+		this.shouldAutoRegister = false;
 	}
 }

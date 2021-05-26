@@ -5,6 +5,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -20,7 +21,7 @@ public class PollCommand implements Command {
 	}
 
 	@Override
-	public void execute(String[] args, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("poll").addField(String.join(" ", Utils.removeFirstArg(args)), "polltutorial", false).build()).queue(msg -> {
 			msg.addReaction("tick:822036832422068225").queue();
 			msg.addReaction("cross:822036805117018132").queue();

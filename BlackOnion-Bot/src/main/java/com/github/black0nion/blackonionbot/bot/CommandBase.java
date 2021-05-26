@@ -19,9 +19,9 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
-import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.ToggleAPI;
@@ -65,8 +65,15 @@ public class CommandBase extends ListenerAdapter {
 
 		for (Class<?> command : annotated) {
 			try {
-				if (command.getDeclaredAnnotationsByType(DontAutoRegister.class).length >= 1) continue;
-				addCommand((Command) command.getConstructor().newInstance());
+				final Command newInstance = (Command) command.getConstructor().newInstance();
+				final String[] packageName = command.getPackage().getName().split(".");
+				final Category parsedCategory = Category.parse(packageName[packageName.length-1]);
+				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
+				if (newInstance.getCommand() != null) {
+					if (newInstance.shouldAutoRegister())
+						addCommand(newInstance);
+				} else
+					System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -76,7 +83,7 @@ public class CommandBase extends ListenerAdapter {
 			Dashboard.init();
 			for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
 				JSONArray array = new JSONArray();
-				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisisbility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
+				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisibility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
 					JSONObject commandJSON = new JSONObject();
 					commandJSON.put("command", command.getCommand());
 					commandJSON.put("description", LanguageSystem.getTranslation("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
@@ -142,7 +149,7 @@ public class CommandBase extends ListenerAdapter {
 			if (!ToggleAPI.isActivated(guild.getId(), cmd)) return;
 			
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
-				if (cmd.getVisisbility() != CommandVisibility.SHOWN)
+				if (cmd.getVisibility() != CommandVisibility.SHOWN)
 					return;
 				message.reply(EmbedUtils.getErrorEmbed(author, guild)
 						.addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
@@ -150,8 +157,8 @@ public class CommandBase extends ListenerAdapter {
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), Utils.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
-							if (cmd.getVisisbility() != CommandVisibility.SHOWN) {
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+							if (cmd.getVisibility() != CommandVisibility.SHOWN) {
 								msg.delete().queueAfter(3, TimeUnit.SECONDS);
 								message.delete().queueAfter(3, TimeUnit.SECONDS);
 							}
@@ -165,7 +172,7 @@ public class CommandBase extends ListenerAdapter {
 			}
 			
 			Bot.executor.submit(() -> {
-				cmd.execute(args, event, message, member, author, guild, channel);
+				cmd.execute(args, new CommandEvent(cmd, event, guild, message, member, author), event, message, member, author, guild, channel);
 			});
 			return;
 		}
