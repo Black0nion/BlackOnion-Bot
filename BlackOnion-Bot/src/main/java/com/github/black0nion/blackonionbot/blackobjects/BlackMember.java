@@ -36,7 +36,7 @@ import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 
 public class BlackMember extends BlackObject implements Member {
 	
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("membersettings", MongoDB.botDatabase);
 	
 	private final Member member;
 	private final BlackGuild blackGuild;
