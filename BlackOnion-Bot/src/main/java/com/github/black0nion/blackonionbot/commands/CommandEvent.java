@@ -119,8 +119,16 @@ public class CommandEvent {
 		reply(successEmbed.addField(name, value, false), success);
 	}
 	
+	public EmbedBuilder loading() {
+		return this.loadingEmbed;
+	}
+	
 	public void loading(String name, String value) {
 		reply(loadingEmbed.addField(name, value, false));
+	}
+	
+	public void loading(String name, String value, Consumer<? super BlackMessage> success) {
+		reply(loadingEmbed.addField(name, value, false), success);
 	}
 	
 	public void error(String name, String value) {

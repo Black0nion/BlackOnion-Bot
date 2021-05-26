@@ -17,20 +17,18 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class WeatherCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "weather" };
+public class WeatherCommand extends Command {
+	
+	public WeatherCommand() {
+		this.setCommand("weather")
+			.setSyntax("<City Name>")
+			.setRequiredArgumentCount(1);
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class WeatherCommand implements Command {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
 			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			EmbedBuilder embed = EmbedUtils.getSuccessEmbed(author, guild)
+			cmde.reply(cmde.success()
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
 					.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
@@ -54,11 +52,10 @@ public class WeatherCommand implements Command {
 					.addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
 					.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
 					.addField("sunrise", sdf.format(sunrise), false)
-					.addField("sunset", sdf.format(sunset), false);
-			message.reply(embed.build()).queue();
+					.addField("sunset", sdf.format(sunset), false));
 			return;
 		} catch (IOException ex) {
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("unknowncity",  query, false).build()).queue();
+			cmde.error("unknowncity",  query);
 			return;
 		}
 	}
@@ -77,20 +74,5 @@ public class WeatherCommand implements Command {
 		in.close();
 		con.disconnect();
 		return new JSONObject(content.toString());
-	}
-
-	@Override
-	public String getSyntax() {
-		return "<City Name>";
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.INFORMATION;
 	}
 }

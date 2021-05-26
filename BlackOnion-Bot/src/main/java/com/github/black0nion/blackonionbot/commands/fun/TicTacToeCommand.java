@@ -13,7 +13,6 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToe;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeBot;
@@ -28,11 +27,12 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class TicTacToeCommand implements Command {
+public class TicTacToeCommand extends Command {
 	
-	@Override
-	public String[] getCommand() {
-		return new String[] { "tictactoe", "ttt" };
+	public TicTacToeCommand() {
+		this.setCommand("tictactoe", "ttt")
+			.setSyntax("<@User / mention me to play against me!>")
+			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
 	}
 
 	@Override
@@ -159,20 +159,5 @@ public class TicTacToeCommand implements Command {
 			TicTacToeGameManager.deleteGame(game);
 			return true;
 		}
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.FUN;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<@User / mention me to play against me!>";
-	}
-	
-	@Override
-	public Permission[] getRequiredBotPermissions() {
-		return new Permission[] { Permission.MESSAGE_MANAGE };
 	}
 }

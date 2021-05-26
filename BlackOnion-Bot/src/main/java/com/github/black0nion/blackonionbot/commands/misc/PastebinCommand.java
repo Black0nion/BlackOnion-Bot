@@ -9,21 +9,19 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class PastebinCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "pastebin" };
+public class PastebinCommand extends Command {
+	
+	public PastebinCommand() {
+		this.setCommand("pastebin")
+			.setSyntax("<language> <text>")
+			.setRequiredArgumentCount(3);
 	}
 	
-	private final PasteClient client = new PasteClientBuilder()
+	private static final PasteClient client = new PasteClientBuilder()
 			.setUserAgent("BlackOnion-Bot")
 			.build();
 
@@ -36,31 +34,14 @@ public class PastebinCommand implements Command {
 		
 		client.createPaste(language, body).async(
 				(id) -> client.getPaste(id).async((paste) -> {
-					EmbedBuilder builder = new EmbedBuilder()
-							.setTitle(LanguageSystem.getTranslation("pastecreated", author, guild), paste.getPasteUrl())
+					cmde.reply(cmde.success()
+							.setTitle("pastecreated", paste.getPasteUrl())
 							.setDescription("```")
 							.appendDescription(paste.getLanguage().getId())
 							.appendDescription("\n")
 							.appendDescription(paste.getBody())
-							.appendDescription("```");
-					
-					message.reply(builder.build()).queue();
+							.appendDescription("```"));
 				})
 		);
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<Sprache> <Text>";
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 3;
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MISC;
 	}
 }
