@@ -7,7 +7,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.DontAutoRegister;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,8 +14,7 @@ import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-@DontAutoRegister
-public class HypixelCommand implements Command {
+public class HypixelCommand extends Command {
 	
 	//private static HypixelAPI api;
 	
@@ -24,6 +22,7 @@ public class HypixelCommand implements Command {
 //		if (ValueManager.getString("hypixelapikey") != null)
 //		if (Bot.getCredentialsManager().has("hypixel"))
 //			api = new HypixelAPI(UUID.fromString(Bot.getCredentialsManager().getString("hypixel")));
+		this.dontAutoRegister();
 	}
 
 	@Override

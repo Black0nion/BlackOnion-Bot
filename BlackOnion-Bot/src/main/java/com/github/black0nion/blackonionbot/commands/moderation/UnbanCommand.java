@@ -8,65 +8,47 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class UnbanCommand implements Command {
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "unban", "unyeet" };
+public class UnbanCommand extends Command {
+	
+	public UnbanCommand() {
+		this.setCommand("unban", "unyeet")
+			.setSyntax("<@User>")
+			.setRequiredArgumentCount(1)
+			.setRequiredPermissions(Permission.BAN_MEMBERS)
+			.setRequiredBotPermissions(Permission.BAN_MEMBERS);
 	}
-
+	
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
 		if (mentionedMembers.size() != 0) {
 			final BlackUser bannedUser = mentionedMembers.get(0).getBlackUser();
 			guild.retrieveBan(bannedUser).queue(ban -> {
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslation("userunbanned", author, guild), LanguageSystem.getTranslation("bannedfor", author, guild).replace("%reason%", "**" + ban.getReason() + "**"), false).build()).queue();
+				cmde.success("uban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + ban.getReason() + "**"));
 			});
 			guild.unban(bannedUser).queue();
 		} else {
 			try {
+				if (!Utils.isLong(args[1])) {
+					cmde.sendPleaseUse();
+					return;
+				}
+				
 				guild.retrieveBanById(args[1]).queue(ban -> {
-					String reason = ban.getReason();
+					final String reason = ban.getReason();
 					guild.unban(ban.getUser()).queue();
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Unban").addField(LanguageSystem.getTranslation("userunbanned", author, guild), LanguageSystem.getTranslation("bannedfor", author, guild).replace("%reason%", "**" + reason + "**"), false).build()).queue();
+					cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + reason + "**"));
 				}, fail -> {
-					message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("usernotfound", author, guild), LanguageSystem.getTranslation("tagornameuser", author, guild), false).build()).queue();
+					cmde.error("usernotfound", "tagornameuser");
 				});
 			} catch (Exception ignored) {}
 		}
-	}
-	
-	@Override
-	public Permission[] getRequiredPermissions() {
-		return new Permission[] {Permission.BAN_MEMBERS};
-	}
-	
-	@Override
-	public Permission[] getRequiredBotPermissions() {
-		return new Permission[] { Permission.BAN_MEMBERS };
-	}
-	
-	@Override
-	public int getRequiredArgumentCount() {
-		return 1;
-	}
-	
-	@Override
-	public String getSyntax() {
-		return "<@User>";
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.MODERATION;
 	}
 }
