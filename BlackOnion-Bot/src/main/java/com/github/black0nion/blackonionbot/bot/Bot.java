@@ -16,7 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import com.github.black0nion.blackonionbot.DefaultValues;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.API.API;
-import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
@@ -98,7 +97,7 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
+		builder.addEventListeners(new CommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), waiter);
 		
 		LanguageSystem.init();
 		CommandBase.addCommands(waiter);

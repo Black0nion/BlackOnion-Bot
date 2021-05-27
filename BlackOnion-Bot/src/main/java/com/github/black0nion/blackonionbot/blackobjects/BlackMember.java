@@ -46,7 +46,8 @@ public class BlackMember extends BlackObject implements Member {
             .build(new CacheLoader<Member, BlackMember>() {
                 @Override
                 public BlackMember load(final Member member) {
-                    return new BlackMember(member, BlackGuild.from(member.getGuild()));
+                    final BlackGuild from = BlackGuild.from(member.getGuild());
+					return new BlackMember(member, from);
                 }
             });
 	

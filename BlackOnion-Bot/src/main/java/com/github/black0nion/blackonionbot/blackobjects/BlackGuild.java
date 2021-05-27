@@ -234,6 +234,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return antiSpoilerType;
 	}
 	
+	@DashboardValue("antispoilertype")
 	public void setAntiSpoilerType(AntiSpoilerType antiSpoilerType) {
 		this.antiSpoilerType = antiSpoilerType;
 		save("antiSpoiler", antiSpoilerType.name());

@@ -18,7 +18,7 @@ public class Logger {
 		//StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[Thread.currentThread().getStackTrace().length - 1];
 		//String log = dtf.format(now) + "[" + stackTraceElement.getFileName().replace(".java", "") + "." + stackTraceElement.getMethodName() + ":" + stackTraceElement.getLineNumber() + "] [" + mode.name() + "] " + logInput;
 		String log = dtf.format(new Date()) + "[" + origin.name() + "] [" + mode.name() + "] " + logInput;
-		if (mode == LogMode.ERROR) {
+		if (mode == LogMode.ERROR || mode == LogMode.FATAL) {
 			System.err.println(log);
 		} else {
 			System.out.println(log);

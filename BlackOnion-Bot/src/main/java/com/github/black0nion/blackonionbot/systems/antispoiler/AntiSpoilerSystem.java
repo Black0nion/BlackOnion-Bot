@@ -1,11 +1,14 @@
 package com.github.black0nion.blackonionbot.systems.antispoiler;
 
-import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.*;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.DELETE;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.OFF;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.REMOVE;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -17,18 +20,17 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Webhook;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AntiSpoilerSystem {
 	/**
 	 * @param event
 	 * @return if the message contained a spoiler
 	 */
-	public static boolean removeSpoilers(GuildMessageReceivedEvent event) {
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		final BlackMessage msg = BlackMessage.from(event.getMessage());
+	public static boolean removeSpoilers(CommandEvent event) {
+		final BlackGuild guild = event.getGuild();
+		final BlackMessage msg = event.getMessage();
 		final String message = msg.getContentRaw();
-		final BlackUser author = BlackUser.from(event.getAuthor());
+		final BlackUser author = event.getUser();
 		final TextChannel channel = event.getChannel();
 		String newMessage = message;
 		AntiSpoilerType type = guild.getAntiSpoilerType();

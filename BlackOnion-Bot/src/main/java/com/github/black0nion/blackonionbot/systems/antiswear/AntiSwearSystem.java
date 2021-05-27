@@ -1,6 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.antiswear;
 
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.*;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.DELETE;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REMOVE;
 
 import java.io.File;
 import java.util.List;
@@ -26,8 +28,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Webhook;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 
 public class AntiSwearSystem {
 	
@@ -35,19 +35,7 @@ public class AntiSwearSystem {
 	
 	public static final File file = new File("resources/logo.png");
 	
-	/**
-	 * @param event
-	 * @return true if the message contained unwanted content
-	 */
-	public static boolean checkMessageForProfanity(GuildMessageReceivedEvent event) {
-		return check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
-	}
-	
-	public static boolean checkMessageForProfanity(GuildMessageUpdateEvent event) {
-		return check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
-	}
-	
-	private static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
+	public static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
 		final String messageContent = message.getContentRaw();
 		final BlackUser user = author.getBlackUser();
 		if (user.isBot()) return false;

@@ -52,7 +52,7 @@ public class ConnectFourCommand extends Command {
 				    	  
 				    	  //ANGENOMMEN
 				    	  ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
-				    	  rerun(game, e.getChannel());
+				    	  rerun(game, e.getChannel(), cmde);
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
 				    	  message.reply(EmbedUtils.getErrorEmbed(answerUser, guild).setTitle(getTranslation("declined", answerUser, guild)).addField(getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), false).build()).queue();
 				    	  return;
@@ -68,7 +68,7 @@ public class ConnectFourCommand extends Command {
 		}
 	}
 	
-	public void rerun(ConnectFour game, TextChannel channel) {
+	public void rerun(ConnectFour game, TextChannel channel, CommandEvent cmde) {
 		CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
 	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
@@ -82,7 +82,7 @@ public class ConnectFourCommand extends Command {
 	  					return;
 	  				} else if (!author.getId().equals(game.currentUser == FieldType.X ? game.getPlayerX() : game.getPlayerY())) {
   						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("wrongturn", author, guild)).build()).queue();
-  						rerun(game, channel);
+  						rerun(game, channel, cmde);
   						return;
   					} else if (game.isValidInput(msg)) {
 	  					Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
@@ -91,7 +91,7 @@ public class ConnectFourCommand extends Command {
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
 	  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("fieldoccopied", author, guild)).build()).queue();
 	  						game.nextUser();
-	  						rerun(game, channel);
+	  						rerun(game, channel, cmde);
 	  						return;
 	  					}
 	  					
@@ -108,10 +108,10 @@ public class ConnectFourCommand extends Command {
 	  				} else {
 	  					game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("wronginput", author, guild)).build()).queue();
 	  				}
-	  				rerun(game, channel);
+	  				rerun(game, channel, cmde);
 	  				return;
 	  			}, 
-	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed(null, BlackGuild.from(channel.getGuild())).addField(LanguageSystem.getTranslation("timeout", BlackGuild.from(channel.getGuild())), LanguageSystem.getTranslation("tooktoolong", BlackGuild.from(channel.getGuild())), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
+	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed(null, cmde.getGuild()).addField(LanguageSystem.getTranslation("timeout", cmde.getGuild()), LanguageSystem.getTranslation("tooktoolong", BlackGuild.from(channel.getGuild())), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
 	}
 }

@@ -20,6 +20,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.LogMode;
@@ -110,7 +111,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-		AntiSwearSystem.checkMessageForProfanity(event);
+		AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
 	}
 	
 	@Override
@@ -129,11 +130,15 @@ public class CommandBase extends ListenerAdapter {
 		final String[] args = msgContent.split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
-		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n"));
+		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)") + "_" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n"));
 		
-		final boolean containsProfanity = AntiSwearSystem.checkMessageForProfanity(event);
+		final boolean containsProfanity = AntiSwearSystem.check(guild, member, message, channel);
 		
-		if (AntiSpoilerSystem.removeSpoilers(event)) return;
+		final CommandEvent cmde = new CommandEvent(event, guild, message, member, author);
+		
+		if (AntiSpoilerSystem.removeSpoilers(cmde)) return;
+		
+		PrefixInfo.handle(cmde);
 		
 		if (!args[0].startsWith(prefix)) return;
 		String str = args[0].replace(prefix, "");
@@ -177,7 +182,8 @@ public class CommandBase extends ListenerAdapter {
 			}
 			
 			Bot.executor.submit(() -> {
-				cmd.execute(args, new CommandEvent(cmd, event, guild, message, member, author), event, message, member, author, guild, channel);
+				cmde.setCommand(cmd);
+				cmd.execute(args, cmde, event, message, member, author, guild, channel);
 			});
 			return;
 		}
