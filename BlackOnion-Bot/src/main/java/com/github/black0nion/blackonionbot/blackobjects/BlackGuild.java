@@ -179,6 +179,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return joinChannel;
 	}
 	
+	@DashboardValue("joinmoin")
 	public void setJoinChannel(long joinChannel) {
 		this.joinChannel = joinChannel;
 		save("joinchannel", joinChannel);
