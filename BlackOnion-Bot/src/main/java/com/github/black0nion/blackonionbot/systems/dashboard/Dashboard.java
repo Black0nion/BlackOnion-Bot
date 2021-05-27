@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -95,5 +96,52 @@ public class Dashboard {
 		DashboardValue value = getDashboardValueFromKey(input[2]);
 		if (value == null) return false;
 		return value.save(args[1], args[2], BlackGuild.from(Long.parseLong(guildid)));
+	}
+	
+	public static final boolean saveValue(Object obj, Method method, Object... args) {
+		try {
+			final Object[] parsed = new Object[args.length];
+			final Parameter[] parameters = method.getParameters();
+			for (int i = 0; i < args.length; i++) {
+				final Class<?> parameterType = parameters[i].getType();
+				if (parameterType == long.class || parameterType == Long.class) {
+					parsed[i] = parseLong(args[i]);
+				} else if (parameterType == int.class || parameterType == Integer.class) {
+					parsed[i] = parseInt(args[i]);
+				} else {					
+					parsed[i] = getValue(parameterType, args[i]);
+				}
+			}
+			method.invoke(obj, parsed);
+			return true;
+		} catch (Exception e) {
+			if (!(e instanceof IllegalArgumentException))
+				e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private static <T> T getValue(Class<T> desiredType, Object o) { 
+	    if (o.getClass().isAssignableFrom(desiredType)) {
+	        return desiredType.cast(o);
+	    } else {
+	        throw new IllegalArgumentException();
+	    }
+	}
+	
+	private static long parseLong(Object obj) {
+		try {
+			return Long.parseLong((String) obj);
+		} catch (Exception e) {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private static int parseInt(Object obj) {
+		try {
+			return Integer.parseInt((String) obj);
+		} catch (Exception e) {
+			throw new IllegalArgumentException();
+		}
 	}
 }
