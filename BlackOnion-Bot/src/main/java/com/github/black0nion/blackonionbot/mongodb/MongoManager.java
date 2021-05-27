@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.bson.Document;
 
+import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.misc.LogMode;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -22,7 +25,10 @@ public class MongoManager {
 	
 	@SuppressWarnings("deprecation")
 	public static boolean connect(String connectionString) {
+		final long start = System.currentTimeMillis();
 		client = new MongoClient(new MongoClientURI(connectionString));
+		final long end = System.currentTimeMillis();
+		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to " + client.getConnectPoint() + " in " + (end - start) + " ms.");
 		try {
 			client.isLocked();
 			return true;
@@ -35,12 +41,15 @@ public class MongoManager {
 	public static boolean connect(String ip, String db, String userName, String password) {
 		return connect(ip, "27017", db, userName, password, 20000);
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	public static boolean connect(String ip, String port, String db, String userName, String password, int timeout) {
+		final long start = System.currentTimeMillis();
 		client = new MongoClient(new ServerAddress(ip, Integer.parseInt(port)), MongoCredential.createCredential(userName, db, password.toCharArray()), MongoClientOptions.builder().connectTimeout(timeout).build());
+		final long end = System.currentTimeMillis();
 		try {
 			client.isLocked();
+			Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to " + client.getConnectPoint() + " in " + (end - start) + " ms.");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -53,6 +53,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static EventWaiter waiter;
 
+	public static int messagesLastTenSecs = 0;
 	public static int commandsLastTenSecs = 0;
 	
 	private static JSONObject commandsJSON = new JSONObject();
@@ -114,6 +115,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		messagesLastTenSecs++;
 		final BlackUser author = BlackUser.from(event.getAuthor());
 		if (author.isBot()) return;
 		
@@ -127,6 +129,7 @@ public class CommandBase extends ListenerAdapter {
 		final String[] args = msgContent.split(" ");
 		
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, log);
+		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n"));
 		
 		final boolean containsProfanity = AntiSwearSystem.checkMessageForProfanity(event);
 		

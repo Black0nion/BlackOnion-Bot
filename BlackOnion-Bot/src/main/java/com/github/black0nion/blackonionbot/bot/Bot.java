@@ -29,7 +29,6 @@ import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
-import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
@@ -37,7 +36,6 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
-import com.github.black0nion.blackonionbot.utils.CustomManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -84,11 +82,11 @@ public class Bot extends ListenerAdapter {
 		credentialsManager = new CredentialsManager(runMode.name().toLowerCase());
 		
 		BotSecrets.init();
-		CustomManager mongoManager = new CustomManager("mongodb");
-		if (mongoManager.getString("connection_string") != null)
-			MongoManager.connect(mongoManager.getString("connection_string"));
+		
+		if (credentialsManager.has("mongo_connection_string"))
+			MongoManager.connect(credentialsManager.getString("mongo_connection_string"));
 		else
-			MongoManager.connect(mongoManager.getString("ip"), mongoManager.getString("port"), mongoManager.getString("authdb"), mongoManager.getString("username"), mongoManager.getString("password"), mongoManager.getInt("timeout"));
+			MongoManager.connect(credentialsManager.getString("mongo_ip"), credentialsManager.getString("mongo_port"), credentialsManager.getString("mongo_authdb"), credentialsManager.getString("mongo_username"), credentialsManager.getString("mongo_password"), credentialsManager.getInt("mongo_timeout"));
 		
 		builder = JDABuilder
 				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
@@ -100,11 +98,10 @@ public class Bot extends ListenerAdapter {
 
 		EventWaiter waiter = new EventWaiter();
 		
-		builder.addEventListeners(new CommandBase(), new MessageLogSystem(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
+		builder.addEventListeners(new CommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new PrefixInfo(), waiter);
 		
 		LanguageSystem.init();
 		CommandBase.addCommands(waiter);
-		MessageLogSystem.init();
 		builder.setStatus(StatusCommand.getStatusFromFile());
 		builder.setActivity(ActivityCommand.getActivity());
 		try {

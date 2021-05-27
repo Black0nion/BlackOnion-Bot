@@ -60,6 +60,16 @@ public class BlackUser extends BlackObject implements User {
 		return users.stream().map(user -> from(user)).collect(Collectors.toList());
 	}
 	
+	@Deprecated
+	/**
+	 * Deprecated as a warning
+	 * @param guild
+	 * @return
+	 */
+	public static final void clearCache() {
+		users.invalidateAll();
+	}
+	
 	private Language language;
 	
 	private BlackUser(final User user) {

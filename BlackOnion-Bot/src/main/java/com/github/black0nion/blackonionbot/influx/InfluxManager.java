@@ -46,29 +46,31 @@ public class InfluxManager {
 	}
 	
 	public static void init() {
-		try {
-			Bot.jda.awaitReady();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		CredentialsManager manager = Bot.getCredentialsManager();
-		if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org")))
-			return;
-		Bot.executor.submit(() -> testSaving(new Document().append("test", "moino")));
-		
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				saveStats();
+		Bot.executor.submit(() -> {			
+			CredentialsManager manager = Bot.getCredentialsManager();
+			if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org")))
+				return;
+			Bot.executor.submit(() -> testSaving(new Document().append("test", "moino")));
+			
+			try {
+				Bot.jda.awaitReady();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		}, 0L, 10000L);
-	
+			
+			new Timer().scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					saveStats();
+				}
+			}, 0L, 10000L);
+		});
 	}
 	
 	public static void saveStats() {
 		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS)
 				.addField("cmdcount", CommandBase.commandsLastTenSecs)
-				.addField("messagecount", MessageLogSystem.messagesSentLastTenSecs)
+				.addField("messagecount", CommandBase.messagesLastTenSecs)
 				.addField("cpuload", getProcessCpuLoad())
 				.addField("guildcount", getGuildCount())
 				.addField("ramload", getProcessRamLoad())
@@ -77,7 +79,7 @@ public class InfluxManager {
 				.addField("profanityfiltered", AntiSwearSystem.profanityFilteredLastTenSecs)
 				.addField("running", true);
 		CommandBase.commandsLastTenSecs = 0;
-		MessageLogSystem.messagesSentLastTenSecs = 0;
+		CommandBase.messagesLastTenSecs = 0;
 		AntiSwearSystem.profanityFilteredLastTenSecs = 0;
 		influxDB.getWriteApi().writePoint(point);
 	}
