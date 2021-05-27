@@ -1,13 +1,18 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.reflections.Reflections;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
+import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
@@ -23,8 +28,34 @@ public class Dashboard {
 	 */
 	private static HashMap<Command, List<DashboardValue>> values = new HashMap<>();
 	
+	// TODO: better name XD
+	public static final HashMap<String, Method> setters = new HashMap<>();
+	
 	public static void init() {
 		values.clear();
+		
+		Reflections reflections = new Reflections(BlackObject.class.getPackage().getName());
+		Set<Class<? extends BlackObject>> annotated = reflections.getSubTypesOf(BlackObject.class);
+
+		for (Class<?> blackobject : annotated) {
+			try {
+				Class<?> objectClass = Class.forName(blackobject.getName());
+				
+				for (final Method method : objectClass.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(com.github.black0nion.blackonionbot.misc.DashboardValue.class)) {
+						final com.github.black0nion.blackonionbot.misc.DashboardValue annotation = method.getAnnotation(com.github.black0nion.blackonionbot.misc.DashboardValue.class);
+						setters.put(annotation.value(), method);
+					}
+				}
+				
+				// this is how you invoke methods:
+				// Method method = objectClass.getMethod("setPrefix", String.class);
+				// method.invoke(valueObject, objectToSendIn);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		add("antiswear", new DashboardMultipleChoice("antiSwear", "AntiSwear", new BlackHashMap<String, String>().add("delete", "Delete").add("resend", "Resend").add("off", "Off")),
 						 new DashboardBoolean("antiSwearBoolean", "AntiBoolean", false),
 						 new DashboardString("antiSwearString", "AntiString", "moin"),
