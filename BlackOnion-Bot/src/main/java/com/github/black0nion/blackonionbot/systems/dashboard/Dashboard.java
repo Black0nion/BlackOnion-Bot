@@ -101,12 +101,11 @@ public class Dashboard {
 		return saveValue(guild, method, Utils.toObjectArray(Utils.subArray(args, 2)));
 	}
 	
-	public static final boolean saveValue(Object obj, Method method, Object... args) {
+	public static final boolean saveValue(Object objectToInvokeMethodIn, Method method, Object... args) {
 		try {
 			final Object[] parsed = new Object[args.length];
 			final Parameter[] parameters = method.getParameters();
 			for (int i = 0; i < args.length; i++) {
-				// TODO: array support
 				final Class<?> parameterType = parameters[i].getType();
 				if (parameterType == long.class || parameterType == Long.class) {
 					parsed[i] = parseLong(args[i]);
@@ -122,11 +121,16 @@ public class Dashboard {
 						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType.newInstance(), ((String) args[i]).toUpperCase());
 						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType, ((String) args[i]).toUpperCase());
 					}
+				} else if (parameterType.isArray()) {
+					// TODO: test
+					parsed[i] = Arrays.asList(Utils.subArray(args, i)).stream().map(obj -> (Object) obj).toArray();
+					break;
 				} else {					
 					parsed[i] = getValue(parameterType, args[i]);
 				}
+				if (parsed[i] == null) throw new IllegalArgumentException("args[" + i + "] is null, should be of type " + parameterType.getName() + "!");
 			}
-			method.invoke(obj, parsed);
+			method.invoke(objectToInvokeMethodIn, parsed);
 			return true;
 		} catch (Exception e) {
 			if (!(e instanceof IllegalArgumentException))
