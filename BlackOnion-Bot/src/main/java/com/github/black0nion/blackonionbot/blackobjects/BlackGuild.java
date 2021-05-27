@@ -33,7 +33,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
@@ -150,6 +149,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return language;
 	}
 	
+	@DashboardValue("guildlanguage")
 	public void setLanguage(Language language) {
 		this.language = language;
 		save("language", language.getLanguageCode());
@@ -173,6 +173,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return joinMessage;
 	}
 	
+	@DashboardValue("joinmessage")
 	public void setJoinMessage(String newMessage) {
 		this.joinMessage = newMessage;
 		save("joinmessage", this.joinMessage);
@@ -182,16 +183,19 @@ public class BlackGuild extends BlackObject implements Guild {
 		return joinChannel;
 	}
 	
-	@DashboardValue("joinmoin")
+	@DashboardValue("joinchannel")
 	public void setJoinChannel(long joinChannel) {
 		this.joinChannel = joinChannel;
-		save("joinchannel", joinChannel);
+		if (joinChannel == -1)
+			clear("joinchannel");
+		save("joinChannel", joinChannel);
 	}
 	
 	public String getLeaveMessage() {
 		return leaveMessage;
 	}
 	
+	@DashboardValue("leavemessage")
 	public void setLeaveMessage(String leaveMessage) {
 		this.leaveMessage = leaveMessage;
 		save("leavemessage", leaveMessage);
@@ -201,6 +205,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return leaveChannel;
 	}
 	
+	@DashboardValue("leavechannel")
 	public void setLeaveChannel(long leaveChannel) {
 		this.leaveChannel = leaveChannel;
 		if (leaveChannel == -1)
