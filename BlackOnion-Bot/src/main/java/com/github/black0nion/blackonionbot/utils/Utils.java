@@ -286,4 +286,8 @@ public class Utils {
 
 	    return c;
 	}
+	
+	public static <T> Object[] toObjectArray(T[] input) {
+		return Arrays.asList(input).stream().map(map -> (Object) map).toArray();
+	}
 }

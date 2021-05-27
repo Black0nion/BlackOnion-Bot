@@ -70,7 +70,10 @@ public class BlackUser extends BlackObject implements User {
 			
 			if (config == null) config = new Document();
 		
-			gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			if (config.getString("language") != null)
+				this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			else
+				this.language = LanguageSystem.getDefaultLanguage();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

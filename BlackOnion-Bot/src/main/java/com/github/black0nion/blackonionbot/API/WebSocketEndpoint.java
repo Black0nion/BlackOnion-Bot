@@ -4,10 +4,19 @@ import java.io.IOException;
 
 import org.eclipse.jetty.websocket.api.Session;
 
-public interface WebSocketEndpoint {
-	String getRoute();
+public abstract class WebSocketEndpoint {
 	
-	default void send(Session session, String message) {
+	String route;
+	
+	public String getRoute() {
+		return this.route;
+	}
+	
+	public void setRoute(String route) {
+		this.route = route;
+	}
+	
+	public void send(Session session, String message) {
 		try {
 			session.getRemote().sendString(message);
 		} catch (IOException e) {
