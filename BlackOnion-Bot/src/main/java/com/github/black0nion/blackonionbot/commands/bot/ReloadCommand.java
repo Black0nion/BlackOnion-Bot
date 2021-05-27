@@ -13,7 +13,6 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
-import com.github.black0nion.blackonionbot.systems.MessageLogSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -42,13 +41,18 @@ public class ReloadCommand extends Command {
 		reload();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void reload() {
 		DefaultValues.init();
-		MessageLogSystem.init();
 		Bot.notifyStatusUsers = new ArrayList<String>(ValueManager.getArrayAsList("notifyUsers"));
 		BotInformation.init();
 		BirthdaySystem.reload();
 		LanguageSystem.init();
 		SessionManager.init();
+		
+		BlackGuild.clearCache();
+		BlackMember.clearCache();
+		BlackMessage.clearCache();
+		BlackUser.clearCache();
 	}
 }

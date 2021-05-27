@@ -2,6 +2,9 @@ package com.github.black0nion.blackonionbot.utils;
 
 import java.io.File;
 
+import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
+
 public class CredentialsManager {
 	private Document doc;
 	private File file;
@@ -19,8 +22,15 @@ public class CredentialsManager {
 	public String getString(String key) {
 		doc = Document.loadDocument(file);
 		if (!doc.has(key))
-			System.out.println("FATAL: NO CREDENTIAL FOR KEY " + key);
+			Logger.logError("No Credential for Key " + key + "!", LogOrigin.BOT);
 		return doc.getString(key);
+	}
+	
+	public int getInt(String key) {
+		doc = Document.loadDocument(file);
+		if (!doc.has(key))
+			Logger.logError("No credential for Key " + key + "!", LogOrigin.BOT);
+		return doc.getInt(key);
 	}
 	
 	public boolean has(String key) {

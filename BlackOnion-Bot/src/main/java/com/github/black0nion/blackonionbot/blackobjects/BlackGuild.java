@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -83,6 +84,16 @@ public class BlackGuild extends BlackObject implements Guild {
                 }
             });
 	
+	@Deprecated
+	/**
+	 * Deprecated as a warning
+	 * @param guild
+	 * @return
+	 */
+	public static final void clearCache() {
+		guilds.invalidateAll();
+	}
+	
 	public static BlackGuild from(@Nullable final Guild guild) {
 		if (guild == null) return null;
 		try {
@@ -97,14 +108,6 @@ public class BlackGuild extends BlackObject implements Guild {
 	public static BlackGuild from(@NotNull final long guildid) {
 		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
 		return first.isPresent() ? first.get().getValue() : from(Bot.jda.getGuildById(guildid));
-	}
-	
-	public static BlackGuild createDummy() {
-		return new BlackGuild();
-	}
-	
-	private BlackGuild() {
-		this.guild = null;
 	}
 	
 	private Language language;
@@ -215,6 +218,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	
 	public List<Command> getDisabledCommands() {
 		return this.disabledCommands;
+	}
+	
+	@DashboardValue("disabledcommands")
+	public void setDisabledCommands(Command[] disabledCommands) {
+		this.setDisabledCommands(Arrays.asList(disabledCommands));
 	}
 	
 	public void setDisabledCommands(List<Command> disabledCommands) {

@@ -63,6 +63,16 @@ public class BlackMember extends BlackObject implements Member {
 		return members.stream().map(mem -> from(mem)).collect(Collectors.toList());
 	}
 	
+	@Deprecated
+	/**
+	 * Deprecated as a warning
+	 * @param guild
+	 * @return
+	 */
+	public static final void clearCache() {
+		members.invalidateAll();
+	}
+	
 	private BlackMember(@NotNull final Member member, BlackGuild blackGuild) {
 		this.member = member;
 		this.blackGuild = blackGuild;

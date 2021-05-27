@@ -69,6 +69,16 @@ public class BlackMessage extends BlackObject implements Message {
 		}
 	}
 	
+	@Deprecated
+	/**
+	 * Deprecated as a warning
+	 * @param guild
+	 * @return
+	 */
+	public static final void clearCache() {
+		messages.invalidateAll();
+	}
+	
 	private BlackMessage(@NotNull final Message message) {
 		this.message = message;
 		this.blackMember = BlackMember.from(message.getMember());
