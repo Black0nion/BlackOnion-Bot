@@ -17,10 +17,12 @@ import javax.annotation.Nullable;
 
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
@@ -97,6 +99,14 @@ public class BlackGuild extends BlackObject implements Guild {
 		return first.isPresent() ? first.get().getValue() : null;
 	}
 	
+	public static BlackGuild createDummy() {
+		return new BlackGuild();
+	}
+	
+	private BlackGuild() {
+		this.guild = null;
+	}
+	
 	private Language language;
 	private boolean isPremium;
 	private AntiSpoilerType antiSpoilerType;
@@ -150,7 +160,8 @@ public class BlackGuild extends BlackObject implements Guild {
 	public String getPrefix() {
 		return prefix;
 	}
-	
+
+	@DashboardValue("prefix")
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
 		save("prefix", prefix);
@@ -1030,5 +1041,13 @@ public class BlackGuild extends BlackObject implements Guild {
 	@Override
 	public CategoryOrderAction modifyVoiceChannelPositions(Category category) {
 		return this.guild.modifyVoiceChannelPositions(category);
+	}
+
+	@Override
+	public String toString() {
+		return "BlackGuild [guild=" + guild + ", language=" + language + ", isPremium=" + isPremium
+				+ ", antiSpoilerType=" + antiSpoilerType + ", antiSwearType=" + antiSwearType + ", prefix=" + prefix
+				+ ", joinMessage=" + joinMessage + ", joinChannel=" + joinChannel + ", leaveMessage=" + leaveMessage
+				+ ", leaveChannel=" + leaveChannel + ", disabledCommands=" + disabledCommands + "]";
 	}
 }
