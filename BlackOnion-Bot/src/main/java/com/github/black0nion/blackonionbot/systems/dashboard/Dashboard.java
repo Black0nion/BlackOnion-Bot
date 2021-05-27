@@ -125,7 +125,7 @@ public class Dashboard {
 					// TODO: test
 					parsed[i] = Arrays.asList(Utils.subArray(args, i)).stream().map(obj -> (Object) obj).toArray();
 					break;
-				} else {					
+				} else {
 					parsed[i] = getValue(parameterType, args[i]);
 				}
 				if (parsed[i] == null) throw new IllegalArgumentException("args[" + i + "] is null, should be of type " + parameterType.getName() + "!");

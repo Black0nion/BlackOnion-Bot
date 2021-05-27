@@ -12,6 +12,8 @@ import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmb
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
@@ -21,6 +23,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -30,11 +33,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
  * Copyright 2021 BlackOnion
  * Class Name: CommandEvent
  */
-@SuppressWarnings("unused")
 public class CommandEvent {
 	
 	private Command command;
 	private GuildMessageReceivedEvent event;
+	private JDA jda;
 	private BlackGuild guild;
 	private TextChannel channel;
 	private BlackMessage message;
@@ -49,10 +52,15 @@ public class CommandEvent {
 	public CommandEvent(Command cmd, GuildMessageReceivedEvent e) {
 		this(cmd, e, BlackGuild.from(e.getGuild()), BlackMessage.from(e.getMessage()), BlackMember.from(e.getMember()), BlackUser.from(e.getAuthor()));
 	}
+	
+	public CommandEvent(GuildMessageReceivedEvent e, BlackGuild guild, BlackMessage message, BlackMember member, BlackUser user) {
+		this(null, e, guild, message, member, user);
+	}
 
 	public CommandEvent(Command cmd, GuildMessageReceivedEvent e, BlackGuild guild, BlackMessage message, BlackMember member, BlackUser user) {
 		this.command = cmd;
 		this.event = e;
+		this.jda = e.getJDA();
 		this.guild = guild;
 		this.channel = e.getChannel();
 		this.message = message;
@@ -212,5 +220,43 @@ public class CommandEvent {
 	
 	public String getTranslation(String key) {
 		return language.getTranslatedString(key);
+	}
+	
+	public BlackMessage getMessage() {
+		return message;
+	}
+	
+	public TextChannel getChannel() {
+		return channel;
+	}
+	
+	public Command getCommand() {
+		return command;
+	}
+	
+	public BlackUser getUser() {
+		return user;
+	}
+	
+	public BlackGuild getGuild() {
+		return guild;
+	}
+	
+	public BlackMember getMember() {
+		return member;
+	}
+	
+	@Nullable
+	public GuildMessageReceivedEvent getEvent() {
+		return event;
+	}
+	
+	
+	public JDA getJda() {
+		return jda;
+	}
+
+	public void setCommand(Command cmd) {
+		this.command = cmd;
 	}
 }
