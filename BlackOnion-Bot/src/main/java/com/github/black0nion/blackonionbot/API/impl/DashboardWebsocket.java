@@ -20,7 +20,11 @@ import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 @WebSocket
-public class DashboardWebsocket implements WebSocketEndpoint {
+public class DashboardWebsocket extends WebSocketEndpoint {
+	
+	public DashboardWebsocket() {
+		this.setRoute("dashboard");
+	}
 	
 	private static boolean logHeartbeats = ValueManager.getBoolean("logHeartbeats");
 	
@@ -61,10 +65,5 @@ public class DashboardWebsocket implements WebSocketEndpoint {
 		}
 		
 		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + message.replace("\n", "\\n"), LogOrigin.DASHBOARD);
-	}
-
-	@Override
-	public String getRoute() {
-		return "dashboard";
 	}
 }

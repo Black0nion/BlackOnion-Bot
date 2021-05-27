@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -83,7 +84,8 @@ public class BlackGuild extends BlackObject implements Guild {
                 }
             });
 	
-	public static BlackGuild from(@NotNull final Guild guild) {
+	public static BlackGuild from(@Nullable final Guild guild) {
+		if (guild == null) return null;
 		try {
 			return guilds.get(guild);
 		} catch (Exception e) {
@@ -95,7 +97,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	@Nullable
 	public static BlackGuild from(@NotNull final long guildid) {
 		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
-		return first.isPresent() ? first.get().getValue() : null;
+		return first.isPresent() ? first.get().getValue() : from(Bot.jda.getGuildById(guildid));
 	}
 	
 	public static BlackGuild createDummy() {
@@ -121,13 +123,14 @@ public class BlackGuild extends BlackObject implements Guild {
 		this.guild = guild;
 		
 		try {
-			Document config = configs.find(Filters.eq("userid", guild.getIdLong())).first();
+			Document config = configs.find(this.getIdentifier()).first();
 			
 			if (config == null) config = new Document();
 		
 			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
 			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
+			System.out.println(this.prefix);
 			this.antiSpoilerType = gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
 			this.antiSwearType = gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
 			this.joinMessage = gOD(config.getString("joinmessage"), this.language.getTranslatedString("defaultjoinmessage"));

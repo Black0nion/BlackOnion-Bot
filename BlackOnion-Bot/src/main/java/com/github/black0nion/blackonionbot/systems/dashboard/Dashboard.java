@@ -87,15 +87,18 @@ public class Dashboard {
 	}
 	
 	public static boolean tryUpdateValue(String message) {
+		System.out.println(message);
 		// should be only "updatevalue"
 		final String[] input = message.split(" ");
-		// syntax: guildid databasekey newvalue
+		// syntax: guildid key values...
 		final String[] args = Utils.removeFirstArg(input);
 		final String guildid = args[0];
 		if (args.length < 3 || !Utils.isLong(guildid)) return false;
-		DashboardValue value = getDashboardValueFromKey(input[2]);
-		if (value == null) return false;
-		return value.save(args[1], args[2], BlackGuild.from(Long.parseLong(guildid)));
+		Method method = setters.get(args[1]);
+		if (method == null) return false;
+		BlackGuild guild = BlackGuild.from(Long.parseLong(guildid));
+		if (guild == null) return false;
+		return saveValue(guild, method, Utils.toObjectArray(Utils.subArray(args, 2)));
 	}
 	
 	public static final boolean saveValue(Object obj, Method method, Object... args) {
@@ -103,11 +106,22 @@ public class Dashboard {
 			final Object[] parsed = new Object[args.length];
 			final Parameter[] parameters = method.getParameters();
 			for (int i = 0; i < args.length; i++) {
+				// TODO: array support
 				final Class<?> parameterType = parameters[i].getType();
 				if (parameterType == long.class || parameterType == Long.class) {
 					parsed[i] = parseLong(args[i]);
 				} else if (parameterType == int.class || parameterType == Integer.class) {
 					parsed[i] = parseInt(args[i]);
+				} else if (parameterType.isEnum()) {
+					final Method parse = parameterType.getDeclaredMethod("parse", String.class);
+					// TODO: test if it also works without newInstance (static)
+					if (parse != null) {
+						parsed[i] = parse.invoke(parameterType.newInstance(), (String) args[i]);
+						parsed[i] = parse.invoke(parameterType, (String) args[i]);
+					} else {
+						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType.newInstance(), ((String) args[i]).toUpperCase());
+						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType, ((String) args[i]).toUpperCase());
+					}
 				} else {					
 					parsed[i] = getValue(parameterType, args[i]);
 				}

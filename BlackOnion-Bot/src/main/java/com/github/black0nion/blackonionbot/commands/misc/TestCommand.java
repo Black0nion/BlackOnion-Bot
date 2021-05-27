@@ -1,12 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -24,8 +22,6 @@ public class TestCommand extends Command {
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		final Method method = Dashboard.setters.get(args[1]);
-		Object[] obj = Arrays.asList(Utils.removeFirstArg(Utils.removeFirstArg(args))).stream().map(map -> (Object) map).toArray();
-		System.out.println(Dashboard.saveValue(guild, method, obj));
+		System.out.println(Dashboard.tryUpdateValue(String.join(" ", Utils.removeFirstArg(args))));
 	}
 }

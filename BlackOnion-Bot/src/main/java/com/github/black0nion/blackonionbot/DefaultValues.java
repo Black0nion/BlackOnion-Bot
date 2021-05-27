@@ -9,7 +9,7 @@ import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 public class DefaultValues {
 	public static void init() {
-		setDefault("runMode", "production");
+		setDefault("runMode", RunMode.DEV.name());
 		
 		setDefault("prefix", "?");
 		
