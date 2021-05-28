@@ -259,5 +259,6 @@
     "qrdecodefail": "QR-Code decodieren fehlgeschlagen!",
     "qrnotfound": "Es wurde kein QR-Code gefunden!",
     "privateqr": "Dieser QR-Code ist privat!",
-    "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!"
+    "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!",
+    "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)"
 }
