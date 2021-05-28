@@ -87,7 +87,6 @@ public class Dashboard {
 	}
 	
 	public static boolean tryUpdateValue(String message) {
-		System.out.println(message);
 		// should be only "updatevalue"
 		final String[] input = message.split(" ");
 		// syntax: guildid key values...
@@ -107,23 +106,25 @@ public class Dashboard {
 			final Parameter[] parameters = method.getParameters();
 			for (int i = 0; i < args.length; i++) {
 				final Class<?> parameterType = parameters[i].getType();
-				if (parameterType == long.class || parameterType == Long.class) {
+				if (parameterType == boolean.class || parameterType == Boolean.class) {
+					parsed[i] = (boolean) args[i];
+				} else if (parameterType == long.class || parameterType == Long.class) {
 					parsed[i] = parseLong(args[i]);
 				} else if (parameterType == int.class || parameterType == Integer.class) {
 					parsed[i] = parseInt(args[i]);
 				} else if (parameterType.isEnum()) {
 					final Method parse = parameterType.getDeclaredMethod("parse", String.class);
-					// TODO: test if it also works without newInstance (static)
 					if (parse != null) {
-						parsed[i] = parse.invoke(parameterType.newInstance(), (String) args[i]);
 						parsed[i] = parse.invoke(parameterType, (String) args[i]);
 					} else {
-						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType.newInstance(), ((String) args[i]).toUpperCase());
 						parsed[i] = parameterType.getDeclaredMethod("valueOf", String.class).invoke(parameterType, ((String) args[i]).toUpperCase());
 					}
 				} else if (parameterType.isArray()) {
-					// TODO: test
-					parsed[i] = Arrays.asList(Utils.subArray(args, i)).stream().map(obj -> (Object) obj).toArray();
+					Object[] newObject = new Object[args.length - i];
+					for (int j = i; j < args.length; j++) {
+						newObject[i] = args[j];
+					}
+					parsed[i] = newObject;
 					break;
 				} else {
 					parsed[i] = getValue(parameterType, args[i]);
@@ -133,6 +134,7 @@ public class Dashboard {
 			method.invoke(objectToInvokeMethodIn, parsed);
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (!(e instanceof IllegalArgumentException))
 				e.printStackTrace();
 			return false;
