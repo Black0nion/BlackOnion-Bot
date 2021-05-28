@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -70,32 +71,34 @@ import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 
 public class BlackGuild extends BlackObject implements Guild {
-	
+
 	private final Guild guild;
-	
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings", MongoDB.botDatabase);
-	
+
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings",
+			MongoDB.botDatabase);
+
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder()
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .build(new CacheLoader<Guild, BlackGuild>() {
-                @Override
-                public BlackGuild load(final Guild guild) {
-                    return new BlackGuild(guild);
-                }
-            });
-	
+			.expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<Guild, BlackGuild>() {
+				@Override
+				public BlackGuild load(final Guild guild) {
+					return new BlackGuild(guild);
+				}
+			});
+
 	@Deprecated
 	/**
 	 * Deprecated as a warning
+	 * 
 	 * @param guild
 	 * @return
 	 */
 	public static final void clearCache() {
 		guilds.invalidateAll();
 	}
-	
+
 	public static BlackGuild from(@Nullable final Guild guild) {
-		if (guild == null) return null;
+		if (guild == null)
+			return null;
 		try {
 			return guilds.get(guild);
 		} catch (Exception e) {
@@ -103,13 +106,14 @@ public class BlackGuild extends BlackObject implements Guild {
 			return null;
 		}
 	}
-	
+
 	@Nullable
 	public static BlackGuild from(@NotNull final long guildid) {
-		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
+		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream()
+				.filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
 		return first.isPresent() ? first.get().getValue() : from(Bot.jda.getGuildById(guildid));
 	}
-	
+
 	private Language language;
 	private boolean isPremium;
 	private AntiSpoilerType antiSpoilerType;
@@ -120,47 +124,54 @@ public class BlackGuild extends BlackObject implements Guild {
 	private String leaveMessage;
 	private long leaveChannel;
 	private List<Command> disabledCommands;
-	
+
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
-		
+
 		try {
 			Document config = configs.find(this.getIdentifier()).first();
-			
-			if (config == null) config = new Document();
-		
-			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+
+			if (config == null)
+				config = new Document();
+
+			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")),
+					LanguageSystem.defaultLocale);
 			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
 			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
 			this.antiSpoilerType = gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
 			this.antiSwearType = gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
-			this.joinMessage = gOD(config.getString("joinmessage"), this.language.getTranslatedString("defaultjoinmessage"));
+			this.joinMessage = gOD(config.getString("joinmessage"),
+					this.language.getTranslatedString("defaultjoinmessage"));
 			this.joinChannel = gOD(config.getLong("joinchannel"), -1L);
-			this.leaveMessage = gOD(config.getString("leavemessage"), this.language.getTranslatedString("defaultleavemessage"));
+			this.leaveMessage = gOD(config.getString("leavemessage"),
+					this.language.getTranslatedString("defaultleavemessage"));
 			this.leaveChannel = gOD(config.getLong("leavechannel"), -1L);
 			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
-				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
+				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd))
+						.collect(Collectors.toList());
+			} else {
+				this.disabledCommands = new ArrayList<>();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Language getLanguage() {
 		return language;
 	}
-	
+
 	@DashboardValue("guildlanguage")
 	public void setLanguage(Language language) {
 		this.language = language;
 		save("language", language.getLanguageCode());
 	}
-	
+
 	public boolean isPremium() {
 		return isPremium;
 	}
-	
+
 	public String getPrefix() {
 		return prefix;
 	}
@@ -170,21 +181,21 @@ public class BlackGuild extends BlackObject implements Guild {
 		this.prefix = prefix;
 		save("prefix", prefix);
 	}
-	
+
 	public String getJoinMessage() {
 		return joinMessage;
 	}
-	
+
 	@DashboardValue("joinmessage")
 	public void setJoinMessage(String newMessage) {
 		this.joinMessage = newMessage;
 		save("joinmessage", this.joinMessage);
 	}
-	
+
 	public long getJoinChannel() {
 		return joinChannel;
 	}
-	
+
 	@DashboardValue("joinchannel")
 	public void setJoinChannel(long joinChannel) {
 		this.joinChannel = joinChannel;
@@ -192,21 +203,21 @@ public class BlackGuild extends BlackObject implements Guild {
 			clear("joinchannel");
 		save("joinChannel", joinChannel);
 	}
-	
+
 	public String getLeaveMessage() {
 		return leaveMessage;
 	}
-	
+
 	@DashboardValue("leavemessage")
 	public void setLeaveMessage(String leaveMessage) {
 		this.leaveMessage = leaveMessage;
 		save("leavemessage", leaveMessage);
 	}
-	
+
 	public long getLeaveChannel() {
 		return leaveChannel;
 	}
-	
+
 	@DashboardValue("leavechannel")
 	public void setLeaveChannel(long leaveChannel) {
 		this.leaveChannel = leaveChannel;
@@ -214,51 +225,70 @@ public class BlackGuild extends BlackObject implements Guild {
 			clear("leavechannel");
 		save("leaveChannel", leaveChannel);
 	}
-	
+
 	public List<Command> getDisabledCommands() {
 		return this.disabledCommands;
 	}
-	
+
 	@DashboardValue("disabledcommands")
+	public void setDisabledCommands(Object[] disabledCommands) {
+		this.setDisabledCommands(Arrays.asList(disabledCommands).stream()
+				.map(cmd -> CommandBase.commands.get((String) cmd)).collect(Collectors.toList()));
+	}
+
 	public void setDisabledCommands(Command[] disabledCommands) {
 		this.setDisabledCommands(Arrays.asList(disabledCommands));
 	}
-	
+
 	public void setDisabledCommands(List<Command> disabledCommands) {
 		this.disabledCommands = disabledCommands;
 		saveList("disabledCommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
 	}
-		
+	
+	public boolean isCommandActivated(Command cmd) {
+		return !this.disabledCommands.contains(cmd);
+	}
+	
+	public boolean setCommandActivated(Command cmd, boolean activated) {
+		if  (!cmd.isToggleable()) return false;
+		if (disabledCommands.contains(cmd) && activated) {
+			disabledCommands.remove(cmd);
+		} else if (activated && !disabledCommands.contains(cmd)) {
+			disabledCommands.add(cmd);
+		}
+		return true;
+	}
+
 	public AntiSpoilerType getAntiSpoilerType() {
 		return antiSpoilerType;
 	}
-	
+
 	@DashboardValue("antispoilertype")
 	public void setAntiSpoilerType(AntiSpoilerType antiSpoilerType) {
 		this.antiSpoilerType = antiSpoilerType;
 		save("antiSpoiler", antiSpoilerType.name());
 	}
-	
+
 	public AntiSwearType getAntiSwearType() {
 		return antiSwearType;
 	}
-	
+
 	public void setAntiSwearType(AntiSwearType antiSwearType) {
 		this.antiSwearType = antiSwearType;
 		save("antiSwear", antiSwearType.name());
 	}
-	
+
 	// override methods
 	@Override
 	public Document getIdentifier() {
 		return new Document("guildid", this.guild.getIdLong());
 	}
-	
+
 	@Override
 	MongoCollection<Document> getCollection() {
 		return configs;
 	}
-	
+
 	// built in methods
 	@NotNull
 	@Override
@@ -369,7 +399,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	public List<Member> getBoosters() {
 		return this.guild.getBoosters();
 	}
-	
+
 	public List<BlackMember> getBlackBoosters() {
 		return BlackMember.from(this.guild.getBoosters());
 	}
@@ -405,7 +435,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	public Member getOwner() {
 		return this.guild.getOwner();
 	}
-	
+
 	public BlackMember getBlackOwner() {
 		return BlackMember.from(this.guild.getOwner());
 	}
@@ -464,7 +494,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	public BlackMember getMemberById(@NotNull final String userId) {
 		return BlackMember.from(this.guild.getMemberById(userId));
 	}
-	
+
 	@Override
 	@NotNull
 	@Deprecated

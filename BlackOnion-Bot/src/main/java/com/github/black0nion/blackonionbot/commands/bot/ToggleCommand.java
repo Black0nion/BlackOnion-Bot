@@ -7,7 +7,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -29,7 +28,7 @@ public class ToggleCommand extends Command {
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		Command command = CommandBase.commands.get(args[1]);
-		if (command == null || command.isVisible()) {
+		if (command == null || !command.isVisible()) {
 			cmde.error("wrongargument", "commandnotfound");
 			return;
 		}
@@ -44,7 +43,7 @@ public class ToggleCommand extends Command {
 			return;
 		}
 		
-		if (ToggleAPI.setActivated(guild.getIdLong(), command, activated)) {
+		if (guild.setCommandActivated(command, activated)) {
 			final String commandName = command.getCommand()[0].toUpperCase();
 			cmde.success("commandtoggled", "commandisnow", new Placeholder("command", commandName), new Placeholder("status", cmde.getTranslation(activated ? "on" : "off")));
 			return;

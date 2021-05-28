@@ -146,7 +146,7 @@ public abstract class Command {
 	}
 	
 	public Command notToggleable() {
-		this.isToggleable = true;
+		this.isToggleable = false;
 		return this;
 	}
 

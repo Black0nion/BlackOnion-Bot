@@ -39,9 +39,11 @@ public class BotInformation {
 	public static long botId;
 
 	public static void init() {
-		
 		try {
-			calculateCodeLines();
+			Bot.executor.submit(() -> {				
+				calculateCodeLines();
+			});
+			
 			if (osBean == null)
 				osBean = ManagementFactory.getOperatingSystemMXBean();
 

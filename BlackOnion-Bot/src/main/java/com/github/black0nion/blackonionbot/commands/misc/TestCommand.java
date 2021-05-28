@@ -21,6 +21,6 @@ public class TestCommand extends Command {
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		System.out.println(Dashboard.tryUpdateValue(String.join(" ", Utils.removeFirstArg(args))));
+		Dashboard.tryUpdateValue(String.join(" ", Utils.removeFirstArg(args)));
 	}
 }

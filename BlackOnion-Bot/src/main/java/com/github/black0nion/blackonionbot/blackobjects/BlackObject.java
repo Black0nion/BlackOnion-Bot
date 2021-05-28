@@ -48,7 +48,7 @@ public abstract class BlackObject {
 	}
 	
 	public <T> void saveList(String key, List<T> value) {
-		save(new Document("$set", new Document(key, value)));
+		save(new Document(key, value));
 	}
 	
 	public <T> T get(String key, Class<T> clazz) {

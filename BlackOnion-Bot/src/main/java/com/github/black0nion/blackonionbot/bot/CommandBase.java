@@ -25,7 +25,6 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.ToggleAPI;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -159,7 +158,7 @@ public class CommandBase extends ListenerAdapter {
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
 			if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
 			
-			if (!ToggleAPI.isActivated(guild.getId(), cmd)) return;
+			if (!guild.isCommandActivated(cmd)) return;
 			
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.getVisibility() != CommandVisibility.SHOWN)
