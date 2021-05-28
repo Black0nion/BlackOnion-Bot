@@ -137,6 +137,10 @@ public class CommandEvent {
 		return this.loadingEmbed;
 	}
 	
+	public void loading(Consumer<? super BlackMessage> success) {
+		reply(loadingEmbed, success);
+	}
+	
 	public void loading(String name, String value) {
 		reply(loadingEmbed.addField(name, value, false));
 	}
