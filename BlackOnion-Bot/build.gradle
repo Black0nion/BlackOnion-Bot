@@ -21,7 +21,7 @@ repositories {
     maven {
 	    url 'https://m2.dv8tion.net/releases'
 	    name 'm2-dv8tion'
-  }
+  	}
 }
 
 jar {
@@ -31,7 +31,7 @@ jar {
         attributes 'Main-Class': 'com.github.black0nion.blackonionbot.bot.Main'
     }
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

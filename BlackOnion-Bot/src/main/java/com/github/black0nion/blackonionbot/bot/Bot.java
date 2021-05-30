@@ -125,12 +125,18 @@ public class Bot extends ListenerAdapter {
 		
 		Newssystem.init();
 		
-		Executors.newCachedThreadPool().submit(() -> { 
+		executor.submit(() -> { 
 			while (true) {
 				Scanner sc = new Scanner(System.in);
 				String input = sc.nextLine();
-				if (input.equalsIgnoreCase("reload")) {
+				if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
+					Logger.logInfo("Reloading...", LogOrigin.BOT);
 					ReloadCommand.reload();
+				} else if (input.equalsIgnoreCase("shutdown")) {
+					Logger.logWarning("Shutting down...", LogOrigin.BOT);
+					jda.shutdown();
+					Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
+					System.exit(0);
 				}
 			}
 		});
