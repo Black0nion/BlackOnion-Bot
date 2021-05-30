@@ -58,7 +58,7 @@ jobs:
         API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
       run: |
         answer=$(curl --location --request POST 'https://www.black-onion.com'"${API_ENDPOINT}"'' --header 't0k3n: '"${API_KEY}"'' -A "BlackOnion Action Client (yes actually a real one)")
-        if [[ $answer == *"Successfully started the script!"* ]];
+        if [[ $answer == *"200-success |"* ]];
         then
           echo Successfully connected and started the script!
           exit 0
