@@ -1,11 +1,11 @@
 name: NotifyServer
 
 on:
-  push:
-    tags: 'v*'
+  release:
+    types: [released]
 
 jobs:
-  check-for-changes:
+  notify-server:
     runs-on: ubuntu-latest
     steps:
     - shell: bash
