@@ -28,7 +28,8 @@ public class PasteCommand extends Command {
 		final String language = args[1];
 		final String contentRaw = e.getMessage().getContentRaw();
 		final int index = contentRaw.indexOf(language) + language.length();
-		final String body = contentRaw.substring(index).trim();
+		final String bodyLong = contentRaw.substring(index).trim();
+		// todo pls help alvin
 		
 		cmde.loading(msg -> {				
 			try {
@@ -36,7 +37,7 @@ public class PasteCommand extends Command {
 				HttpResponse<String> response = Unirest.post("https://paste.sv-studios.net/documents")
 						.header("Content-Type", "text/plain")
 						.header("language", language)
-						.body("hallo sparki das ist ein test von simulatan dem echten")
+						.body(bodyLong)
 						.asString();
 				
 				JSONObject obj = new JSONObject(response.getBody());
@@ -46,7 +47,7 @@ public class PasteCommand extends Command {
 						.setDescription("```")
 						.appendDescription(language)
 						.appendDescription("\n")
-						.appendDescription(body)
+						.appendDescription(bodyLong)
 						.appendDescription("```");
 				
 				msg.editMessage(builder.build()).queue();

@@ -22,7 +22,7 @@ public class UserInfoCommand extends Command {
 
 	public UserInfoCommand() {
 		this.setCommand("userinfo")
-			.setSyntax("[@User | UserID");
+			.setSyntax("[@User | UserID]");
 	}
 
 	@Override
