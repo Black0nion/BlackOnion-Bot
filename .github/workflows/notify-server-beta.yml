@@ -1,8 +1,8 @@
 name: NotifyServerBETA
 
 on:
-  push:
-    tags: 'b*'
+  release:
+    types: [prereleased]
 
 jobs:
   check-for-changes:
