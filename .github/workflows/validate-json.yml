@@ -30,5 +30,5 @@ jobs:
         with:
           message: |
             Invalid JSONs detected.
-            Files affected: $FILES_AFFECTED
+            Files affected: ${{ env.FILES_AFFECTED }}
           allow-repeats: true
