@@ -266,5 +266,5 @@
     "uploadasattachment": "Please send the Image as a attachment instead of sending a link!",
     "yourcode": "Your code: **%code%** (using this code you can delete your paste)",
     "tooold": "This message is too old!",
-    "messagestooold": "Due to Discord's limitations I can only delete messages that are younger than 2 weeks!"
+    "messagestooold": "Due to Discord's limitations I can only delete messages that are younger than 2 weeks!",
 }
