@@ -10,6 +10,7 @@ import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getErrorEmbed
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getLoadingEmbed;
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmbed;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -157,6 +158,10 @@ public class CommandEvent {
 		reply(errorEmbed.setTitle(title).addField(name, value, false));
 	}
 	
+	public void error(String name, String value, Consumer<? super BlackMessage> success) {
+		reply(errorEmbed.addField(name, value, false), success);
+	}
+	
 	public void error(String title, String name, String value, final Placeholder... placeholders) {
 		title = language.getTranslatedString(title);
 		name = language.getTranslatedString(name);
@@ -183,6 +188,10 @@ public class CommandEvent {
 	
 	public void exception() {
 		error("errorhappened", "somethingwentwrong");
+	}
+
+	public void selfDestructingException() {
+		error("errorhappened", "somethingwentwrong", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
 	}
 	
 	public void reply(EmbedBuilder builder) {
