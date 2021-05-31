@@ -32,19 +32,20 @@ public class PasteCommand extends Command {
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final String bodyRaw = String.join(" ", Utils.removeFirstArg(args)).trim();
 		// broken lol
-		final Matcher m = Pattern.compile("\\`\\`\\`(?:([a-zA-Z]+)\\n)?(.*)\\`\\`\\`").matcher(bodyRaw);
+		final Matcher m = Pattern.compile("\\`\\`\\`(?:([a-zA-Z]+)\\n)?\\n*([^`]*)\\`\\`\\`").matcher(bodyRaw);
 		String body = null, language = null;
 		
+		m.find();
 		try {
 			language = m.group(1);
-		} catch (Exception ignored) { }
+		} catch (Exception ignored) {  }
 		
 		try {
 			body = m.group(2);
 		} catch (Exception ignored) { body = bodyRaw; }
 		
 		final String finalLanguage = language;
-		final String finalBody = body;
+		final String finalBody = body.replace("`", "\\`");
 		
 		cmde.loading(msg -> {				
 			try {
