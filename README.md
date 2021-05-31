@@ -1,3 +1,4 @@
+[![BuildAndRelease](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml)
 # Discord-Bot
 
 The official BlackOnion-Bot!
