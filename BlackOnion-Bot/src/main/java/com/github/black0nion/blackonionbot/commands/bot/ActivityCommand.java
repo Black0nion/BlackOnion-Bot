@@ -1,16 +1,19 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.entities.Activity;
@@ -22,8 +25,8 @@ public class ActivityCommand extends Command {
 	
 	public ActivityCommand() {
 		this.setCommand("activity")
-			.setSyntax("[playing | watching | listening] <Text>")
-			.setRequiredArgumentCount(2)
+			.setSyntax("([playing | watching | listening] <Text>) | clear")
+			.setRequiredArgumentCount(1)
 			.botAdminRequired()
 			.setHidden()
 			.setCategory(Category.BOT);
@@ -31,15 +34,28 @@ public class ActivityCommand extends Command {
 	
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		String status = "";
-		for (int i = 2; i <= args.length - 1; i++) {
-			status += args[i] + (i == args.length - 1 ? "" : " ");
+		message.delete().queue();
+		final String activityType = args[1].toLowerCase();
+		
+		if (activityType.equalsIgnoreCase("clear")) {
+			ValueManager.remove("activityType");
+			Bot.restartSwitchingStatus(e.getJDA());
+			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("activitycleared", "theactivitygotcleared", false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
+			return;
 		}
-		if(args[1].toLowerCase().contains("playing")) {
+		
+		if (args.length < 2) {
+			cmde.sendPleaseUse(msg -> msg.delete().queueAfter(3, TimeUnit.SECONDS));
+			return;
+		}
+		
+		final String status = String.join(" ", Utils.subArray(args, 2));
+		
+		if (activityType.contains("playing")) {
 			e.getJDA().getPresence().setActivity(Activity.playing(status));
-		} else if (args[1].toLowerCase().contains("watching")) {
+		} else if (activityType.contains("watching")) {
 			e.getJDA().getPresence().setActivity(Activity.watching(status));
-		} else if (args[1].toLowerCase().contains("listening")) {
+		} else if (activityType.contains("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();

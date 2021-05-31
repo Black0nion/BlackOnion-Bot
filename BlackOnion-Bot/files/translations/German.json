@@ -61,6 +61,8 @@
     "languageupdated": "Sprache geändert!",
     "newlanguage": "Neue Sprache: `%newlang%`",
     "newactivity": "Neue Aktivität",
+    "activitycleared": "Aktivität gelöscht!",
+    "theactivitygotcleared": "Die Aktivität wurde zurückgesetzt!",
     "newstatus": "Neuer Status",
     "ping": "Ping!",
     "pong": "Pong :D",
