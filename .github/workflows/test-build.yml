@@ -16,7 +16,6 @@ jobs:
       - uses: eskatos/gradle-command-action@v1
         with:
           build-root-directory: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/build
-          wrapper-directory: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/gradle/wrapper
           wrapper-cache-enabled: true
           dependencies-cache-enabled: true
           arguments: shadowJar
