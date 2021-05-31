@@ -14,7 +14,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - name: debug
-        run: cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/ && pwd
+        run: cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/ && ls
       - uses: eskatos/gradle-command-action@v1
         with:
           wrapper-directory: BlackOnion-Bot
