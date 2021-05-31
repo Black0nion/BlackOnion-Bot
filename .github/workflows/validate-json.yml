@@ -22,6 +22,11 @@ jobs:
         with:
           labels: jsoninvalid
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions-ecosystem/action-remove-labels@v1
+        if: ${{ success() }}
+        with:
+          labels: jsoninvalid
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: mshick/add-pr-comment@v1
         if: ${{ failure() }}
         env:
