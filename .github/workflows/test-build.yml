@@ -1,0 +1,21 @@
+name: TestBuild
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - uses: eskatos/gradle-command-action@v1
+          with:
+            build-root-directory: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
+            wrapper-cache-enabled: true
+            dependencies-cache-enabled: true
+            arguments: shadowJar
