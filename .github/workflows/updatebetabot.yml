@@ -16,11 +16,25 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/BlackOnion-Bot/.gradle/caches
+            ~/BlackOnion-Bot/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Build with Gradle
         run: |
           cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
           chmod +x ./gradlew
           ./gradlew shadowJar
+      - name: Cleanup Gradle Cache
+        # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
+        run: |
+          rm -f ~/BlackOnion-Bot/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/BlackOnion.Bot/.gradle/caches/modules-2/gc.properties
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
