@@ -20,10 +20,4 @@ jobs:
           wrapper-directory: BlackOnion-Bot
           wrapper-cache-enabled: true
           dependencies-cache-enabled: true
-          arguments: build
-      - uses: eskatos/gradle-command-action@v1
-        with:
-          wrapper-directory: BlackOnion-Bot
-          wrapper-cache-enabled: true
-          dependencies-cache-enabled: true
-          arguments: shadowJar
+          arguments: build clean
