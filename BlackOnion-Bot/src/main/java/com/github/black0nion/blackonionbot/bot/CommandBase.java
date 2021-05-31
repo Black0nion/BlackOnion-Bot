@@ -147,7 +147,7 @@ public class CommandBase extends ListenerAdapter {
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
-			FileUtils.appendToFile("commandLog", log);
+			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 			commandsLastTenSecs++;
 			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {

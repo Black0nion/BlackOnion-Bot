@@ -101,6 +101,7 @@ public class CommandEvent {
 	}
 	
 	public void success(String title, String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+		title = language.getTranslatedString(title);
 		name = language.getTranslatedString(name);
 		value = language.getTranslatedString(value);
 		for (final Placeholder placeholder : placeholders) {
