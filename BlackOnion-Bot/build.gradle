@@ -39,7 +39,6 @@ compileJava.options.encoding = 'UTF-8'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-asdf
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their implementation classpath.
