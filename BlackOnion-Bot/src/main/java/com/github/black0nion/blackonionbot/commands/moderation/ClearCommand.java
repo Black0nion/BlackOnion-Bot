@@ -53,6 +53,7 @@ public class ClearCommand extends Command {
 					}
 					
 					if (messages.size() < 2 || messages.size() > 100) {
+						message.delete().queue();
 						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("nomessagesfound", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 						return;
 					}
