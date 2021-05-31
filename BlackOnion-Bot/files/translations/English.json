@@ -127,6 +127,9 @@
     "usergotbanned": "User got banned!",
     "userunbanned": "User got unbanned!",
     "bannedfor": "User was banned for: %reason%",
+    "notanumber": "Keine Nummmer!",
+    "invalidvolume": "Ungültige Lautstärke!",
+    "volumerange": "Die Lautstärke muss zwischen 1 und 150 sein!",
     "inputnumber": "Please input a valid number!",
     "usernotfound": "User not found!",
     "welcome": "Welcome,",
@@ -157,6 +160,8 @@
     "thisnotfound": "This entry couldn't be found!",
     "notinvc": "Not in a voicechannel!",
     "goinvc": "You have to be in a voicechannel to use this command!",
+    "notinsamevc": "Du bist nicht in einem Voicechannel mit mir!",
+    "dontstopotherpplmusic": "Außerdem, stoppe bitte nicht die Musik von anderen Leuten :|",
     "notconnected": "I'm not connected at the moment!",
     "startmusictostop": "You have to start a song first to stop it ;)",
     "nowplaying": "NOW PLAYING: ",
@@ -266,5 +271,5 @@
     "uploadasattachment": "Please send the Image as a attachment instead of sending a link!",
     "yourcode": "Your code: **%code%** (using this code you can delete your paste)",
     "tooold": "This message is too old!",
-    "messagestooold": "Due to Discord's limitations I can only delete messages that are younger than 2 weeks!"
+    "messagestooold": "Due to Discord's limitations I can only delete messages younger than 2 weeks!"
 }
