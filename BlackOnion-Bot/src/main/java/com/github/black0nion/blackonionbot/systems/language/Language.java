@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
+import javax.annotation.Nonnull;
+
 import org.json.JSONObject;
 
 import com.google.common.io.Files;
@@ -46,7 +48,8 @@ public class Language {
 		return name;
 	}
 	
+	@Nonnull
 	public String getTranslatedString(String key) {
-		return messages.get(key);
+		return messages.get(key) != null ? messages.get(key) : key;
 	}
 }
