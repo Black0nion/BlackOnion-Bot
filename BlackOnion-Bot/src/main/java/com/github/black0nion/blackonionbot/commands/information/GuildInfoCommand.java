@@ -21,15 +21,16 @@ public class GuildInfoCommand extends Command {
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		cmde.reply(cmde.success()
-				.setTitle("guildinfo")
-				.setThumbnail(guild.getIconUrl())
-				.addField("name", guild.getName(), true)
-				.addField("Owner", guild.retrieveOwner().submit().join().getUser().getAsMention(), true)
-				.addField("serverid", guild.getId(), true)
-				.addField("rolecount", String.valueOf(guild.getRoles().size()), true)
-				.addField("membercount", String.valueOf(guild.getMemberCount()), true)
-				.addField("channelcount", String.valueOf(guild.getChannels().size()), true)
-				.addField("boostlevel", guild.getBoostTier().name(), true)
-				.addField("created", guild.getTimeCreated().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")), true));
+			.setTitle("guildinfo")
+			.setThumbnail(guild.getIconUrl())
+			.addField("name", guild.getName(), true)
+			.addField("language", guild.getLanguage().getName() + " (" + guild.getLanguage().getLanguageCode() + ")", true)
+			.addField("Owner", guild.retrieveOwner().submit().join().getUser().getAsMention(), true)
+			.addField("serverid", guild.getId(), true)
+			.addField("rolecount", String.valueOf(guild.getRoles().size()), true)
+			.addField("membercount", String.valueOf(guild.getMemberCount()), true)
+			.addField("channelcount", String.valueOf(guild.getChannels().size()), true)
+			.addField("boostlevel", guild.getBoostTier().name(), true)
+			.addField("created", guild.getTimeCreated().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")), true));
 	}
 }

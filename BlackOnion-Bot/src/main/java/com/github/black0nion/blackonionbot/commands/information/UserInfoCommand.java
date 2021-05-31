@@ -67,7 +67,7 @@ public class UserInfoCommand extends Command {
 		builder.addField("discriminator", statsUser.getDiscriminator(), true);
 		builder.addField("userid", statsUser.getId(), true);
 		builder.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false);
-		builder.addField("language", statsUser.getLanguage().getName() + " (" + statsUser.getLanguage() + ")", true);
+		builder.addField("language", statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")", true);
 		builder.addField("created", statsUser.getTimeCreated().format(pattern), true);
 		if (statsMember != null)
 			builder.addField("joined", statsMember.getTimeJoined().format(pattern), true);
