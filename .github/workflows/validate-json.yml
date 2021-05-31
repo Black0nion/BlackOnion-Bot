@@ -1,0 +1,22 @@
+name: Validate JSON Syntax
+
+on:
+  push:
+    paths:
+      - '**.json'
+  pull_request:
+    paths:
+      - '**.json'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: json-syntax-check
+        uses: limitusus/json-syntax-check@v1
+        with:
+          pattern: "\\.json$"
+      - name: error-if-not-valid
+        if: ${{ steps.test.outputs.failed_files }}
+        run: echo ${{ steps.test.outputs.failed_files }}
