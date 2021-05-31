@@ -18,6 +18,7 @@ jobs:
         with:
           pattern: "\\.json$"
       - name: print shit
+        if: always()
         run: ${{ steps.test.outputs.failed_files }}
       - uses: actions-ecosystem/action-add-labels@v1
         if: ${{ steps.test.outputs.failed_files }}
