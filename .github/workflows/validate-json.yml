@@ -17,6 +17,16 @@ jobs:
         uses: limitusus/json-syntax-check@v1
         with:
           pattern: "\\.json$"
-      - name: error-if-not-valid
+      - uses: actions-ecosystem/action-add-labels@v1
         if: ${{ steps.test.outputs.failed_files }}
-        run: echo ${{ steps.test.outputs.failed_files }}
+        with:
+          labels: jsoninvalid
+      - uses: mshick/add-pr-comment@v1
+        if: ${{ steps.test.outputs.failed_files }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            Invalid JSONs detected.
+            Files affected: ${{ steps.test.outputs.failed_files }}
+          allow-repeats: true
