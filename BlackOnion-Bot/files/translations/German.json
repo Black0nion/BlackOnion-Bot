@@ -130,6 +130,8 @@
     "notanumber": "Keine Nummmer!",
     "invalidvolume": "Ungültige Lautstärke!",
     "volumerange": "Die Lautstärke muss zwischen 1 und 150 sein!",
+    "volumechanged": "Lautstärke geändert!",
+    "volumesetto": "Die Lautstärke wurde auf %volume% gesetzt.",
     "inputnumber": "Bitte gebe eine gültige Zahl ein!",
     "usernotfound": "User nicht gefunden!",
     "welcome": "Willkommen,",
