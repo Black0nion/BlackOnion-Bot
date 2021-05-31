@@ -77,7 +77,9 @@
     "pastecreated": "Paste created",
     "numberofdeletedmessages": "Please input the amount of messages to delete!",
     "messagesdeleted": "Messages deleted",
-    "msgsgotdeleted": "messages got deleted",
+    "msgsgotdeleted": "%msgcount% Nachrichten wurden gelöscht.",
+    "msgsgotdeletedless": "%msgcount% Nachrichten wurden gelöscht.\nDie restlichen %remaining% Nachrichten können nicht gelöscht werden, weil sie zu alt sind.",
+    "nomessagesfound": "Es wurden keine zu löschenden Nachrichten gefunden!",
     "weather": "Weather",
     "weatherfor": "Weather for",
     "temperature": "Temperature",
@@ -260,5 +262,7 @@
     "qrnotfound": "Es wurde kein QR-Code gefunden!",
     "privateqr": "Dieser QR-Code ist privat!",
     "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!",
-    "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)"
+    "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)",
+    "tooold": "Diese Nachricht ist zu alt!",
+    "messagestooold": "Aufgrund von Discord's Limitierungen kann ich nur Nachrichten die jünger als 2 Wochen sind löschen!"
 }
