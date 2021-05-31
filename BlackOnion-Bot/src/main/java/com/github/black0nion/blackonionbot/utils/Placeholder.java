@@ -22,6 +22,11 @@ public class Placeholder {
 		this.value = value;
 	}
 	
+	public Placeholder(String placeholder, Object value) {
+		this.placeholder = "%" + placeholder + "%";
+		this.value = value.toString();
+	}
+	
 	public String process(String input) {
 		return input.replace(placeholder, value.toString());
 	}
