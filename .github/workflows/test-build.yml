@@ -13,11 +13,8 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - name: debug
-        run: chmod +x /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot/gradlew
-      - uses: eskatos/gradle-command-action@v1
-        with:
-          wrapper-directory: BlackOnion-Bot
-          wrapper-cache-enabled: true
-          dependencies-cache-enabled: true
-          arguments: build
+      - name: Build with Gradle
+        run: |
+          cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
+          chmod +x ./gradlew
+          ./gradlew shadowJar
