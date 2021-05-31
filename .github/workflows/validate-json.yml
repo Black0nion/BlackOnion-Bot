@@ -19,13 +19,13 @@ jobs:
           pattern: "\\.json$"
       - name: print shit
         if: always()
-        run: ${{ steps.test.outputs.failed_files }}
+        run: echo ${{ steps.test.outputs.failed_files }}
       - uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ steps.test.outputs.failed_files }}
+        if: failed()
         with:
           labels: jsoninvalid
       - uses: mshick/add-pr-comment@v1
-        if: ${{ steps.test.outputs.failed_files }}
+        if: failed()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
