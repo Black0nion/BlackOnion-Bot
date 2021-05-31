@@ -61,6 +61,8 @@
     "languageupdated": "Sprache geändert!",
     "newlanguage": "Neue Sprache: `%newlang%`",
     "newactivity": "Neue Aktivität",
+    "activitycleared": "Aktivität gelöscht!",
+    "theactivitygotcleared": "Die Aktivität wurde zurückgesetzt!",
     "newstatus": "Neuer Status",
     "ping": "Ping!",
     "pong": "Pong :D",
@@ -77,7 +79,9 @@
     "pastecreated": "Paste erstellt",
     "numberofdeletedmessages": "Bitte gebe die Anzahl an zu löschenden Nachrichten an!",
     "messagesdeleted": "Nachrichten gelöscht",
-    "msgsgotdeleted": "Nachrichten wurden gelöscht",
+    "msgsgotdeleted": "%msgcount% Nachrichten wurden gelöscht.",
+    "msgsgotdeletedless": "%msgcount% Nachrichten wurden gelöscht.\nDie restlichen %remaining% Nachrichten können nicht gelöscht werden, weil sie zu alt sind.",
+    "nomessagesfound": "Es wurden keine zu löschenden Nachrichten gefunden!",
     "weather": "Wetter",
     "weatherfor": "Wetter für",
     "temperature": "Temperatur",
@@ -260,5 +264,7 @@
     "qrnotfound": "Es wurde kein QR-Code gefunden!",
     "privateqr": "Dieser QR-Code ist privat!",
     "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!",
-    "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)"
+    "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)",
+    "tooold": "Diese Nachricht ist zu alt!",
+    "messagestooold": "Aufgrund von Discord's Limitierungen kann ich nur Nachrichten die jünger als 2 Wochen sind löschen!"
 }
