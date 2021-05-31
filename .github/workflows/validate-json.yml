@@ -21,11 +21,11 @@ jobs:
         if: always()
         run: echo ${{ steps.test.outputs.failed_files }}
       - uses: actions-ecosystem/action-add-labels@v1
-        if: failed()
+        if: ${{ failed() }}
         with:
           labels: jsoninvalid
       - uses: mshick/add-pr-comment@v1
-        if: failed()
+        if: ${{ failed() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
