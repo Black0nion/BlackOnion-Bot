@@ -9,8 +9,10 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import com.github.black0nion.blackonionbot.DefaultValues;
@@ -70,6 +72,10 @@ public class Bot extends ListenerAdapter {
 	public static final long startTime = System.currentTimeMillis();
 	
 	public static final Random random = new Random();
+	
+	public static Future<Object> switchingStatusFuture;
+	
+	public static Callable<Object> switchingStatusCallable;
 	
 	@SuppressWarnings("resource")
 	public void startBot() {
@@ -146,22 +152,25 @@ public class Bot extends ListenerAdapter {
 	public void onReady(ReadyEvent e) {
 		BotInformation.botId = e.getJDA().getSelfUser().getIdLong();
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator());
-		executor.submit(() -> {
+		
+		switchingStatusCallable = () -> {
 			while (true) {
 				try {
 					String activityType = ValueManager.getString("activityType");
 					if (activityType != null && (!activityType.equalsIgnoreCase("") && !(activityType.equalsIgnoreCase("none")))) {
-						e.getJDA().getPresence().setActivity(ActivityCommand.getActivity());
+						jda.getPresence().setActivity(ActivityCommand.getActivity());
 						Thread.sleep(60000);
 					}
-					e.getJDA().getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
+					jda.getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
 					Thread.sleep(60000);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					if (!(ex instanceof InterruptedException))
+						ex.printStackTrace();
 				}
 			}
-		});
+		};
 		
+		restartSwitchingStatus(e.getJDA());
 		/** @Deprecated: not working due to not be able to message not cached users on Discord's side (intended)
 		notifyStatusUsers.forEach(userId -> {
 			jda.retrieveUserById(userId).queue(user -> {
@@ -171,6 +180,11 @@ public class Bot extends ListenerAdapter {
 			});
 		});
 		*/
+	}
+	
+	public static void restartSwitchingStatus(JDA jda) {
+		if (switchingStatusFuture != null) switchingStatusFuture.cancel(true);
+		switchingStatusFuture = executor.submit(switchingStatusCallable);
 	}
 	
 	public static HashMap<String, Object> getOsThings(OperatingSystemMXBean os) {
