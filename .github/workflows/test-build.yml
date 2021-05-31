@@ -20,4 +20,4 @@ jobs:
           wrapper-directory: BlackOnion-Bot
           wrapper-cache-enabled: true
           dependencies-cache-enabled: true
-          arguments: shadowJar
+          arguments: build
