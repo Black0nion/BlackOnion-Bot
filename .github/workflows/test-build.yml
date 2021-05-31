@@ -14,8 +14,8 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - uses: eskatos/gradle-command-action@v1
-          with:
-            build-root-directory: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
-            wrapper-cache-enabled: true
-            dependencies-cache-enabled: true
-            arguments: shadowJar
+        with:
+          build-root-directory: /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
+          wrapper-cache-enabled: true
+          dependencies-cache-enabled: true
+          arguments: shadowJar
