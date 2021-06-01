@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.Embed;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -80,8 +81,8 @@ public class CommandEvent {
 		return language;
 	}
 	
-	public EmbedBuilder success() {
-		return this.successEmbed;
+	public Embed success() {
+		return new Embed(this.successEmbed);
 	}
 	
 	public void success(String name, String value) {
@@ -135,8 +136,8 @@ public class CommandEvent {
 		reply(successEmbed.addField(name, value, false), success);
 	}
 	
-	public EmbedBuilder loading() {
-		return this.loadingEmbed;
+	public Embed loading() {
+		return new Embed(this.loadingEmbed);
 	}
 	
 	public void loading(Consumer<? super BlackMessage> success) {
@@ -149,6 +150,10 @@ public class CommandEvent {
 	
 	public void loading(String name, String value, Consumer<? super BlackMessage> success) {
 		reply(loadingEmbed.addField(name, value, false), success);
+	}
+	
+	public Embed error() {
+		return new Embed(this.errorEmbed);
 	}
 	
 	public void error(String name, String value) {

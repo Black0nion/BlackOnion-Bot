@@ -16,6 +16,22 @@ public class Embed extends EmbedBuilder {
 		this.guild = guild;
 	}
 	
+	public Embed(EmbedBuilder builder) {
+		super(builder);
+	}
+	
+	public Embed(Embed embed) {
+		super(embed);
+		this.user = embed.user;
+		this.guild = embed.guild;
+	}
+	
+	public Embed(BlackUser user, BlackGuild guild, EmbedBuilder builder) {
+		super(builder);
+		this.user = user;
+		this.guild = guild;
+	}
+	
 	public Embed() {
 		this.user = null;
 		this.guild = null;
