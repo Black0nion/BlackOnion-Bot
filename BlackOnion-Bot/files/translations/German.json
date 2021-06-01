@@ -288,5 +288,13 @@
     "urded": "You are ded,",
     "notbigsurprise": "not big surprise!",
     "uwon": "You won,",
-    "bigsurprise": "big surprise!"
+    "bigsurprise": "big surprise!",
+    "suggestion": "Vorschlag",
+    "suggestionsoff": "Vorschläge sind ausgeschaltet!",
+    "nosuggestionfeature": "Auf diesem Server ist kein Kanal für das Suggestion-Feature gesetzt!",
+    "suggestionschannelnotfound": "Der Kanal für Vorschläge konnte nicht gefunden werden!",
+    "pleaseresetsuggestionschannel": "Bitte setzen den Kanal neu!",
+    "suggestionby": "Vorschlag von %user%",
+    "suggestiongotsent": "Vorschlag abgesendet!",
+    "suggestionisin": "Dein Vorschlag wurde in %channel% gesendet!"
 }
