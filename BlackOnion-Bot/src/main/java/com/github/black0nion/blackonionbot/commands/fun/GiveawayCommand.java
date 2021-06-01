@@ -72,9 +72,10 @@ public class GiveawayCommand extends Command {
 		final String item = String.join(" ", Utils.subArray(args, 3, args.length - 1));
 		final Date finalEndDate = endDate;
 		final int finalWinnersCount = winnersCount;
-		cmde.success("giveawayfor", "giveawayend", msg -> {
+		
+		cmde.reply(cmde.success().setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item))).setDescription(cmde.getTranslation("giveawaydesc", new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " ")))), msg -> {
 			msg.addReaction("U+1F389").queue();
 			GiveawaysSystem.createGiveaway(finalEndDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, finalWinnersCount);
-		}, new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " ")));
+		});
 	}
 }
