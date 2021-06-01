@@ -11,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import org.bson.Document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +24,11 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 
-public class GiveawaysSystem {
+public class GiveawaySystem {
 	private static List<Giveaway> giveaways = new ArrayList<>();
 	
 	private static MongoCollection<Document> collection;
@@ -38,6 +41,7 @@ public class GiveawaysSystem {
 		giveawayKeys.add("endDate");
 		giveawayKeys.add("messageId");
 		giveawayKeys.add("channelId");
+		giveawayKeys.add("createrId");
 		giveawayKeys.add("guildId");
 		giveawayKeys.add("item");
 		giveawayKeys.add("winners");
@@ -55,15 +59,20 @@ public class GiveawaysSystem {
 			
 			for (Document doc : collection.find()) {
 				if (doc.keySet().containsAll(giveawayKeys))
-					createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
+					createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("createrId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
 			}
 		});
 	}
 	
+	@Nullable
+	public static Giveaway getGiveaway(long messageid) {
+		return giveaways.stream().filter(giveaway -> giveaway.getMessageId() == messageid).findFirst().orElse(null);
+	}
+	
 	@SuppressWarnings("unchecked")
-	public static Giveaway createGiveaway(Date endDate, long messageId, long channelId, long guildId, String item, int winners) {
+	public static Giveaway createGiveaway(Date endDate, long messageId, long channelId, long createrId, long guildId, String item, int winners) {
 		try { 
-			Giveaway giveaway = new Giveaway(endDate, messageId, channelId, guildId, item, winners);
+			Giveaway giveaway = new Giveaway(endDate, messageId, channelId, createrId, guildId, item, winners);
 			if (giveaways.contains(giveaway))
 				return giveaway;
 			giveaways.add(giveaway);
@@ -84,42 +93,47 @@ public class GiveawaysSystem {
 		Date endDate = giveaway.getEndDate();
 		BlackGuild guild = BlackGuild.from(Bot.jda.getGuildById(giveaway.getGuildId()));
 		guild.getTextChannelById(giveaway.getChannelId()).retrieveMessageById(giveaway.getMessageId()).queue(msg -> {
-			final int winnas = giveaway.getWinners();
 			if (msg == null) {
 				deleteGiveaway(giveaway);
 				return;
 			}
+			
 			executor.schedule(() -> {
-				try {
-					msg.retrieveReactionUsers("\uD83C\uDF89").queue(users -> {
-						final SelfUser selfUser = Bot.jda.getSelfUser();
-						if (users.size() == 0 || users.stream().filter(user -> {return user.getIdLong() != selfUser.getIdLong();}).count() == 0) {
-							msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
-							deleteGiveaway(giveaway);
-							return;
-						}
-						
-						users.remove(selfUser);
-						final int winnerCount = winnas < users.size() ? winnas : users.size();
-						final String[] winners = new String[winnerCount];
-						final long[] winnersIds = new long[winnerCount];
-						
-						Collections.shuffle(users, Bot.random);
-						
-						for (int i = 0; i < winners.length; i++) {
-							final User currentWinner = users.get(i);
-							winners[i] = currentWinner.getAsMention();
-							winnersIds[i] = currentWinner.getIdLong(); 
-						}
-						
-						msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslation("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).mentionUsers(winnersIds).queue();
-					});
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				deleteGiveaway(giveaway);
+				endGiveaway(giveaway, msg, guild);
 			}, endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
 		});
+	}
+	
+	public static final void endGiveaway(Giveaway giveaway, Message msg, BlackGuild guild) {
+		try {
+			msg.retrieveReactionUsers("\uD83C\uDF89").queue(users -> {
+				final SelfUser selfUser = Bot.jda.getSelfUser();
+				if (users.size() == 0 || users.stream().filter(user -> {return user.getIdLong() != selfUser.getIdLong();}).count() == 0) {
+					msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
+					deleteGiveaway(giveaway);
+					return;
+				}
+				
+				users.remove(selfUser);
+				final int winnerCountGiveawy = giveaway.getWinners();
+				final int winnerCount = winnerCountGiveawy < users.size() ? winnerCountGiveawy : users.size();
+				final String[] winners = new String[winnerCount];
+				final long[] winnersIds = new long[winnerCount];
+				
+				Collections.shuffle(users, Bot.random);
+				
+				for (int i = 0; i < winners.length; i++) {
+					final User currentWinner = users.get(i);
+					winners[i] = currentWinner.getAsMention();
+					winnersIds[i] = currentWinner.getIdLong(); 
+				}
+				
+				msg.editMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslation("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).mentionUsers(winnersIds).queue();
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		deleteGiveaway(giveaway);
 	}
 	
 	private static final void deleteGiveaway(Giveaway giveaway) {

@@ -16,7 +16,8 @@ public class TestCommand extends Command {
 	
 	public TestCommand() {
 		this.setCommand("test", "tet")
-			.setRequiredArgumentCount(2);
+			.setRequiredArgumentCount(2)
+			.botAdminRequired();
 	}
 
 	@Override

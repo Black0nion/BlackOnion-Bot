@@ -17,7 +17,7 @@ public class LanguageCommand extends Command {
 	
 	public LanguageCommand() {
 		this.setCommand("language", "lang", "locale", "sprache")
-			.setSyntax("[language code]");
+			.setSyntax("[language code | list]");
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class LanguageCommand extends Command {
 			} else {
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			cmde.success("Languages", "Your Language: " + language, "To change your language, use " + CommandEvent.getPleaseUse(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list" + "`");
+			cmde.success("Languages", "Your Language: " + language, "To change your language, use `" + CommandEvent.getCommandHelp(guild, author, this) + "`.\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list" + "`");
 		}
 	}
 }

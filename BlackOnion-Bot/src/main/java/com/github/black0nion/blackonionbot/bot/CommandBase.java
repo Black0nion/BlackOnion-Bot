@@ -90,7 +90,8 @@ public class CommandBase extends ListenerAdapter {
 				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisibility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
 					JSONObject commandJSON = new JSONObject();
 					commandJSON.put("command", command.getCommand());
-					commandJSON.put("description", LanguageSystem.getTranslation("help" + command.getCommand()[0], LanguageSystem.getDefaultLanguage()));
+					final String translation = LanguageSystem.getDefaultLanguage().getTranslation("help" + command.getCommand()[0]);
+					commandJSON.put("description", translation != null ? translation : LanguageSystem.getDefaultLanguage().getTranslationNonNull("empty"));
 					commandJSON.put("isToggleable", command.isToggleable());
 					if (Dashboard.hasValues(command)) {
 						JSONArray values = new JSONArray();
@@ -163,13 +164,12 @@ public class CommandBase extends ListenerAdapter {
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.getVisibility() != CommandVisibility.SHOWN)
 					return;
-				message.reply(EmbedUtils.getErrorEmbed(author, guild)
-						.addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()), false).build()).queue();
+				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargumentcount", author, guild), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
 							if (cmd.getVisibility() != CommandVisibility.SHOWN) {
 								msg.delete().queueAfter(3, TimeUnit.SECONDS);
 								message.delete().queueAfter(3, TimeUnit.SECONDS);
@@ -179,7 +179,7 @@ public class CommandBase extends ListenerAdapter {
 			}
 			
 			if (containsProfanity) {
-				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("dontexecuteprofanitycommands", "pleaseremoveprofanity", false).build()).queue();
+				cmde.error("dontexecuteprofanitycommands", "pleaseremoveprofanity");
 				return;
 			}
 			

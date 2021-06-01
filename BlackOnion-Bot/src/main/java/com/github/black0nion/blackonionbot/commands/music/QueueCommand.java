@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -38,7 +37,7 @@ public class QueueCommand extends Command {
         		builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
         	});
     	} else {
-    		builder.setDescription(LanguageSystem.getTranslation("thistracksplus", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
+    		builder.setDescription(cmde.getTranslation("thistracksplus").replace("%tracks%", String.valueOf(tracks.size() - 10)));
     		for (int i = 0; i < tracks.size(); i++) {
     			final AudioTrack track = tracks.get(i);
     			if (i < 10) builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);

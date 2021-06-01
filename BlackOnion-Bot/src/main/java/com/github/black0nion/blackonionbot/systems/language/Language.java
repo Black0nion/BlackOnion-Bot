@@ -5,9 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.google.common.io.Files;
 
 public class Language {
@@ -49,7 +51,27 @@ public class Language {
 	}
 	
 	@Nonnull
-	public String getTranslatedString(String key) {
+	public String getTranslationNonNull(String key) {
 		return messages.get(key) != null ? messages.get(key) : key;
+	}
+	
+	@Nonnull
+	public String getTranslationNonNull(String key, Placeholder... placeholders) {
+		String result = getTranslationNonNull(key);
+		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
+		return result;
+	}
+	
+	@Nullable
+	public String getTranslation(String key) {
+		return messages.get(key);
+	}
+	
+	@Nullable
+	public String getTranslation(String key, Placeholder... placeholders) {
+		String result = getTranslation(key);
+		if (result == null) return null;
+		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
+		return result;
 	}
 }

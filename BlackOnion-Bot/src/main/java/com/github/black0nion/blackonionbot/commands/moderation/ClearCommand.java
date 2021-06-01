@@ -13,7 +13,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -36,7 +35,7 @@ public class ClearCommand extends Command {
 		try {
 			final int amount = Integer.parseInt(args[1]);
 			if (amount < 2 || amount > 100) {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("numberofdeletedmessages", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("numberofdeletedmessages"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 				return;
 			}
 			
@@ -54,15 +53,15 @@ public class ClearCommand extends Command {
 					
 					if (messages.size() < 2 || messages.size() > 100) {
 						message.delete().queue();
-						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), LanguageSystem.getTranslation("nomessagesfound", author, guild), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("nomessagesfound"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 						return;
 					}
 					channel.deleteMessages(messages).queue(succ -> {
 						// TODO: delete after x seconds
 						if (messages.size() != amount) {
-							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("messagesdeleted", author, guild), LanguageSystem.getTranslation("msgsgotdeletedless", author, guild).replace("%msgcount%", String.valueOf(messages.size())).replace("%remaining%", String.valueOf(messages.size() - amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless").replace("%msgcount%", String.valueOf(messages.size())).replace("%remaining%", String.valueOf(messages.size() - amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 						} else
-							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("messagesdeleted", author, guild), LanguageSystem.getTranslation("msgsgotdeleted", author, guild).replace("%msgcount%", String.valueOf(amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted").replace("%msgcount%", String.valueOf(amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 					}, error -> { });
 				});
 			} catch (Exception ex) {

@@ -101,9 +101,9 @@ public class CommandEvent {
 	}
 	
 	public void success(String title, String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
-		title = language.getTranslatedString(title);
-		name = language.getTranslatedString(name);
-		value = language.getTranslatedString(value);
+		title = language.getTranslationNonNull(title);
+		name = language.getTranslationNonNull(name);
+		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
 			title = placeholder.process(title);
 			name = placeholder.process(name);
@@ -114,8 +114,8 @@ public class CommandEvent {
 	}
 	
 	public void success(String name, String value, final Placeholder... placeholders) {
-		name = language.getTranslatedString(name);
-		value = language.getTranslatedString(value);
+		name = language.getTranslationNonNull(name);
+		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -125,8 +125,8 @@ public class CommandEvent {
 	}
 	
 	public void success(String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
-		name = language.getTranslatedString(name);
-		value = language.getTranslatedString(value);
+		name = language.getTranslationNonNull(name);
+		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -164,9 +164,9 @@ public class CommandEvent {
 	}
 	
 	public void error(String title, String name, String value, final Placeholder... placeholders) {
-		title = language.getTranslatedString(title);
-		name = language.getTranslatedString(name);
-		value = language.getTranslatedString(value);
+		title = language.getTranslationNonNull(title);
+		name = language.getTranslationNonNull(name);
+		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
 			title = placeholder.process(title);
 			name = placeholder.process(name);
@@ -177,8 +177,8 @@ public class CommandEvent {
 	}
 	
 	public void error(String name, String value, final Placeholder... placeholders) {
-		name = language.getTranslatedString(name);
-		value = language.getTranslatedString(value);
+		name = language.getTranslationNonNull(name);
+		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
 			name = placeholder.process(name);
 			value = placeholder.process(value);
@@ -233,7 +233,18 @@ public class CommandEvent {
 	}
 	
 	public String getTranslation(String key) {
-		return language.getTranslatedString(key);
+		return language.getTranslationNonNull(key);
+	}
+	
+	public String getTranslation(String key, Placeholder... placeholders) {
+		String result = getTranslation(key);
+		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
+		return result;
+	}
+	
+	public String getTranslationOrEmpty(String key) {
+		final String translation = language.getTranslation(key);
+		return translation != null ? translation : language.getTranslationNonNull("empty");
 	}
 	
 	public BlackMessage getMessage() {
