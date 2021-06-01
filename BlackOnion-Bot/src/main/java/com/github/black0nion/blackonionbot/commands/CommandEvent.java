@@ -241,6 +241,12 @@ public class CommandEvent {
 		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
 		return result;
 	}
+	
+	public String getTranslationOrEmpty(String key) {
+		final String translation = language.getTranslation(key);
+		return translation != null ? translation : language.getTranslationNonNull("empty");
+	}
+	
 	public BlackMessage getMessage() {
 		return message;
 	}
