@@ -4,9 +4,6 @@ on:
   push:
     paths:
       - '**.json'
-  pull_request:
-    paths:
-      - '**.json'
 
 jobs:
   test:
