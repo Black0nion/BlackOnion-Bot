@@ -198,9 +198,17 @@
     "undertenchars": "The prefix has to be shorter than 10 characters!",
     "toomanywinners": "Too many winners!",
     "maxhundretwinners": "Max 100 users can win!",
+    "giveaway": "GIVEAWAY",
     "giveawayfor": "Giveaway of %item% | Winner: %winners%",
-    "giveawayend": "End of the giveaway: %end%",
+    "giveawaydesc": ":people_holding_hands: Amount of winners: %winners%\n:alarm_clock: End of the giveaway: %end%\n<:S_START:849205334949101598> Created by %user%",
     "giveawaywinner": "Winner: %winner%",
+    "giveawaynotfound": "Giveaway not found!",
+    "giveawaynotfounddesc": "This giveaway couldn't be found!",
+    "giveawayid": "Giveaway ID: %id%",
+    "giveawayended": "Giveaway ended!",
+    "giveawaygotended": "The giveaway got ended and the winners got drawn!",
+    "nogiveawayendrights": "You don't have the rights to end this giveaway!",
+    "mustbeadminorgiveawaycreater": "You have to be the creator of the giveaway or have the right `Message Manage` to end the giveaway!",
     "nowinner": "No winners :(",
     "nobodyparticipated": "Nobody participated which is why nobody can win :P",
     "tooshort": "Too short!",
@@ -273,5 +281,6 @@
     "uploadasattachment": "Please send the Image as a attachment instead of sending a link!",
     "yourcode": "Your code: **%code%** (using this code you can delete your paste)",
     "tooold": "This message is too old!",
-    "messagestooold": "Due to Discord's limitations I can only delete messages younger than 2 weeks!"
+    "messagestooold": "Due to Discord's limitations I can only delete messages younger than 2 weeks!",
+    "invalidmessageid": "Invalid MessageID!"
 }
