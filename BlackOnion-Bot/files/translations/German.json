@@ -200,7 +200,7 @@
     "maxhundretwinners": "Es können maximal 100 User gewinnen!",
     "giveaway": "GIVEAWAY",
     "giveawayfor": ":gift:` Giveaway von` %item%",
-    "giveawaydesc": ":people_holding_hands: Anzahl an Gewinnern: %winners%\n:alarm_clock: Ende des Giveaways: %end%",
+    "giveawaydesc": ":people_holding_hands: Anzahl an Gewinnern: %winners%\n:alarm_clock: Ende des Giveaways: %end%\n<:S_START:849205334949101598> Erstellt von: %user%",
     "giveawaywinner": ":partying_face:Gewinner: %winner%",
     "giveawaynotfound": "Giveaway nicht gefunden!",
     "giveawaynotfounddesc": "Dieses Giveaway konnte nicht gefunden werden!",

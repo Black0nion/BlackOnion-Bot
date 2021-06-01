@@ -74,7 +74,7 @@ public class GiveawayCommand extends Command {
 		final Date finalEndDate = endDate;
 		final int finalWinnersCount = winnersCount;
 		
-		final EmbedBuilder giveawayMessage = cmde.success().setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item))).setDescription(cmde.getTranslation("giveawaydesc", new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " "))));
+		final EmbedBuilder giveawayMessage = cmde.success().setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item))).setDescription(cmde.getTranslation("giveawaydesc", new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " ")), new Placeholder("user", author.getAsMention())));
 		cmde.reply(giveawayMessage, msg -> {
 			msg.addReaction("U+1F389").queue();
 			msg.editMessage(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", msg.getId()))).build()).queue();
