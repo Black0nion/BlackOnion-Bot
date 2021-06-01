@@ -141,10 +141,10 @@ public class BlackGuild extends BlackObject implements Guild {
 			this.antiSpoilerType = gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
 			this.antiSwearType = gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
 			this.joinMessage = gOD(config.getString("joinmessage"),
-					this.language.getTranslatedString("defaultjoinmessage"));
+					this.language.getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = gOD(config.getLong("joinchannel"), -1L);
 			this.leaveMessage = gOD(config.getString("leavemessage"),
-					this.language.getTranslatedString("defaultleavemessage"));
+					this.language.getTranslationNonNull("defaultleavemessage"));
 			this.leaveChannel = gOD(config.getLong("leavechannel"), -1L);
 			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
