@@ -4,20 +4,21 @@ import java.util.Date;
 
 public class Giveaway {
 	private final Date endDate;
-	private final long messageId;
 	private final long channelId;
+	private final long messageId;
+	private final long createrId;
 	private final long guildId;
 	private final String item;
 	private final int winners;
 	
-	public Giveaway(Date endDate, long messageId, long channelId, long guildId, String item, int winners) {
-		super();
+	public Giveaway(Date endDate, long messageId, long channelId, long createrId, long guildId, String item, int winners) {
 		this.endDate = endDate;
 		this.messageId = messageId;
 		this.channelId = channelId;
 		this.guildId = guildId;
 		this.item = item;
 		this.winners = winners;
+		this.createrId = createrId;
 	}
 
 	public Date getEndDate() {
@@ -42,6 +43,10 @@ public class Giveaway {
 
 	public int getWinners() {
 		return winners;
+	}
+	
+	public long getCreaterId() {
+		return createrId;
 	}
 
 	@Override

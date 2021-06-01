@@ -36,14 +36,23 @@ public class HelpCommand extends Command {
 			if (args.length >= 2) {
 				// a command
 				for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-					if (entry.getValue().isVisible() && Arrays.asList(entry.getKey()).contains(args[1])) {
-						final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), author, guild);
-						if (commandHelp == null) System.out.println("Help for " + entry.getKey()[0] + " not set!");
-						cmde.success("help", CommandEvent.getCommandHelp(guild, author, entry.getValue()), commandHelp != null ? commandHelp : "empty");
+					final Command cmd = entry.getValue();
+					if (cmd.isVisible() && Arrays.asList(entry.getKey()).contains(args[1])) {
+						cmde.success("help", CommandEvent.getCommandHelp(guild, author, cmd), cmde.getTranslationOrEmpty("help" + cmd.getCommand()[0].toLowerCase()));
 						return;
 					}
 				}
-				cmde.error("commandnotfound", "thecommandnotfound", new Placeholder("command", "`" + args[1] + "`"));
+				
+				final Category category = Category.parse(args[1]);
+				if (category != null) {
+					EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
+					for (Command c : CommandBase.commandsInCategory.get(category)) {
+						builder.addField(CommandEvent.getCommandHelp(guild, author, c), cmde.getTranslationOrEmpty("help" + c.getCommand()[0]), false);
+					}
+					cmde.reply(builder);
+				} else {	
+					cmde.error("commandnotfound", "thecommandnotfound", new Placeholder("command", "`" + args[1] + "`"));
+				}
 			} else {
 				// start the help system thingy lmao
 				EmbedBuilder builder = cmde.success()
@@ -53,18 +62,18 @@ public class HelpCommand extends Command {
 				final Category[] cats = Category.values();
 				for (int i = 0; i <= cats.length; i++) {
 					String commandsInCategory = "";
-					Category c = null;
+					Category category = null;
 					if (i == 0) {
 						commandsInCategory = ", " + cmde.getTranslation("helpmodules");
 					} else {						
-						c = cats[i - 1];
-						for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-							if (entry.getValue().getCategory() == c && entry.getValue().isVisible())
-								commandsInCategory += ", " + entry.getValue().getCommand()[0];
+						category = cats[i - 1];
+						for (Command c : CommandBase.commandsInCategory.get(category)) {
+							if (c.isVisible())
+								commandsInCategory += ", " + c.getCommand()[0];
 						}
 					}
 					if (commandsInCategory.length() <= 2) continue;
-					builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + cmde.getTranslation("modules")), commandsInCategory.substring(1), false);
+					builder.addField(Utils.emojis[i] + (category != null ? " " + category.name() : " " + cmde.getTranslation("modules")), commandsInCategory.substring(1), false);
 				}
 				message.reply(builder.build()).queue((msg) -> {
 					for (int i = 0; i <= cats.length; i++)
@@ -106,18 +115,18 @@ public class HelpCommand extends Command {
 						final Category[] cats = Category.values();
 						for (int i = 0; i <= cats.length; i++) {
 							String commandsInCategory = "";
-							Category c = null;
+							Category category = null;
 							if (i == 0) {
 								commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", user, guild);
 							} else {						
-								c = cats[i - 1];
-								for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-									if (entry.getValue().getCategory() == c && entry.getValue().isVisible())
-										commandsInCategory += ", " + entry.getValue().getCommand()[0];
+								category = cats[i - 1];
+								for (Command c : CommandBase.commandsInCategory.get(category)) {
+									if (c.isVisible())
+										commandsInCategory += ", " + c.getCommand()[0];
 								}
 							}
 							
-							builder.addField(Utils.emojis[i] + (c != null ? " " + c.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
+							builder.addField(Utils.emojis[i] + (category != null ? " " + category.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
 						}
 					} else {
 						emojiReactionNum--;

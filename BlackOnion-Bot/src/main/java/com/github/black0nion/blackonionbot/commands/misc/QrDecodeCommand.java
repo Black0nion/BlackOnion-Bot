@@ -32,7 +32,7 @@ public class QrDecodeCommand extends Command {
 	
 	public QrDecodeCommand() {
 		this.setCommand("qrdecode", "qrd")
-			.setSyntax("<attach file / url to a public image");
+			.setSyntax("<attach file / url to a public image>");
 	}
 
 	@Override

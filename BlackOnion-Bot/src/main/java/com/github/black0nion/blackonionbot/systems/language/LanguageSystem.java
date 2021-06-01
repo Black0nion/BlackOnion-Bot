@@ -59,54 +59,24 @@ public class LanguageSystem {
 		return defaultLocale;
 	}
 	
-	public static void updateUserLocale(BlackUser user, String locale) {
-		user.setLanguage(getLanguageFromName(locale));
-	}
-	
-	public static void updateGuildLocale(BlackGuild guild, String locale) {
-		guild.setLanguage(getLanguageFromName(locale));
-	}
-	
 	public static Language getLanguageFromName(String name) {
-		if (name == null) return null;
-		try {
-			return languages.get(name.toUpperCase());
-		} catch (Exception ignored) {}
-		return null;
+		if (name == null || !languages.containsKey(name.toUpperCase())) return null;
+		return languages.get(name.toUpperCase());
 	}
 	
 	public static String getTranslation(String key, BlackUser author, BlackGuild guild) {
 		try {
-			return author.getLanguage().getTranslatedString(key);
+			return author.getLanguage().getTranslationNonNull(key);
 		} catch (Exception ignored) {}
 		try {
-			return guild.getLanguage().getTranslatedString(key);
+			return guild.getLanguage().getTranslationNonNull(key);
 		} catch (Exception ignored) {}
 		try {
-			return defaultLocale.getTranslatedString(key);
+			return defaultLocale.getTranslationNonNull(key);
 		} catch (Exception ignored) {}
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
-	public static String getTranslation(String key, BlackUser author) {
-		try {
-			return author.getLanguage().getTranslatedString(key);
-		} catch (Exception ignored) {}
-		try {
-			return defaultLocale.getTranslatedString(key);
-		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
-	}
-
-	public static String getTranslation(String key, BlackGuild guild) {
-		try {
-			return guild.getLanguage().getTranslatedString(key);
-		} catch (Exception ignored) {}
-		try {
-			return defaultLocale.getTranslatedString(key);
-		} catch (Exception ignored) {}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
-	}
 	/**
 	 * The replacement will also get translated!
 	 * @param key
@@ -118,9 +88,5 @@ public class LanguageSystem {
 	 */
 	public static String getReplacedTranslation(String key, BlackUser author, BlackGuild guild, String toReplace, String replacement) {
 		return getTranslation(key, author, guild).replace(toReplace, getTranslation(replacement, author, guild));
-	}
-	
-	public static String getTranslation(String key, Language language) {
-		return language.getTranslatedString(key);
 	}
 }

@@ -17,7 +17,6 @@ import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToe;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeBot;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeGameManager;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToePlayer;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -141,7 +140,7 @@ public class TicTacToeCommand extends Command {
 		  				return;
 	  				}
 	  			}, 
-	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed().addField(LanguageSystem.getTranslation("timeout", guild), LanguageSystem.getTranslation("tooktoolong", guild), false).build()).queue(); TicTacToeGameManager.deleteGame(game); return;}
+	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed().addField(guild.getLanguage().getTranslationNonNull("timeout"), guild.getLanguage().getTranslationNonNull("tooktoolong"), false).build()).queue(); TicTacToeGameManager.deleteGame(game); return;}
 	  	);
 	}
 	
