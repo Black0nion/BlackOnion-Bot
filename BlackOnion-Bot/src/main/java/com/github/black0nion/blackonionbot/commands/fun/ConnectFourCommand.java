@@ -15,7 +15,6 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -77,11 +76,11 @@ public class ConnectFourCommand extends Command {
 	  				final BlackGuild guild = BlackGuild.from(answerEvent.getGuild());
 	  				answerEvent.getMessage().delete().queue();
 	  				if (Utils.equalsOneIgnoreCase(msg, "exit", "stop", "cancel", "leave")) {
-	  					game.getMessage().editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(getTranslation("gaveup", author, guild)).addField(Utils.removeMarkdown(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention())), getTranslation("sadloose", author, guild), false).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(cmde.getTranslation("gaveup")).addField(Utils.removeMarkdown(cmde.getTranslation("usergaveup").replace("%user%", author.getAsMention())), cmde.getTranslation("sadloose"), false).build()).queue();
 	  					ConnectFourGameManager.deleteGame(game);
 	  					return;
 	  				} else if (!author.getId().equals(game.currentUser == FieldType.X ? game.getPlayerX() : game.getPlayerY())) {
-  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("wrongturn", author, guild)).build()).queue();
+  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " "  + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("wrongturn")).build()).queue();
   						rerun(game, channel, cmde);
   						return;
   					} else if (game.isValidInput(msg)) {
@@ -89,7 +88,7 @@ public class ConnectFourCommand extends Command {
 	  					FieldType[][] temp = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
 	  					System.arraycopy(game.getfield(), 0, temp, 0, game.getfield().length);
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
-	  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("fieldoccopied", author, guild)).build()).queue();
+	  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("fieldoccopied")).build()).queue();
 	  						game.nextUser();
 	  						rerun(game, channel, cmde);
 	  						return;
@@ -98,7 +97,7 @@ public class ConnectFourCommand extends Command {
 	  					temp[coords.getKey()][coords.getValue()] = game.currentUser;
 	  					game.setfield(temp);
 	  					game.nextUser();
-	  					game.getMessage().editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).build()).queue();
 
 		  				if (game.getWinner() != FieldType.EMPTY) {
 		  					game.getMessage().editMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((game.getWinner() == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName())) + "!", false).build()).queue();
@@ -106,12 +105,12 @@ public class ConnectFourCommand extends Command {
 		  					return;
 		  				}
 	  				} else {
-	  					game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(getTranslation("connectfour", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getField(), false).setDescription(getTranslation("wronginput", author, guild)).build()).queue();
+	  					game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("wronginput")).build()).queue();
 	  				}
 	  				rerun(game, channel, cmde);
 	  				return;
 	  			}, 
-	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed(null, cmde.getGuild()).addField(LanguageSystem.getTranslation("timeout", cmde.getGuild()), LanguageSystem.getTranslation("tooktoolong", BlackGuild.from(channel.getGuild())), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
+	  		1, TimeUnit.MINUTES, () -> {game.getMessage().editMessage(EmbedUtils.getErrorEmbed(null, cmde.getGuild()).addField(cmde.getGuild().getLanguage().getTranslation("timeout"), cmde.getGuild().getLanguage().getTranslation("tooktoolong"), false).build()).queue(); ConnectFourGameManager.deleteGame(game); return;}
 	  	);
 	}
 }
