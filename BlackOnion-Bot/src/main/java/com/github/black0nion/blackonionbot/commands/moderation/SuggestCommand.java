@@ -24,6 +24,7 @@ public class SuggestCommand extends Command {
 
 	public SuggestCommand() {
 		this.setCommand("suggest")
+			.setSyntax("<suggestion>")
 			.setRequiredArgumentCount(1);
 	}
 
