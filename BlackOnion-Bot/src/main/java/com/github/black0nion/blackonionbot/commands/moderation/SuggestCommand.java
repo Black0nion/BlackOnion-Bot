@@ -43,8 +43,9 @@ public class SuggestCommand extends Command {
 				Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
 			} else {
 				// all good, we can send the suggestion
-				suggestionsChannel.sendMessage(cmde.success().setTitle("suggestion").addUntranslatedField(guild.getLanguage().getTranslation("suggestionby", new Placeholder("%user%", author.getAsMention())), String.join(" ", Utils.removeFirstArg(args)), false).build()).queue(msg -> {
-					// TODO: add reactions
+				suggestionsChannel.sendMessage(cmde.success().setTitle("suggestion").setDescription(String.join(" ", Utils.removeFirstArg(args))).build()).queue(msg -> {
+					msg.addReaction("U+1F44D").queue();
+					msg.addReaction("U+1F44E").queue();
 				});
 				cmde.success("suggestiongotsent", "suggestionisin", new Placeholder("channel", suggestionsChannel.getAsMention()));
 			}

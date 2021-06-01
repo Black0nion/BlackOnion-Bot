@@ -16,7 +16,6 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.Permission;
@@ -38,7 +37,7 @@ public class ReloadCommand extends Command {
 		message.delete().queue();
 		//e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID, "k").queue();
 		// TODO: delete after x seconds
-		channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("configreload", "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		channel.sendMessage(cmde.success().addField("configreload", "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		reload();
 	}
 	
