@@ -10,6 +10,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
@@ -49,6 +50,7 @@ public class ReloadCommand extends Command {
 		BirthdaySystem.reload();
 		LanguageSystem.init();
 		SessionManager.init();
+		CommandBase.addCommands(CommandBase.waiter);
 		
 		BlackGuild.clearCache();
 		BlackMember.clearCache();
