@@ -17,6 +17,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
@@ -32,6 +33,8 @@ public class HangmanCommand extends Command {
 	
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 	
+	public static final List<Long> ingamePlayers = new ArrayList<>();
+	
 	public HangmanCommand() {
 		this.setCommand("hangman");
 		for (Language language : LanguageSystem.getLanguages().values()) {
@@ -43,9 +46,15 @@ public class HangmanCommand extends Command {
 	
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		if (ingamePlayers.contains(author.getIdLong())) {
+			cmde.error("alreadyingame", "nomultitasking");
+			return;
+		}
+		
 		final List<String> wordsInThisLang = hangmanWords.get(cmde.getLanguage());
 		final String solution = wordsInThisLang.get(Bot.random.nextInt(wordsInThisLang.size()));
 		cmde.reply(cmde.success().setTitle("hangman"), msg -> {
+			ingamePlayers.add(author.getIdLong());
 			rerun(msg, cmde, solution, new ArrayList<>());
 			return;
 		});
@@ -57,12 +66,14 @@ public class HangmanCommand extends Command {
 		
 		if (failedAttemptsCount >= 7) {
 			msg.editMessage(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue();
+			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
 		
 		EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
 		if (won(solution, alreadyGuessed)) {
 			msg.editMessage(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
+			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
 		
@@ -127,5 +138,10 @@ public class HangmanCommand extends Command {
 			if (!tries.contains(c)) return false;
 		}
 		return true;
+	}
+	
+	@Reloadable("hangman")
+	public static void reload() {
+		ingamePlayers.clear();
 	}
 }
