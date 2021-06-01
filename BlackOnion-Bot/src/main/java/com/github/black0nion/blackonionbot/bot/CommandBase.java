@@ -59,6 +59,13 @@ public class CommandBase extends ListenerAdapter {
 	
 	private static JSONObject commandsJSON = new JSONObject();
 	
+	/**
+	 * Don't call on init!
+	 */
+	public static void addCommands() {
+		addCommands(waiter);
+	}
+	
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
 		waiter = newWaiter;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Document;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.gson.JsonElement;
@@ -65,6 +66,7 @@ public class BirthdaySystem {
 		t.start();
 	}
 	
+	@Reloadable("birthday")
 	public static void reload() {
 		File file = new File("files", "birthdays.json");
 		try {
