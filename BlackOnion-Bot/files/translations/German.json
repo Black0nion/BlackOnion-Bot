@@ -202,6 +202,13 @@
     "giveawayfor": ":gift:` Giveaway von` %item%",
     "giveawaydesc": ":people_holding_hands: Anzahl an Gewinnern: %winners%\n:alarm_clock: Ende des Giveaways: %end%",
     "giveawaywinner": ":partying_face:Gewinner: %winner%",
+    "giveawaynotfound": "Giveaway nicht gefunden!",
+    "giveawaynotfounddesc": "Dieses Giveaway konnte nicht gefunden werden!",
+    "giveawayid": "Giveaway ID: %id%",
+    "giveawayended": "Giveaway beendet!",
+    "giveawaygotended": "Das Giveaway wurde beendet und die Gewinner ausgelost!",
+    "nogiveawayendrights": "Du hast keine Rechte, dieses Giveaway zu enden!",
+    "mustbeadminorgiveawaycreater": "Du musst der Ersteller des Giveaways oder das Recht `Message Manage` haben, um das Giveaway zu beenden!",
     "nowinner": "Keine Gewinner :(",
     "nobodyparticipated": "Keiner hat mitgemacht, deswegen kann auch keiner gewinnen :P",
     "tooshort": "Zu kurz!",
@@ -274,5 +281,6 @@
     "uploadasattachment": "Bitte schicke das Bild mit deiner Nachricht mit statt einen Link zu benutzen!",
     "yourcode": "Dein Code: **%code%** (damit kannst du den Paste löschen)",
     "tooold": "Diese Nachricht ist zu alt!",
-    "messagestooold": "Aufgrund von Discord's Limitierungen kann ich nur Nachrichten die jünger als 2 Wochen sind löschen!"
+    "messagestooold": "Aufgrund von Discord's Limitierungen kann ich nur Nachrichten die jünger als 2 Wochen sind löschen!",
+    "invalidmessageid": "Ungültige MessageID!"
 }

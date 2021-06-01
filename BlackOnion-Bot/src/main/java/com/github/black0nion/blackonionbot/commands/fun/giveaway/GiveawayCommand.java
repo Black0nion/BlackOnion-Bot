@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.fun;
+package com.github.black0nion.blackonionbot.commands.fun.giveaway;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,10 +11,11 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaysSystem;
+import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -73,9 +74,11 @@ public class GiveawayCommand extends Command {
 		final Date finalEndDate = endDate;
 		final int finalWinnersCount = winnersCount;
 		
-		cmde.reply(cmde.success().setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item))).setDescription(cmde.getTranslation("giveawaydesc", new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " ")))), msg -> {
+		final EmbedBuilder giveawayMessage = cmde.success().setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item))).setDescription(cmde.getTranslation("giveawaydesc", new Placeholder("item", item), new Placeholder("winners", String.valueOf(winnersCount)), new Placeholder("end", format.format(endDate).replace("_", " "))));
+		cmde.reply(giveawayMessage, msg -> {
 			msg.addReaction("U+1F389").queue();
-			GiveawaysSystem.createGiveaway(finalEndDate, msg.getIdLong(), channel.getIdLong(), guild.getIdLong(), item, finalWinnersCount);
+			msg.editMessage(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", msg.getId()))).build()).queue();
+			GiveawaySystem.createGiveaway(finalEndDate, msg.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, finalWinnersCount);
 		});
 	}
 }
