@@ -296,5 +296,7 @@
     "pleaseresetsuggestionschannel": "Bitte setzen den Kanal neu!",
     "suggestionby": "Vorschlag von %user%",
     "suggestiongotsent": "Vorschlag abgesendet!",
-    "suggestionisin": "Dein Vorschlag wurde in %channel% gesendet!"
+    "suggestionisin": "Dein Vorschlag wurde in %channel% gesendet!",
+    "suggestionchannelset": "Vorschlagkanal gesetzt!",
+    "thisissuggestionchannel": "Wenn jemand einen Vorschlag macht, wird er in diesen Kanal gesendet!"
 }
