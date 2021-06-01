@@ -38,41 +38,46 @@ public class Embed extends EmbedBuilder {
 	}
 	
 	@Override
-	public EmbedBuilder setFooter(String text) {
+	public Embed setFooter(String text) {
 		String tempText = LanguageSystem.getTranslation(text, user, guild);
 		if (tempText != null)
 			text = tempText;
-		return super.setFooter(text);
+		super.setFooter(text);
+		return this;
 	}
 	
 	@Override
-	public EmbedBuilder setTitle(String title) {
+	public Embed setTitle(String title) {
 		String tempTitle = LanguageSystem.getTranslation(title, user, guild);
 		if (tempTitle != null)
 			title = tempTitle;
-		return super.setTitle(title);
+		super.setTitle(title);
+		return this;
 	}
 	
 	@Override
-	public EmbedBuilder setTitle(String title, String url) {
+	public Embed setTitle(String title, String url) {
 		String tempTitle = LanguageSystem.getTranslation(title, user, guild);
 		if (tempTitle != null)
 			title = tempTitle;
-		return super.setTitle(title, url);
+		super.setTitle(title, url);
+		return this;
 	}
 	
 	@Override
-	public EmbedBuilder addField(String name, String value, boolean inline) {
+	public Embed addField(String name, String value, boolean inline) {
 		String tempName = LanguageSystem.getTranslation(name, user, guild);
 		String tempValue = LanguageSystem.getTranslation(value, user, guild);
 		if (tempName != null)
 			name = tempName;
 		if (tempValue != null)
 			value = tempValue;
-		return super.addField(name, value, inline);
+		super.addField(name, value, inline);
+		return this;
 	}
 	
-	public EmbedBuilder addUntranslatedField(String name, String value, boolean inline) {
-		return super.addField(name, value, inline);
+	public Embed addUntranslatedField(String name, String value, boolean inline) {
+		super.addField(name, value, inline);
+		return this;
 	}
 }
