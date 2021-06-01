@@ -73,6 +73,7 @@ import net.dv8tion.jda.api.utils.concurrent.Task;
 public class BlackGuild extends BlackObject implements Guild {
 
 	private final Guild guild;
+	private final BlackMember selfBlackMember;
 
 	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings",
 			MongoDB.botDatabase);
@@ -124,9 +125,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	private String leaveMessage;
 	private long leaveChannel;
 	private List<Command> disabledCommands;
+	private long suggestionsChannel;
 
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
+		this.selfBlackMember = BlackMember.from(guild.getSelfMember());
 
 		try {
 			Document config = configs.find(this.getIdentifier()).first();
@@ -146,13 +149,12 @@ public class BlackGuild extends BlackObject implements Guild {
 			this.leaveMessage = gOD(config.getString("leavemessage"),
 					this.language.getTranslationNonNull("defaultleavemessage"));
 			this.leaveChannel = gOD(config.getLong("leavechannel"), -1L);
+			this.suggestionsChannel = gOD(config.getLong("suggestionschannel"), -1L);
 			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
-			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
-				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd))
-						.collect(Collectors.toList());
-			} else {
+			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) 
+				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
+			else 
 				this.disabledCommands = new ArrayList<>();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -276,6 +278,20 @@ public class BlackGuild extends BlackObject implements Guild {
 	public void setAntiSwearType(AntiSwearType antiSwearType) {
 		this.antiSwearType = antiSwearType;
 		save("antiSwear", antiSwearType.name());
+	}
+	
+	public long getSuggestionsChannel() {
+		return suggestionsChannel;
+	}
+	
+	@DashboardValue(value = "suggestionschannel", channelSelector = true)
+	public void setSuggestionsChannel(long suggestionsChannel) {
+		this.suggestionsChannel = suggestionsChannel;
+		save("suggestionsChannel", suggestionsChannel);
+	}
+	
+	public BlackMember getSelfBlackMember() {
+		return selfBlackMember;
 	}
 
 	// override methods

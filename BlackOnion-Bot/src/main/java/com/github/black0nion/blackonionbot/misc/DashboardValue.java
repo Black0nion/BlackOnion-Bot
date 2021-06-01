@@ -21,4 +21,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public abstract @interface DashboardValue {
 	public String value();
+	
+	/**
+	 * @return true if you should be able to select the channel in the dashboard, will get sent as a long for the bot to parse!
+	 */
+	public boolean channelSelector() default false;
 }
