@@ -287,7 +287,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	@DashboardValue(value = "suggestionschannel", channelSelector = true)
 	public void setSuggestionsChannel(long suggestionsChannel) {
 		this.suggestionsChannel = suggestionsChannel;
-		save("suggestionsChannel", suggestionsChannel);
+		save("suggestionschannel", suggestionsChannel);
 	}
 	
 	public BlackMember getSelfBlackMember() {
