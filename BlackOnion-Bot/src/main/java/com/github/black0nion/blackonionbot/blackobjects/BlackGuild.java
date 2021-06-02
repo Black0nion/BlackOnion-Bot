@@ -103,7 +103,8 @@ public class BlackGuild extends BlackObject implements Guild {
 		try {
 			return guilds.get(guild);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (!(e instanceof IllegalStateException))
+				e.printStackTrace();
 			return null;
 		}
 	}
