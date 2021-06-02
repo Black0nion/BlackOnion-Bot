@@ -24,6 +24,15 @@ repositories {
   	}
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+            includes = ["**/*"]
+        }
+    }
+}
+
 jar {
     archiveBaseName = 'blackonion-bot'
     archiveVersion =  '1.8.7'
