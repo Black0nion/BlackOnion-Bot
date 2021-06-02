@@ -3,7 +3,8 @@ package com.github.black0nion.blackonionbot.utils;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -101,7 +103,7 @@ public class Utils {
 	}
 	
 	public static String getCountryFromCode(String code) {
-		return new JSONObject(FileUtils.readFromFile(new File("resources/countrycodes.json"))).getString(code);
+		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream("/countrycodes.json"))).lines().collect(Collectors.joining()))).getString(code);
 	}
 	
 	public static boolean isDiscordUser(String token) {
@@ -256,10 +258,15 @@ public class Utils {
      * @return missing permissions?
      */
     public static boolean handleRights(BlackGuild guild, BlackUser author, TextChannel channel, Permission... permissions) {
-    	if (!guild.getSelfMember().hasPermission(channel, permissions)) {
-			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
-			return true;
-		}
+    	if (channel == null) {
+    		if (!guild.getSelfMember().hasPermission(permissions))
+    			return true;
+    	} else {    		
+    		if (!guild.getSelfMember().hasPermission(channel, permissions)) {
+    			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+    			return true;
+    		}
+    	}
     	return false;
     }
 

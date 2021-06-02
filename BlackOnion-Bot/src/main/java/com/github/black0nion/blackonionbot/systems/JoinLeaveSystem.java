@@ -8,8 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -36,9 +34,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
     
     public JoinLeaveSystem() {
     	try {
-    		InputStream inputstream = new FileInputStream(new File("resources/background.png"));
-
-        	defaultBackGround = ImageIO.read(inputstream);
+        	defaultBackGround = ImageIO.read(getClass().getResource("/background.png"));
         	return;
     	} catch (Exception e) {
     		e.printStackTrace();
