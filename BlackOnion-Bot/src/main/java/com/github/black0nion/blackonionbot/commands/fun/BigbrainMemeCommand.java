@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +36,7 @@ public class BigbrainMemeCommand extends Command {
 		this.setCommand("bigbrain")
 			.setSyntax("<smul brain text>,<medium brain text>,<big brain text>,<thicc brain text>");
 		try {
-			InputStream inputstream = new FileInputStream(new File("resources/bigbrain-meme.jpg"));
-
-    		defaultBackGround = ImageIO.read(inputstream);
+    		defaultBackGround = ImageIO.read(getClass().getResource("/bigbrain-meme.jpg"));
     		return;
 		} catch (Exception e) {
 			e.printStackTrace();
