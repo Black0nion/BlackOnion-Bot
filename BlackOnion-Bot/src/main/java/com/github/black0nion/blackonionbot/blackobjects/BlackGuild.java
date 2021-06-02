@@ -25,6 +25,7 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.DashboardValue;
+import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
@@ -117,7 +118,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	private Language language;
-	private boolean isPremium;
+	private GuildType guildType;
 	private AntiSpoilerType antiSpoilerType;
 	private AntiSwearType antiSwearType;
 	private List<String> antiSwearWhitelist;
@@ -142,7 +143,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
 			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")),
 					LanguageSystem.defaultLocale);
-			this.isPremium = gOS("isPremium", config.getBoolean("isPremium"), false);
+			this.guildType = gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
 			this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
 			this.antiSpoilerType = gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
 			this.antiSwearType = gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
@@ -174,9 +175,18 @@ public class BlackGuild extends BlackObject implements Guild {
 		this.language = language;
 		save("language", language.getLanguageCode());
 	}
+	
+	public GuildType getGuildType() {
+		return this.guildType;
+	}
+	
+	public void setGuildType(GuildType type) {
+		this.guildType = type;
+		save("guildtype", type);
+	}
 
 	public boolean isPremium() {
-		return isPremium;
+		return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
 	}
 
 	public String getPrefix() {
@@ -1159,9 +1169,11 @@ public class BlackGuild extends BlackObject implements Guild {
 
 	@Override
 	public String toString() {
-		return "BlackGuild [guild=" + guild + ", language=" + language + ", isPremium=" + isPremium
-				+ ", antiSpoilerType=" + antiSpoilerType + ", antiSwearType=" + antiSwearType + ", prefix=" + prefix
-				+ ", joinMessage=" + joinMessage + ", joinChannel=" + joinChannel + ", leaveMessage=" + leaveMessage
-				+ ", leaveChannel=" + leaveChannel + ", disabledCommands=" + disabledCommands + "]";
+		return "BlackGuild [guild=" + guild + ", selfBlackMember=" + selfBlackMember + ", language=" + language
+				+ ", guildType=" + guildType + ", antiSpoilerType=" + antiSpoilerType + ", antiSwearType="
+				+ antiSwearType + ", antiSwearWhitelist=" + antiSwearWhitelist + ", prefix=" + prefix + ", joinMessage="
+				+ joinMessage + ", joinChannel=" + joinChannel + ", leaveMessage=" + leaveMessage + ", leaveChannel="
+				+ leaveChannel + ", disabledCommands=" + disabledCommands + ", suggestionsChannel=" + suggestionsChannel
+				+ ", autoRoles=" + autoRoles + "]";
 	}
 }
