@@ -120,6 +120,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	private boolean isPremium;
 	private AntiSpoilerType antiSpoilerType;
 	private AntiSwearType antiSwearType;
+	private List<String> antiSwearWhitelist;
 	private String prefix;
 	private String joinMessage;
 	private long joinChannel;
@@ -127,6 +128,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	private long leaveChannel;
 	private List<Command> disabledCommands;
 	private long suggestionsChannel;
+	private List<Long> autoRoles;
 
 	private BlackGuild(@NotNull final Guild guild) {
 		this.guild = guild;
@@ -151,6 +153,8 @@ public class BlackGuild extends BlackObject implements Guild {
 					this.language.getTranslationNonNull("defaultleavemessage"));
 			this.leaveChannel = gOD(config.getLong("leavechannel"), -1L);
 			this.suggestionsChannel = gOD(config.getLong("suggestionschannel"), -1L);
+			this.autoRoles = gOD(config.getList("autoroles", Long.class), new ArrayList<>());
+			this.antiSwearWhitelist = gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
 			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) 
 				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
@@ -259,6 +263,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		} else if (activated && !disabledCommands.contains(cmd)) {
 			disabledCommands.add(cmd);
 		}
+		setDisabledCommands(this.disabledCommands);
 		return true;
 	}
 
@@ -281,6 +286,29 @@ public class BlackGuild extends BlackObject implements Guild {
 		save("antiSwear", antiSwearType.name());
 	}
 	
+	public List<String> getAntiSwearWhitelist() {
+		return antiSwearWhitelist;
+	}
+	
+	public void setAntiSwearWhitelist(List<String> antiSwearWhitelist) {
+		this.antiSwearWhitelist = antiSwearWhitelist;
+		saveAntiSwearWhitelist();
+	}
+	
+	public void addToAntiSwearWhitelist(String toAdd) {
+		this.antiSwearWhitelist.add(toAdd);
+		saveAntiSwearWhitelist();
+	}
+	
+	public void removeFromAntiSwearWhitelist(String toRemove) {
+		this.antiSwearWhitelist.remove(toRemove);
+		saveAntiSwearWhitelist();
+	}
+	
+	public void saveAntiSwearWhitelist() {
+		saveList("antiswearwhitelist", antiSwearWhitelist);
+	}
+	
 	public long getSuggestionsChannel() {
 		return suggestionsChannel;
 	}
@@ -293,6 +321,29 @@ public class BlackGuild extends BlackObject implements Guild {
 	
 	public BlackMember getSelfBlackMember() {
 		return selfBlackMember;
+	}
+	
+	public void removeAutoRole(long roleId) {
+		this.autoRoles.remove(roleId);
+		saveAutoRoles();
+	}
+	
+	public void addAutoRole(long roleId) {
+		if (!this.autoRoles.contains(roleId)) this.autoRoles.add(roleId);
+		saveAutoRoles();
+	}
+	
+	public void setAutoRoles(List<Long> autoRoles) {
+		this.autoRoles = autoRoles;
+		saveAutoRoles();
+	}
+	
+	public void saveAutoRoles() {
+		saveList("autoroles", autoRoles);
+	}
+	
+	public List<Long> getAutoRoles() {
+		return autoRoles;
 	}
 
 	// override methods

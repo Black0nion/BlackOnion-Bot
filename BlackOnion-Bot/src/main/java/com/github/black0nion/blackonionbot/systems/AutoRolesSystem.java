@@ -18,7 +18,7 @@ public class AutoRolesSystem extends ListenerAdapter {
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackUser user = BlackUser.from(event.getUser());
 		
-		List<Long> autoroles = guild.getList("autoroles", Long.class);
+		List<Long> autoroles = guild.getAutoRoles();
 		List<Long> removedRoles = new ArrayList<>();
 		
 		if (Utils.handleRights(guild, user, null, Permission.MANAGE_ROLES)) return;
@@ -33,7 +33,7 @@ public class AutoRolesSystem extends ListenerAdapter {
 		
 		if (removedRoles.size() != 0) {
 			autoroles.removeAll(removedRoles);
-			guild.saveList("autoroles", removedRoles);
+			guild.setAutoRoles(autoroles);
 		}
  	}
 }
