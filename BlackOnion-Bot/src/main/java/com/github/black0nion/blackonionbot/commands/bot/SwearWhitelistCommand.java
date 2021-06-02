@@ -46,7 +46,7 @@ public class SwearWhitelistCommand extends Command {
 			boolean add = args[1].equalsIgnoreCase("add");
 			
 			if (mentionedStuff.size() != 0) {
-				List<String> newWhitelist = guild.getList("whitelist", String.class);
+				List<String> newWhitelist = guild.getAntiSwearWhitelist();
 				if (newWhitelist == null) newWhitelist = new ArrayList<>();
 				List<String> temp = new ArrayList<String>(newWhitelist);
 				if (add) {
@@ -54,11 +54,11 @@ public class SwearWhitelistCommand extends Command {
 					newWhitelist.removeAll(temp);
 					newWhitelist.addAll(mentionedStuff);
 				} else newWhitelist.removeAll(mentionedStuff);
-				guild.saveList("whitelist", newWhitelist);
+				guild.setAntiSwearWhitelist(newWhitelist);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("whitelistupdated", (add ? LanguageSystem.getTranslation("addedtowhitelist", author, guild).replace("%add%", mentionedStuff.toString()) : LanguageSystem.getTranslation("removedfromwhitelist", author, guild).replace("%removed%", mentionedStuff.toString())), false).build()).queue();
 			}
 		} else {
-			final List<String> whitelist = guild.getList("whitelist", String.class);
+			final List<String> whitelist = guild.getAntiSwearWhitelist();
 			// TODO: whitelist into the new system
 			message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"), false).build()).queue();
 		}

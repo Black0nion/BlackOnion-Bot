@@ -51,7 +51,7 @@ public class AntiSwearSystem {
 		try {
 			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
-			final List<String> whitelist = guild.getList("whitelist", String.class);
+			final List<String> whitelist = guild.getAntiSwearWhitelist();
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
 			//Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
