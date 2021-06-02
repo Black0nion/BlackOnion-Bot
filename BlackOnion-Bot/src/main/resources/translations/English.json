@@ -12,7 +12,7 @@
     "helpadminhelp": "Help for se admins",
     "helphelp": "Displays the Help",
     "helplanguage": "Change your Language",
-    "helpnotify": "The Bot informs you per DM when it starts or stops",
+    "helpnotify": "The Bot informs you per DM when it starts or stops.",
     "helpping": "Displays the ping of the Bot",
     "helpreload": "Reloads all configs",
     "helpdbshutdown": "",
@@ -288,6 +288,5 @@
     "urded": "You are ded,",
     "notbigsurprise": "not big surprise!",
     "uwon": "You won,",
-    "bigsurprise": "big surprise!",
-    "invalidmessageid": "Invalid MessageID!"
+    "bigsurprise": "big surprise!"
 }
