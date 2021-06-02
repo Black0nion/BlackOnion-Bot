@@ -81,7 +81,7 @@ public class ReactionRolesSetupCommand extends Command {
 								.append("roleid", role.getIdLong());
 						
 						if (finalArgs[1].equalsIgnoreCase("create")) {
-							if (ReactionRoleSystem.collection.find(doc) != null) {
+							if (ReactionRoleSystem.collection.find(doc).first() != null) {
 								message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
 								return;
 							}
