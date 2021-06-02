@@ -14,7 +14,7 @@ package com.github.black0nion.blackonionbot.systems.antispoiler;
  */
 public enum AntiSpoilerType {
 	DELETE("Deletes the message, never to be seen again."),
-	REMOVE("Removes the spoilers from the message and resends the message without them."),
+	REPLACE("Removes the spoilers from the message and resends the message without them."),
 	OFF;
 	
 	private String description;

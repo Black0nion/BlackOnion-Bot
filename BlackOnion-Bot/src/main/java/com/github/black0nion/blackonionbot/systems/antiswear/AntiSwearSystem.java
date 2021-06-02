@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems.antiswear;
 
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.DELETE;
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REMOVE;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REPLACE;
 
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class AntiSwearSystem {
 					// if shit fuck it here
 					if (type == DELETE) return true;
 					
-					if (type == REMOVE) {
+					if (type == REPLACE) {
 						
 						if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS)) return true;
 						

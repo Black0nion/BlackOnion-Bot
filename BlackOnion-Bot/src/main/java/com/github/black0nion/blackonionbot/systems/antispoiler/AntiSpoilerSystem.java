@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems.antispoiler;
 
 import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.DELETE;
 import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.OFF;
-import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.REMOVE;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.REPLACE;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
@@ -53,7 +53,7 @@ public class AntiSpoilerSystem {
 			
 			final String finalNewMessage = newMessage;
 			
-			if (type == REMOVE) {
+			if (type == REPLACE) {
 				try {
 					channel.retrieveWebhooks().queue(webhooks -> {
 						try {
