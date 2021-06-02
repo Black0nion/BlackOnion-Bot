@@ -61,6 +61,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
+		commandsInCategory.clear();
 		waiter = newWaiter;
 		Reflections reflections = new Reflections(Command.class.getPackage().getName());
 		Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
