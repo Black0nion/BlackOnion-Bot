@@ -118,6 +118,7 @@ public class CommandBase extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		messagesLastTenSecs++;
+		ValueManager.save("messagesSent", ValueManager.getInt("messagesSent") + 1);
 		final BlackUser author = BlackUser.from(event.getAuthor());
 		if (author.isBot()) return;
 		
@@ -149,11 +150,12 @@ public class CommandBase extends ListenerAdapter {
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
-			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
-			commandsLastTenSecs++;
 			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
 				return;
 			}
+			
+			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
+			commandsLastTenSecs++;
 			
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
