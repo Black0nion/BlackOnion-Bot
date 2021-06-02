@@ -20,7 +20,7 @@ public class AntiSpoilerCommand extends Command {
 	
 	public AntiSpoilerCommand() {
 		this.setCommand("antispoiler", "as")
-			.setSyntax("[remove | delete | off]")
+			.setSyntax("[replace | delete | off]")
 			.setRequiredPermissions(Permission.MESSAGE_MANAGE);
 	}
 
@@ -34,8 +34,8 @@ public class AntiSpoilerCommand extends Command {
 		if (Utils.handleRights(guild, author, null, Permission.MESSAGE_MANAGE)) return;
 		if (args.length >= 2) {
 			final String type = args[1];
-			if (type.equalsIgnoreCase("remove")) {
-				guild.setAntiSpoilerType(AntiSpoilerType.REMOVE);
+			if (type.equalsIgnoreCase("replaec")) {
+				guild.setAntiSpoilerType(AntiSpoilerType.REPLACE);
 				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("remove"))), false).build()).queue();
 				return;
 			} else if (type.equalsIgnoreCase("delete")) {
