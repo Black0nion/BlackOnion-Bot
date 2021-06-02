@@ -9,6 +9,7 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
@@ -19,7 +20,7 @@ public class AntiSpoilerCommand extends Command {
 	
 	public AntiSpoilerCommand() {
 		this.setCommand("antispoiler", "as")
-			.setSyntax("[on | delete | off]")
+			.setSyntax("[remove | delete | off]")
 			.setRequiredPermissions(Permission.MESSAGE_MANAGE);
 	}
 
@@ -35,15 +36,15 @@ public class AntiSpoilerCommand extends Command {
 			final String type = args[1];
 			if (type.equalsIgnoreCase("remove")) {
 				guild.setAntiSpoilerType(AntiSpoilerType.REMOVE);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "on"), false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("remove"))), false).build()).queue();
 				return;
 			} else if (type.equalsIgnoreCase("delete")) {
 				guild.setAntiSpoilerType(AntiSpoilerType.DELETE);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "delete"), false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("delete"))), false).build()).queue();
 				return;
 			} else if (type.equalsIgnoreCase("off")) {
 				guild.setAntiSpoilerType(AntiSpoilerType.OFF);
-				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", LanguageSystem.getReplacedTranslation("%antispoileris%", author, guild, "status", "off"), false).build()).queue();
+				message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("off"))), false).build()).queue();
 				return;
 			} else {
 				cmde.sendPleaseUse();

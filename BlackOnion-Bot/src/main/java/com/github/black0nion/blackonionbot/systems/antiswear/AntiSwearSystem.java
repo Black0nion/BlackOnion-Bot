@@ -4,7 +4,6 @@ import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearTyp
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REMOVE;
 
-import java.io.File;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -32,8 +31,6 @@ import net.dv8tion.jda.api.entities.Webhook;
 public class AntiSwearSystem {
 	
 	public static int profanityFilteredLastTenSecs = 0;
-	
-	public static final File file = new File("resources/logo.png");
 	
 	public static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
 		final String messageContent = message.getContentRaw();
@@ -101,7 +98,7 @@ public class AntiSwearSystem {
 								if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
 									webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
 								} else {
-									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSwearSystem.class.getResourceAsStream("logo.png"))).submit().join();
 								}
 								
 								WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
