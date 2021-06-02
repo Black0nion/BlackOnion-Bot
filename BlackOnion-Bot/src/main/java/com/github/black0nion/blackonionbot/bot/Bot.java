@@ -125,7 +125,7 @@ public class Bot extends ListenerAdapter {
 		PlayerManager.init();
 		//MusicSystem.init();
 		
-		new API();
+		API.init();
 
 		SessionManager.init();
 		
