@@ -282,5 +282,12 @@
     "yourcode": "Your code: **%code%** (using this code you can delete your paste)",
     "tooold": "This message is too old!",
     "messagestooold": "Due to Discord's limitations I can only delete messages younger than 2 weeks!",
+    "invalidmessageid": "Invalid MessageID!",
+    "hangman": "Hangman",
+    "hangmanwords": "Zug,Käse,hallo,blackonion,zwiebel,Discord,Finanzdienstleistungsunternehmen,Umweltschutzorganisation,Haftpflichtversicherung,Nahrungsmittel,mutterseelenallein,Eintrittskarte,Toilettenpapier,Schneemann,Kopfsteinpflaster,Rumpelstilzchen",
+    "urded": "You are ded,",
+    "notbigsurprise": "not big surprise!",
+    "uwon": "You won,",
+    "bigsurprise": "big surprise!",
     "invalidmessageid": "Invalid MessageID!"
 }
