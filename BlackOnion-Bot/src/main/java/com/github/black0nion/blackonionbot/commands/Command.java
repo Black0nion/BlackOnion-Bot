@@ -28,6 +28,7 @@ public abstract class Command {
 	private boolean isToggleable = true;
 	private boolean isDashboardCommand = true;
 	private boolean shouldAutoRegister = true;
+	private boolean isPremium = false;
 
 	public abstract void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
 
@@ -163,8 +164,18 @@ public abstract class Command {
 		return this.shouldAutoRegister;
 	}
 	
-	public void dontAutoRegister() {
+	public Command dontAutoRegister() {
 		this.shouldAutoRegister = false;
+		return this;
+	}
+	
+	public Command premiumRequired() {
+		this.isPremium = true;
+		return this;
+	}
+	
+	public boolean isPremiumCommand() {
+		return this.isPremium;
 	}
 
 	@Override
