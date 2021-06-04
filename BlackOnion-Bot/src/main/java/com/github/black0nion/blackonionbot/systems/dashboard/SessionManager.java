@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.bson.Document;
 
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.mongodb.BasicDBObject;
@@ -15,6 +16,7 @@ public class SessionManager {
 	
 	private static MongoCollection<Document> collection;
 	
+	@Reloadable("sessionmanager")
 	public static void init() {
 		collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 		

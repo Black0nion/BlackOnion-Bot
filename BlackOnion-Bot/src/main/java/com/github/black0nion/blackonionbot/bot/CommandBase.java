@@ -26,6 +26,7 @@ import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -59,6 +60,14 @@ public class CommandBase extends ListenerAdapter {
 	public static int commandsLastTenSecs = 0;
 	
 	private static JSONObject commandsJSON = new JSONObject();
+	
+	/**
+	 * Don't call on init!
+	 */
+	@Reloadable("commands")
+	public static void addCommands() {
+		addCommands(waiter);
+	}
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();

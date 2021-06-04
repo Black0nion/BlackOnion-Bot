@@ -19,6 +19,7 @@ import java.util.List;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.OS;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -38,6 +39,7 @@ public class BotInformation {
 	
 	public static long botId;
 
+	@Reloadable("botinformation")
 	public static void init() {
 		try {
 			Bot.executor.submit(() -> {				

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -66,6 +67,7 @@ public class BlackUser extends BlackObject implements User {
 	 * @param guild
 	 * @return
 	 */
+	@Reloadable("usercache")
 	public static final void clearCache() {
 		users.invalidateAll();
 	}

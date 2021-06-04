@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.google.common.cache.CacheBuilder;
@@ -70,6 +71,7 @@ public class BlackMember extends BlackObject implements Member {
 	 * @param guild
 	 * @return
 	 */
+	@Reloadable("membercache")
 	public static final void clearCache() {
 		members.invalidateAll();
 	}

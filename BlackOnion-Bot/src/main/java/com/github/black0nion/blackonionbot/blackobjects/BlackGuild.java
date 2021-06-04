@@ -25,6 +25,7 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.DashboardValue;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
@@ -94,6 +95,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	 * @param guild
 	 * @return
 	 */
+	@Reloadable("guildcache")
 	public static final void clearCache() {
 		guilds.invalidateAll();
 	}

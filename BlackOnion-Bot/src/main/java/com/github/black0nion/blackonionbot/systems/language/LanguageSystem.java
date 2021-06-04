@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 
 public class LanguageSystem {
 	
@@ -18,6 +19,7 @@ public class LanguageSystem {
 	
 	public static Language defaultLocale;
 	
+	@Reloadable("language")
 	public static void init() {
 		languages.clear();
 		english = new Language("English", "EN");
