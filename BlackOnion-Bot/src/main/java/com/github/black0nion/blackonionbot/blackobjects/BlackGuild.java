@@ -182,7 +182,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	
 	public void setGuildType(GuildType type) {
 		this.guildType = type;
-		save("guildtype", type);
+		save("guildtype", type.name());
 	}
 
 	public boolean isPremium() {
