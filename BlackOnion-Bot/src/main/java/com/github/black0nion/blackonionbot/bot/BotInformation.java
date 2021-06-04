@@ -102,7 +102,7 @@ public class BotInformation {
 			line_count = ValueManager.getInt("lines");
 			file_count = ValueManager.getInt("files");
 		} else {
-			File dir = new File("src/main/java/com/github/black0nion/blackonionbot");
+			File dir = new File("src/main");
 			File[] files = dir.listFiles();
 			line_count = 1337;
 			file_count = 69;
@@ -156,9 +156,13 @@ public class BotInformation {
 					searchDirectory(file.listFiles());
 				} else {
 					file_count++;
+					final String fileName = file.getName();
+					if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) continue;
 					BufferedReader reader = new BufferedReader(new FileReader(file));
+					int count = 0;
 					while (reader.readLine() != null)
-						line_count++;
+						count++;
+					line_count += count;
 					reader.close();
 				}
 			}

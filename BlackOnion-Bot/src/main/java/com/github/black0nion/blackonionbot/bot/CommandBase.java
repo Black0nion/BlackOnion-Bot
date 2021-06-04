@@ -23,6 +23,7 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
@@ -70,6 +71,7 @@ public class CommandBase extends ListenerAdapter {
 	
 	public static void addCommands(EventWaiter newWaiter) {
 		commands.clear();
+		commandsInCategory.clear();
 		waiter = newWaiter;
 		Reflections reflections = new Reflections(Command.class.getPackage().getName());
 		Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
@@ -127,6 +129,7 @@ public class CommandBase extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		messagesLastTenSecs++;
+		ValueManager.save("messagesSent", ValueManager.getInt("messagesSent") + 1);
 		final BlackUser author = BlackUser.from(event.getAuthor());
 		if (author.isBot()) return;
 		
@@ -158,11 +161,12 @@ public class CommandBase extends ListenerAdapter {
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
-			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
-			commandsLastTenSecs++;
 			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
 				return;
 			}
+			
+			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
+			commandsLastTenSecs++;
 			
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
@@ -176,6 +180,9 @@ public class CommandBase extends ListenerAdapter {
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
+				return;
+			} else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+				message.reply(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
 				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {

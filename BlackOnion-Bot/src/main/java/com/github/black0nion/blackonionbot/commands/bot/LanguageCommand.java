@@ -26,7 +26,7 @@ public class LanguageCommand extends Command {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
 				final Language newLang = LanguageSystem.getLanguageFromName(args[1]);
 				author.setLanguage(newLang);
-				cmde.success("languageupdated", "newlanguage", new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
+				cmde.success(newLang.getTranslationNonNull("languageupdated"), newLang.getTranslationNonNull("newlanguage"), new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
 			} else {
 				if (args[1].equalsIgnoreCase("list")) {
 					cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
