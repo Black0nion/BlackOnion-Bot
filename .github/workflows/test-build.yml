@@ -1,6 +1,9 @@
 name: TestBuild
 
-on: push
+on: 
+  push:
+    branches:
+      - 'dependabot/**'
 
 jobs:
   build:
