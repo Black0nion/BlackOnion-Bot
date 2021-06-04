@@ -1,3 +1,4 @@
+
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -26,7 +27,6 @@ public class AntiSwearCommand extends Command {
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		
 		if (!guild.isPremium()) {
 			channel.sendMessage(EmbedUtils.premiumRequired(author, guild)).queue();
 			return;
