@@ -37,7 +37,7 @@ public class SetGuildTypeCommand extends Command {
 			Guild mentionedGuild = e.getJDA().getGuildById(Long.parseLong(args[1]));
 			final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);
 			if (mentionedBlackGuild != null) {
-				final GuildType parsedGuildType = GuildType.parse(args[2]);
+				final GuildType parsedGuildType = GuildType.parse(args[2].toUpperCase());
 				if (parsedGuildType != null) {
 					mentionedBlackGuild.setGuildType(parsedGuildType);
 					cmde.success("guildtypeset", "guildtypesetto", new Placeholder("guild", mentionedBlackGuild.getName() + " (G:" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
