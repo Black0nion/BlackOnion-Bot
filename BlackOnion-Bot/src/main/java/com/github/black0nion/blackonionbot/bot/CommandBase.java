@@ -23,6 +23,7 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -161,7 +162,7 @@ public class CommandBase extends ListenerAdapter {
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
-			if (cmd.requiresBotAdmin() && !BotSecrets.isAdmin(author.getIdLong())) {
+			if (cmd.requiresBotAdmin() && author.hasPermission(CustomPermission.ADMIN)) {
 				return;
 			}
 			
