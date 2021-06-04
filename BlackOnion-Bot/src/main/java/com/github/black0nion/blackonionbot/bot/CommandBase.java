@@ -25,6 +25,7 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -62,6 +63,7 @@ public class CommandBase extends ListenerAdapter {
 	/**
 	 * Don't call on init!
 	 */
+	@Reloadable("commands")
 	public static void addCommands() {
 		addCommands(waiter);
 	}
