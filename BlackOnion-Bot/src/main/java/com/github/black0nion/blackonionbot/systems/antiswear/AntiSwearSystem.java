@@ -2,9 +2,8 @@ package com.github.black0nion.blackonionbot.systems.antiswear;
 
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.DELETE;
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REMOVE;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REPLACE;
 
-import java.io.File;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -33,8 +32,6 @@ public class AntiSwearSystem {
 	
 	public static int profanityFilteredLastTenSecs = 0;
 	
-	public static final File file = new File("resources/logo.png");
-	
 	public static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
 		final String messageContent = message.getContentRaw();
 		final BlackUser user = author.getBlackUser();
@@ -54,7 +51,7 @@ public class AntiSwearSystem {
 		try {
 			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
-			final List<String> whitelist = guild.getList("whitelist", String.class);
+			final List<String> whitelist = guild.getAntiSwearWhitelist();
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
 			//Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
@@ -76,7 +73,7 @@ public class AntiSwearSystem {
 					// if shit fuck it here
 					if (type == DELETE) return true;
 					
-					if (type == REMOVE) {
+					if (type == REPLACE) {
 						
 						if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS)) return true;
 						
@@ -101,7 +98,7 @@ public class AntiSwearSystem {
 								if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
 									webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
 								} else {
-									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(file)).submit().join();
+									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSwearSystem.class.getResourceAsStream("logo.png"))).submit().join();
 								}
 								
 								WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());

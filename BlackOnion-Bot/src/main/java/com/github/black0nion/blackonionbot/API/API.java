@@ -18,6 +18,7 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInf
 import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import spark.Spark;
 
@@ -26,10 +27,12 @@ public class API {
 	static ArrayList<PostRequest> postRequests = new ArrayList<>();
 	static ArrayList<GetRequest> getRequests = new ArrayList<>();
 
-	public API() {
-		
-		//Spark.secure("files/keystore.jks", "ahitm20202025", null, null);
-		Spark.port(187);
+	// TODO: add annotion to make it reloadable
+	public static void init() {
+		postRequests.clear();
+		getRequests.clear();
+		final int port = ValueManager.getInt("api_port");
+		Spark.port(port != 0 ? port : 187);
 		
 		Reflections reflections = new Reflections(API.class.getPackage().getName());
 		//------------------WebSockets------------------

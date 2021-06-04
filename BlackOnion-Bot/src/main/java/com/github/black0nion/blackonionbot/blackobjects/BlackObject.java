@@ -40,13 +40,6 @@ public abstract class BlackObject {
 		return getCollection().find().into(new ArrayList<>());
 	}
 	
-	@Nullable
-	public <T> List<T> getList(String key, Class<T> clazz) {
-		final Document doc = getConfig();
-		if (doc == null) return null;
-		return doc.getList(key, clazz);
-	}
-	
 	public <T> void saveList(String key, List<T> value) {
 		save(new Document(key, value));
 	}

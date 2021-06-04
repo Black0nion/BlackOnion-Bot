@@ -8,21 +8,26 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.DrawType;
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.RunMode;
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -36,9 +41,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
     
     public JoinLeaveSystem() {
     	try {
-    		InputStream inputstream = new FileInputStream(new File("resources/background.png"));
-
-        	defaultBackGround = ImageIO.read(inputstream);
+        	defaultBackGround = ImageIO.read(getClass().getResource("/background.png"));
         	return;
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -79,8 +82,17 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 	
 	@Override
+	/**
+	 * Called when the bot gets added to a new guild
+	 */
 	public void onGuildJoin(GuildJoinEvent event) {
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
+		
+		if (Bot.runMode == RunMode.BETA && guild.getGuildType() != GuildType.BETA) {
+			// TODO: print error message
+			guild.leave().queue();
+		}
+		
 		final String prefix = guild.getPrefix();
 		guild.retrieveOwner().queue(user -> {
 			final BlackUser author = BlackUser.from(user.getUser());

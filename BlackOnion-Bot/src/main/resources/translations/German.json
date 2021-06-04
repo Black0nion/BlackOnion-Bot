@@ -292,5 +292,10 @@
     "notbigsurprise": "not big surprise!",
     "uwon": "You won,",
     "bigsurprise": "big surprise!",
-    "reloadables": "Folgende Dinge können Reloaded werden:"
+    "reloadables": "Folgende Dinge können Reloaded werden:",
+    "guildtypenotfound": "GuildType nicht gefunden!",
+    "validguildtypes": "Mögliche GuildTypes:\n%guildtypes%",
+    "guildtypeset": "GuildType gesetzt!",
+    "guildtypesetto": "Der GuildType von **%guild%** ist jetzt `%guildtype%`",
+    "thisguildnotfound": "Diese Guild konnte nicht gefunden werden!"
 }

@@ -22,15 +22,13 @@ public class AutoRolesCommand extends Command {
 		this.setCommand("autoroles", "autorole")
 			.setSyntax("<create | remove / delete> <@role | roleid>")
 			.setRequiredArgumentCount(2)
-			.setRequiredPermissions(Permission.MESSAGE_MANAGE)
+			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
-			
 	}
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		List<String> argz = Arrays.asList(args); 
-		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
 			cmde.error("invalidrole", "iseveryone");
 			return;
@@ -56,12 +54,12 @@ public class AutoRolesCommand extends Command {
 				}
 			}
 			
-			List<Long> tempList = guild.getList("autoroles", Long.class);
+			List<Long> tempList = guild.getAutoRoles();
 			if (tempList.contains(roleID)) {
 				cmde.success("alreadyexisting", "thisalreadyexisting");
 				return;
 			} else tempList.add(roleID);
-			guild.saveList("autoroles", tempList);
+			guild.addAutoRole(roleID);
 			cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
 		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
 			List<Role> roles = message.getMentionedRoles();
@@ -83,12 +81,12 @@ public class AutoRolesCommand extends Command {
 				}
 			}
 			
-			List<Long> tempList = guild.getList("autoroles", Long.class);
+			List<Long> tempList = guild.getAutoRoles();
 			if (!tempList.contains(roleID)) {
 				cmde.error("notfound", "thisnotfound");
 				return;
 			} else tempList.remove(roleID);
-			guild.saveList("autoroles", tempList);
+			guild.removeAutoRole(roleID);
 			cmde.success("autorolesdeleted", "autoroledeletedinfo", new Placeholder("role", role.getAsMention()));
 		} else {
 			cmde.sendPleaseUse();
