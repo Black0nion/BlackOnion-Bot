@@ -173,7 +173,8 @@ public class API {
 							response.status(401);
 							return new JSONObject().put("success", false).put("reason", 401).toString();
 						}
-						if (req.requiresAdmin() && !Utils.isAdmin(token)) {
+						// TODO: admin check!
+						if (req.requiresAdmin()) {
 							response.status(403);
 							return new JSONObject().put("success", false).put("reason", 403).toString();
 						}

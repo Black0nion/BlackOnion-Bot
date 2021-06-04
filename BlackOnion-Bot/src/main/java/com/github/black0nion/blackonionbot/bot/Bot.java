@@ -86,15 +86,13 @@ public class Bot extends ListenerAdapter {
 		DefaultValues.init();
 		credentialsManager = new CredentialsManager(runMode.name().toLowerCase());
 		
-		BotSecrets.init();
-		
 		if (credentialsManager.has("mongo_connection_string"))
 			MongoManager.connect(credentialsManager.getString("mongo_connection_string"));
 		else
 			MongoManager.connect(credentialsManager.getString("mongo_ip"), credentialsManager.getString("mongo_port"), credentialsManager.getString("mongo_authdb"), credentialsManager.getString("mongo_username"), credentialsManager.getString("mongo_password"), credentialsManager.getInt("mongo_timeout"));
 		
 		builder = JDABuilder
-				.createDefault(BotSecrets.bot_token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
+				.createDefault(credentialsManager.getString("token"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
 						GatewayIntent.GUILD_MESSAGE_REACTIONS)
 				.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE))
 				.enableCache(CacheFlag.VOICE_STATE)

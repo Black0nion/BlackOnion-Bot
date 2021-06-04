@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
@@ -36,7 +35,7 @@ public class GetGuildsToManage implements GetRequest {
 		try {
 			Unirest.setTimeouts(0, 0);
 			HttpResponse<String> resp = Unirest.get("https://discord.com/api/users/@me/guilds")
-			  .header("Authorization", "Bot " + BotSecrets.bot_token)
+			  .header("Authorization", "Bot " + Bot.getCredentialsManager().getString("token"))
 			  .asString();
 			
 			JSONArray jsonResponse = new JSONArray(resp.getBody());

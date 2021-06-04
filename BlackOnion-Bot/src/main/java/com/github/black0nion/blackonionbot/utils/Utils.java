@@ -24,7 +24,6 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotSecrets;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -186,10 +185,6 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public static boolean isAdmin(String token) {
-		return BotSecrets.isAdmin(Long.valueOf(getUserInfoFromToken(token).getString("id")));
 	}
 	
 	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {

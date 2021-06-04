@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
@@ -73,6 +75,7 @@ public class BlackUser extends BlackObject implements User {
 	}
 	
 	private Language language;
+	private List<CustomPermission> permissions;
 	
 	private BlackUser(final User user) {
 		this.user = user;
@@ -81,6 +84,8 @@ public class BlackUser extends BlackObject implements User {
 			Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
 			
 			if (config == null) config = new Document();
+			
+			permissions = CustomPermission.parse(gOD(config.getList("permissions", String.class), new ArrayList<>()));
 		
 			if (config.getString("language") != null)
 				this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
@@ -98,6 +103,30 @@ public class BlackUser extends BlackObject implements User {
 	public void setLanguage(Language language) {
 		this.language = language;
 		save("language", language.getLanguageCode());
+	}
+	
+	public List<CustomPermission> getPermissions() {
+		return permissions;
+	}
+	
+	public boolean hasPermission(CustomPermission permission) {
+		for (CustomPermission perm : this.permissions) {
+			if (perm.hasPermission(this, permission)) return true;
+		}
+		return false;
+	}
+	
+	public void addPermissions(CustomPermission... permissions) {
+		List<CustomPermission> perms = this.permissions;
+		for (CustomPermission perm : permissions) {
+			if (!perms.contains(perm)) perms.add(perm);
+		}
+		setPermissions(perms);
+	}
+	
+	public void setPermissions(List<CustomPermission> permissions) {
+		this.permissions = permissions;
+		save("permissions", permissions.stream().map(perm -> perm.name()).collect(Collectors.toList()));
 	}
 	
 	// override methods
