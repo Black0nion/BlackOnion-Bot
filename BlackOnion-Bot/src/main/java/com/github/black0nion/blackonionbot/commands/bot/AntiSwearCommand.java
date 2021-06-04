@@ -21,17 +21,14 @@ public class AntiSwearCommand extends Command {
 	
 	public AntiSwearCommand() {
 		this.setCommand("antiswear")
-			.setSyntax("[replace | delete | off]")
-			.setRequiredPermissions(Permission.ADMINISTRATOR);
+			.setSyntax("<replace | delete | off>")
+			.setRequiredArgumentCount(1)
+			.setRequiredPermissions(Permission.ADMINISTRATOR)
+			.premiumRequired();
 	}
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		if (!guild.isPremium()) {
-			channel.sendMessage(EmbedUtils.premiumRequired(author, guild)).queue();
-			return;
-		}
-		
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_MANAGE)) return;
 		if (args.length >= 2) {
 			final String type = args[1];
