@@ -10,6 +10,7 @@ import org.apache.commons.collections4.Bag;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.google.common.cache.CacheBuilder;
@@ -75,6 +76,7 @@ public class BlackMessage extends BlackObject implements Message {
 	 * @param guild
 	 * @return
 	 */
+	@Reloadable("messagecache")
 	public static final void clearCache() {
 		messages.invalidateAll();
 	}

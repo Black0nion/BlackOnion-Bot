@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -34,8 +32,6 @@ public class GiveawaySystem {
 	private static MongoCollection<Document> collection;
 	
 	private static final Collection<String> giveawayKeys = new ArrayList<>();
-	
-	private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	
 	static {
 		giveawayKeys.add("endDate");
@@ -98,7 +94,7 @@ public class GiveawaySystem {
 				return;
 			}
 			
-			executor.schedule(() -> {
+			Bot.scheduledExecutor.schedule(() -> {
 				endGiveaway(giveaway, msg, guild);
 			}, endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
 		});
