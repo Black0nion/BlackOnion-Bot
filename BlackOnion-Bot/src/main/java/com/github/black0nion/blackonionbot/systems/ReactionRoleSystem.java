@@ -41,9 +41,9 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
 		if (!e.getUser().isBot()) {
-			long guildid = e.getGuild().getIdLong();
-			long channelid = e.getChannel().getIdLong();
-			long messageid = e.getMessageIdLong();
+			final long guildid = e.getGuild().getIdLong();
+			final long channelid = e.getChannel().getIdLong();
+			final long messageid = e.getMessageIdLong();
 			try {
 				String emote = e.getReactionEmote().getAsReactionCode();
 				
