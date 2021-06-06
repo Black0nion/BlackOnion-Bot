@@ -83,14 +83,17 @@ public class BlackUser extends BlackObject implements User {
 		try {
 			Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
 			
-			if (config == null) config = new Document();
+			if (config == null) {
+				config = new Document();
+			}
 			
 			permissions = CustomPermission.parse(gOD(config.getList("permissions", String.class), new ArrayList<>()));
 		
-			if (config.getString("language") != null)
+			if (config.getString("language") != null) {
 				this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
-			else
+			} else {
 				this.language = LanguageSystem.getDefaultLanguage();
+			}
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -116,16 +119,15 @@ public class BlackUser extends BlackObject implements User {
 	}
 	
 	public boolean hasPermission(final CustomPermission permission) {
-		for (final CustomPermission perm : this.permissions)
-			if (perm.hasPermission(permission))
-				return true;
-		return false;
+		return CustomPermission.hasRights(permission, this.permissions);
 	}
 	
 	public void addPermissions(final CustomPermission... permissions) {
 		final List<CustomPermission> perms = this.permissions;
 		for (final CustomPermission perm : permissions)
-			if (!perms.contains(perm)) perms.add(perm);
+			if (!perms.contains(perm)) {
+				perms.add(perm);
+			}
 		setPermissions(perms);
 	}
 	
