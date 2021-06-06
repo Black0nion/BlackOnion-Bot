@@ -321,6 +321,6 @@
     "guildstatsleave": "```Name: %name%```",
     "savedbotlogschannel": "BotLogsChannel set!",
     "thisisbotlogschannel": "I will send my logs to this channel in the future!",
-    "notbeta": "Dieser Server ist kein Beta-Server!",
-    "betatutorial": "Bitte beantrage deinen Beta-Zugang auf dem BlackOnion Discord Server!"
+    "notbeta": "This server isn't a beta-server!",
+    "betatutorial": "Please apply for the beta-access on the BlackOnion Discord Server!"
 }
