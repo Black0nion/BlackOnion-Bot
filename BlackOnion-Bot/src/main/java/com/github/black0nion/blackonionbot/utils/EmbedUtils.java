@@ -12,8 +12,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EmbedUtils {
 	
-	public static BlackEmbed getErrorEmbed(BlackUser author, BlackGuild guild) {
-		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
+	public static BlackEmbed getErrorEmbed(final BlackUser author, final BlackGuild guild) {
+		final BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("error")
 				.setColor(Color.RED)
 				.setTimestamp(Instant.now());
@@ -27,8 +27,8 @@ public class EmbedUtils {
 				.setTimestamp(Instant.now());
 	}
 	
-	public static BlackEmbed getSuccessEmbed(BlackUser author, BlackGuild guild) {
-		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
+	public static BlackEmbed getSuccessEmbed(final BlackUser author, final BlackGuild guild) {
+		final BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("success")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
@@ -42,8 +42,8 @@ public class EmbedUtils {
 				.setTimestamp(Instant.now());
 	}
 	
-	public static BlackEmbed getLoadingEmbed(BlackUser author, BlackGuild guild) {
-		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
+	public static BlackEmbed getLoadingEmbed(final BlackUser author, final BlackGuild guild) {
+		final BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("loading")
 				.setColor(Color.getHSBColor(0.16F, 1F, 1F))
 				.setTimestamp(Instant.now());
@@ -58,8 +58,8 @@ public class EmbedUtils {
 	}
 	
 	private static final Color premiumColor = new Color(245, 189, 2);
-	public static MessageEmbed premiumRequired(BlackUser author, BlackGuild guild) {
-		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
+	public static MessageEmbed premiumRequired(final BlackUser author, final BlackGuild guild) {
+		final BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("error")
 				.addField("notpremium", "premiumrequired", false)
 				.setColor(premiumColor)

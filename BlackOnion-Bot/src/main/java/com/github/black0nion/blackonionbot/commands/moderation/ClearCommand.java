@@ -31,7 +31,7 @@ public class ClearCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {		
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {		
 		try {
 			final int amount = Integer.parseInt(args[1]);
 			if (amount < 2 || amount > 100) {
@@ -42,12 +42,11 @@ public class ClearCommand extends Command {
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {						
 					final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2).plusSeconds(1);
-					List<Message> messages = new ArrayList<>();
+					final List<Message> messages = new ArrayList<>();
 					int i = amount + 1;
-					for (Message m : msgs) {
-						if (!m.isPinned() && m.getTimeCreated().isAfter(now)) {
+					for (final Message m : msgs) {
+						if (!m.isPinned() && m.getTimeCreated().isAfter(now))
 							messages.add(m);
-						}
 						if (--i <= 0) break;
 					}
 					
@@ -58,22 +57,21 @@ public class ClearCommand extends Command {
 					}
 					channel.deleteMessages(messages).queue(succ -> {
 						// TODO: delete after x seconds
-						if (messages.size() != amount) {
+						if (messages.size() != amount)
 							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless").replace("%msgcount%", String.valueOf(messages.size())).replace("%remaining%", String.valueOf(messages.size() - amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-						} else
+						else
 							message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted").replace("%msgcount%", String.valueOf(amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 					}, error -> { });
 				});
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				if (!(ex instanceof IllegalArgumentException)) {					
 					ex.printStackTrace();
 					cmde.selfDestructingException();
-				} else {
+				} else
 					cmde.error("tooold", "messagestooold", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
-				}
 				return;
 			}
-		} catch (Exception ignored) { cmde.sendPleaseUse(); }
+		} catch (final Exception ignored) { cmde.sendPleaseUse(); }
 		return;
 	}
 }

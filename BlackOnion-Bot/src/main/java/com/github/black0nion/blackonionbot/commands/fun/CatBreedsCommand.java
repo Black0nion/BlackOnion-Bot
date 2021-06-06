@@ -29,18 +29,18 @@ public class CatBreedsCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		try {
 			Unirest.setTimeouts(0, 0);
-			HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/breeds")
+			final HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/breeds")
 			  .header("Content-Type", "application/json")
 			  .asString();
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());
 			final HashMap<Integer, HashMap<String, String>> pages = new HashMap<>();
 			
-			final int pageCount = (int) Math.ceil((double) responseAsJSONArray.length() / 10D);
+			final int pageCount = (int) Math.ceil(responseAsJSONArray.length() / 10D);
 			for (int i = 0; i < pageCount; i++) {
-				HashMap<String, String> entrysOnThisPage = new HashMap<>();
+				final HashMap<String, String> entrysOnThisPage = new HashMap<>();
 				for (int j = i * 10; j < (i+1) * 10; j++) {
 					if (j >= responseAsJSONArray.length()) break;
 					final JSONObject jsonObjectForThisPage = responseAsJSONArray.getJSONObject(j);
@@ -49,7 +49,7 @@ public class CatBreedsCommand extends Command {
 				pages.put(i, entrysOnThisPage);
 			}
 			
-			EmbedBuilder builder = cmde.success().setTitle("UwU");
+			final EmbedBuilder builder = cmde.success().setTitle("UwU");
 			pages.get(0).forEach((name, value) -> {
 				builder.addField(name, value, false);
 			});
@@ -59,25 +59,25 @@ public class CatBreedsCommand extends Command {
 					msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 				waitForPageSwitch(cmde, msg, author, pages);
 			});
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 			cmde.exception();
 			return;
 		}
 	}
 	
-	private static void waitForPageSwitch(CommandEvent cmde, BlackMessage msg, BlackUser user, HashMap<Integer, HashMap<String, String>> pages) {
+	private static void waitForPageSwitch(final CommandEvent cmde, final BlackMessage msg, final BlackUser user, final HashMap<Integer, HashMap<String, String>> pages) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class,
 				(event) -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
 				(event) -> {
 					event.getReaction().removeReaction(event.getUser()).queue();
-					Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
+					final Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> {return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());}).findFirst().get().getKey();
 					
 					if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || pages.size() < emojiReactionNum)
 						waitForPageSwitch(cmde, msg, user, pages);
 					
 					// all fine, we can switch page
-					EmbedBuilder builder = cmde.success().setTitle("UwU");
+					final EmbedBuilder builder = cmde.success().setTitle("UwU");
 					pages.get(emojiReactionNum).forEach((name, value) -> {
 						builder.addField(name, value, false);
 					});

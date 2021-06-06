@@ -24,7 +24,7 @@ public class MongoManager {
 	public static MongoClient client;
 	
 	@SuppressWarnings("deprecation")
-	public static boolean connect(String connectionString) {
+	public static boolean connect(final String connectionString) {
 		final long start = System.currentTimeMillis();
 		client = new MongoClient(new MongoClientURI(connectionString));
 		final long end = System.currentTimeMillis();
@@ -32,18 +32,18 @@ public class MongoManager {
 		try {
 			client.isLocked();
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
 	
-	public static boolean connect(String ip, String db, String userName, String password) {
+	public static boolean connect(final String ip, final String db, final String userName, final String password) {
 		return connect(ip, "27017", db, userName, password, 20000);
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static boolean connect(String ip, String port, String db, String userName, String password, int timeout) {
+	public static boolean connect(final String ip, final String port, final String db, final String userName, final String password, final int timeout) {
 		final long start = System.currentTimeMillis();
 		client = new MongoClient(new ServerAddress(ip, Integer.parseInt(port)), MongoCredential.createCredential(userName, db, password.toCharArray()), MongoClientOptions.builder().connectTimeout(timeout).build());
 		final long end = System.currentTimeMillis();
@@ -51,7 +51,7 @@ public class MongoManager {
 			client.isLocked();
 			Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to " + client.getConnectPoint() + " in " + (end - start) + " ms.");
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -61,51 +61,50 @@ public class MongoManager {
 		client.close();
 	}
 	
-	public static MongoDatabase getDatabase(String key) {
+	public static MongoDatabase getDatabase(final String key) {
 		return client.getDatabase(key);
 	}
 	
-	public static MongoCollection<Document> getCollection(String key, MongoDatabase db) {
+	public static MongoCollection<Document> getCollection(final String key, final MongoDatabase db) {
 		return db.getCollection(key);
 	}
 	
-	public static List<Document> getDocumentsInCollection(String key, MongoCollection<Document> col) {
-		List<Document> docs = new ArrayList<>();
+	public static List<Document> getDocumentsInCollection(final String key, final MongoCollection<Document> col) {
+		final List<Document> docs = new ArrayList<>();
 		try (MongoCursor<Document> cursor = col.find().iterator()) {
-		    while (cursor.hasNext()) {
-		        docs.add(cursor.next());
-		    }
+		    while (cursor.hasNext())
+				docs.add(cursor.next());
 		}
 		return docs;
 	}
 	
-	public static Document getDocumentInCollection(MongoCollection<Document> col, String key, String value) {
+	public static Document getDocumentInCollection(final MongoCollection<Document> col, final String key, final String value) {
 		return col.find(Filters.eq(key, value)).first();
 	}
 	
-	public static void insertOne(MongoCollection<Document> collection, Document document) {
+	public static void insertOne(final MongoCollection<Document> collection, final Document document) {
 		collection.insertOne(document);
 	}
 	
-	public static void insertMany(MongoCollection<Document> collection, List<Document> documents) {
+	public static void insertMany(final MongoCollection<Document> collection, final List<Document> documents) {
 		collection.insertMany(documents);
 	}
 	
-	public static void updateOne(MongoCollection<Document> collection, BasicDBObject query, BasicDBObject updatedValue) {
-		BasicDBObject updateObject = new BasicDBObject();
+	public static void updateOne(final MongoCollection<Document> collection, final BasicDBObject query, final BasicDBObject updatedValue) {
+		final BasicDBObject updateObject = new BasicDBObject();
 		updateObject.put("$set", updatedValue);
 		
 		collection.updateOne(query, updateObject);
 	}
 	
-	public static void updateMany(MongoCollection<Document> collection, BasicDBObject query, BasicDBObject updatedValue) {
-		BasicDBObject updateObject = new BasicDBObject();
+	public static void updateMany(final MongoCollection<Document> collection, final BasicDBObject query, final BasicDBObject updatedValue) {
+		final BasicDBObject updateObject = new BasicDBObject();
 		updateObject.put("$set", updatedValue);
 		
 		collection.updateMany(query, updateObject);
 	}
 	
-	public static void updateValue(MongoCollection<Document> collection, BasicDBObject query, Document updatedValue) {	
+	public static void updateValue(final MongoCollection<Document> collection, final BasicDBObject query, final Document updatedValue) {	
 		final Document tempDoc = collection.find(query).first();
 		if (tempDoc != null)
 			collection.updateOne(query, new BasicDBObject().append("$set", updatedValue));
@@ -115,15 +114,15 @@ public class MongoManager {
 		}
 	}
 	
-	public static void removeValue(MongoCollection<Document> collection, BasicDBObject query, String key) {
-		BasicDBObject updateObject = new BasicDBObject();
+	public static void removeValue(final MongoCollection<Document> collection, final BasicDBObject query, final String key) {
+		final BasicDBObject updateObject = new BasicDBObject();
 		updateObject.put("$unset", new Document(key, 1));
 		
 		collection.updateOne(query, updateObject);
 	}
 	
-	public static void removeValue(MongoCollection<Document> collection, BasicDBObject query, Document remove) {
-		BasicDBObject updateObject = new BasicDBObject();
+	public static void removeValue(final MongoCollection<Document> collection, final BasicDBObject query, final Document remove) {
+		final BasicDBObject updateObject = new BasicDBObject();
 		updateObject.put("$unset", remove);
 		
 		collection.updateOne(query, updateObject);

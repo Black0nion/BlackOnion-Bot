@@ -14,17 +14,16 @@ public class Logger {
 	
 	private static final SimpleDateFormat dtf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	
-	public static void log(LogMode mode, LogOrigin origin, String logInput) {
+	public static void log(final LogMode mode, final LogOrigin origin, final String logInput) {
 		//StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[Thread.currentThread().getStackTrace().length - 1];
 		//String log = dtf.format(now) + "[" + stackTraceElement.getFileName().replace(".java", "") + "." + stackTraceElement.getMethodName() + ":" + stackTraceElement.getLineNumber() + "] [" + mode.name() + "] " + logInput;
 		final String log = dtf.format(new Date()) + " [" + origin.name() + "] [" + mode.name() + "] " + logInput;
-		if (mode == LogMode.ERROR || mode == LogMode.FATAL) {
+		if (mode == LogMode.ERROR || mode == LogMode.FATAL)
 			System.err.println(log);
-		} else if (mode == LogMode.WARNING) {
+		else if (mode == LogMode.WARNING)
 			System.out.println("\033[33m" + log + "\033[0m");
-		} else {
+		else
 			System.out.println("\033[94m" + log + "\033[0m");
-		}
 		
 		try {
 			final File file = new File("files/logs/log." + origin.name().toLowerCase() + "/" + origin.name().toLowerCase() + "." + mode.name().toLowerCase() + ".log");
@@ -32,36 +31,36 @@ public class Logger {
 			file.createNewFile();
 			Files.asCharSink(file, StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log);
 			Files.asCharSink(new File("files/logs/bot.log"), StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void logInfo(String logInput, LogOrigin origin) {
+	public static void logInfo(final String logInput, final LogOrigin origin) {
 		log(LogMode.INFORMATION, origin, logInput);
 	}
 	
-	public static void logWarning(String logInput, LogOrigin origin) {
+	public static void logWarning(final String logInput, final LogOrigin origin) {
 		log(LogMode.WARNING, origin, logInput);
 	}
 	
-	public static void logError(String logInput, LogOrigin origin) {
+	public static void logError(final String logInput, final LogOrigin origin) {
 		log(LogMode.ERROR, origin, logInput);
 	}
 	
-	public static void log(LogMode mode, String logInput) {
+	public static void log(final LogMode mode, final String logInput) {
 		log(mode, LogOrigin.BOT, logInput);
 	}
 	
-	public static void logInfo(String logInput) {
+	public static void logInfo(final String logInput) {
 		log(LogMode.INFORMATION, LogOrigin.BOT, logInput);	
 	}
 	
-	public static void logWarning(String logInput) {
+	public static void logWarning(final String logInput) {
 		log(LogMode.WARNING, LogOrigin.BOT, logInput);
 	}
 	
-	public static void logError(String logInput) {
+	public static void logError(final String logInput) {
 		log(LogMode.ERROR, LogOrigin.BOT, logInput);
 	}
 }

@@ -10,7 +10,7 @@ public class CachedUserInfo {
 	Date refreshDate;
 	String token;
 	
-	public CachedUserInfo(JSONObject userInfo, String token) {
+	public CachedUserInfo(final JSONObject userInfo, final String token) {
 		this.info = userInfo;
 		this.refreshDate = new Date();
 		this.token = token;
@@ -28,8 +28,8 @@ public class CachedUserInfo {
 		return refreshDate;
 	}
 	
-	public CachedUserInfo refresh(String token) {
-		JSONObject userInfo = Utils.getUserInfoFromToken(token);
+	public CachedUserInfo refresh(final String token) {
+		final JSONObject userInfo = Utils.getUserInfoFromToken(token);
 		
 		if (!userInfo.has("id"))
 			return null;

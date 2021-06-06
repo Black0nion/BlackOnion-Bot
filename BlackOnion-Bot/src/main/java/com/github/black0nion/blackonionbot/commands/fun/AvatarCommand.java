@@ -24,14 +24,14 @@ public class AvatarCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		BlackUser mentionedUser = author;
 		if (args.length > 1) {			
-			String user = String.join(" ", Utils.removeFirstArg((args)));
+			final String user = String.join(" ", Utils.removeFirstArg((args)));
 			final List<BlackUser> mentionedBlackUsers = message.getMentionedBlackUsers();
-			if (!mentionedBlackUsers.isEmpty()) {
+			if (!mentionedBlackUsers.isEmpty())
 				mentionedUser = mentionedBlackUsers.get(0);
-			} else {
+			else {
 				if (!Utils.isLong(user)) {
 					cmde.sendPleaseUse();
 					return;
@@ -50,7 +50,7 @@ public class AvatarCommand extends Command {
 		print(cmde, author, mentionedUser, guild, channel, message);
 	}
 	
-	private static void print(CommandEvent cmde, BlackUser author, BlackUser mentionedUser, BlackGuild guild, MessageChannel channel, BlackMessage message) {
+	private static void print(final CommandEvent cmde, final BlackUser author, final BlackUser mentionedUser, final BlackGuild guild, final MessageChannel channel, final BlackMessage message) {
 		cmde.reply(cmde.success().setTitle(LanguageSystem.getTranslation("pfpof", author, guild) + " " + Utils.removeMarkdown(mentionedUser.getName()) + "#" + mentionedUser.getDiscriminator(), mentionedUser.getEffectiveAvatarUrl())
 				.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())

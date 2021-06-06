@@ -35,17 +35,15 @@ public class AdminHelpCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		message.delete().queue();
-		EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
+		final EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
 				.setTitle("Adminhilfe")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
 		
-		for (Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-			if (entry.getValue().getVisibility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0]) {
+		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet())
+			if (entry.getValue().getVisibility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0])
 				builder.addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
-			}
-		}
 		
 		channel.sendMessage(builder.build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
 	}

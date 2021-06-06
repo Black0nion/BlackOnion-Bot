@@ -9,11 +9,11 @@ import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardVal
 
 public class DashboardMultipleChoice extends DashboardValue {
 	
-	private BlackHashMap<String, String> possibleValues;
-	private String databaseKey;
-	private String fancyName;
+	private final BlackHashMap<String, String> possibleValues;
+	private final String databaseKey;
+	private final String fancyName;
 	
-	public DashboardMultipleChoice(String databaseKey, String fancyName, BlackHashMap<String, String> possibleValues) {
+	public DashboardMultipleChoice(final String databaseKey, final String fancyName, final BlackHashMap<String, String> possibleValues) {
 		this.possibleValues = possibleValues;
 		this.databaseKey = databaseKey;
 		this.fancyName = fancyName;
@@ -30,7 +30,7 @@ public class DashboardMultipleChoice extends DashboardValue {
 	}
 
 	@Override
-	public boolean save(String key, String value, BlackGuild guild) {
+	public boolean save(final String key, final String value, final BlackGuild guild) {
 		if (possibleValues.containsKey(value)) {			
 			guild.save(key, value);
 			return true;

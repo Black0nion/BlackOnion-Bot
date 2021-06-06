@@ -23,7 +23,7 @@ public class JoinLeaveMessageCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String newMessage = String.join(" ", Utils.subArray(args, 2));
 		if (args[1].equalsIgnoreCase("join")) {
 			guild.setJoinMessage(newMessage);
@@ -31,8 +31,7 @@ public class JoinLeaveMessageCommand extends Command {
 		} else if (args[1].equalsIgnoreCase("leave")) {
 			guild.setLeaveMessage(newMessage);
 			cmde.success("setleavemessage", "leavemessagesestto", new Placeholder("msg", "`" + newMessage + "`"));
-		} else {
+		} else
 			cmde.sendPleaseUse();
-		}
 	}
 }

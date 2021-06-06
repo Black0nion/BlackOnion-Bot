@@ -21,27 +21,23 @@ public class LanguageCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
 				final Language newLang = LanguageSystem.getLanguageFromName(args[1]);
 				author.setLanguage(newLang);
 				cmde.success(newLang.getTranslationNonNull("languageupdated"), newLang.getTranslationNonNull("newlanguage"), new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
-			} else {
-				if (args[1].equalsIgnoreCase("list")) {
-					cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
-				} else {
-					cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
-				}
-			}
+			} else if (args[1].equalsIgnoreCase("list"))
+				cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
+			else
+				cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
 		} else {
 			String language = "";
 			final Language userLanguage = author.getLanguage();
-			if (userLanguage != null) {
+			if (userLanguage != null)
 				language = userLanguage.getName() + " (" + userLanguage.getLanguageCode() + ")";
-			} else {
+			else
 				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
-			}
 			cmde.success("Languages", "Your Language: " + language, "To change your language, use `" + CommandEvent.getCommandHelp(guild, author, this) + "`.\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list" + "`");
 		}
 	}

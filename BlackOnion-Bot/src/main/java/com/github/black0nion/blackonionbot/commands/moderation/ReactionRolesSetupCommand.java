@@ -33,13 +33,13 @@ public class ReactionRolesSetupCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		// TODO: switch to new system
 		args = message.getContentDisplay().split(" ");
-		List<TextChannel> channels = message.getMentionedChannels();
-		List<Role> roles = message.getMentionedRoles();
+		final List<TextChannel> channels = message.getMentionedChannels();
+		final List<Role> roles = message.getMentionedRoles();
 		
-		List<String> argz = Arrays.asList(args); 
+		final List<String> argz = Arrays.asList(args); 
 		
 		if (argz.contains("@everyone") || argz.contains("@here")) {
 			cmde.error("invalidrole", "iseveryone");
@@ -47,14 +47,14 @@ public class ReactionRolesSetupCommand extends Command {
 		}
 		
 		if (!channels.isEmpty() && !roles.isEmpty()) {
-			TextChannel tc = channels.get(0);
-			Role role = roles.get(0);
+			final TextChannel tc = channels.get(0);
+			final Role role = roles.get(0);
 			
 			final String[] finalArgs = args; 
-			String messageIDString = args[3];
+			final String messageIDString = args[3];
 			
 			try {
-				long messageID = Long.parseLong(messageIDString);
+				final long messageID = Long.parseLong(messageIDString);
 				tc.retrieveMessageById(messageID).queue(success -> {
 					final String emoteName = finalArgs[4];
 					guild.retrieveEmotes().queue(emoteList -> {
@@ -97,11 +97,10 @@ public class ReactionRolesSetupCommand extends Command {
 								final String finalEmote = emote;
 								tc.retrieveMessageById(messageID).queue(msg -> {
 									guild.retrieveEmoteById(finalEmote.split(":")[2].replace(">", "")).queue(customEmote -> {										
-										if (customEmote != null) {
+										if (customEmote != null)
 											msg.clearReactions(customEmote).queue();
-										} else {
+										else
 											msg.clearReactions(finalEmote).queue();
-										}
 										cmde.success("entrydeleted", "reactionroledeleted");
 									});
 								});
@@ -122,11 +121,10 @@ public class ReactionRolesSetupCommand extends Command {
 					cmde.error("messagenotfound", "messagecouldntbefound");
 					return;
 				});
-			} catch (NumberFormatException ex) {
+			} catch (final NumberFormatException ex) {
 				cmde.sendPleaseUse();
 			}
-		} else {
+		} else
 			cmde.sendPleaseUse();
-		}
 	}
 }

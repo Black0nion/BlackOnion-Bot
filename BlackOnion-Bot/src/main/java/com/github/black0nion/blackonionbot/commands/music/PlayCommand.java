@@ -25,16 +25,15 @@ public class PlayCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		GuildVoiceState state = member.getVoiceState();
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final GuildVoiceState state = member.getVoiceState();
 		if (state != null && state.getChannel() != null) {
-			StringBuilder builder = new StringBuilder();
+			final StringBuilder builder = new StringBuilder();
 			for (int i = 1; i < args.length; i++) builder.append(args[i] + " ");
 			
 			String url = builder.toString().trim();
-			if (!url.startsWith("http")) {
+			if (!url.startsWith("http"))
 				url = "ytsearch:" + url;
-			}
 			
 			final AudioManager audioManager = e.getGuild().getAudioManager();
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
@@ -42,8 +41,7 @@ public class PlayCommand extends Command {
 			audioManager.openAudioConnection(memberChannel);
 			
 			PlayerManager.getInstance().loadAndPlay(author, e.getChannel(), url, audioManager, memberChannel);
-		} else {
+		} else
 			cmde.error("notinvc", "goinvc");
-		}
 	}
 }

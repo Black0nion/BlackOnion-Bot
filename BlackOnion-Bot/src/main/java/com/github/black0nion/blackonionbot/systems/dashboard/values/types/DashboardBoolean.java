@@ -8,11 +8,11 @@ import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardVal
 
 public class DashboardBoolean extends DashboardValue {
 	
-	private boolean defaultValue;
-	private String databaseKey;
-	private String fancyName;
+	private final boolean defaultValue;
+	private final String databaseKey;
+	private final String fancyName;
 	
-	public DashboardBoolean(String databaseKey, String fancyName, boolean defaultValue) {
+	public DashboardBoolean(final String databaseKey, final String fancyName, final boolean defaultValue) {
 		this.defaultValue = defaultValue;
 		this.databaseKey = databaseKey;
 		this.fancyName = fancyName;
@@ -29,7 +29,7 @@ public class DashboardBoolean extends DashboardValue {
 	}
 
 	@Override
-	public boolean save(String key, String value, BlackGuild guild) {
+	public boolean save(final String key, final String value, final BlackGuild guild) {
 		boolean result;
 		if (value.equals("true")) result = true;
 		else if (value.equals("false")) result = false;

@@ -7,10 +7,10 @@ public enum Category {
 	 * @param string
 	 * @return
 	 */
-	public static final Category parse(String input) {
+	public static final Category parse(final String input) {
 		try {
 			return valueOf(input.toUpperCase());
-		} catch (Exception e) {			
+		} catch (final Exception e) {			
 			return null;
 		}
 	}

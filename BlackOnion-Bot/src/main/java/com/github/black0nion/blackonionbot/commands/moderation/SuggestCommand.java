@@ -29,20 +29,20 @@ public class SuggestCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		// TODO: translate
 		final long suggestionsChannelId = guild.getSuggestionsChannel();
 		if (suggestionsChannelId == -1) {
 			cmde.error("suggestionsoff", "nosuggestionfeature");
 			return;
 		} else {
-			TextChannel suggestionsChannel = guild.getTextChannelById(suggestionsChannelId);
+			final TextChannel suggestionsChannel = guild.getTextChannelById(suggestionsChannelId);
 			if (suggestionsChannel == null) {
 				cmde.error("suggestionschannelnotfound", "pleaseresetsuggestionschannel");
 				return;
-			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION))) {
+			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION)))
 				Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
-			} else {
+			else {
 				// all good, we can send the suggestion
 				suggestionsChannel.sendMessage(cmde.success().setTitle("suggestion").setDescription(String.join(" ", Utils.removeFirstArg(args))).build()).queue(msg -> {
 					msg.addReaction("U+1F44D").queue();

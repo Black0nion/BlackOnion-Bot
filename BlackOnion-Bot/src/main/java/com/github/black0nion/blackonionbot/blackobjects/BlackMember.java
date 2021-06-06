@@ -55,7 +55,7 @@ public class BlackMember extends BlackObject implements Member {
 	public static BlackMember from(final Member member) {
 		try {
 			return members.get(member);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -76,7 +76,7 @@ public class BlackMember extends BlackObject implements Member {
 		members.invalidateAll();
 	}
 	
-	private BlackMember(@NotNull final Member member, BlackGuild blackGuild) {
+	private BlackMember(@NotNull final Member member, final BlackGuild blackGuild) {
 		this.member = member;
 		this.blackGuild = blackGuild;
 	}
@@ -332,12 +332,12 @@ public class BlackMember extends BlackObject implements Member {
     }
 
 	@Override
-	public boolean canSync(GuildChannel targetChannel, GuildChannel syncSource) {
+	public boolean canSync(final GuildChannel targetChannel, final GuildChannel syncSource) {
 		return this.member.canSync(targetChannel, syncSource);
 	}
 
 	@Override
-	public boolean canSync(GuildChannel channel) {
+	public boolean canSync(final GuildChannel channel) {
 		return this.member.canSync(channel);
 	}
 

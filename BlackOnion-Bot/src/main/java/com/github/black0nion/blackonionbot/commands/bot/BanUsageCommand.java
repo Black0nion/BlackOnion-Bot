@@ -32,7 +32,8 @@ public class BanUsageCommand extends Command {
 	public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("usagebans");
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		// TODO: this is a fucking old system, fix that shit soon
 		message.delete().queue();
 		if (args.length >= 2) {
 			final String stuffToBan = args[2];

@@ -39,12 +39,12 @@ public class DefaultValues {
 		Bot.notifyStatusUsers = new ArrayList<String>(ValueManager.getArrayAsList("notifyUsers"));
 	}
 	
-	private static void setDefault(String key, Object value) {
+	private static void setDefault(final String key, final Object value) {
 		if (check(key))
 			ValueManager.save(key, value);
 	}
 	
-	private static boolean check(String key) {
+	private static boolean check(final String key) {
 		if (ValueManager.get(key) == null) 
 			return true;
 		return false;

@@ -13,7 +13,7 @@ public class GuildMusicManager {
     
     public final BlackGuild guild;
     
-    public GuildMusicManager(AudioPlayerManager manager, BlackGuild guild) {
+    public GuildMusicManager(final AudioPlayerManager manager, final BlackGuild guild) {
         this.audioPlayer = manager.createPlayer();
         this.scheduler = new TrackScheduler(this.audioPlayer, guild);
         this.audioPlayer.addListener(this.scheduler);

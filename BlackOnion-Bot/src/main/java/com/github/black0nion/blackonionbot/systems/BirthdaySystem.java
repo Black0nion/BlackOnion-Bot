@@ -22,45 +22,39 @@ public class BirthdaySystem {
 	
 	public static void init() {
 		reload();
-		String guildID = "756810598158696458";
-		String roleID = "776341810539659274";
+		final String guildID = "756810598158696458";
+		final String roleID = "776341810539659274";
 		//String channelID = "";
 		
-		SimpleDateFormat df = new SimpleDateFormat("MM-dd");
+		final SimpleDateFormat df = new SimpleDateFormat("MM-dd");
 		
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
+		final Thread t = new Thread(() -> {
+			while (true)
+				try {
 					try {
-						try {
-							ValueManager.getLong("bdayDelay");
-						} catch (NumberFormatException ex) {
-							ValueManager.save("bdayDelay", 1000);
-						}
-						Thread.sleep(ValueManager.getLong("bdayDelay"));
-						String current = df.format(new Date());
-						try { 
-							for (Map.Entry<String, String> bdays : birthdays.entrySet()) {
-								if (ValueManager.get("bday") != null && !current.equalsIgnoreCase(bdays.getKey())) {
-									Bot.jda.getGuildById(guildID).removeRoleFromMember(ValueManager.getString("bday"), Bot.jda.getGuildById(guildID).getRoleById(roleID)).queue(); 
-									ValueManager.remove("bday");
-								}
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						for (Map.Entry<String, String> bdays : birthdays.entrySet()) {
-							if (current.equalsIgnoreCase(bdays.getKey())) {
-								Bot.jda.getGuildById(guildID).addRoleToMember(bdays.getValue(), Bot.jda.getGuildById(guildID).getRoleById(roleID)).queue();
-								ValueManager.save("bday", bdays.getValue());
-							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
+						ValueManager.getLong("bdayDelay");
+					} catch (final NumberFormatException ex) {
+						ValueManager.save("bdayDelay", 1000);
 					}
+					Thread.sleep(ValueManager.getLong("bdayDelay"));
+					final String current = df.format(new Date());
+					try { 
+						for (final Map.Entry<String, String> bdays1 : birthdays.entrySet())
+							if (ValueManager.get("bday") != null && !current.equalsIgnoreCase(bdays1.getKey())) {
+								Bot.jda.getGuildById(guildID).removeRoleFromMember(ValueManager.getString("bday"), Bot.jda.getGuildById(guildID).getRoleById(roleID)).queue(); 
+								ValueManager.remove("bday");
+							}
+					} catch (final Exception e1) {
+						e1.printStackTrace();
+					}
+					for (final Map.Entry<String, String> bdays2 : birthdays.entrySet())
+						if (current.equalsIgnoreCase(bdays2.getKey())) {
+							Bot.jda.getGuildById(guildID).addRoleToMember(bdays2.getValue(), Bot.jda.getGuildById(guildID).getRoleById(roleID)).queue();
+							ValueManager.save("bday", bdays2.getValue());
+						}
+				} catch (final Exception e2) {
+					e2.printStackTrace();
 				}
-			}
 		});
 		t.setName("BDayThread");
 		t.start();
@@ -68,20 +62,19 @@ public class BirthdaySystem {
 	
 	@Reloadable("birthday")
 	public static void reload() {
-		File file = new File("files", "birthdays.json");
+		final File file = new File("files", "birthdays.json");
 		try {
 			file.createNewFile();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		Document doc = Document.loadDocument(file);
-		JsonElement element = JsonParser.parseString(doc.convertToJson());
-		JsonObject obj = element.getAsJsonObject();
-		Set<Map.Entry<String, JsonElement>> entries = obj.entrySet();
+		final Document doc = Document.loadDocument(file);
+		final JsonElement element = JsonParser.parseString(doc.convertToJson());
+		final JsonObject obj = element.getAsJsonObject();
+		final Set<Map.Entry<String, JsonElement>> entries = obj.entrySet();
 		birthdays.clear();
-		for (Map.Entry<String, JsonElement> entry : entries) {
-		    birthdays.put(entry.getKey(), entry.getValue().getAsString());
-		}
+		for (final Map.Entry<String, JsonElement> entry : entries)
+			birthdays.put(entry.getKey(), entry.getValue().getAsString());
 	}
 
 }

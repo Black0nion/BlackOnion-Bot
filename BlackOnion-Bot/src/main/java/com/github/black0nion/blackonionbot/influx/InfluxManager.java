@@ -30,14 +30,14 @@ public class InfluxManager {
 	
 	private static final int mb = 1024 * 1024;
 	
-	public static boolean connect(String databaseURL, String token, String org) {
+	public static boolean connect(final String databaseURL, final String token, final String org) {
 		if (influxDB != null) influxDB.close();
 		try { 
 			influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
 			influxDB.getWriteApiBlocking().writePoint(Point.measurement("startupshutdown").addField("online", true));
 			Logger.logInfo("Connected.", LogOrigin.INFLUX_DB);
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.logError("Couldn't connect to InfluxDB!", LogOrigin.INFLUX_DB);
 			influxDB = null;
 		    return false;
@@ -46,14 +46,14 @@ public class InfluxManager {
 	
 	public static void init() {
 		Bot.executor.submit(() -> {			
-			CredentialsManager manager = Bot.getCredentialsManager();
+			final CredentialsManager manager = Bot.getCredentialsManager();
 			if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org")))
 				return;
 			Bot.executor.submit(() -> testSaving(new Document().append("test", "moino")));
 			
 			try {
 				Bot.jda.awaitReady();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			
@@ -67,7 +67,7 @@ public class InfluxManager {
 	}
 	
 	public static void saveStats() {
-		Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS)
+		final Point point = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS)
 				.addField("cmdcount", CommandBase.commandsLastTenSecs)
 				.addField("messagecount", CommandBase.messagesLastTenSecs)
 				.addField("cpuload", getProcessCpuLoad())
@@ -85,50 +85,50 @@ public class InfluxManager {
 	
 	
 	@TestOnly
-	public static void testSaving(Document args) {
+	public static void testSaving(final Document args) {
 		for (int i = 0; i < 20; i++) {
-			Point point2 = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("num", Bot.random.nextInt(32));
+			final Point point2 = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("num", Bot.random.nextInt(32));
 			influxDB.getWriteApi().writePoint(point2);
 			try {
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public static void save(String bucket, Document args) {
+	public static void save(final String bucket, final Document args) {
 		influxDB.getWriteApi().writePoint(Point.measurement(bucket).time(System.currentTimeMillis(), WritePrecision.MS).addFields(args));
 	}
 	
 	public static double getProcessCpuLoad() {
 		try {
-			    MBeanServer mbs    = ManagementFactory.getPlatformMBeanServer();
-			    ObjectName name    = ObjectName.getInstance("java.lang:type=OperatingSystem");
-			    AttributeList list = mbs.getAttributes(name, new String[]{ "ProcessCpuLoad" });
+			    final MBeanServer mbs    = ManagementFactory.getPlatformMBeanServer();
+			    final ObjectName name    = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			    final AttributeList list = mbs.getAttributes(name, new String[]{ "ProcessCpuLoad" });
 		
 			    if (list.isEmpty())     return Double.NaN;
 		
-			    Attribute att = (Attribute)list.get(0);
-			    Double value  = (Double)att.getValue();
+			    final Attribute att = (Attribute)list.get(0);
+			    final Double value  = (Double)att.getValue();
 		
 			    // usually takes a couple of seconds before we get real values
 			    if (value == -1.0)      return Double.NaN;
 			    // returns a percentage value with 1 decimal point precision
 			    return Utils.roundToDouble("#0.000", value);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return Double.NaN;
 	}
 	
 	private static double getProcessRamLoad() {
-		Runtime runtime = Runtime.getRuntime();
+		final Runtime runtime = Runtime.getRuntime();
 		return (runtime.totalMemory() - runtime.freeMemory()) / mb;
 	}
 	
 	private static double getProcessMaxRamLoad() {
-		Runtime runtime = Runtime.getRuntime();
+		final Runtime runtime = Runtime.getRuntime();
 		return runtime.maxMemory() / mb;
 	}
 	

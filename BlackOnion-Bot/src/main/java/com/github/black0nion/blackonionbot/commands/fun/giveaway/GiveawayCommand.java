@@ -37,22 +37,22 @@ public class GiveawayCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		int duration = -1;
 		int winnersCount = -1;
 		Date endDate = null;
 		try {
 			winnersCount = Integer.parseInt(args[2]);
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		
-		try { endDate = format.parse(args[1]); } catch (Exception ignored) {
+		try { endDate = format.parse(args[1]); } catch (final Exception ignored) {
 			try {
 				duration = Integer.parseInt(args[1]);
 				duration *= 1000;
-				Calendar cal = Calendar.getInstance(); 
-				cal.setTimeInMillis(cal.getTimeInMillis() + (long) duration);
+				final Calendar cal = Calendar.getInstance(); 
+				cal.setTimeInMillis(cal.getTimeInMillis() + duration);
 				endDate = cal.getTime();
-			} catch (Exception ignored2) {}
+			} catch (final Exception ignored2) {}
 		}
 		
 		if (duration == -1 || endDate == null || winnersCount == -1) {

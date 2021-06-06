@@ -36,105 +36,97 @@ public class QrDecodeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final List<Attachment> attachments = message.getAttachments();
 		if (attachments.size() == 0) {
 			if (args.length >= 2) {
 				final String url = args[1];
-				if (url.endsWith(".png") || url.endsWith(".jpg")) {
+				if (url.endsWith(".png") || url.endsWith(".jpg"))
 					readQR(cmde, url, channel, author, guild, message);
-				} else {
+				else
 					cmde.sendPleaseUse();
-				}
-			} else {
+			} else
 				cmde.sendPleaseUse();
-			}
 		} else {
 			final Attachment path = attachments.get(0);
-			if (path.isImage()) {
+			if (path.isImage())
 				readQR(cmde, path, channel, author, guild, message);
-			} else {
+			else
 				cmde.sendPleaseUse();
-			}
 		}
 	}
 	
-	private void send(CommandEvent cmde, Result result, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage message, String imageUrl) {
-		if (result == null || result.getBarcodeFormat() == null) {
+	private void send(final CommandEvent cmde, final Result result, final TextChannel channel, final BlackUser author, final BlackGuild guild, final BlackMessage message, final String imageUrl) {
+		if (result == null || result.getBarcodeFormat() == null)
 			cmde.sendPleaseUse();
-		} else {
+		else
 			cmde.reply(cmde.success().setTitle("qrcode", "https://zxing.github.io/zxing")
 					.setThumbnail(imageUrl)
 					.addField("qrresult", result.getText(), false));
-		}
 	}
 	
-	private void readQR(CommandEvent cmde, String url, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
+	private void readQR(final CommandEvent cmde, final String url, final TextChannel channel, final BlackUser author, final BlackGuild guild, final BlackMessage msg) {
 		try {
-			Map<EncodeHintType, ErrorCorrectionLevel> map
+			final Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
 	                      ErrorCorrectionLevel>();
 			map.put(EncodeHintType.ERROR_CORRECTION,
 	                ErrorCorrectionLevel.L);
 			
-			BinaryBitmap binaryBitmap
+			final BinaryBitmap binaryBitmap
             = new BinaryBitmap(new HybridBinarizer(
                 new BufferedImageLuminanceSource(
                     ImageIO.read(
                         new URL(url).openStream()))));
 	
-			Result result = new MultiFormatReader().decode(binaryBitmap);
+			final Result result = new MultiFormatReader().decode(binaryBitmap);
 			send(cmde, result, channel, author, guild, msg, url);
 			return;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (e instanceof NotFoundException) {
 				msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
 				return;
-			} else {
-				if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
-					msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("privateqr", "uploadasattachment", false).build()).queue();
-					return;
-				} else {					
-					e.printStackTrace();
-					msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
-					return;
-				}
+			} else if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
+				msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("privateqr", "uploadasattachment", false).build()).queue();
+				return;
+			} else {					
+				e.printStackTrace();
+				msg.reply(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+				return;
 			}
 		}
 	}
 
-	private void readQR(CommandEvent cmde, Attachment path, TextChannel channel, BlackUser author, BlackGuild guild, BlackMessage msg) {
+	private void readQR(final CommandEvent cmde, final Attachment path, final TextChannel channel, final BlackUser author, final BlackGuild guild, final BlackMessage msg) {
 		try {
-			Map<EncodeHintType, ErrorCorrectionLevel> map
+			final Map<EncodeHintType, ErrorCorrectionLevel> map
 	        = new HashMap<EncodeHintType,
 	                      ErrorCorrectionLevel>();
 			map.put(EncodeHintType.ERROR_CORRECTION,
 	                ErrorCorrectionLevel.L);
 			
 			final InputStream is = path.retrieveInputStream().join();
-			BinaryBitmap binaryBitmap
+			final BinaryBitmap binaryBitmap
             = new BinaryBitmap(new HybridBinarizer(
                 new BufferedImageLuminanceSource(
                     ImageIO.read(
                         is))));
 			is.close();
 	
-			Result result = new MultiFormatReader().decode(binaryBitmap);
+			final Result result = new MultiFormatReader().decode(binaryBitmap);
 			send(cmde, result, channel, author, guild, msg, path.getUrl());
 			return;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (e instanceof NotFoundException) {
 				msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("qrdecodefail", "qrnotfound", false).build()).queue();
 				return;
-			} else {
-				if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("privateqr", "uploadasattachment", false).build()).queue();
-					return;
-				} else {					
-					e.printStackTrace();
-					msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
-					return;
-				}
+			} else if (e.getMessage().startsWith("Server returned HTTP response code: 403 for URL:")) {
+				msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("privateqr", "uploadasattachment", false).build()).queue();
+				return;
+			} else {					
+				e.printStackTrace();
+				msg.reply(EmbedUtils.getErrorEmbed(msg.getBlackUser(), guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+				return;
 			}
 		}
 	}

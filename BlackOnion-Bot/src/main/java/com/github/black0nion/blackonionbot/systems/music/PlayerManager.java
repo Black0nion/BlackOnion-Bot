@@ -58,10 +58,10 @@ public class PlayerManager {
 				@Override
 				public void run() {
 					try {
-						ClientCredentialsGrantRequest clientCredentialsRequest = spotifyApi.clientCredentialsGrant().build();
-						ClientCredentials credentials = clientCredentialsRequest.get();
+						final ClientCredentialsGrantRequest clientCredentialsRequest = spotifyApi.clientCredentialsGrant().build();
+						final ClientCredentials credentials = clientCredentialsRequest.get();
 						spotifyApi.setAccessToken(credentials.getAccessToken());
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -76,7 +76,7 @@ public class PlayerManager {
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
     }
 
-    public GuildMusicManager getMusicManager(TextChannel channel) {
+    public GuildMusicManager getMusicManager(final TextChannel channel) {
         return this.musicManagers.computeIfAbsent(channel.getGuild().getIdLong(), (guildId) -> {
             final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, BlackGuild.from(channel.getGuild()));
 
@@ -86,18 +86,18 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(BlackUser author, TextChannel channel, String trackUrl, AudioManager manager, VoiceChannel vc) {
+    public void loadAndPlay(final BlackUser author, final TextChannel channel, String trackUrl, final AudioManager manager, final VoiceChannel vc) {
         final GuildMusicManager musicManager = this.getMusicManager(channel);
         final BlackGuild guild = BlackGuild.from(channel.getGuild());
         MusicSystem.channels.put(guild.getIdLong(), channel.getIdLong());
 
         if (trackUrl.contains("spotify.com")) {
-        	String[] parsed = trackUrl.split("/track/");
+        	final String[] parsed = trackUrl.split("/track/");
         	if (parsed.length == 2) {
         		final TrackRequest request = spotifyApi.getTrack(parsed[1]).build();
         		try {
         			trackUrl = "ytsearch:" + request.get().getName();
-        		} catch (Exception e) {
+        		} catch (final Exception e) {
         			e.printStackTrace();
         		}
         	}
@@ -105,34 +105,34 @@ public class PlayerManager {
         
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
-            public void trackLoaded(AudioTrack track) {
+            public void trackLoaded(final AudioTrack track) {
                 musicManager.scheduler.queue(track, manager, vc);
                 channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
             }
 
             @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
+            public void playlistLoaded(final AudioPlaylist playlist) {
                 final List<AudioTrack> tracks = playlist.getTracks();
                 
                 if (playlist.isSearchResult()) {
-                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
-        			List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
+                	final EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
+        			final List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
         			for (int i = 0; i < trackz.size(); i++) {
-        				AudioTrack track = trackz.get(i);
+        				final AudioTrack track = trackz.get(i);
         				builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
         			}
-        			channel.sendMessage(builder.build()).queue((msgg) -> { BlackMessage msg = BlackMessage.from(msgg); for (int i=0;i<trackz.size();i++) msg.addReaction(Utils.numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
+        			channel.sendMessage(builder.build()).queue((msgg) -> { final BlackMessage msg = BlackMessage.from(msgg); for (int i=0;i<trackz.size();i++) msg.addReaction(Utils.numbersUnicode.get(i)).queue(); retry(author, msg, trackz, musicManager, manager, vc);});
                 } else {
-                	EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
+                	final EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild);
                 	
                 	builder.setTitle("addedtoqueue");
                 	
-                	if (tracks.size() <= 10) {
-	                	tracks.forEach(track -> {
+                	if (tracks.size() <= 10)
+						tracks.forEach(track -> {
 	                		builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
 		                	musicManager.scheduler.queue(track, manager, vc);
 	                	});
-                	} else {
+					else {
                 		builder.setDescription(LanguageSystem.getTranslation("thistracksplusadded", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
                 		for (int i = 0; i < tracks.size(); i++) {
                 			final AudioTrack track = tracks.get(i);
@@ -151,14 +151,14 @@ public class PlayerManager {
             }
 
             @Override
-            public void loadFailed(FriendlyException exception) {
+            public void loadFailed(final FriendlyException exception) {
 				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
                 exception.printStackTrace();
             }
         });
     }
     
-    private void retry(BlackUser author, BlackMessage msg, List<AudioTrack> tracks, GuildMusicManager musicManager, AudioManager manager, VoiceChannel vc) {
+    private void retry(final BlackUser author, final BlackMessage msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final VoiceChannel vc) {
 		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class, 
 			(event) -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), 
 			event -> {
@@ -173,9 +173,8 @@ public class PlayerManager {
 	}
 
     public static PlayerManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new PlayerManager();
-        }
+        if (INSTANCE == null)
+			INSTANCE = new PlayerManager();
 
         return INSTANCE;
     }

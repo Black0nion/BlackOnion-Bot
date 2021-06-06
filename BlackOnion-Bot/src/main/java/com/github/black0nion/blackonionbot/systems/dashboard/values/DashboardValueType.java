@@ -12,7 +12,7 @@ public enum DashboardValueType {
 	
 	private final Class<?> clazz;
 	
-	DashboardValueType(Class<?> clazz) {
+	DashboardValueType(final Class<?> clazz) {
 		this.clazz = clazz;
 	}
 	

@@ -41,7 +41,7 @@ public class BlackUser extends BlackObject implements User {
             .build(new CacheLoader<User, BlackUser>() {
                 @Override
                 public BlackUser load(final User user) {
-                	BlackUser blacc = new BlackUser(user);
+                	final BlackUser blacc = new BlackUser(user);
                     return blacc;
                 }
             });
@@ -53,7 +53,7 @@ public class BlackUser extends BlackObject implements User {
 	public static BlackUser from(@NotNull final User user) {
 		try {
 			return users.get(user);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -91,7 +91,7 @@ public class BlackUser extends BlackObject implements User {
 				this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 			else
 				this.language = LanguageSystem.getDefaultLanguage();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -100,7 +100,7 @@ public class BlackUser extends BlackObject implements User {
 		return language;
 	}
 	
-	public void setLanguage(Language language) {
+	public void setLanguage(final Language language) {
 		this.language = language;
 		save("language", language.getLanguageCode());
 	}
@@ -109,22 +109,20 @@ public class BlackUser extends BlackObject implements User {
 		return permissions;
 	}
 	
-	public boolean hasPermission(CustomPermission permission) {
-		for (CustomPermission perm : this.permissions) {
+	public boolean hasPermission(final CustomPermission permission) {
+		for (final CustomPermission perm : this.permissions)
 			if (perm.hasPermission(this, permission)) return true;
-		}
 		return false;
 	}
 	
-	public void addPermissions(CustomPermission... permissions) {
-		List<CustomPermission> perms = this.permissions;
-		for (CustomPermission perm : permissions) {
+	public void addPermissions(final CustomPermission... permissions) {
+		final List<CustomPermission> perms = this.permissions;
+		for (final CustomPermission perm : permissions)
 			if (!perms.contains(perm)) perms.add(perm);
-		}
 		setPermissions(perms);
 	}
 	
-	public void setPermissions(List<CustomPermission> permissions) {
+	public void setPermissions(final List<CustomPermission> permissions) {
 		this.permissions = permissions;
 		save("permissions", permissions.stream().map(perm -> perm.name()).collect(Collectors.toList()));
 	}

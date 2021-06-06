@@ -103,7 +103,7 @@ public class BlackGuild extends BlackObject implements Guild {
 			return null;
 		try {
 			return guilds.get(guild);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (!(e instanceof IllegalStateException))
 				e.printStackTrace();
 			return null;
@@ -161,7 +161,7 @@ public class BlackGuild extends BlackObject implements Guild {
 				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
 			else 
 				this.disabledCommands = new ArrayList<>();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -171,7 +171,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("guildlanguage")
-	public void setLanguage(Language language) {
+	public void setLanguage(final Language language) {
 		this.language = language;
 		save("language", language.getLanguageCode());
 	}
@@ -180,7 +180,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return this.guildType;
 	}
 	
-	public void setGuildType(GuildType type) {
+	public void setGuildType(final GuildType type) {
 		this.guildType = type;
 		save("guildtype", type.name());
 	}
@@ -194,7 +194,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("prefix")
-	public void setPrefix(String prefix) {
+	public void setPrefix(final String prefix) {
 		this.prefix = prefix;
 		save("prefix", prefix);
 	}
@@ -204,7 +204,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("joinmessage")
-	public void setJoinMessage(String newMessage) {
+	public void setJoinMessage(final String newMessage) {
 		this.joinMessage = newMessage;
 		save("joinmessage", this.joinMessage);
 	}
@@ -214,7 +214,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("joinchannel")
-	public void setJoinChannel(long joinChannel) {
+	public void setJoinChannel(final long joinChannel) {
 		this.joinChannel = joinChannel;
 		if (joinChannel == -1)
 			clear("joinchannel");
@@ -226,7 +226,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("leavemessage")
-	public void setLeaveMessage(String leaveMessage) {
+	public void setLeaveMessage(final String leaveMessage) {
 		this.leaveMessage = leaveMessage;
 		save("leavemessage", leaveMessage);
 	}
@@ -236,7 +236,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("leavechannel")
-	public void setLeaveChannel(long leaveChannel) {
+	public void setLeaveChannel(final long leaveChannel) {
 		this.leaveChannel = leaveChannel;
 		if (leaveChannel == -1)
 			clear("leavechannel");
@@ -248,31 +248,30 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("disabledcommands")
-	public void setDisabledCommands(Object[] disabledCommands) {
+	public void setDisabledCommands(final Object[] disabledCommands) {
 		this.setDisabledCommands(Arrays.asList(disabledCommands).stream()
-				.map(cmd -> CommandBase.commands.get((String) cmd)).collect(Collectors.toList()));
+				.map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList()));
 	}
 
-	public void setDisabledCommands(Command[] disabledCommands) {
+	public void setDisabledCommands(final Command[] disabledCommands) {
 		this.setDisabledCommands(Arrays.asList(disabledCommands));
 	}
 
-	public void setDisabledCommands(List<Command> disabledCommands) {
+	public void setDisabledCommands(final List<Command> disabledCommands) {
 		this.disabledCommands = disabledCommands;
 		saveList("disabledCommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
 	}
 	
-	public boolean isCommandActivated(Command cmd) {
+	public boolean isCommandActivated(final Command cmd) {
 		return !this.disabledCommands.contains(cmd);
 	}
 	
-	public boolean setCommandActivated(Command cmd, boolean activated) {
+	public boolean setCommandActivated(final Command cmd, final boolean activated) {
 		if  (!cmd.isToggleable()) return false;
-		if (disabledCommands.contains(cmd) && activated) {
+		if (disabledCommands.contains(cmd) && activated)
 			disabledCommands.remove(cmd);
-		} else if (activated && !disabledCommands.contains(cmd)) {
+		else if (activated && !disabledCommands.contains(cmd))
 			disabledCommands.add(cmd);
-		}
 		setDisabledCommands(this.disabledCommands);
 		return true;
 	}
@@ -282,7 +281,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@DashboardValue("antispoilertype")
-	public void setAntiSpoilerType(AntiSpoilerType antiSpoilerType) {
+	public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 		this.antiSpoilerType = antiSpoilerType;
 		save("antiSpoiler", antiSpoilerType.name());
 	}
@@ -291,7 +290,7 @@ public class BlackGuild extends BlackObject implements Guild {
 		return antiSwearType;
 	}
 
-	public void setAntiSwearType(AntiSwearType antiSwearType) {
+	public void setAntiSwearType(final AntiSwearType antiSwearType) {
 		this.antiSwearType = antiSwearType;
 		save("antiSwear", antiSwearType.name());
 	}
@@ -300,17 +299,17 @@ public class BlackGuild extends BlackObject implements Guild {
 		return antiSwearWhitelist;
 	}
 	
-	public void setAntiSwearWhitelist(List<String> antiSwearWhitelist) {
+	public void setAntiSwearWhitelist(final List<String> antiSwearWhitelist) {
 		this.antiSwearWhitelist = antiSwearWhitelist;
 		saveAntiSwearWhitelist();
 	}
 	
-	public void addToAntiSwearWhitelist(String toAdd) {
+	public void addToAntiSwearWhitelist(final String toAdd) {
 		this.antiSwearWhitelist.add(toAdd);
 		saveAntiSwearWhitelist();
 	}
 	
-	public void removeFromAntiSwearWhitelist(String toRemove) {
+	public void removeFromAntiSwearWhitelist(final String toRemove) {
 		this.antiSwearWhitelist.remove(toRemove);
 		saveAntiSwearWhitelist();
 	}
@@ -324,7 +323,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 	
 	@DashboardValue(value = "suggestionschannel", channelSelector = true)
-	public void setSuggestionsChannel(long suggestionsChannel) {
+	public void setSuggestionsChannel(final long suggestionsChannel) {
 		this.suggestionsChannel = suggestionsChannel;
 		save("suggestionschannel", suggestionsChannel);
 	}
@@ -333,17 +332,17 @@ public class BlackGuild extends BlackObject implements Guild {
 		return selfBlackMember;
 	}
 	
-	public void removeAutoRole(long roleId) {
+	public void removeAutoRole(final long roleId) {
 		this.autoRoles.remove(roleId);
 		saveAutoRoles();
 	}
 	
-	public void addAutoRole(long roleId) {
+	public void addAutoRole(final long roleId) {
 		if (!this.autoRoles.contains(roleId)) this.autoRoles.add(roleId);
 		saveAutoRoles();
 	}
 	
-	public void setAutoRoles(List<Long> autoRoles) {
+	public void setAutoRoles(final List<Long> autoRoles) {
 		this.autoRoles = autoRoles;
 		saveAutoRoles();
 	}
@@ -1148,22 +1147,22 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 
 	@Override
-	public ChannelAction<TextChannel> createTextChannel(String name, Category parent) {
+	public ChannelAction<TextChannel> createTextChannel(final String name, final Category parent) {
 		return this.guild.createTextChannel(name, parent);
 	}
 
 	@Override
-	public ChannelAction<VoiceChannel> createVoiceChannel(String name, Category parent) {
+	public ChannelAction<VoiceChannel> createVoiceChannel(final String name, final Category parent) {
 		return this.guild.createVoiceChannel(name, parent);
 	}
 
 	@Override
-	public CategoryOrderAction modifyTextChannelPositions(Category category) {
+	public CategoryOrderAction modifyTextChannelPositions(final Category category) {
 		return this.guild.modifyTextChannelPositions(category);
 	}
 
 	@Override
-	public CategoryOrderAction modifyVoiceChannelPositions(Category category) {
+	public CategoryOrderAction modifyVoiceChannelPositions(final Category category) {
 		return this.guild.modifyVoiceChannelPositions(category);
 	}
 

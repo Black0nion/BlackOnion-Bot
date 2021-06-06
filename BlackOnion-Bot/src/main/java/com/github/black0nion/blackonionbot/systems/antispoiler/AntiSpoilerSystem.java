@@ -25,14 +25,14 @@ public class AntiSpoilerSystem {
 	 * @param event
 	 * @return if the message contained a spoiler
 	 */
-	public static boolean removeSpoilers(CommandEvent event) {
+	public static boolean removeSpoilers(final CommandEvent event) {
 		final BlackGuild guild = event.getGuild();
 		final BlackMessage msg = event.getMessage();
 		final String message = msg.getContentRaw();
 		final BlackUser author = event.getUser();
 		final TextChannel channel = event.getChannel();
 		String newMessage = message;
-		AntiSpoilerType type = guild.getAntiSpoilerType();
+		final AntiSpoilerType type = guild.getAntiSpoilerType();
 		
 		if (type != OFF) {
 			long count = message.chars().filter(c -> c == '|').count();
@@ -53,44 +53,42 @@ public class AntiSpoilerSystem {
 			
 			final String finalNewMessage = newMessage;
 			
-			if (type == REPLACE) {
+			if (type == REPLACE)
 				try {
 					channel.retrieveWebhooks().queue(webhooks -> {
 						try {
 						Webhook webhook;
 	
-						if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
+						if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);}))
 							webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
-						} else {
+						else
 							webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSpoilerSystem.class.getResourceAsStream("/logo.png"))).submit().join();
-						}
 						
-						WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+						final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
 						clientBuilder.setThreadFactory((job) -> {
-							Thread thread = new Thread(job);
+							final Thread thread = new Thread(job);
 							thread.setName("ContentModerator");
 							thread.setDaemon(true);
 							return thread;
 						});
 						
-						WebhookClient client = clientBuilder.build();
-						WebhookMessageBuilder builder = new WebhookMessageBuilder();
+						final WebhookClient client = clientBuilder.build();
+						final WebhookMessageBuilder builder = new WebhookMessageBuilder();
 						builder.setUsername(author.getName() + "#" + author.getDiscriminator());
 						builder.setContent(finalNewMessage);
 						builder.setAvatarUrl(author.getAvatarUrl());
 						client.send(builder.build());
 						client.close();
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							e.printStackTrace();
 						}
 					});
 					return true;
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
-			} else {
+			else
 				channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
-			}
 		}
 		return false;
 	}

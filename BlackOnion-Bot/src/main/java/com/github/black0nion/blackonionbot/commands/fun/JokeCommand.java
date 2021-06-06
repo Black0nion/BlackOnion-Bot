@@ -23,17 +23,17 @@ public class JokeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		try {
 			Unirest.setTimeouts(0, 0);
-			Language lang = cmde.getLanguage();
+			final Language lang = cmde.getLanguage();
 			String langString = null;
 			if (Utils.equalsOneIgnoreCase(lang.getLanguageCode(), "de", "en", "cs", "es", "fr", "pt"))
 				langString = "&lang=" + lang.getLanguageCode().toLowerCase();
-			HttpResponse<String> response = Unirest.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langString != null ? langString : "")).asString();
-			JSONObject object = new JSONObject(response.getBody());
+			final HttpResponse<String> response = Unirest.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langString != null ? langString : "")).asString();
+			final JSONObject object = new JSONObject(response.getBody());
 			cmde.success("Joke", "https://jokeapi.dev", object.getString("setup"), object.getString("delivery"));
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			cmde.exception();
 			ex.printStackTrace();
 		}

@@ -12,7 +12,7 @@ public class TicTacToePlayer {
 	public TicTacToePlayer() {
 	}
 	
-	public TicTacToePlayer(User user) {
+	public TicTacToePlayer(final User user) {
 		this.user = user;
 	}
 	

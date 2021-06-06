@@ -12,7 +12,7 @@ public class CachedGuildInfo {
 	List<Member> members;
 	Guild guild;
 	
-	public CachedGuildInfo(Guild guild) {
+	public CachedGuildInfo(final Guild guild) {
 		this.refreshDate = new Date();
 		this.guild = guild;
 		this.members.addAll(guild.getMembers());

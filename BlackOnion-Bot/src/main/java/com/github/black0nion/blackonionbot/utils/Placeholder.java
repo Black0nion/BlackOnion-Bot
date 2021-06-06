@@ -14,20 +14,20 @@ package com.github.black0nion.blackonionbot.utils;
  */
 public class Placeholder {
 	
-	private String placeholder;
-	private String value;
+	private final String placeholder;
+	private final String value;
 	
-	public Placeholder(String placeholder, String value) {
+	public Placeholder(final String placeholder, final String value) {
 		this.placeholder = "%" + placeholder + "%";
 		this.value = value;
 	}
 	
-	public Placeholder(String placeholder, Object value) {
+	public Placeholder(final String placeholder, final Object value) {
 		this.placeholder = "%" + placeholder + "%";
 		this.value = value.toString();
 	}
 	
-	public String process(String input) {
+	public String process(final String input) {
 		return input.replace(placeholder, value.toString());
 	}
 }

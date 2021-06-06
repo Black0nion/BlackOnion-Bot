@@ -18,7 +18,7 @@ public class Trio<T, U, V> {
 	private U second;
 	private V third;
 	
-	public Trio(T first, U second, V third) {
+	public Trio(final T first, final U second, final V third) {
 		this.first = first;
 		this.second = second;
 		this.third = third;
@@ -34,7 +34,7 @@ public class Trio<T, U, V> {
 	/**
 	 * @param first the first to set
 	 */
-	public void setFirst(T first) {
+	public void setFirst(final T first) {
 		this.first = first;
 	}
 	
@@ -48,7 +48,7 @@ public class Trio<T, U, V> {
 	/**
 	 * @param second the second to set
 	 */
-	public void setSecond(U second) {
+	public void setSecond(final U second) {
 		this.second = second;
 	}
 	
@@ -62,7 +62,7 @@ public class Trio<T, U, V> {
 	/**
 	 * @param third the third to set
 	 */
-	public void setThird(V third) {
+	public void setThird(final V third) {
 		this.third = third;
 	}
 }

@@ -28,18 +28,18 @@ public class IpLocationCommand extends Command {
 	private static final InetAddressValidator validator = InetAddressValidator.getInstance();
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 			if (!validator.isValid(args[1])) {
 				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("notavalidip", "pleaseentervalidip", false).build()).queue();
 				return;
 			}
-			MessageAction action = message.reply(cmde.loading().build());
+			final MessageAction action = message.reply(cmde.loading().build());
 			action.queue(msg -> {				
 				try {
 					Unirest.setTimeouts(0, 0);
-					HttpResponse<String> response = Unirest.get("https://ipapi.co/" + args[1] + "/json/").asString();
-					JSONObject object = new JSONObject(response.getBody());
-					if (object.has("error") && object.getBoolean("error")) {
+					final HttpResponse<String> response = Unirest.get("https://ipapi.co/" + args[1] + "/json/").asString();
+					final JSONObject object = new JSONObject(response.getBody());
+					if (object.has("error") && object.getBoolean("error"))
 						if (object.getBoolean("reserved")) {
 							cmde.error("ipnotpublic", "pleaseentervalidip");
 							return;
@@ -47,9 +47,8 @@ public class IpLocationCommand extends Command {
 							cmde.sendPleaseUse();
 							return;
 						}
-					}
 					msg.editMessage(cmde.success().setTitle("IP Geolocation", "https://ipapi.co").addField(object.getString("city") + ", " + object.getString("region") + " (" + object.getString("region_code") + ", " + object.getString("country") + ")", object.getString("timezone"), false).build()).queue();
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					ex.printStackTrace();
 					cmde.exception();
 				}

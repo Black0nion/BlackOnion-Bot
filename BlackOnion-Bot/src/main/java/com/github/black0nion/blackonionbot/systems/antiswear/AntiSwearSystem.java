@@ -32,7 +32,7 @@ public class AntiSwearSystem {
 	
 	public static int profanityFilteredLastTenSecs = 0;
 	
-	public static boolean check(BlackGuild guild, BlackMember author, BlackMessage message, TextChannel channel) {
+	public static boolean check(final BlackGuild guild, final BlackMember author, final BlackMessage message, final TextChannel channel) {
 		final String messageContent = message.getContentRaw();
 		final BlackUser user = author.getBlackUser();
 		if (user.isBot()) return false;
@@ -55,13 +55,13 @@ public class AntiSwearSystem {
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention())))) return false;
 			//Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
-			HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True")
+			final HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True")
 			  .header("Content-Type", "text/plain")
 			  .header("Ocp-Apim-Subscription-Key", Bot.getCredentialsManager().getString("content_moderator_key"))
 			  .body(messageContent)
 			  .asString();
 	
-			JSONObject responseJson = new JSONObject(response.getBody());
+			final JSONObject responseJson = new JSONObject(response.getBody());
 			// check for profanity
 			if (responseJson.has("Terms")) {
 				// this will happen if it doesn't contain any profanity
@@ -77,7 +77,7 @@ public class AntiSwearSystem {
 						
 						if (Utils.handleRights(guild, user, channel, Permission.MANAGE_WEBHOOKS)) return true;
 						
-						WebhookMessageBuilder builder = new WebhookMessageBuilder();
+						final WebhookMessageBuilder builder = new WebhookMessageBuilder();
 						final JSONArray terms = responseJson.getJSONArray("Terms");
 						
 						String newMessage = messageContent;
@@ -95,36 +95,34 @@ public class AntiSwearSystem {
 							try {
 								Webhook webhook;
 								
-								if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);})) {
+								if (webhooks.stream().anyMatch(tempWebhook -> {if (tempWebhook == null) return false; else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);}))
 									webhook = webhooks.stream().filter(tempWebhook -> {return tempWebhook.getOwner().getIdLong() == BotInformation.botId;}).findFirst().get();
-								} else {
+								else
 									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSwearSystem.class.getResourceAsStream("logo.png"))).submit().join();
-								}
 								
-								WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+								final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
 								clientBuilder.setThreadFactory((job) -> {
-									Thread thread = new Thread(job);
+									final Thread thread = new Thread(job);
 									thread.setName("ContentModerator");
 									thread.setDaemon(true);
 									return thread;
 								});
 								
-								WebhookClient client = clientBuilder.build();
+								final WebhookClient client = clientBuilder.build();
 								client.send(builder.build());
 								client.close();
-							} catch (Exception ex) {
+							} catch (final Exception ex) {
 								ex.printStackTrace();
 							}
 						});
-					} else {
+					} else
 						channel.sendMessage(EmbedUtils.getErrorEmbed(user, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
-					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 				return true;
 			} else throw new RuntimeException("Some error happened while contacting the Microsoft API. Response: \n" + response.getBody());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return false;

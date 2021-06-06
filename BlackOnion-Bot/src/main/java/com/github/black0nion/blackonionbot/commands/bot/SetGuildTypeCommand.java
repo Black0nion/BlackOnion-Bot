@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -30,11 +27,11 @@ public class SetGuildTypeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		if (!Utils.isLong(args[1])) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		if (!Utils.isLong(args[1]))
 			cmde.error("notanumber", "inputnumber");
-		} else {
-			Guild mentionedGuild = e.getJDA().getGuildById(Long.parseLong(args[1]));
+		else {
+			final Guild mentionedGuild = e.getJDA().getGuildById(Long.parseLong(args[1]));
 			final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);
 			if (mentionedBlackGuild != null) {
 				final GuildType parsedGuildType = GuildType.parse(args[2].toUpperCase());
@@ -43,14 +40,12 @@ public class SetGuildTypeCommand extends Command {
 					cmde.success("guildtypeset", "guildtypesetto", new Placeholder("guild", mentionedBlackGuild.getName() + " (G:" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
 				} else {
 					String validGuildTypes = "";
-					for (GuildType type : GuildType.values()) {
+					for (final GuildType type : GuildType.values())
 						validGuildTypes += "\n- " + type.name();
-					}
 					cmde.error("guildtypenotfound", "validguildtypes", new Placeholder("guildtypes", "```" + validGuildTypes + "```"));
 				}
-			} else {
+			} else
 				cmde.error("notfound", "thisguildnotfound");
-			}
 		}
 	}
 }

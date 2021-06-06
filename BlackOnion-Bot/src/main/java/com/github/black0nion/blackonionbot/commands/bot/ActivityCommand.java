@@ -33,7 +33,7 @@ public class ActivityCommand extends Command {
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		message.delete().queue();
 		final String activityType = args[1].toLowerCase();
 		
@@ -51,13 +51,13 @@ public class ActivityCommand extends Command {
 		
 		final String status = String.join(" ", Utils.subArray(args, 2));
 		
-		if (activityType.contains("playing")) {
+		if (activityType.contains("playing"))
 			e.getJDA().getPresence().setActivity(Activity.playing(status));
-		} else if (activityType.contains("watching")) {
+		else if (activityType.contains("watching"))
 			e.getJDA().getPresence().setActivity(Activity.watching(status));
-		} else if (activityType.contains("listening")) {
+		else if (activityType.contains("listening"))
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
-		} else {
+		else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
@@ -70,15 +70,14 @@ public class ActivityCommand extends Command {
 		return getActivity(ValueManager.getString("activityType"), ValueManager.getString("activity"));
 	}
 
-	public static Activity getActivity(String status, String activity) {
-		if(status.contains("playing")) {
+	public static Activity getActivity(final String status, final String activity) {
+		if(status.contains("playing"))
 			return Activity.playing(activity);
-		} else if (status.contains("watching")) {
+		else if (status.contains("watching"))
 			return Activity.watching(activity);
-		} else if (status.contains("listening")) {
+		else if (status.contains("listening"))
 			return Activity.listening(activity);
-		} else {
+		else
 			return null;
-		}
 	}
 }
