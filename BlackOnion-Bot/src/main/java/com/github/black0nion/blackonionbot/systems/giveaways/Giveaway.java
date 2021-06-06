@@ -11,7 +11,7 @@ public class Giveaway {
 	private final String item;
 	private final int winners;
 	
-	public Giveaway(Date endDate, long messageId, long channelId, long createrId, long guildId, String item, int winners) {
+	public Giveaway(final Date endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
 		this.endDate = endDate;
 		this.messageId = messageId;
 		this.channelId = channelId;

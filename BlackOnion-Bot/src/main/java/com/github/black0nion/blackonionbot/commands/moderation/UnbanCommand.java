@@ -26,7 +26,7 @@ public class UnbanCommand extends Command {
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
 		if (mentionedMembers.size() != 0) {
 			final BlackUser bannedUser = mentionedMembers.get(0).getBlackUser();
@@ -34,7 +34,7 @@ public class UnbanCommand extends Command {
 				cmde.success("uban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + ban.getReason() + "**"));
 			});
 			guild.unban(bannedUser).queue();
-		} else {
+		} else
 			try {
 				if (!Utils.isLong(args[1])) {
 					cmde.sendPleaseUse();
@@ -48,7 +48,6 @@ public class UnbanCommand extends Command {
 				}, fail -> {
 					cmde.error("usernotfound", "tagornameuser");
 				});
-			} catch (Exception ignored) {}
-		}
+			} catch (final Exception ignored) {}
 	}
 }

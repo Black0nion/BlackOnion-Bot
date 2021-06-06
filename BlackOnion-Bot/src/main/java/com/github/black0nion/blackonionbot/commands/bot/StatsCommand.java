@@ -30,11 +30,11 @@ public class StatsCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		try {
-	        long diff = System.currentTimeMillis() - Bot.startTime;
+	        final long diff = System.currentTimeMillis() - Bot.startTime;
 			
-			EmbedBuilder builder = cmde.success()
+			final EmbedBuilder builder = cmde.success()
 				.setTitle("Bot Stats")
 				.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 				.addField("prefix", "``" + guild.getPrefix() + "``", true)
@@ -53,7 +53,7 @@ public class StatsCommand extends Command {
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
 			cmde.reply(builder);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	}

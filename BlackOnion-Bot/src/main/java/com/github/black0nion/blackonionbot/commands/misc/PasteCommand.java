@@ -29,7 +29,7 @@ public class PasteCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String bodyRaw = String.join(" ", Utils.removeFirstArg(args)).trim();
 		// broken lol
 		final Matcher m = Pattern.compile("\\s*```([a-z]+\\n)?\\s*([\\s\\S]*?)\\s*```\\s*").matcher(bodyRaw);
@@ -38,11 +38,11 @@ public class PasteCommand extends Command {
 		m.find();
 		try {
 			language = m.group(1);
-		} catch (Exception ignored) {  }
+		} catch (final Exception ignored) {  }
 		
 		try {
 			body = m.group(2);
-		} catch (Exception ignored) { body = bodyRaw; }
+		} catch (final Exception ignored) { body = bodyRaw; }
 		
 		final String finalLanguage = language;;
 		final String finalBody = body;
@@ -54,9 +54,9 @@ public class PasteCommand extends Command {
 				
 				if (finalLanguage != null) headers.header("language", finalLanguage);
 				
-				HttpResponse<String> response = headers.body(finalBody).asString();
+				final HttpResponse<String> response = headers.body(finalBody).asString();
 				
-				JSONObject obj = new JSONObject(response.getBody());
+				final JSONObject obj = new JSONObject(response.getBody());
 				
 				final EmbedBuilder builder = cmde.success()
 						.setTitle("pastecreated", "https://paste.sv-studios.net/" + obj.getString("key"))
@@ -70,7 +70,7 @@ public class PasteCommand extends Command {
 				author.openPrivateChannel().queue(ch -> {
 					ch.sendMessage(builder.appendDescription("\n" + cmde.getTranslation("yourcode").replace("%code%", obj.getString("deleteSecret"))).build()).queue();
 				});
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				cmde.exception();
 			}
 		});

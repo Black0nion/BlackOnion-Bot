@@ -17,13 +17,13 @@ public abstract class BlackObject {
 	abstract MongoCollection<Document> getCollection();
 	
 	@Nonnull
-	public final <T> T gOS(String key, T value, T defaultValue) {
+	public final <T> T gOS(final String key, final T value, final T defaultValue) {
 		if (value == null) save(key, defaultValue);
 		return (value != null ? value : defaultValue);
 	}
 	
 	@Nonnull
-	public final <T> T gOD(T value, T defaultValue) {
+	public final <T> T gOD(final T value, final T defaultValue) {
 		return (value != null ? value : defaultValue);
 	}
 	
@@ -40,34 +40,34 @@ public abstract class BlackObject {
 		return getCollection().find().into(new ArrayList<>());
 	}
 	
-	public <T> void saveList(String key, List<T> value) {
+	public <T> void saveList(final String key, final List<T> value) {
 		save(new Document(key, value));
 	}
 	
-	public <T> T get(String key, Class<T> clazz) {
+	public <T> T get(final String key, final Class<T> clazz) {
 		return getConfig().get(key, clazz);
 	}
 	
-	public <T> void save(String key, T value) {
+	public <T> void save(final String key, final T value) {
 		save(new Document(key, value));
 	}
 	
-	private void save(Document doc) {
+	private void save(final Document doc) {
 		if (getCollection().find(getIdentifier()).first() == null) {
-			Document newDoc = getIdentifier();
+			final Document newDoc = getIdentifier();
 			newDoc.putAll(doc);
 			getCollection().insertOne(newDoc);
 		} else
 			getCollection().updateOne(getIdentifier(), new Document("$set", doc));
 	}
 	
-	public void clear(String... keys) {
-		Document doc = new Document();
-		for (String key : keys) doc.put(key, "");
+	public void clear(final String... keys) {
+		final Document doc = new Document();
+		for (final String key : keys) doc.put(key, "");
 		clear(doc);
 	}
 	
-	public void clear(Document doc) {
+	public void clear(final Document doc) {
 		getCollection().updateOne(getIdentifier(), new Document("$unset", doc));
 	}
 }

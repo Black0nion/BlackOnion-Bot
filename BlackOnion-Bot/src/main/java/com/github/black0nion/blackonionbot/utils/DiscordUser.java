@@ -9,7 +9,7 @@ public class DiscordUser {
 	String locale;
 	boolean mfa_enabled;
 	
-	public DiscordUser(long userId, String userName, String avatar, String discriminator, String locale, boolean mfa_enabled) {
+	public DiscordUser(final long userId, final String userName, final String avatar, final String discriminator, final String locale, final boolean mfa_enabled) {
 		this.userId = userId;
 		this.userName = userName;
 		this.avatar = avatar;

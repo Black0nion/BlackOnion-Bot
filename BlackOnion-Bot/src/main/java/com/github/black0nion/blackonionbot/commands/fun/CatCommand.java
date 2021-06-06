@@ -30,11 +30,11 @@ public class CatCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		String breed = (args.length >= 2 ? args[1] : null);
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final String breed = (args.length >= 2 ? args[1] : null);
 		try {
 			Unirest.setTimeouts(0, 0);
-			HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/images/search" + (breed != null ? "?breed_ids=" + breed : ""))
+			final HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/images/search" + (breed != null ? "?breed_ids=" + breed : ""))
 			  .header("Content-Type", "application/json")
 			  .asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
@@ -45,7 +45,7 @@ public class CatCommand extends Command {
 			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());
 			final JSONObject responseAsJSON = responseAsJSONArray.getJSONObject(0);
 			cmde.reply(cmde.success().setTitle("UwU").setImage(responseAsJSON.getString("url")));
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 			cmde.exception();
 			return;

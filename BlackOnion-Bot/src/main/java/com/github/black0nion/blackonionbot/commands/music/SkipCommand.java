@@ -22,8 +22,8 @@ public class SkipCommand extends Command {
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		GuildVoiceState state = guild.getSelfMember().getVoiceState();
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
 		if (state != null && state.getChannel() != null) {
 			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel());
 			final AudioPlayer player = musicManager.audioPlayer;
@@ -35,8 +35,7 @@ public class SkipCommand extends Command {
 			
 			musicManager.scheduler.nextTrack();
 			cmde.success("songskipped", "songgotskipped", new Placeholder("song", musicManager.audioPlayer.getPlayingTrack().getInfo().title));
-		} else {
+		} else
 			cmde.error("notconnected", "startmusictostop");
-		}
 	}
 }

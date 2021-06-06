@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.github.black0nion.blackonionbot.misc;
 
 import java.lang.annotation.ElementType;

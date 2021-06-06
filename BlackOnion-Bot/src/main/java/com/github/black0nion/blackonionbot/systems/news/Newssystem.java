@@ -16,7 +16,7 @@ public class Newssystem {
 	public static void init() {
 		Bot.executor.submit(() -> {
 			final MongoCollection<Document> collection = MongoDB.generalDatabase.getCollection("News");
-			List<Document> postsRaw = collection.find().into(new ArrayList<>());
+			final List<Document> postsRaw = collection.find().into(new ArrayList<>());
 			
 			postsRaw.forEach(document -> {
 				posts.add(new Newspost(document.getString("title"), document.getString("content").replace("#", ""), document.getDate("date")));

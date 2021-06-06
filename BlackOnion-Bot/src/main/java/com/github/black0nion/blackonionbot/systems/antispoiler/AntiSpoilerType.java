@@ -19,7 +19,7 @@ public enum AntiSpoilerType {
 	
 	private String description;
 	
-	private AntiSpoilerType(String description) {
+	private AntiSpoilerType(final String description) {
 		this.description = description;
 	}
 	
@@ -31,7 +31,7 @@ public enum AntiSpoilerType {
 		return description;
 	}
 	
-	public static AntiSpoilerType parse(String input) {
+	public static AntiSpoilerType parse(final String input) {
 		if (input == null || input == "") return null;
 		return valueOf(input.toUpperCase());
 	}

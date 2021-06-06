@@ -20,7 +20,7 @@ public class HandRaiseSystem extends ListenerAdapter {
 	public static HashMap<String, String> nicked = new HashMap<>();
 	
 	@Override
-	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
+	public void onGuildMemberUpdateNickname(final GuildMemberUpdateNicknameEvent e) {
 		if (nicked.containsKey(e.getUser().getId())) {
 			e.getMember().modifyNickname(e.getOldNickname()).queue();
 			e.getUser().openPrivateChannel().queue((channel) -> {
@@ -30,10 +30,10 @@ public class HandRaiseSystem extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
-		Guild guild = e.getGuild();
-		TextChannel channel = e.getChannel();
-		String message = e.getMessageId();
+	public void onGuildMessageReactionAdd(final GuildMessageReactionAddEvent e) {
+		final Guild guild = e.getGuild();
+		final TextChannel channel = e.getChannel();
+		final String message = e.getMessageId();
 		
 		if (guild.getId().equals(guildID) && channel.getId().equals(channelID) && message.equals(messageID) && !e.getMember().isOwner() && !e.getMember().getId().equals(e.getJDA().getSelfUser().getId())) {
 			final String previousNick = e.getMember().getNickname();
@@ -45,10 +45,10 @@ public class HandRaiseSystem extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
-		Guild guild = e.getGuild();
-		TextChannel channel = e.getChannel();
-		String message = e.getMessageId();
+	public void onGuildMessageReactionRemove(final GuildMessageReactionRemoveEvent e) {
+		final Guild guild = e.getGuild();
+		final TextChannel channel = e.getChannel();
+		final String message = e.getMessageId();
 		
 		if (guild.getId().equals(guildID) && channel.getId().equals(channelID) && message.equals(messageID) && nicked.containsKey(e.getUserId())) {
 			final String previousName = nicked.get(e.getUserId());

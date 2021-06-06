@@ -10,17 +10,17 @@ import com.google.common.io.Files;
 
 public class FileUtils {
 	
-	public static String readFromFile(File file) {
+	public static String readFromFile(final File file) {
 		try {
 			return String.join(" ", Files.asCharSource(file, StandardCharsets.UTF_8).readLines());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			if (!(e instanceof FileNotFoundException))
 				e.printStackTrace();
 		}
 		return null;
 	}
 	
-	public static void appendToFile(String fileName, String input) {
+	public static void appendToFile(final String fileName, final String input) {
 		try {
 			final File file = new File(fileName);
 			final File parentFile = file.getParentFile();
@@ -29,7 +29,7 @@ public class FileUtils {
 			if (!file.exists())
 				file.createNewFile();
 			Files.asCharSink(file, StandardCharsets.UTF_8, FileWriteMode.APPEND);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 		    e.printStackTrace();
 		}
 	}

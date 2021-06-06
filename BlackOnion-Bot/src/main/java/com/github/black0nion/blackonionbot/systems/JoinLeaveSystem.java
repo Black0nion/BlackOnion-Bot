@@ -44,40 +44,40 @@ public class JoinLeaveSystem extends ListenerAdapter {
     	try {
         	defaultBackGround = ImageIO.read(getClass().getResource("/background.png"));
         	return;
-    	} catch (Exception e) {
+    	} catch (final Exception e) {
     		e.printStackTrace();
     	}
     	defaultBackGround = null;
 	}
     
 	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+	public void onGuildMemberJoin(final GuildMemberJoinEvent event) {
 		try {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
 			final BlackUser author = BlackUser.from(event.getUser());
-			long id = guild.getJoinChannel();
+			final long id = guild.getJoinChannel();
 			if (id == -1) return;
-			TextChannel channel = guild.getTextChannelById(id);
+			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
 			channel.sendMessage(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "welcome.png").queue();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Override
-	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+	public void onGuildMemberRemove(final GuildMemberRemoveEvent event) {
 		try {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
 			final BlackUser author = BlackUser.from(event.getUser());
-			long id = guild.getLeaveChannel();
+			final long id = guild.getLeaveChannel();
 			if (id == -1) return;
-			TextChannel channel = guild.getTextChannelById(id);
+			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
 			channel.sendMessage(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getName())).addFile(file, "goodbye.png").queue();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -86,7 +86,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	 * Called when the bot gets added to a new guild
 	 */
 	@Override
-	public void onGuildJoin(GuildJoinEvent event) {
+	public void onGuildJoin(final GuildJoinEvent event) {
 		Bot.executor.submit(() -> {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
 			final String prefix = guild.getPrefix();
@@ -99,7 +99,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				try {
 					final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
 					guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessage(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getName() + "(U:" + author.getId() + ")")), false).build()).queue();
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 				
@@ -118,7 +118,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildLeave(GuildLeaveEvent event) {
+	public void onGuildLeave(final GuildLeaveEvent event) {
 		Bot.executor.submit(() -> {
 			final Guild guild = event.getGuild();
 			Logger.logInfo("I got removed from the guild " + guild.getName() + "(G:" + guild.getId() + ")");
@@ -126,7 +126,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			try {
 				final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
 				guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessage(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -136,7 +136,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public static File generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
         final double separatorTransparency = 1;
 
-        BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
+        final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
 
         final Graphics2D innerBox = bufferedImage.createGraphics();
         try {
@@ -172,19 +172,18 @@ public class JoinLeaveSystem extends ListenerAdapter {
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
         newGraphics.setColor(Color.DARK_GRAY);
-        String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslation("welcome", user, guild) : LanguageSystem.getTranslation("goodbye", user, guild);
+        final String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslation("welcome", user, guild) : LanguageSystem.getTranslation("goodbye", user, guild);
         newGraphics.drawString(message, 205, 55);
         newGraphics.setFont(new Font("Arial", Font.BOLD, 80));
         newGraphics.setColor(textColor);
-        String userName = user.getName();
-        int width = newGraphics.getFontMetrics().stringWidth(userName);
+        final String userName = user.getName();
+        final int width = newGraphics.getFontMetrics().stringWidth(userName);
         newGraphics.drawString(userName, 190 + (500 - width) / 2, 145);
 
         final File file = new File("tmp/joinleave/" + user.getId() + ".png");
 
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
+        if (file.getParentFile() != null)
+			file.getParentFile().mkdirs();
 
         ImageIO.write(bufferedImage, "png", file);
 

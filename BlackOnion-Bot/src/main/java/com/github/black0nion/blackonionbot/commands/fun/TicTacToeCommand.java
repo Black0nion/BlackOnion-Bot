@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class TicTacToeCommand extends Command {
-	
+
 	public TicTacToeCommand() {
 		this.setCommand("tictactoe", "ttt")
 			.setSyntax("<@User / mention me to play against me!>")
@@ -35,7 +35,7 @@ public class TicTacToeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (message.getMentionedBlackUsers().size() != 0) {
 			final BlackUser challenged = message.getMentionedBlackUsers().get(0);
 			if (challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
@@ -53,13 +53,13 @@ public class TicTacToeCommand extends Command {
 					(event) -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), 
 					event -> {
 				  final BlackUser eventAuthor = BlackUser.from(event.getAuthor());
-				if (!eventAuthor.isBot() && eventAuthor.getId().equals(challenged.getId())) {
-				      if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
+				if (!eventAuthor.isBot() && eventAuthor.getId().equals(challenged.getId()))
+					if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 				    	  
 				    	  message.reply(EmbedUtils.getSuccessEmbed(eventAuthor, guild).addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 				    	  
 				    	  //ANGENOMMEN
-				    	  TicTacToe game = TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
+				    	  final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
 				    	  rerun(game, e.getChannel());
 				    	  return;
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
@@ -69,7 +69,6 @@ public class TicTacToeCommand extends Command {
 				    	  message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("challengedeclined", eventAuthor, guild), getTranslation("answerwithyes", eventAuthor, guild), false).build()).queue();
 				    	  return;
 				      }
-				  }
 				}, 1, TimeUnit.MINUTES, () -> message.reply(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("nousermentioned", author, guild), getTranslation("inputusertoplayagainst", author, guild), false).build()).queue();
@@ -77,7 +76,7 @@ public class TicTacToeCommand extends Command {
 		}
 	}
 	
-	public void rerun(TicTacToe game, TextChannel channel) {
+	public void rerun(final TicTacToe game, final TextChannel channel) {
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
 		CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, 
 	  			(answerEvent) -> answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && game.isPlayer(answerEvent.getAuthor().getId()),
@@ -95,7 +94,7 @@ public class TicTacToeCommand extends Command {
   						return;
   					} else if (game.isValidInput(msg)) {
 						Pair<Integer, Integer> coords = TicTacToe.getCoordinatesFromString(msg);
-	  					FieldType[][] temp = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
+	  					final FieldType[][] temp = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 	  					System.arraycopy(game.getField(), 0, temp, 0, game.getField().length);
 	  					
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
@@ -116,7 +115,7 @@ public class TicTacToeCommand extends Command {
 	  					if (game.getPlayerY().isBot()) {
 		  					try {
 								Thread.sleep(Bot.random.nextInt(1500) + 1000 * (game.getMoves() / 2 + 1));
-							} catch (InterruptedException ex) {
+							} catch (final InterruptedException ex) {
 								ex.printStackTrace();
 							}
 		  					
@@ -144,11 +143,11 @@ public class TicTacToeCommand extends Command {
 	  	);
 	}
 	
-	private boolean handleWin(TicTacToe game, Pair<Integer, Integer> coords) {
+	private boolean handleWin(final TicTacToe game, final Pair<Integer, Integer> coords) {
 		final FieldType firstWinner = game.getWinner(coords.getKey(), coords.getValue());
-		if (firstWinner == null) {
+		if (firstWinner == null)
 			return false;
-		} else if (firstWinner != FieldType.EMPTY) {
+		else if (firstWinner != FieldType.EMPTY) {
 			game.getMessage().editMessage(EmbedUtils.getSuccessEmbed().addField("WE HAVE A WINNER!", "And the winner is....\n" + Utils.removeMarkdown((firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())) + "!", false).build()).queue();
 			TicTacToeGameManager.deleteGame(game);
 			return true;

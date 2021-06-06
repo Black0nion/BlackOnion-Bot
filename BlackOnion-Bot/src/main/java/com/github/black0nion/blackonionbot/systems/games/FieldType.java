@@ -1,5 +1,5 @@
 package com.github.black0nion.blackonionbot.systems.games;
 
 public enum FieldType {
-	X, Y, EMPTY
+	X, O, EMPTY
 }

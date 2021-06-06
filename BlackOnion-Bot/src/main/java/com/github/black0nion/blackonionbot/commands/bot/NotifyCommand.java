@@ -23,16 +23,16 @@ public class NotifyCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (Bot.notifyStatusUsers.contains(author.getId())) {
 			Bot.notifyStatusUsers.remove(author.getId());
-			ArrayList<String> users = new ArrayList<String>();
+			final ArrayList<String> users = new ArrayList<String>();
 			users.addAll(ValueManager.getArrayAsList("notifyUsers"));
 			users.remove(author.getId());
 			ValueManager.save("notifyUsers", users);
 			Bot.notifyStatusUsers.remove(author.getId());
 		} else {
-			ArrayList<String> users = new ArrayList<String>();
+			final ArrayList<String> users = new ArrayList<String>();
 			users.addAll(ValueManager.getArrayAsList("notifyUsers"));
 			users.add(author.getId());
 			ValueManager.save("notifyUsers", users);

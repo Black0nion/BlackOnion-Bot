@@ -14,60 +14,60 @@ import com.google.gson.JsonElement;
 
 public class CustomManager {
 	private Document doc;
-	private File file;
+	private final File file;
 	
-	public CustomManager(String name) {
+	public CustomManager(final String name) {
 		file = new File("files", name + ".json");
 		file.getParentFile().mkdirs();
 		try {
 			file.createNewFile();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void save(String key, String value) {
+	public void save(final String key, final String value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 	
-	public Document save(String key, Number value) {
+	public Document save(final String key, final Number value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 		return doc;
 	}
 
-	public Document save(String key, Boolean value) {
+	public Document save(final String key, final Boolean value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 		return doc;
 	}
 
-	public Document save(String key, JsonElement value) {
+	public Document save(final String key, final JsonElement value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 		return doc;
 	}
 	
-	public Document save(String key, Document value) {
+	public Document save(final String key, final Document value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 		return doc;
 	}
 
-	public Document save(String key, Object value) {
+	public Document save(final String key, final Object value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 		return doc;
 	}
 	
-	public Document remove(String key) {
+	public Document remove(final String key) {
 		doc = Document.loadDocument(file);
 		doc.remove(key);
 		doc.saveAsFile(file);
@@ -79,47 +79,47 @@ public class CustomManager {
 		return doc.keys();
 	}
 	
-	public JsonElement get(String key) {
+	public JsonElement get(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.get(key);
 	}
 	
-	public String getString(String key) {
+	public String getString(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getString(key);
 	}
 	
-	public int getInt(String key) {
+	public int getInt(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getInt(key);
 	}
 	
-	public long getLong(String key) {
+	public long getLong(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getLong(key);
 	}
 	
-	public double getDouble(String key) {
+	public double getDouble(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getDouble(key);
 	}
 	
-	public float getFloat(String key) {
+	public float getFloat(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getFloat(key);
 	}
 		
-	public short getShort(String key) {
+	public short getShort(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getShort(key);
 	}
 	
-	public boolean getBoolean(String key) {
+	public boolean getBoolean(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getBoolean(key);
 	}
 
-	public <T> T getObject(String key, Class<T> c) {
+	public <T> T getObject(final String key, final Class<T> c) {
 		doc = Document.loadDocument(file);
 		return doc.getObject(key, c);
 	}
@@ -130,7 +130,7 @@ public class CustomManager {
 	 * @deprecated only use this if you need something other than in this wrapper because the other functions of the document is already in this wrapper, thats what it was written for<br/>
 	*/
 	@Deprecated
-	public Document getDocument(String key) {
+	public Document getDocument(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getDocument(key);
 	}
@@ -138,45 +138,45 @@ public class CustomManager {
 	/**
 	 * @deprecated THIS METHOD WILL WIPE OUT ALL DATA! USE CAREFULLY!
 	*/
+	@Deprecated
 	public void clear() {
 		doc = Document.loadDocument(file);
 		doc.clear();
 		doc.saveAsFile(file);
 	}
 	
-	public JsonArray getJsonArray(String key) {
+	public JsonArray getJsonArray(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getArray(key);
 	}
 	
-	public String[] getStringArray(String key) {
+	public String[] getStringArray(final String key) {
 		doc = Document.loadDocument(file);
-		List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<String>();
 		doc.getArray(key).forEach(entry -> {
 			list.add(entry.getAsString());
 		});
-		String[] array = new String[list.size()];
+		final String[] array = new String[list.size()];
 		return list.toArray(array);
 	}
 
-	public Number[] getNumberArray(String key) {
+	public Number[] getNumberArray(final String key) {
 		doc = Document.loadDocument(file);
-		List<Number> list = new ArrayList<Number>();
+		final List<Number> list = new ArrayList<Number>();
 		doc.getArray(key).forEach(entry -> {
 			list.add(entry.getAsNumber());
 		});
-		Number[] array = new Number[list.size()];
+		final Number[] array = new Number[list.size()];
 		return list.toArray(array);
 	}
 	
-	public List<String> getArrayAsList(String key) {
+	public List<String> getArrayAsList(final String key) {
 		doc = Document.loadDocument(file);
 		JsonArray array = new JsonArray();
 		array = doc.getArray(key);
-		List<String> list = new ArrayList<String>();
-		for(int i = 0; i < array.size(); i++){
-		    list.add(array.get(i).getAsString());
-		}
+		final List<String> list = new ArrayList<String>();
+		for(int i = 0; i < array.size(); i++)
+			list.add(array.get(i).getAsString());
 		return list;
 	}
 }

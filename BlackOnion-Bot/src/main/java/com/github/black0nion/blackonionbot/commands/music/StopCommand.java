@@ -21,7 +21,7 @@ public class StopCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
 		if (state != null && state.getChannel() != null) {
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
@@ -32,11 +32,9 @@ public class StopCommand extends Command {
 				e.getGuild().getAudioManager().closeAudioConnection();
 				
 				cmde.success("musicstopped", "leftvc");
-			} else {
+			} else
 				cmde.error("notinsamevc", "dontstopotherpplmusic");
-			}
-		} else {
+		} else
 			cmde.error("notconnected", "startmusictostop");
-		}
 	}
 }

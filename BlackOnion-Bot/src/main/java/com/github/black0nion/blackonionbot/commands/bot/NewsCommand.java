@@ -22,12 +22,12 @@ public class NewsCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		EmbedBuilder builder = cmde.success()
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final EmbedBuilder builder = cmde.success()
 				.setTitle("clickfornewspage", "https://www.black-onion.com/news/");
-		List<Newspost> news = Newssystem.posts.subList(0, (Newssystem.posts.size() <= 5 ? Newssystem.posts.size() : 5)); 
+		final List<Newspost> news = Newssystem.posts.subList(0, (Newssystem.posts.size() <= 5 ? Newssystem.posts.size() : 5)); 
 		for (int i = 0; i < news.size(); i++) {
-			Newspost post = news.get(i);
+			final Newspost post = news.get(i);
 			builder.addField(post.title, "`" + post.date + "`\n" + post.content + (i != news.size()-1 ? "\n​" : ""), false);
 		}
 		cmde.reply(builder);

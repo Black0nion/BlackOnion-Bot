@@ -23,7 +23,7 @@ public enum GuildType {
 	
 	private final int code;
 	
-	private GuildType(int code) {
+	private GuildType(final int code) {
 		this.code = code;
 	}
 	
@@ -35,7 +35,7 @@ public enum GuildType {
 	 * @param type the GuildType to compare to
 	 * @return if the current GuildType is higher than the argument
 	 */
-	public boolean higherThan(GuildType type) {
+	public boolean higherThan(final GuildType type) {
 		return this.getCode() > type.getCode();
 	}
 	
@@ -43,14 +43,14 @@ public enum GuildType {
 	 * @param type the GuildType to compare to
 	 * @return if the current GuildType is higher than or equal to the argument
 	 */
-	public boolean higherThanOrEqual(GuildType type) {
+	public boolean higherThanOrEqual(final GuildType type) {
 		return this.getCode() >= type.getCode();
 	}
 	
-	public static final GuildType parse(String input) {
+	public static final GuildType parse(final String input) {
 		try {
 			return valueOf(input.toUpperCase());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return null;
 		}
 	}

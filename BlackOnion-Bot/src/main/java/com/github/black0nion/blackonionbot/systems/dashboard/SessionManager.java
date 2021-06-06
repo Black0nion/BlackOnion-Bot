@@ -20,7 +20,7 @@ public class SessionManager {
 	public static void init() {
 		collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 		
-		for (Document doc : collection.find()) {
+		for (final Document doc : collection.find())
 			if (!doc.containsKey("sessionid"))
 				System.out.println("Error! Object with id " + doc.getObjectId("_id").toHexString() + " is invalid!");
 			else if (doc.containsKey("sessionid") && doc.containsKey("access_token") && doc.containsKey("refresh_token")) {
@@ -28,23 +28,21 @@ public class SessionManager {
 				if (info.getUser() == null) collection.deleteOne(new BasicDBObject().append("sessionid", doc.getString("sessionid")));
 			} else
 				DashboardSessionInformation.from(doc.getString("sessionid"));
-		}
 	}
 	
-	public static DashboardSessionInformation generateSession(Session session) {
+	public static DashboardSessionInformation generateSession(final Session session) {
 		final Document doc = MongoManager.getDocumentInCollection(collection, "sessionid", session.id());
 		
 		if (doc == null) {
 			MongoManager.insertOne(collection, new Document().append("sessionid", session.id()));
 			return DashboardSessionInformation.from(session.id());
-		} else if (doc.containsKey("access_token") && doc.containsKey("refresh_token")) {
+		} else if (doc.containsKey("access_token") && doc.containsKey("refresh_token"))
 			return DashboardSessionInformation.from(session.id(), doc.getString("access_token"), doc.getString("refresh_token"));
-		} else {
+		else
 			return DashboardSessionInformation.from(session.id());
-		}
 	}
 	
-	public static DashboardSessionInformation generateSession(Session session, String accessToken, String refreshToken) {
+	public static DashboardSessionInformation generateSession(final Session session, final String accessToken, final String refreshToken) {
 		if (MongoManager.getDocumentInCollection(collection, "sessionid", session.id()) == null)
 			MongoManager.insertOne(collection, new Document().append("sessionid", session.id()));
 		else
@@ -56,12 +54,12 @@ public class SessionManager {
 	}
 	
 	@Nullable
-	public static DashboardSessionInformation getSessionInformation(Session session) {
+	public static DashboardSessionInformation getSessionInformation(final Session session) {
 		return getSessionInformation(session.id());
 	}
 	
 	@Nullable
-	public static DashboardSessionInformation getSessionInformation(String sessionId) {
+	public static DashboardSessionInformation getSessionInformation(final String sessionId) {
 		return DashboardSessionInformation.get(sessionId);
 	}
 }

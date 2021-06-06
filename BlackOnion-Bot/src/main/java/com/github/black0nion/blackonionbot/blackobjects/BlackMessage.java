@@ -64,7 +64,7 @@ public class BlackMessage extends BlackObject implements Message {
 	public static BlackMessage from(@NotNull final Message message) {
 		try {
 			return messages.get(message);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -107,7 +107,7 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public void formatTo(Formatter arg0, int arg1, int arg2, int arg3) {
+	public void formatTo(final Formatter arg0, final int arg1, final int arg2, final int arg3) {
 		this.message.formatTo(arg0, arg1, arg2, arg3);
 	}
 
@@ -153,11 +153,11 @@ public class BlackMessage extends BlackObject implements Message {
 
 	@Override
 	@Deprecated
-	public List<Member> getMentionedMembers(Guild guild) {
+	public List<Member> getMentionedMembers(final Guild guild) {
 		return this.message.getMentionedMembers(guild);
 	}
 	
-	public List<BlackMember> getMentionedBlackMembers(Guild guild) {
+	public List<BlackMember> getMentionedBlackMembers(final Guild guild) {
 		return BlackMember.from(this.message.getMentionedMembers(guild));
 	}
 
@@ -172,12 +172,12 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public List<IMentionable> getMentions(MentionType... types) {
+	public List<IMentionable> getMentions(final MentionType... types) {
 		return this.message.getMentions(types);
 	}
 
 	@Override
-	public boolean isMentioned(IMentionable mentionable, MentionType... types) {
+	public boolean isMentioned(final IMentionable mentionable, final MentionType... types) {
 		return this.message.isMentioned(mentionable, types);
 	}
 
@@ -247,7 +247,7 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public boolean isFromType(ChannelType type) {
+	public boolean isFromType(final ChannelType type) {
 		return this.message.isFromType(type);
 	}
 
@@ -332,22 +332,22 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public MessageAction editMessage(CharSequence newContent) {
+	public MessageAction editMessage(final CharSequence newContent) {
 		return this.message.editMessage(newContent);
 	}
 
 	@Override
-	public MessageAction editMessage(MessageEmbed newContent) {
+	public MessageAction editMessage(final MessageEmbed newContent) {
 		return this.message.editMessage(newContent);
 	}
 
 	@Override
-	public MessageAction editMessageFormat(String format, Object... args) {
+	public MessageAction editMessageFormat(final String format, final Object... args) {
 		return this.message.editMessageFormat(format, args);
 	}
 
 	@Override
-	public MessageAction editMessage(Message newContent) {
+	public MessageAction editMessage(final Message newContent) {
 		return this.message.editMessage(newContent);
 	}
 
@@ -377,12 +377,12 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public RestAction<Void> addReaction(Emote emote) {
+	public RestAction<Void> addReaction(final Emote emote) {
 		return this.message.addReaction(emote);
 	}
 
 	@Override
-	public RestAction<Void> addReaction(String unicode) {
+	public RestAction<Void> addReaction(final String unicode) {
 		return this.message.addReaction(unicode);
 	}
 
@@ -392,62 +392,62 @@ public class BlackMessage extends BlackObject implements Message {
 	}
 
 	@Override
-	public RestAction<Void> clearReactions(String unicode) {
+	public RestAction<Void> clearReactions(final String unicode) {
 		return this.message.clearReactions(unicode);
 	}
 
 	@Override
-	public RestAction<Void> clearReactions(Emote emote) {
+	public RestAction<Void> clearReactions(final Emote emote) {
 		return this.message.clearReactions(emote);
 	}
 
 	@Override
-	public RestAction<Void> removeReaction(Emote emote) {
+	public RestAction<Void> removeReaction(final Emote emote) {
 		return this.message.removeReaction(emote);
 	}
 
 	@Override
-	public RestAction<Void> removeReaction(Emote emote, User user) {
+	public RestAction<Void> removeReaction(final Emote emote, final User user) {
 		return this.message.removeReaction(emote, user);
 	}
 
 	@Override
-	public RestAction<Void> removeReaction(String unicode) {
+	public RestAction<Void> removeReaction(final String unicode) {
 		return this.message.removeReaction(unicode);
 	}
 
 	@Override
-	public RestAction<Void> removeReaction(String unicode, User user) {
+	public RestAction<Void> removeReaction(final String unicode, final User user) {
 		return this.message.removeReaction(unicode, user);
 	}
 
 	@Override
-	public ReactionPaginationAction retrieveReactionUsers(Emote emote) {
+	public ReactionPaginationAction retrieveReactionUsers(final Emote emote) {
 		return this.message.retrieveReactionUsers(emote);
 	}
 
 	@Override
-	public ReactionPaginationAction retrieveReactionUsers(String unicode) {
+	public ReactionPaginationAction retrieveReactionUsers(final String unicode) {
 		return this.message.retrieveReactionUsers(unicode);
 	}
 
 	@Override
-	public ReactionEmote getReactionByUnicode(String unicode) {
+	public ReactionEmote getReactionByUnicode(final String unicode) {
 		return this.message.getReactionByUnicode(unicode);
 	}
 
 	@Override
-	public ReactionEmote getReactionById(String id) {
+	public ReactionEmote getReactionById(final String id) {
 		return this.message.getReactionById(id);
 	}
 
 	@Override
-	public ReactionEmote getReactionById(long id) {
+	public ReactionEmote getReactionById(final long id) {
 		return this.message.getReactionById(id);
 	}
 
 	@Override
-	public AuditableRestAction<Void> suppressEmbeds(boolean suppressed) {
+	public AuditableRestAction<Void> suppressEmbeds(final boolean suppressed) {
 		return this.message.suppressEmbeds(suppressed);
 	}
 

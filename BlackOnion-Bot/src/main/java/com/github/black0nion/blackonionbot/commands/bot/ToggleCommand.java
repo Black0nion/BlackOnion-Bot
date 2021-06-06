@@ -26,19 +26,19 @@ public class ToggleCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		Command command = CommandBase.commands.get(args[1]);
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final Command command = CommandBase.commands.get(args[1]);
 		if (command == null || !command.isVisible()) {
 			cmde.error("wrongargument", "commandnotfound");
 			return;
 		}
 		boolean activated;
 		final String activatedUnparsed = args[2];
-		if (Utils.equalsOneIgnoreCase(activatedUnparsed, "enabled", "true", "on")) {
+		if (Utils.equalsOneIgnoreCase(activatedUnparsed, "enabled", "true", "on"))
 			activated = true;
-		} else if (Utils.equalsOneIgnoreCase(activatedUnparsed, "disabled", "false", "off")) {
+		else if (Utils.equalsOneIgnoreCase(activatedUnparsed, "disabled", "false", "off"))
 			activated = false;
-		} else {
+		else {
 			cmde.sendPleaseUse();
 			return;
 		}

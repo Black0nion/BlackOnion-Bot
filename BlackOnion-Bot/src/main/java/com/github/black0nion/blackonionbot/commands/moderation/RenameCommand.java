@@ -27,7 +27,7 @@ public class RenameCommand extends Command {
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember sentmember, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember sentmember, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (Utils.handleRights(guild, author, e.getChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
 		message.delete().queue();
 		final Member mem = guild.getMemberById(args[1]);
@@ -38,9 +38,8 @@ public class RenameCommand extends Command {
 			if (mem != null) member = mem;
 			else return;
 			String nickname = "";
-			for (int i = 2; i < args.length; i++) {
+			for (int i = 2; i < args.length; i++)
 				nickname += args[i] + " ";
-			}
 			nickname.trim();
 			member.modifyNickname(String.join(" ", nickname)).queue();
 			return;

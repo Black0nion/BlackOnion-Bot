@@ -26,7 +26,7 @@ public class HypixelCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 //		if (args[1].toLowerCase().equalsIgnoreCase("stats")) {
 //			api.getPlayerByName(args[2]).whenComplete((response, error) -> {
 //
@@ -67,15 +67,14 @@ public class HypixelCommand extends Command {
 	}
 	
 	 @SuppressWarnings("unused")
-	private static String getFieldOrNA(String field, JsonObject json) {
-	        JsonElement value = json.get(field);
-	        if (value != null) {
-	            // If the field was found, return its value
+	private static String getFieldOrNA(final String field, final JsonObject json) {
+	        final JsonElement value = json.get(field);
+	        if (value != null)
+				// If the field was found, return its value
 	            return value.getAsString();
-	        } else {
-	            // Otherwise, return "N/A"
+			else
+				// Otherwise, return "N/A"
 	            return "N/A";
-	        }
     }
 	
 	@Override

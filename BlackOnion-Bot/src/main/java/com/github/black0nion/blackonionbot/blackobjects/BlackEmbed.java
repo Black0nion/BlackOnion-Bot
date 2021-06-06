@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
 public class BlackEmbed extends EmbedBuilder {
 
-	private Language lang;
+	private final Language lang;
 	
-	public BlackEmbed(Language lang) {
+	public BlackEmbed(final Language lang) {
 		this.lang = lang;
 	}
 	
@@ -24,7 +24,7 @@ public class BlackEmbed extends EmbedBuilder {
 		this.lang = LanguageSystem.getDefaultLanguage();
 	}
 	
-	public BlackEmbed(BlackEmbed embed) {
+	public BlackEmbed(final BlackEmbed embed) {
 		super(embed);
 		this.lang = embed.getLang();
 	}
@@ -35,7 +35,7 @@ public class BlackEmbed extends EmbedBuilder {
 	
 	@Override
 	public BlackEmbed setFooter(String text) {
-		String tempText = lang.getTranslation(text);
+		final String tempText = lang.getTranslation(text);
 		if (tempText != null)
 			text = tempText;
 		super.setFooter(text);
@@ -44,7 +44,7 @@ public class BlackEmbed extends EmbedBuilder {
 	
 	@Override
 	public BlackEmbed setTitle(String title) {
-		String tempTitle = lang.getTranslation(title);
+		final String tempTitle = lang.getTranslation(title);
 		if (tempTitle != null)
 			title = tempTitle;
 		super.setTitle(title);
@@ -52,8 +52,8 @@ public class BlackEmbed extends EmbedBuilder {
 	}
 	
 	@Override
-	public BlackEmbed setTitle(String title, String url) {
-		String tempTitle = lang.getTranslation(title);
+	public BlackEmbed setTitle(String title, final String url) {
+		final String tempTitle = lang.getTranslation(title);
 		if (tempTitle != null)
 			title = tempTitle;
 		super.setTitle(title, url);
@@ -61,9 +61,9 @@ public class BlackEmbed extends EmbedBuilder {
 	}
 	
 	@Override
-	public BlackEmbed addField(String name, String value, boolean inline) {
-		String tempName = lang.getTranslation(name);
-		String tempValue = lang.getTranslation(value);
+	public BlackEmbed addField(String name, String value, final boolean inline) {
+		final String tempName = lang.getTranslation(name);
+		final String tempValue = lang.getTranslation(value);
 		if (tempName != null)
 			name = tempName;
 		if (tempValue != null)
@@ -72,25 +72,25 @@ public class BlackEmbed extends EmbedBuilder {
 		return this;
 	}
 	
-	public BlackEmbed addUntranslatedField(String name, String value, boolean inline) {
+	public BlackEmbed addUntranslatedField(final String name, final String value, final boolean inline) {
 		super.addField(name, value, inline);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed addBlankField(boolean inline) {
+	public BlackEmbed addBlankField(final boolean inline) {
 		super.addBlankField(inline);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed addField(Field field) {
+	public BlackEmbed addField(final Field field) {
 		super.addField(field);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed appendDescription(CharSequence description) {
+	public BlackEmbed appendDescription(final CharSequence description) {
 		super.appendDescription(description);
 		return this;
 	}
@@ -135,7 +135,7 @@ public class BlackEmbed extends EmbedBuilder {
 	
 	@Override
 	@Deprecated
-	public boolean isValidLength(AccountType type) {
+	public boolean isValidLength(final AccountType type) {
 		return super.isValidLength(type);
 	}
 	
@@ -145,55 +145,55 @@ public class BlackEmbed extends EmbedBuilder {
 	}
 	
 	@Override
-	public BlackEmbed setAuthor(String name) {
+	public BlackEmbed setAuthor(final String name) {
 		super.setAuthor(name);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setAuthor(String name, String url) {
+	public BlackEmbed setAuthor(final String name, final String url) {
 		super.setAuthor(name, url);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setAuthor(String name, String url, String iconUrl) {
+	public BlackEmbed setAuthor(final String name, final String url, final String iconUrl) {
 		super.setAuthor(name, url, iconUrl);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setColor(Color color) {
+	public BlackEmbed setColor(final Color color) {
 		super.setColor(color);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setColor(int color) {
+	public BlackEmbed setColor(final int color) {
 		super.setColor(color);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setFooter(String text, String iconUrl) {
+	public BlackEmbed setFooter(final String text, final String iconUrl) {
 		super.setFooter(text, iconUrl);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setImage(String url) {
+	public BlackEmbed setImage(final String url) {
 		super.setImage(url);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setThumbnail(String url) {
+	public BlackEmbed setThumbnail(final String url) {
 		super.setThumbnail(url);
 		return this;
 	}
 	
 	@Override
-	public BlackEmbed setTimestamp(TemporalAccessor temporal) {
+	public BlackEmbed setTimestamp(final TemporalAccessor temporal) {
 		super.setTimestamp(temporal);
 		return this;
 	}

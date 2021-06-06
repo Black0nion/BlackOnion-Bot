@@ -16,25 +16,24 @@ public class TicTacToeGameManager {
 	 * @param playerY UserID of Player Y
 	 * @return The new created Game
 	 */
-	public static TicTacToe createGame(TextChannel channel, TicTacToePlayer playerX, TicTacToePlayer playerY) {
-		TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
+	public static TicTacToe createGame(final TextChannel channel, final TicTacToePlayer playerX, final TicTacToePlayer playerY) {
+		final TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
 		games.add(newGame);
 		return newGame;
 	}
 	
-	public static void deleteGame(TicTacToe game) {
+	public static void deleteGame(final TicTacToe game) {
 		games.remove(game);
 	}
 	
-	public static boolean isIngame(String userID) {
-		for (TicTacToe game : games) {
+	public static boolean isIngame(final String userID) {
+		for (final TicTacToe game : games)
 			if (game.getPlayerX().getId().equals(userID) || game.getPlayerY().getId().equals(userID))
 				return true;
-		}
 		return false;
 	}
 	
-	public static TicTacToe getGameByMessageID(long messageID) {
+	public static TicTacToe getGameByMessageID(final long messageID) {
 		return games.stream().filter(game -> game.getMessage().getIdLong() == messageID).findFirst().orElse(null);
 	}
 }

@@ -21,48 +21,48 @@ public class ValueManager {
 		file.getParentFile().mkdirs();
 		try {
 			file.createNewFile();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void save(String key, String value) {
+	public static void save(final String key, final String value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 	
-	public static void save(String key, Number value) {
+	public static void save(final String key, final Number value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 
-	public static void save(String key, Boolean value) {
+	public static void save(final String key, final Boolean value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 
-	public static void save(String key, JsonElement value) {
+	public static void save(final String key, final JsonElement value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 	
-	public static void save(String key, Document value) {
+	public static void save(final String key, final Document value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 
-	public static void save(String key, Object value) {
+	public static void save(final String key, final Object value) {
 		doc = Document.loadDocument(file);
 		doc.append(key, value);
 		doc.saveAsFile(file);
 	}
 	
-	public static void remove(String key) {
+	public static void remove(final String key) {
 		doc = Document.loadDocument(file);
 		doc.remove(key);
 		doc.saveAsFile(file);
@@ -73,47 +73,47 @@ public class ValueManager {
 		return doc.keys();
 	}
 	
-	public static JsonElement get(String key) {
+	public static JsonElement get(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.get(key);
 	}
 	
-	public static String getString(String key) {
+	public static String getString(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getString(key);
 	}
 	
-	public static int getInt(String key) {
+	public static int getInt(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getInt(key);
 	}
 	
-	public static long getLong(String key) {
+	public static long getLong(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getLong(key);
 	}
 	
-	public static double getDouble(String key) {
+	public static double getDouble(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getDouble(key);
 	}
 	
-	public static float getFloat(String key) {
+	public static float getFloat(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getFloat(key);
 	}
 		
-	public static short getShort(String key) {
+	public static short getShort(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getShort(key);
 	}
 	
-	public static boolean getBoolean(String key) {
+	public static boolean getBoolean(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getBoolean(key);
 	}
 
-	public static <T> T getObject(String key, Class<T> c) {
+	public static <T> T getObject(final String key, final Class<T> c) {
 		doc = Document.loadDocument(file);
 		return doc.getObject(key, c);
 	}
@@ -124,7 +124,7 @@ public class ValueManager {
 	 * @deprecated only use this if you need something other than in this wrapper because the other functions of the document is already in this wrapper, thats what it was written for<br/>
 	*/
 	@Deprecated
-	public static Document getDocument(String key) {
+	public static Document getDocument(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getDocument(key);
 	}
@@ -132,45 +132,45 @@ public class ValueManager {
 	/**
 	 * @deprecated THIS METHOD WILL WIPE OUT ALL DATA! USE CAREFULLY!
 	*/
+	@Deprecated
 	public static void clear() {
 		doc = Document.loadDocument(file);
 		doc.clear();
 		doc.saveAsFile(file);
 	}
 	
-	public static JsonArray getJsonArray(String key) {
+	public static JsonArray getJsonArray(final String key) {
 		doc = Document.loadDocument(file);
 		return doc.getArray(key);
 	}
 	
-	public static String[] getStringArray(String key) {
+	public static String[] getStringArray(final String key) {
 		doc = Document.loadDocument(file);
-		List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<String>();
 		doc.getArray(key).forEach(entry -> {
 			list.add(entry.getAsString());
 		});
-		String[] array = new String[list.size()];
+		final String[] array = new String[list.size()];
 		return list.toArray(array);
 	}
 
-	public static Number[] getNumberArray(String key) {
+	public static Number[] getNumberArray(final String key) {
 		doc = Document.loadDocument(file);
-		List<Number> list = new ArrayList<Number>();
+		final List<Number> list = new ArrayList<Number>();
 		doc.getArray(key).forEach(entry -> {
 			list.add(entry.getAsNumber());
 		});
-		Number[] array = new Number[list.size()];
+		final Number[] array = new Number[list.size()];
 		return list.toArray(array);
 	}
 	
-	public static List<String> getArrayAsList(String key) {
+	public static List<String> getArrayAsList(final String key) {
 		doc = Document.loadDocument(file);
 		JsonArray array = new JsonArray();
 		array = doc.getArray(key);
-		List<String> list = new ArrayList<String>();
-		for(int i = 0; i < array.size(); i++){
-		    list.add(array.get(i).getAsString());
-		}
+		final List<String> list = new ArrayList<String>();
+		for(int i = 0; i < array.size(); i++)
+			list.add(array.get(i).getAsString());
 		return list;
 	}
 }

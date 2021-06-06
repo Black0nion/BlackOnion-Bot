@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -32,7 +29,7 @@ public class VolumeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
 		if (state != null && state.getChannel() != null) {
 			final VoiceChannel memberChannel = member.getVoiceState().getChannel();
@@ -43,18 +40,14 @@ public class VolumeCommand extends Command {
 					if (volume > 0 && volume <= 150) {						
 						musicManager.scheduler.player.setVolume(volume);
 						cmde.success("volumechanged", "volumesetto", new Placeholder("volume", volume));
-					} else {
+					} else
 						cmde.error("invalidvolume", "volumerange");
-					}
 					
-				} else {
+				} else
 					cmde.error("notanumber", "inputnumber");
-				}
-			} else {
+			} else
 				cmde.error("notinsamevc", "dontstopotherpplmusic");
-			}
-		} else {
+		} else
 			cmde.error("notconnected", "startmusictostop");
-		}
 	}
 }

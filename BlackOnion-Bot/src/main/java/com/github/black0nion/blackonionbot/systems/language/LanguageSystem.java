@@ -30,9 +30,8 @@ public class LanguageSystem {
 		languages.put("EN", english);
 		languages.put("DE", german);
 		
-		for (Map.Entry<String, Language> entry : languages.entrySet()) {
+		for (final Map.Entry<String, Language> entry : languages.entrySet())
 			validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
-		}
 		validLanguages += "```";
 	}
 	
@@ -42,18 +41,18 @@ public class LanguageSystem {
 		return languages;
 	}
 	
-	public static Language getLanguage(BlackUser author, BlackGuild guild) {
+	public static Language getLanguage(final BlackUser author, final BlackGuild guild) {
 		try {
-			Language userLang = author.getLanguage();
+			final Language userLang = author.getLanguage();
 			if (userLang != null) return userLang;
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		try {
-			Language guildLang = guild.getLanguage();
+			final Language guildLang = guild.getLanguage();
 			if (guildLang != null) return guildLang;
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		try {
 			return defaultLocale;
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		return null;
 	}
 	
@@ -61,21 +60,21 @@ public class LanguageSystem {
 		return defaultLocale;
 	}
 	
-	public static Language getLanguageFromName(String name) {
+	public static Language getLanguageFromName(final String name) {
 		if (name == null || !languages.containsKey(name.toUpperCase())) return null;
 		return languages.get(name.toUpperCase());
 	}
 	
-	public static String getTranslation(String key, BlackUser author, BlackGuild guild) {
+	public static String getTranslation(final String key, final BlackUser author, final BlackGuild guild) {
 		try {
 			return author.getLanguage().getTranslationNonNull(key);
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		try {
 			return guild.getLanguage().getTranslationNonNull(key);
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		try {
 			return defaultLocale.getTranslationNonNull(key);
-		} catch (Exception ignored) {}
+		} catch (final Exception ignored) {}
 		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
 	}
 	
@@ -88,7 +87,7 @@ public class LanguageSystem {
 	 * @param replacement
 	 * @return
 	 */
-	public static String getReplacedTranslation(String key, BlackUser author, BlackGuild guild, String toReplace, String replacement) {
+	public static String getReplacedTranslation(final String key, final BlackUser author, final BlackGuild guild, final String toReplace, final String replacement) {
 		return getTranslation(key, author, guild).replace(toReplace, getTranslation(replacement, author, guild));
 	}
 }

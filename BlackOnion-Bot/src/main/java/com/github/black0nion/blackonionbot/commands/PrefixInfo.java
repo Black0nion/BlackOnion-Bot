@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.Permission;
 public class PrefixInfo {
 	
 	@SuppressWarnings("deprecation")
-	public static void handle(CommandEvent cmde) {
+	public static void handle(final CommandEvent cmde) {
 		final BlackMessage message = cmde.getMessage();
 		final BlackUser author = cmde.getUser();
 		if (author.isBot() || message.getMentionedUsers().size() == 0) return;

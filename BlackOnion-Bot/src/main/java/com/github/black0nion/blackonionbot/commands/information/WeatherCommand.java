@@ -32,17 +32,17 @@ public class WeatherCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 		try {
-			JSONObject weather = getWeather(query);
-			JSONObject sys = weather.getJSONObject("sys");
-			JSONObject main = weather.getJSONObject("main");
-			Date sunrise = new Date(sys.getInt("sunrise") * 1000L);
-			Date sunset = new Date(sys.getInt("sunset") * 1000L);
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
+			final JSONObject weather = getWeather(query);
+			final JSONObject sys = weather.getJSONObject("sys");
+			final JSONObject main = weather.getJSONObject("main");
+			final Date sunrise = new Date(sys.getInt("sunrise") * 1000L);
+			final Date sunset = new Date(sys.getInt("sunset") * 1000L);
+			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); 
-			JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
+			final JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
 			cmde.reply(cmde.success()
 					.setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
 					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
@@ -54,23 +54,22 @@ public class WeatherCommand extends Command {
 					.addField("sunrise", sdf.format(sunrise), false)
 					.addField("sunset", sdf.format(sunset), false));
 			return;
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			cmde.error("unknowncity",  query);
 			return;
 		}
 	}
 
-	public static JSONObject getWeather(String query) throws IOException {
-		URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query
+	public static JSONObject getWeather(final String query) throws IOException {
+		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query
 				+ "&units=metric&appid=9f5fe633ea9efc307ea6629f3a12bd6c");
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		final HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
-		StringBuffer content = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
+		final StringBuffer content = new StringBuffer();
+		while ((inputLine = in.readLine()) != null)
 			content.append(inputLine);
-		}
 		in.close();
 		con.disconnect();
 		return new JSONObject(content.toString());

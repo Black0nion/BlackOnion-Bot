@@ -38,15 +38,15 @@ public class BigbrainMemeCommand extends Command {
 		try {
     		defaultBackGround = ImageIO.read(getClass().getResource("/bigbrain-meme.jpg"));
     		return;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		defaultBackGround = null;
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
 			cmde.sendPleaseUse();
 			return;
@@ -61,13 +61,12 @@ public class BigbrainMemeCommand extends Command {
 	}
 	
 	@NotNull
-	public static File generateImage(String[] args) {
+	public static File generateImage(final String[] args) {
 		try {
-			for (int i = 0; i < args.length; i++) {
+			for (int i = 0; i < args.length; i++)
 				args[i] = args[i].trim();
-			}
 			
-        	BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
+        	final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
 	
 	        final Graphics2D newGraphics = bufferedImage.createGraphics();
 	        newGraphics.setRenderingHint(
@@ -78,7 +77,7 @@ public class BigbrainMemeCommand extends Command {
 	        
 	        final FontMetrics fontMetrics = newGraphics.getFontMetrics();
 	        
-	        List<String> lines = new ArrayList<>();
+	        final List<String> lines = new ArrayList<>();
 	        int width;
 	        String current;
 	        String[] input;
@@ -154,14 +153,13 @@ public class BigbrainMemeCommand extends Command {
 	
 	        final File file = new File("tmp/bigbrain/" + System.currentTimeMillis() + ".png");
 	
-	        if (file.getParentFile() != null) {
-	            file.getParentFile().mkdirs();
-	        }
+	        if (file.getParentFile() != null)
+				file.getParentFile().mkdirs();
 	
 	        ImageIO.write(bufferedImage, "png", file);
 	
 	        return file;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return null;
 		}

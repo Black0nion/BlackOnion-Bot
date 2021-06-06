@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.github.black0nion.blackonionbot.commands.fun;
 
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ public class HangmanCommand extends Command {
 	
 	public HangmanCommand() {
 		this.setCommand("hangman");
-		for (Language language : LanguageSystem.getLanguages().values()) {
+		for (final Language language : LanguageSystem.getLanguages().values()) {
 			final String translation = language.getTranslation("hangmanwords");
 			if (translation != null)
 				hangmanWords.put(language, Arrays.asList(translation.toLowerCase().split(",")));
@@ -45,7 +42,7 @@ public class HangmanCommand extends Command {
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (ingamePlayers.contains(author.getIdLong())) {
 			cmde.error("alreadyingame", "nomultitasking");
 			return;
@@ -60,7 +57,7 @@ public class HangmanCommand extends Command {
 		});
 	}
 	
-	private static void rerun(Message msg, CommandEvent cmde, String solution, List<Character> alreadyGuessed) {
+	private static void rerun(final Message msg, final CommandEvent cmde, final String solution, final List<Character> alreadyGuessed) {
 		final String failedAttempts = getFailedAttempts(solution, alreadyGuessed);
 		final int failedAttemptsCount = failedAttempts.equalsIgnoreCase("") ? 0 : failedAttempts.split(", ").length;
 		
@@ -70,7 +67,7 @@ public class HangmanCommand extends Command {
 			return;
 		}
 		
-		EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
+		final EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
 		if (won(solution, alreadyGuessed)) {
 			msg.editMessage(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
 			ingamePlayers.remove(cmde.getUser().getIdLong());
@@ -89,7 +86,7 @@ public class HangmanCommand extends Command {
 		});
 	}
 	
-	private static String getDrawing(int tries) {
+	private static String getDrawing(final int tries) {
 		String result = "";
 		if (tries >= 1) {
 			result += "    O\n";
@@ -103,9 +100,8 @@ public class HangmanCommand extends Command {
 							result += "    |\n";
 							if (tries >= 6) {
 								result += "   /";
-								if (tries >= 7) {
+								if (tries >= 7)
 									result += " \\";
-								}
 							}
 						}
 					}
@@ -115,28 +111,25 @@ public class HangmanCommand extends Command {
 		return result;
 	}
 	
-	private static String getSpacesString(String solution, List<Character> tries) {
+	private static String getSpacesString(final String solution, final List<Character> tries) {
 		String s = "Word: ";
 		
-		for (Character c : solution.toCharArray()) {
+		for (final Character c : solution.toCharArray())
 			if (tries.contains(c)) s += String.valueOf(c) + " ";
 			else s += "_ ";
-		}
 		return s;
 	}
 	
-	private static String getFailedAttempts(String solution, List<Character> tries) {
+	private static String getFailedAttempts(final String solution, final List<Character> tries) {
 		String failedAttempts = "";
-		for (Character c : tries) {
+		for (final Character c : tries)
 			if (!solution.contains(String.valueOf(c))) failedAttempts += ", " + c;
-		}
 		return failedAttempts.equalsIgnoreCase("") ? "" : failedAttempts.substring(1);
 	}
 	
-	private static boolean won(String solution, List<Character> tries) {
-		for (Character c : solution.toCharArray()) {
+	private static boolean won(final String solution, final List<Character> tries) {
+		for (final Character c : solution.toCharArray())
 			if (!tries.contains(c)) return false;
-		}
 		return true;
 	}
 	

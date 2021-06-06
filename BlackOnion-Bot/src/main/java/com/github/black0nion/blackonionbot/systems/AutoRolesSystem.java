@@ -14,17 +14,17 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class AutoRolesSystem extends ListenerAdapter {
 	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {		
+	public void onGuildMemberJoin(final GuildMemberJoinEvent event) {		
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackUser user = BlackUser.from(event.getUser());
 		
-		List<Long> autoroles = guild.getAutoRoles();
-		List<Long> removedRoles = new ArrayList<>();
+		final List<Long> autoroles = guild.getAutoRoles();
+		final List<Long> removedRoles = new ArrayList<>();
 		
 		if (Utils.handleRights(guild, user, null, Permission.MANAGE_ROLES)) return;
 		
-		for (long roleid : autoroles) {
-			Role role = guild.getRoleById(roleid);
+		for (final long roleid : autoroles) {
+			final Role role = guild.getRoleById(roleid);
 			if (role == null)
 				removedRoles.add(roleid);
 			else

@@ -70,47 +70,47 @@ public class Utils {
 
 	private static ArrayList<CachedUserInfo> cachedUserInfo = new ArrayList<>();
 	
-	public static String removeMarkdown(String text) {
+	public static String removeMarkdown(final String text) {
 		return text.replace("_", "\\_").replace("*", "\\*");
 	}
 
-	public static String[] removeFirstArg(String[] input) {
+	public static String[] removeFirstArg(final String[] input) {
 		return Arrays.copyOfRange(input, 1, input.length);
 	}
 	
-	public static String round(String decimal, double number) {
-		DecimalFormat df = new DecimalFormat(decimal);
+	public static String round(final String decimal, final double number) {
+		final DecimalFormat df = new DecimalFormat(decimal);
 		df.setRoundingMode(RoundingMode.CEILING);
 	    return df.format(number);
 	}
 	
-	public static double roundToDouble(String decimal, double number) {
-		DecimalFormat df = new DecimalFormat(decimal);
+	public static double roundToDouble(final String decimal, final double number) {
+		final DecimalFormat df = new DecimalFormat(decimal);
 		df.setRoundingMode(RoundingMode.CEILING);
 		return Double.valueOf(df.format(number).replace(",", "."));
 	}
 	
-	public static boolean compareSHA256(String hashed, String unhashed) {
-		String sha256hex = Hashing.sha256()
+	public static boolean compareSHA256(final String hashed, final String unhashed) {
+		final String sha256hex = Hashing.sha256()
 				  .hashString(unhashed, StandardCharsets.UTF_8)
 				  .toString();
 		return hashed.equals(sha256hex);
 	}
 	
-	public static String hashSHA256(String input) {
+	public static String hashSHA256(final String input) {
 		return Hashing.sha256().hashString(input, StandardCharsets.UTF_8).toString();
 	}
 	
-	public static String getCountryFromCode(String code) {
+	public static String getCountryFromCode(final String code) {
 		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream("/countrycodes.json"))).lines().collect(Collectors.joining()))).getString(code);
 	}
 	
-	public static boolean isDiscordUser(String token) {
+	public static boolean isDiscordUser(final String token) {
 		return getUserInfoFromToken(token).has("id");
 	}
 	
-	public static String getUserIdFromToken(String token) {
-			JSONObject userInfo = getUserInfoFromToken(token);
+	public static String getUserIdFromToken(final String token) {
+			final JSONObject userInfo = getUserInfoFromToken(token);
 			if (userInfo.has("id"))
 				return userInfo.getString("id");
 			else
@@ -118,54 +118,51 @@ public class Utils {
 	}
 	
 	public static int gc() {
-		ArrayList<CachedUserInfo> found = new ArrayList<>();
-		for (CachedUserInfo userInfo : cachedUserInfo) {
+		final ArrayList<CachedUserInfo> found = new ArrayList<>();
+		for (final CachedUserInfo userInfo : cachedUserInfo)
 			if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2)
 				found.add(userInfo);
-		}
 		
 		cachedUserInfo.removeAll(found);
 		return found.size();
 	}
 	
-	public static JSONObject getUserInfoFromToken(String token) {
+	public static JSONObject getUserInfoFromToken(final String token) {
 		for (int i = 0; i < cachedUserInfo.size(); i++) {
 			CachedUserInfo userInfo = cachedUserInfo.get(i);
-			if (userInfo.getToken().equals(token)) {
+			if (userInfo.getToken().equals(token))
 				if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2) {
 					cachedUserInfo.remove(i);
-					CachedUserInfo refreshed = userInfo.refresh(token);
+					final CachedUserInfo refreshed = userInfo.refresh(token);
 					cachedUserInfo.add(refreshed);
 					userInfo = userInfo.refresh(token);
 					return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
-				} else {
+				} else
 					return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
-				}
-			}
 		}
 		
-		CachedUserInfo newInfo = new CachedUserInfo(new JSONObject(getUserInfoFromTokenResponse(token).getBody()), token);
+		final CachedUserInfo newInfo = new CachedUserInfo(new JSONObject(getUserInfoFromTokenResponse(token).getBody()), token);
 		
 		cachedUserInfo.add(newInfo);
 		
 		return newInfo.getInfo().has("id") ? newInfo.getInfo() : null;
 	}
 	
-	public static HttpResponse<String> getUserInfoFromTokenResponse(String token) {
+	public static HttpResponse<String> getUserInfoFromTokenResponse(final String token) {
 		try {
 			Unirest.setTimeouts(0, 0);
 			return Unirest.get("https://discord.com/api/users/@me")
 			  .header("Authorization", "Bearer " + token)
 			  .asString();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	@Deprecated
-	public static HttpResponse<String> getTokenFromCode(String code) {
-		CredentialsManager manager = Bot.getCredentialsManager();
+	public static HttpResponse<String> getTokenFromCode(final String code) {
+		final CredentialsManager manager = Bot.getCredentialsManager();
 		if (!manager.has("client_id") || !manager.has("client_secret") || !manager.has("redirect_uri")) {
 			Logger.log(LogMode.ERROR, LogOrigin.API, "DiscordAuthSettings isn't filled correctly!");
 			return null;
@@ -181,7 +178,7 @@ public class Utils {
 					  .field("redirect_uri", manager.getString("redirect_uri"))
 					  .field("scope", "identify")
 					  .asString();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -195,33 +192,33 @@ public class Utils {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 	
-	public static<T> T[] subArray(T[] array, int beg) {
+	public static<T> T[] subArray(final T[] array, final int beg) {
 		return subArray(array, beg, array.length-1);
 	}
 	
-	public static<T> T[] subArray(T[] array, int beg, int end) {
+	public static<T> T[] subArray(final T[] array, final int beg, final int end) {
 		return Arrays.copyOfRange(array, beg, end + 1);
 	}
 	
-	public static boolean isLong(String input) {
+	public static boolean isLong(final String input) {
 		try {
 			Long.parseLong(input.trim());
 			return true;
-		} catch (Exception e) { return false; }
+		} catch (final Exception e) { return false; }
 	}
 	
 	/**
 	 * @return if the given Object equals to one of the other given Objects
 	 */
 	@SafeVarargs
-	public static <T> boolean equalsOne(T input, T... comparison) {
+	public static <T> boolean equalsOne(final T input, final T... comparison) {
 		return Arrays.asList(comparison).contains(input);
 	}
 	
 	/**
 	 * @return if the given String equals to one of the other given Strings (ignoring case)
 	 */
-	public static boolean equalsOneIgnoreCase(String input, String... comparison) {
+	public static boolean equalsOneIgnoreCase(final String input, final String... comparison) {
 		return input.matches("(?i)" + String.join("|", comparison));
 	}
 
@@ -252,36 +249,34 @@ public class Utils {
      * @param permissions
      * @return missing permissions?
      */
-    public static boolean handleRights(BlackGuild guild, BlackUser author, TextChannel channel, Permission... permissions) {
+    public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, final Permission... permissions) {
     	if (channel == null) {
     		if (!guild.getSelfMember().hasPermission(permissions))
     			return true;
-    	} else {    		
-    		if (!guild.getSelfMember().hasPermission(channel, permissions)) {
-    			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
-    			return true;
-    		}
-    	}
+    	} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
+			if (channel != null) channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+			return true;
+		}
     	return false;
     }
 
-	public static MessageEmbed noRights(BlackGuild guild, BlackUser author, Permission... missingPermissions) {
+	public static MessageEmbed noRights(final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
-	public static String getPermissionString(Permission... permissions) {
+	public static String getPermissionString(final Permission... permissions) {
 		String output = "```";
-		for (int i = 0; i  < permissions.length; i++) {
+		for (int i = 0; i  < permissions.length; i++)
 			output += "- " + permissions[i].getName() + (i == permissions.length-1 ? "```" : "\n");
-		}
 		return output;
 	}
 	
-	public static <T> T[] concatenate(T[] a, T[] b) {
-	    int aLen = a.length;
-	    int bLen = b.length;
+	public static <T> T[] concatenate(final T[] a, final T[] b) {
+	    final int aLen = a.length;
+	    final int bLen = b.length;
 
 	    @SuppressWarnings("unchecked")
+		final
 	    T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
 	    System.arraycopy(a, 0, c, 0, aLen);
 	    System.arraycopy(b, 0, c, aLen, bLen);
@@ -289,7 +284,7 @@ public class Utils {
 	    return c;
 	}
 	
-	public static <T> Object[] toObjectArray(T[] input) {
+	public static <T> Object[] toObjectArray(final T[] input) {
 		return Arrays.asList(input).stream().map(map -> (Object) map).toArray();
 	}
 

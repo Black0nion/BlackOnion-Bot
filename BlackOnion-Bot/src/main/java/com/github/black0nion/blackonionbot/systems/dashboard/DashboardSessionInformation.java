@@ -30,35 +30,35 @@ public class DashboardSessionInformation {
 	 * @param accessToken
 	 * @param refreshToken
 	 */
-	public DashboardSessionInformation(String sessionId, String accessToken, String refreshToken, DiscordUser user) {
+	public DashboardSessionInformation(final String sessionId, final String accessToken, final String refreshToken, final DiscordUser user) {
 		this.sessionId = sessionId;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.user = user;
 	}
 	
-	public DashboardSessionInformation(String sessionId) {
+	public DashboardSessionInformation(final String sessionId) {
 		this.sessionId = sessionId;
 	}
 	
-	public static DashboardSessionInformation from(String sessionId) {
+	public static DashboardSessionInformation from(final String sessionId) {
 		return existingSessions.stream().filter(info -> {
 			return info.getSessionId().equals(sessionId);
 		}).findFirst().orElseGet(() -> {
-			DashboardSessionInformation info = new DashboardSessionInformation(sessionId);
+			final DashboardSessionInformation info = new DashboardSessionInformation(sessionId);
 			existingSessions.add(info);
 			return info;
 		});
 	}
 	
-	public static DashboardSessionInformation from(String sessionId, String accessToken, String refreshToken) {
-		JSONObject userInfo = Utils.getUserInfoFromToken(accessToken);
-		DashboardSessionInformation info = existingSessions.stream().filter(inf -> {
+	public static DashboardSessionInformation from(final String sessionId, final String accessToken, final String refreshToken) {
+		final JSONObject userInfo = Utils.getUserInfoFromToken(accessToken);
+		final DashboardSessionInformation info = existingSessions.stream().filter(inf -> {
 			if (inf.getAccessToken() == null || inf.getRefreshToken() == null)
 				return false;
 			return inf.getAccessToken().equals(accessToken) && inf.getRefreshToken().equals(refreshToken) && inf.getSessionId().equals(sessionId);
 		}).findFirst().orElseGet(() -> {
-			DashboardSessionInformation newInfo = new DashboardSessionInformation(sessionId, accessToken, refreshToken, (userInfo != null && userInfo.has("id") ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null));
+			final DashboardSessionInformation newInfo = new DashboardSessionInformation(sessionId, accessToken, refreshToken, (userInfo != null && userInfo.has("id") ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null));
 			if (newInfo.user == null) newInfo.refreshToken();
 			existingSessions.add(newInfo);
 			return newInfo;
@@ -73,21 +73,21 @@ public class DashboardSessionInformation {
 	}
 	
 	@Nullable
-	public static DashboardSessionInformation get(String sessionId) {
+	public static DashboardSessionInformation get(final String sessionId) {
 		return existingSessions.stream().filter(session -> {return session.sessionId.equals(sessionId);}).findFirst().orElse(null);
 	} 
 	
 	public DashboardSessionInformation refreshToken() {
-		String resp = RefreshToken.refreshToken(refreshToken);
+		final String resp = RefreshToken.refreshToken(refreshToken);
 		if (resp == null) return this;
-		String[] response = resp.split(":");
+		final String[] response = resp.split(":");
 		accessToken = response[0];
 		refreshToken = response[1];
 		return this;
 	}
 	
 	public DashboardSessionInformation update() {
-		JSONObject userInfo = Utils.getUserInfoFromToken(accessToken);
+		final JSONObject userInfo = Utils.getUserInfoFromToken(accessToken);
 		user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
 		return this;
 	}

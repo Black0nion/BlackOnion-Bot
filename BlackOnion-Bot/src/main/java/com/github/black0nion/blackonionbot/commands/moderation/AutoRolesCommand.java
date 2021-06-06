@@ -27,15 +27,15 @@ public class AutoRolesCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		List<String> argz = Arrays.asList(args); 
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		final List<String> argz = Arrays.asList(args); 
 		if (argz.contains("@everyone") || argz.contains("@here")) {
 			cmde.error("invalidrole", "iseveryone");
 			return;
 		}
 		
 		if (args[1].equalsIgnoreCase("create")) {
-			List<Role> roles = message.getMentionedRoles();
+			final List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;
 			Role role = null;
 			if (roles.size() != 0) {
@@ -47,14 +47,14 @@ public class AutoRolesCommand extends Command {
 					return;
 				}
 			} else {
-				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (NumberFormatException ignored) {}
+				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (final NumberFormatException ignored) {}
 				if (roleID == null) {
 					cmde.sendPleaseUse();
 					return;
 				}
 			}
 			
-			List<Long> tempList = guild.getAutoRoles();
+			final List<Long> tempList = guild.getAutoRoles();
 			if (tempList.contains(roleID)) {
 				cmde.success("alreadyexisting", "thisalreadyexisting");
 				return;
@@ -62,7 +62,7 @@ public class AutoRolesCommand extends Command {
 			guild.addAutoRole(roleID);
 			cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
 		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
-			List<Role> roles = message.getMentionedRoles();
+			final List<Role> roles = message.getMentionedRoles();
 			Long roleID = null;
 			Role role = null;
 			if (roles.size() != 0) {
@@ -74,22 +74,21 @@ public class AutoRolesCommand extends Command {
 					return;
 				}
 			} else {
-				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (NumberFormatException ignored) {}
+				try {role = guild.getRoleById(args[2]); if (role != null) roleID = Long.parseLong(args[2]);} catch (final NumberFormatException ignored) {}
 				if (roleID == null) {
 					cmde.sendPleaseUse();
 					return;
 				}
 			}
 			
-			List<Long> tempList = guild.getAutoRoles();
+			final List<Long> tempList = guild.getAutoRoles();
 			if (!tempList.contains(roleID)) {
 				cmde.error("notfound", "thisnotfound");
 				return;
 			} else tempList.remove(roleID);
 			guild.removeAutoRole(roleID);
 			cmde.success("autorolesdeleted", "autoroledeletedinfo", new Placeholder("role", role.getAsMention()));
-		} else {
+		} else
 			cmde.sendPleaseUse();
-		}
 	}
 }

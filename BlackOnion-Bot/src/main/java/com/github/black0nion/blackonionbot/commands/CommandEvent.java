@@ -38,28 +38,28 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class CommandEvent {
 	
 	private Command command;
-	private GuildMessageReceivedEvent event;
-	private JDA jda;
-	private BlackGuild guild;
-	private TextChannel channel;
-	private BlackMessage message;
-	private BlackMember member;
-	private BlackUser user;
-	private BlackEmbed successEmbed;
-	private BlackEmbed loadingEmbed;
-	private BlackEmbed errorEmbed;
-	private Language language;
+	private final GuildMessageReceivedEvent event;
+	private final JDA jda;
+	private final BlackGuild guild;
+	private final TextChannel channel;
+	private final BlackMessage message;
+	private final BlackMember member;
+	private final BlackUser user;
+	private final BlackEmbed successEmbed;
+	private final BlackEmbed loadingEmbed;
+	private final BlackEmbed errorEmbed;
+	private final Language language;
 	
 	@Deprecated
-	public CommandEvent(Command cmd, GuildMessageReceivedEvent e) {
+	public CommandEvent(final Command cmd, final GuildMessageReceivedEvent e) {
 		this(cmd, e, BlackGuild.from(e.getGuild()), BlackMessage.from(e.getMessage()), BlackMember.from(e.getMember()), BlackUser.from(e.getAuthor()));
 	}
 	
-	public CommandEvent(GuildMessageReceivedEvent e, BlackGuild guild, BlackMessage message, BlackMember member, BlackUser user) {
+	public CommandEvent(final GuildMessageReceivedEvent e, final BlackGuild guild, final BlackMessage message, final BlackMember member, final BlackUser user) {
 		this(null, e, guild, message, member, user);
 	}
 
-	public CommandEvent(Command cmd, GuildMessageReceivedEvent e, BlackGuild guild, BlackMessage message, BlackMember member, BlackUser user) {
+	public CommandEvent(final Command cmd, final GuildMessageReceivedEvent e, final BlackGuild guild, final BlackMessage message, final BlackMember member, final BlackUser user) {
 		this.command = cmd;
 		this.event = e;
 		this.jda = e.getJDA();
@@ -85,23 +85,23 @@ public class CommandEvent {
 		return new BlackEmbed(this.successEmbed);
 	}
 	
-	public void success(String name, String value) {
+	public void success(final String name, final String value) {
 		reply(successEmbed.addField(name, value, false));
 	}
 	
-	public void success(String title, String name, String value) {
+	public void success(final String title, final String name, final String value) {
 		reply(successEmbed.setTitle(title).addField(name, value, false));
 	}
 	
-	public void success(String title, String url, String name, String value) {
+	public void success(final String title, final String url, final String name, final String value) {
 		reply(successEmbed.setTitle(title, url).addField(name, value, false));
 	}
 	
-	public void success(String title, String name, String value, final Placeholder... placeholders) {
+	public void success(final String title, final String name, final String value, final Placeholder... placeholders) {
 		success(title, name, value, null, placeholders);
 	}
 	
-	public void success(String title, String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+	public void success(String title, String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
 		title = language.getTranslationNonNull(title);
 		name = language.getTranslationNonNull(name);
 		value = language.getTranslationNonNull(value);
@@ -125,7 +125,7 @@ public class CommandEvent {
 		reply(successEmbed.addField(name, value, false), null);
 	}
 	
-	public void success(String name, String value, Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+	public void success(String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
 		name = language.getTranslationNonNull(name);
 		value = language.getTranslationNonNull(value);
 		for (final Placeholder placeholder : placeholders) {
@@ -140,15 +140,15 @@ public class CommandEvent {
 		return new BlackEmbed(this.loadingEmbed);
 	}
 	
-	public void loading(Consumer<? super BlackMessage> success) {
+	public void loading(final Consumer<? super BlackMessage> success) {
 		reply(loadingEmbed, success);
 	}
 	
-	public void loading(String name, String value) {
+	public void loading(final String name, final String value) {
 		reply(loadingEmbed.addField(name, value, false));
 	}
 	
-	public void loading(String name, String value, Consumer<? super BlackMessage> success) {
+	public void loading(final String name, final String value, final Consumer<? super BlackMessage> success) {
 		reply(loadingEmbed.addField(name, value, false), success);
 	}
 	
@@ -156,15 +156,15 @@ public class CommandEvent {
 		return new BlackEmbed(this.errorEmbed);
 	}
 	
-	public void error(String name, String value) {
+	public void error(final String name, final String value) {
 		reply(errorEmbed.addField(name, value, false));
 	}
 	
-	public void error(String title, String name, String value) {
+	public void error(final String title, final String name, final String value) {
 		reply(errorEmbed.setTitle(title).addField(name, value, false));
 	}
 	
-	public void error(String name, String value, Consumer<? super BlackMessage> success) {
+	public void error(final String name, final String value, final Consumer<? super BlackMessage> success) {
 		reply(errorEmbed.addField(name, value, false), success);
 	}
 	
@@ -200,15 +200,15 @@ public class CommandEvent {
 		error("errorhappened", "somethingwentwrong", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
 	}
 	
-	public void reply(EmbedBuilder builder) {
+	public void reply(final EmbedBuilder builder) {
 		reply(builder, null, null);
 	}
 	
-	public void reply(EmbedBuilder builder, Consumer<? super BlackMessage> success) {
+	public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success) {
 		reply(builder, success, null);
 	}
 	
-	public void reply(EmbedBuilder builder, Consumer<? super BlackMessage> success, Consumer<? super Throwable> error) {
+	public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
 		message.reply(builder.build()).queue(msg -> { if (success != null) success.accept(BlackMessage.from(msg)); }, error);
 	}
 	
@@ -216,19 +216,19 @@ public class CommandEvent {
 		sendPleaseUse(null, null);
 	}
 	
-	public void sendPleaseUse(Consumer<? super BlackMessage> success) {
+	public void sendPleaseUse(final Consumer<? super BlackMessage> success) {
 		sendPleaseUse(success, null);
 	}
 	
-	public void sendPleaseUse(Consumer<? super BlackMessage> success, Consumer<? super Throwable> error) {
+	public void sendPleaseUse(final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
 		reply(getWrongArgument(), success, error);
 	}
 
-	public static String getPleaseUse(BlackGuild guild, BlackUser author, Command command) {
+	public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final Command command) {
 		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
 	}
 
-	public static String getCommandHelp(BlackGuild guild, BlackUser author, Command command) {
+	public static String getCommandHelp(final BlackGuild guild, final BlackUser author, final Command command) {
 		final String syntax = command.getSyntax();
 		return guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "");
 	}
@@ -237,17 +237,17 @@ public class CommandEvent {
 		return errorEmbed.addField("wrongargument", getPleaseUse(this.guild, this.user, this.command), false);
 	}
 	
-	public String getTranslation(String key) {
+	public String getTranslation(final String key) {
 		return language.getTranslationNonNull(key);
 	}
 	
-	public String getTranslation(String key, Placeholder... placeholders) {
+	public String getTranslation(final String key, final Placeholder... placeholders) {
 		String result = getTranslation(key);
-		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
+		for (final Placeholder placeholder : placeholders) result = placeholder.process(result);
 		return result;
 	}
 	
-	public String getTranslationOrEmpty(String key) {
+	public String getTranslationOrEmpty(final String key) {
 		final String translation = language.getTranslation(key);
 		return translation != null ? translation : language.getTranslationNonNull("empty");
 	}
@@ -286,7 +286,7 @@ public class CommandEvent {
 		return jda;
 	}
 
-	public void setCommand(Command cmd) {
+	public void setCommand(final Command cmd) {
 		this.command = cmd;
 	}
 }

@@ -29,14 +29,14 @@ public class QrCodeCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String filePath = String.valueOf("tmp/" + System.currentTimeMillis()) + ".png";
 		final File file = new File(filePath);
 		file.getParentFile().mkdirs();
 		
 		createQR(String.join(" ", Utils.removeFirstArg(args)), filePath, "UTF-8", 420, 420);
 		
-		EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
+		final EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild)
 				.setTitle("qrcode", "https://zxing.github.io/zxing")
 				.setImage("attachment://qr.png");
 		
@@ -48,7 +48,7 @@ public class QrCodeCommand extends Command {
 				if (!file.delete())
 					file.deleteOnExit();
 			});
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (!file.delete())
 				file.deleteOnExit();
 			ex.printStackTrace();
@@ -56,13 +56,13 @@ public class QrCodeCommand extends Command {
 		}
 	}
 	
-	public static void createQR(String data, String path, String charset, int height, int width) {
+	public static void createQR(final String data, final String path, final String charset, final int height, final int width) {
 		try {
-			BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset),
+			final BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset),
 					BarcodeFormat.QR_CODE, width, height);
 	
 			MatrixToImageWriter.writeToPath(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path).toPath());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}

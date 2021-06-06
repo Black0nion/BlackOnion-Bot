@@ -27,20 +27,19 @@ public class VirusCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		Bot.executor.submit(() -> {
 			final List<Attachment> attachments = message.getAttachments();
 			
 			String url = "";
 			if (attachments.size() != 0) {
-				if (attachments.get(0).getSize() >= 32000000) {
+				if (attachments.get(0).getSize() >= 32000000)
 					url = new JSONObject(getUploadUrl()).getString("data");
-				} else {
+				else
 					url = attachments.get(0).getUrl();
-				}
-			} else if (args.length >= 2) {
+			} else if (args.length >= 2)
 				url = args[1];
-			} else {
+			else {
 				cmde.sendPleaseUse();
 				return;
 			}
@@ -56,7 +55,7 @@ public class VirusCommand extends Command {
 				JSONObject analyse = null;
 				int i = 1;
 				do  { 
-					try { Thread.sleep(5000 * i); i++; } catch (InterruptedException ex) { ex.printStackTrace(); }
+					try { Thread.sleep(5000 * i); i++; } catch (final InterruptedException ex) { ex.printStackTrace(); }
 					analyse = new JSONObject(checkAnalyse(new JSONObject(urlResult).getJSONObject("data").getString("id")).getBody()); 
 				} while (!analyse.has("data"));
 				final JSONObject result = analyse.getJSONObject("data").getJSONObject("attributes").getJSONObject("stats");
@@ -66,7 +65,7 @@ public class VirusCommand extends Command {
 		});
 	}
 	
-	public static HttpResponse<String> checkUrl(String url) {
+	public static HttpResponse<String> checkUrl(final String url) {
 		try {
 			final String key = Bot.getCredentialsManager().getString("virustotal_key");
 			if (key == null)
@@ -76,13 +75,13 @@ public class VirusCommand extends Command {
 			  .header("x-apikey", key)
 			  .field("url", url)
 			  .asString();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 	
-	public static HttpResponse<String> checkAnalyse(String analyseId) {
+	public static HttpResponse<String> checkAnalyse(final String analyseId) {
 		try {
 			final String key = Bot.getCredentialsManager().getString("virustotal_key");
 			if (key == null)
@@ -91,7 +90,7 @@ public class VirusCommand extends Command {
 			return Unirest.get("https://www.virustotal.com/api/v3/analyses/" + analyseId)
 			  .header("x-apikey", key)
 			  .asString();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -106,7 +105,7 @@ public class VirusCommand extends Command {
 			return Unirest.get("https://www.virustotal.com/api/v3/files/upload_url")
 			  .header("x-apikey", key)
 			  .asString();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return null;

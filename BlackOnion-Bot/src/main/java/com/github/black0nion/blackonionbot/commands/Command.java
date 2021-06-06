@@ -36,7 +36,7 @@ public abstract class Command {
 		return command;
 	}
 
-	public Command setCommand(String... command) {
+	public Command setCommand(final String... command) {
 		this.command = command;
 		return this;
 	}
@@ -45,7 +45,7 @@ public abstract class Command {
 		return syntax;
 	}
 
-	public Command setSyntax(String syntax) {
+	public Command setSyntax(final String syntax) {
 		if (syntax == null) this.syntax = "";
 		else this.syntax = syntax;
 		return this;
@@ -55,7 +55,7 @@ public abstract class Command {
 		return category;
 	}
 
-	public Command setCategory(Category category) {
+	public Command setCategory(final Category category) {
 		if (category == null) this.category = Category.OTHER;
 		else this.category = category;
 		return this;
@@ -65,7 +65,7 @@ public abstract class Command {
 		return progress;
 	}
 
-	public Command setProgress(Progress progress) {
+	public Command setProgress(final Progress progress) {
 		if (progress == null) this.progress = Progress.DONE;
 		else this.progress = progress;
 		return this;
@@ -79,7 +79,7 @@ public abstract class Command {
 		return visibility == CommandVisibility.SHOWN;
 	}
 	
-	public Command setVisibility(CommandVisibility visibility) {
+	public Command setVisibility(final CommandVisibility visibility) {
 		if (visibility == null) this.visibility = CommandVisibility.HIDDEN;
 		else this.visibility = visibility;
 		return this;
@@ -94,7 +94,7 @@ public abstract class Command {
 		return requiredArgumentCount;
 	}
 
-	public Command setRequiredArgumentCount(int requiredArgumentCount) {
+	public Command setRequiredArgumentCount(final int requiredArgumentCount) {
 		this.requiredArgumentCount = requiredArgumentCount;
 		return this;
 	}
@@ -103,7 +103,7 @@ public abstract class Command {
 		return requiredPermissions;
 	}
 
-	public Command setRequiredPermissions(Permission... requiredPermissions) {
+	public Command setRequiredPermissions(final Permission... requiredPermissions) {
 		if (requiredPermissions == null) this.requiredPermissions = new Permission[] {};
 		else this.requiredPermissions = requiredPermissions;
 		return this;
@@ -113,7 +113,7 @@ public abstract class Command {
 		return requiredBotPermissions;
 	}
 
-	public Command setRequiredBotPermissions(Permission... requiredBotPermissions) {
+	public Command setRequiredBotPermissions(final Permission... requiredBotPermissions) {
 		if (requiredBotPermissions == null) this.requiredBotPermissions = new Permission[] {};
 		else this.requiredBotPermissions = requiredBotPermissions;
 		return this;
@@ -123,7 +123,7 @@ public abstract class Command {
 		return requiresBotAdmin;
 	}
 
-	public Command requiresBotAdmin(boolean requiresBotAdmin) {
+	public Command requiresBotAdmin(final boolean requiresBotAdmin) {
 		this.requiresBotAdmin = requiresBotAdmin;
 		return this;
 	}
@@ -155,7 +155,7 @@ public abstract class Command {
 		return isDashboardCommand;
 	}
 
-	public Command setDashboardCommand(boolean isDashboardCommand) {
+	public Command setDashboardCommand(final boolean isDashboardCommand) {
 		this.isDashboardCommand = isDashboardCommand;
 		return this;
 	}

@@ -26,29 +26,29 @@ public class SwearWhitelistCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (args.length >= 3 && (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove"))) {
-			List<String> mentionedStuff = new ArrayList<>();
-			List<Role> roles = message.getMentionedRoles();
-			List<TextChannel> channels = message.getMentionedChannels();
+			final List<String> mentionedStuff = new ArrayList<>();
+			final List<Role> roles = message.getMentionedRoles();
+			final List<TextChannel> channels = message.getMentionedChannels();
 			for (int i = 2; i < args.length; i++) {
-				String input = args[i];
-				Role rl = roles.stream().filter(r -> r.getAsMention().equals(input)).findFirst().orElse(null);
-				TextChannel ch = channels.stream().filter(c -> c.getAsMention().equals(input)).findFirst().orElse(null);
+				final String input = args[i];
+				final Role rl = roles.stream().filter(r -> r.getAsMention().equals(input)).findFirst().orElse(null);
+				final TextChannel ch = channels.stream().filter(c -> c.getAsMention().equals(input)).findFirst().orElse(null);
 				Permission perm = null;
-				try { perm = Permission.valueOf(input.toUpperCase()); } catch (Exception ignored) {}
+				try { perm = Permission.valueOf(input.toUpperCase()); } catch (final Exception ignored) {}
 				
 				if (rl != null) mentionedStuff.add(rl.getAsMention());
 				if (ch != null) mentionedStuff.add(ch.getAsMention());
 				if (perm != null) mentionedStuff.add(perm.name());
 			}
 			
-			boolean add = args[1].equalsIgnoreCase("add");
+			final boolean add = args[1].equalsIgnoreCase("add");
 			
 			if (mentionedStuff.size() != 0) {
 				List<String> newWhitelist = guild.getAntiSwearWhitelist();
 				if (newWhitelist == null) newWhitelist = new ArrayList<>();
-				List<String> temp = new ArrayList<String>(newWhitelist);
+				final List<String> temp = new ArrayList<String>(newWhitelist);
 				if (add) {
 					temp.retainAll(mentionedStuff);
 					newWhitelist.removeAll(temp);

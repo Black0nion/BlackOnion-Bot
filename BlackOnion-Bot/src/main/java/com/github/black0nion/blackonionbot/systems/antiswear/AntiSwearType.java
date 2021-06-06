@@ -19,7 +19,7 @@ public enum AntiSwearType {
 	
 	private String description;
 	
-	private AntiSwearType(String description) {
+	private AntiSwearType(final String description) {
 		this.description = description;
 	}
 	
@@ -31,7 +31,7 @@ public enum AntiSwearType {
 		return description;
 	}
 	
-	public static AntiSwearType parse(String input) {
+	public static AntiSwearType parse(final String input) {
 		if (input == null || input == "") return null;
 		return valueOf(input.toUpperCase());
 	}

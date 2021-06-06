@@ -29,9 +29,9 @@ public class ConnectFourCommand extends Command {
 	}
 
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (message.getMentionedBlackUsers().size() != 0) {
-			BlackUser challenged = message.getMentionedBlackUsers().get(0);
+			final BlackUser challenged = message.getMentionedBlackUsers().get(0);
 			if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
 				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
 				return;
@@ -45,12 +45,12 @@ public class ConnectFourCommand extends Command {
 					(event) -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), 
 					event -> {
 				  final BlackUser answerUser = BlackUser.from(event.getAuthor());
-				if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId())) {
-				      if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
+				if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId()))
+					if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 				    	  message.reply(EmbedUtils.getSuccessEmbed(answerUser, guild).addField(getTranslation("challengeaccepted", answerUser, guild), getTranslation("playingagainst", answerUser, guild).replace("%challenger%", author.getName()), false).build()).queue();
 				    	  
 				    	  //ANGENOMMEN
-				    	  ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
+				    	  final ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
 				    	  rerun(game, e.getChannel(), cmde);
 				      } else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
 				    	  message.reply(EmbedUtils.getErrorEmbed(answerUser, guild).setTitle(getTranslation("declined", answerUser, guild)).addField(getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), false).build()).queue();
@@ -59,7 +59,6 @@ public class ConnectFourCommand extends Command {
 				    	  message.reply(EmbedUtils.getErrorEmbed(answerUser, guild).addField(getTranslation("challengedeclined", answerUser, guild), getTranslation("answerwithyes", answerUser, guild), false).build()).queue();
 				    	  return;
 				      }
-				  }
 				}, 1, TimeUnit.MINUTES, () -> message.reply(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
 		} else {
 			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("nousermentioned", author, guild), getTranslation("inputusertoplayagainst", author, guild), false).build()).queue();
@@ -67,7 +66,7 @@ public class ConnectFourCommand extends Command {
 		}
 	}
 	
-	public void rerun(ConnectFour game, TextChannel channel, CommandEvent cmde) {
+	public void rerun(final ConnectFour game, final TextChannel channel, final CommandEvent cmde) {
 		CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, 
 	  			(answerEvent) -> game.isPlayer(answerEvent.getAuthor().getId()),
 	  			(answerEvent) -> {
@@ -84,8 +83,8 @@ public class ConnectFourCommand extends Command {
   						rerun(game, channel, cmde);
   						return;
   					} else if (game.isValidInput(msg)) {
-	  					Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
-	  					FieldType[][] temp = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
+	  					final Map.Entry<Integer, Integer> coords = game.getCoordinatesFromString(msg);
+	  					final FieldType[][] temp = new FieldType[ConnectFourGameManager.Y][ConnectFourGameManager.X];
 	  					System.arraycopy(game.getfield(), 0, temp, 0, game.getfield().length);
 	  					if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
 	  						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("fieldoccopied")).build()).queue();
@@ -104,9 +103,8 @@ public class ConnectFourCommand extends Command {
 		  					ConnectFourGameManager.deleteGame(game);
 		  					return;
 		  				}
-	  				} else {
-	  					game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("wronginput")).build()).queue();
-	  				}
+	  				} else
+						game.getMessage().editMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle(cmde.getTranslation("connectfour") + " | " + cmde.getTranslation("currentplayer") + " " + Utils.removeMarkdown((game.currentUser == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(cmde.getTranslation("currentstate"), game.getField(), false).setDescription(cmde.getTranslation("wronginput")).build()).queue();
 	  				rerun(game, channel, cmde);
 	  				return;
 	  			}, 
