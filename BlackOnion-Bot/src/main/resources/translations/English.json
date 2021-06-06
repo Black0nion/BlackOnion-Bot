@@ -315,6 +315,7 @@
     "commands": "Commands",
     "ping": "Ping",
     "uptime": "Uptime",
+    "version": "Version",
     "addedtoguild": "I got added to a Server  :partying_face:",
     "removedfromguild": "I got removed from a Server  :cry:",
     "guildstatsjoin": "```Name: %name%\nUser Count: %usercount%\nOwner: %owner%```",
