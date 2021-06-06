@@ -162,7 +162,7 @@ public class CommandBase extends ListenerAdapter {
 		if (commands.containsKey(str)) {
 			Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
-			if (cmd.requiresBotAdmin() && author.hasPermission(CustomPermission.ADMIN)) {
+			if (cmd.requiresBotAdmin() && !author.hasPermission(CustomPermission.ADMIN)) {
 				return;
 			}
 			

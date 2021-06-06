@@ -33,7 +33,7 @@ public class SetGuildTypeCommand extends Command {
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (!Utils.isLong(args[1])) {
 			cmde.error("notanumber", "inputnumber");
-		} else {			
+		} else {
 			Guild mentionedGuild = e.getJDA().getGuildById(Long.parseLong(args[1]));
 			final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);
 			if (mentionedBlackGuild != null) {

@@ -15,18 +15,23 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.misc.DrawType;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -77,24 +82,53 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		}
 	}
 	
-	@Override
 	/**
 	 * Called when the bot gets added to a new guild
 	 */
+	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		
-		if (Bot.runMode == RunMode.BETA && guild.getGuildType() != GuildType.BETA) {
-			// TODO: print error message
-			guild.leave().queue();
-		}
-		
-		final String prefix = guild.getPrefix();
-		guild.retrieveOwner().queue(user -> {
-			final BlackUser author = BlackUser.from(user.getUser());
-			author.openPrivateChannel().queue(channel -> {
-				channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
+		Bot.executor.submit(() -> {
+			final BlackGuild guild = BlackGuild.from(event.getGuild());
+			final String prefix = guild.getPrefix();
+			
+			guild.retrieveOwner().queue(user -> {
+				final BlackUser author = BlackUser.from(user.getUser());
+				
+				Logger.logInfo("I got added to the guild " + guild.getName() + "(G:" + guild.getId() + ") with owner " + author.getName() + "(U:" + author.getId() + ")");
+				
+				try {
+					final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
+					guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessage(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getName() + "(U:" + author.getId() + ")")), false).build()).queue();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				if (Bot.runMode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
+					guild.leave().queue();
+					author.openPrivateChannel().queue(channel -> channel.sendMessage(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
+					Logger.logError(guild.getName() + "(G:" + guild.getId() + ") is not a beta guild!");
+					return;
+				}
+				
+				author.openPrivateChannel().queue(channel -> {
+					channel.sendMessage(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue();
+				});
 			});
+		});
+	}
+	
+	@Override
+	public void onGuildLeave(GuildLeaveEvent event) {
+		Bot.executor.submit(() -> {
+			final Guild guild = event.getGuild();
+			Logger.logInfo("I got removed from the guild " + guild.getName() + "(G:" + guild.getId() + ")");
+			
+			try {
+				final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
+				guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessage(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 	}
 	

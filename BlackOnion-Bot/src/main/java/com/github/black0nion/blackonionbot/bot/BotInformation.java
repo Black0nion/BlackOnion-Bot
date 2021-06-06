@@ -16,12 +16,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bson.Document;
+
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.OS;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;
+import com.mongodb.client.model.Filters;
 import com.sun.jna.platform.win32.Advapi32Util;
 
 public class BotInformation {
@@ -38,63 +43,74 @@ public class BotInformation {
 	public static String defaultPrefix;
 	
 	public static long botId;
+	
+	public static long botLogsChannel;
+	public static long supportServer;
 
 	@Reloadable("botinformation")
 	public static void init() {
-		try {
-			Bot.executor.submit(() -> {				
-				calculateCodeLines();
-			});
+		Bot.executor.submit(() -> {
+			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
+			if (doc != null) {
+				supportServer = doc.getLong("guildid");
+				botLogsChannel = doc.getLong("botlogschannel");
+			}
 			
-			if (osBean == null)
-				osBean = ManagementFactory.getOperatingSystemMXBean();
-
-			if (os == null) {
-				if (osBean.getName().toLowerCase().contains("windows")) {
-					os = OS.WINDOWS;
-					osName = osBean.getName();
+			try {
+				Bot.executor.submit(() -> {				
+					calculateCodeLines();
+				});
+				
+				if (osBean == null)
+					osBean = ManagementFactory.getOperatingSystemMXBean();
+	
+				if (os == null) {
+					if (osBean.getName().toLowerCase().contains("windows")) {
+						os = OS.WINDOWS;
+						osName = osBean.getName();
+					} else {
+						os = OS.LINUX;
+						File cpuinfofile = new File("/etc/os-release");
+						HashMap<String, String> osInfo = new HashMap<>();
+						List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
+						for (String key : input) {
+							String[] pair = key.split("=", 2);
+							osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
+						}
+	
+						osName = osInfo.get("PRETTY_NAME").replace("\"", "");
+					}
+				}
+				
+				if (os == OS.WINDOWS) {
+					cpuName = Advapi32Util.registryGetStringValue(HKEY_LOCAL_MACHINE,
+							"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "ProcessorNameString");
+					cpuMhz = String.valueOf(Advapi32Util.registryGetValue(HKEY_LOCAL_MACHINE,
+							"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "~MHZ"));
 				} else {
-					os = OS.LINUX;
-					File cpuinfofile = new File("/etc/os-release");
-					HashMap<String, String> osInfo = new HashMap<>();
+					File cpuinfofile = new File("/proc/cpuinfo");
+					HashMap<String, String> cpuinfo = new HashMap<>();
 					List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
 					for (String key : input) {
-						String[] pair = key.split("=", 2);
-						osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
+						String[] pair = key.split(":", 2);
+						cpuinfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
 					}
-
-					osName = osInfo.get("PRETTY_NAME").replace("\"", "");
+	
+					cpuName = cpuinfo.get("model name");
+					cpuMhz = cpuinfo.get("cpu MHz");
 				}
-			}
-			
-			if (os == OS.WINDOWS) {
-				cpuName = Advapi32Util.registryGetStringValue(HKEY_LOCAL_MACHINE,
-						"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "ProcessorNameString");
-				cpuMhz = String.valueOf(Advapi32Util.registryGetValue(HKEY_LOCAL_MACHINE,
-						"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "~MHZ"));
-			} else {
-				File cpuinfofile = new File("/proc/cpuinfo");
-				HashMap<String, String> cpuinfo = new HashMap<>();
-				List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
-				for (String key : input) {
-					String[] pair = key.split(":", 2);
-					cpuinfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
+	
+				cpuMhz = cpuMhz.substring(0, 1) + "," + cpuMhz.substring(1, 3) + " GHz";
+	
+				if (cpuName.contains("@")) {
+					cpuName = cpuName.split("@")[0].trim();
 				}
-
-				cpuName = cpuinfo.get("model name");
-				cpuMhz = cpuinfo.get("cpu MHz");
+	
+				cpuName = cpuName.replace("CPU", "").trim().replaceAll(" s", " ");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
-			cpuMhz = cpuMhz.substring(0, 1) + "," + cpuMhz.substring(1, 3) + " GHz";
-
-			if (cpuName.contains("@")) {
-				cpuName = cpuName.split("@")[0].trim();
-			}
-
-			cpuName = cpuName.replace("CPU", "").trim().replaceAll(" s", " ");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		});
 	}
 
 	public static void calculateCodeLines() {
