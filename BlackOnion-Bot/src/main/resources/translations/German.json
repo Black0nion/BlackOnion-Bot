@@ -314,5 +314,13 @@
     "messagessent": "Nachrichten gesendet",
     "commands": "Commands",
     "ping": "Ping",
-    "uptime": "Uptime"
+    "uptime": "Uptime",
+    "addedtoguild": "Ich wurde zu einem Server hinzugefügt  :partying_face:",
+    "removedfromguild": "Ich wurde von einem Server entfernt  :cry:",
+    "guildstatsjoin": "```Name: %name%\nUser Count: %usercount%\nOwner: %owner%```",
+    "guildstatsleave": "```Name: %name%```",
+    "savedbotlogschannel": "BotLogsChannel gesetzt!",
+    "thisisbotlogschannel": "Ich werde in Zukunft meine Logdaten hier herein senden!",
+    "notbeta": "Dieser Server ist kein Beta-Server!",
+    "betatutorial": "Bitte beantrage deinen Beta-Zugang auf dem BlackOnion Discord Server!"
 }

@@ -25,10 +25,9 @@ import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.DashboardValue;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -77,8 +76,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	private final Guild guild;
 	private final BlackMember selfBlackMember;
 
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("guildsettings",
-			MongoDB.botDatabase);
+	public static final MongoCollection<Document> configs = MongoDB.botDatabase.getCollection("guildsettings");
 
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder()
 			.expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<Guild, BlackGuild>() {

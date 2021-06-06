@@ -50,15 +50,15 @@ public class Logger {
 	}
 	
 	public static void log(LogMode mode, String logInput) {
-		log(mode, LogOrigin.API, logInput);
+		log(mode, LogOrigin.BOT, logInput);
 	}
 	
 	public static void logInfo(String logInput) {
-		log(LogMode.INFORMATION, LogOrigin.API, logInput);	
+		log(LogMode.INFORMATION, LogOrigin.BOT, logInput);	
 	}
 	
 	public static void logWarning(String logInput) {
-		log(LogMode.WARNING, LogOrigin.API, logInput);
+		log(LogMode.WARNING, LogOrigin.BOT, logInput);
 	}
 	
 	public static void logError(String logInput) {
