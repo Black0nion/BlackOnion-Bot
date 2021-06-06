@@ -15,13 +15,13 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.Embed;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,9 +45,9 @@ public class CommandEvent {
 	private BlackMessage message;
 	private BlackMember member;
 	private BlackUser user;
-	private EmbedBuilder successEmbed;
-	private EmbedBuilder loadingEmbed;
-	private EmbedBuilder errorEmbed;
+	private BlackEmbed successEmbed;
+	private BlackEmbed loadingEmbed;
+	private BlackEmbed errorEmbed;
 	private Language language;
 	
 	@Deprecated
@@ -81,8 +81,8 @@ public class CommandEvent {
 		return language;
 	}
 	
-	public Embed success() {
-		return new Embed(this.successEmbed);
+	public BlackEmbed success() {
+		return new BlackEmbed(this.successEmbed);
 	}
 	
 	public void success(String name, String value) {
@@ -136,8 +136,8 @@ public class CommandEvent {
 		reply(successEmbed.addField(name, value, false), success);
 	}
 	
-	public Embed loading() {
-		return new Embed(this.loadingEmbed);
+	public BlackEmbed loading() {
+		return new BlackEmbed(this.loadingEmbed);
 	}
 	
 	public void loading(Consumer<? super BlackMessage> success) {
@@ -152,8 +152,8 @@ public class CommandEvent {
 		reply(loadingEmbed.addField(name, value, false), success);
 	}
 	
-	public Embed error() {
-		return new Embed(this.errorEmbed);
+	public BlackEmbed error() {
+		return new BlackEmbed(this.errorEmbed);
 	}
 	
 	public void error(String name, String value) {
