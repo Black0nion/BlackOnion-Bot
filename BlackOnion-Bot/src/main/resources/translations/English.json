@@ -64,7 +64,7 @@
     "activitycleared": "Activity cleared!",
     "theactivitygotcleared": "The activity got reset!",
     "newstatus": "New status",
-    "ping": "Ping!",
+    "pinglong": "Ping!",
     "pong": "Pong :D",
     "myping": "My Ping is **%ping%ms**",
     "configreload": "All configs reloaded!",

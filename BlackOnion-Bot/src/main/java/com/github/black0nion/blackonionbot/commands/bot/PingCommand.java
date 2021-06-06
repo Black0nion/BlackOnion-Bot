@@ -19,6 +19,6 @@ public class PingCommand extends Command {
 
 	@Override
 	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		cmde.success("ping", "pong", "myping", new Placeholder("ping", String.valueOf(e.getJDA().getGatewayPing())));
+		cmde.success("pinglong", "pong", "myping", new Placeholder("ping", String.valueOf(e.getJDA().getGatewayPing())));
 	}
 }
