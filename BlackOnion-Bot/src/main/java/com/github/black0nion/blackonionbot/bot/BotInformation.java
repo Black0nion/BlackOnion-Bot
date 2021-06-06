@@ -5,6 +5,7 @@ import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bson.Document;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -46,10 +48,23 @@ public class BotInformation {
 	
 	public static long botLogsChannel;
 	public static long supportServer;
+	
+	public static String version = "N/A";
 
 	@Reloadable("botinformation")
 	public static void init() {
 		Bot.executor.submit(() -> {
+			try {
+				final File file = new File("version");
+				if (file.exists()) {					
+					final @Nullable String readFirstLine = Files.asCharSource(file, StandardCharsets.UTF_8).readFirstLine();
+					if (readFirstLine != null) {
+						version = readFirstLine;
+					}
+				}
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
 			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
 			if (doc != null) {
 				supportServer = doc.getLong("guildid");
@@ -61,8 +76,9 @@ public class BotInformation {
 					calculateCodeLines();
 				});
 				
-				if (osBean == null)
+				if (osBean == null) {
 					osBean = ManagementFactory.getOperatingSystemMXBean();
+				}
 	
 				if (os == null) {
 					if (osBean.getName().toLowerCase().contains("windows")) {
@@ -70,11 +86,11 @@ public class BotInformation {
 						osName = osBean.getName();
 					} else {
 						os = OS.LINUX;
-						File cpuinfofile = new File("/etc/os-release");
-						HashMap<String, String> osInfo = new HashMap<>();
-						List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
-						for (String key : input) {
-							String[] pair = key.split("=", 2);
+						final File cpuinfofile = new File("/etc/os-release");
+						final HashMap<String, String> osInfo = new HashMap<>();
+						final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
+						for (final String key : input) {
+							final String[] pair = key.split("=", 2);
 							osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
 						}
 	
@@ -88,11 +104,11 @@ public class BotInformation {
 					cpuMhz = String.valueOf(Advapi32Util.registryGetValue(HKEY_LOCAL_MACHINE,
 							"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "~MHZ"));
 				} else {
-					File cpuinfofile = new File("/proc/cpuinfo");
-					HashMap<String, String> cpuinfo = new HashMap<>();
-					List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
-					for (String key : input) {
-						String[] pair = key.split(":", 2);
+					final File cpuinfofile = new File("/proc/cpuinfo");
+					final HashMap<String, String> cpuinfo = new HashMap<>();
+					final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
+					for (final String key : input) {
+						final String[] pair = key.split(":", 2);
 						cpuinfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
 					}
 	
@@ -107,7 +123,7 @@ public class BotInformation {
 				}
 	
 				cpuName = cpuName.replace("CPU", "").trim().replaceAll(" s", " ");
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -118,8 +134,8 @@ public class BotInformation {
 			line_count = ValueManager.getInt("lines");
 			file_count = ValueManager.getInt("files");
 		} else {
-			File dir = new File("src/main");
-			File[] files = dir.listFiles();
+			final File dir = new File("src/main");
+			final File[] files = dir.listFiles();
 			line_count = 1337;
 			file_count = 69;
 			Bot.executor.submit(() -> {
@@ -128,61 +144,65 @@ public class BotInformation {
 				ValueManager.save("files", file_count);
 				//Send a request to the servers to update the two counters
 				try {
-					for (String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
+					for (final String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
 						Bot.executor.submit(() -> {
 							try {
-								String body = "{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}";
-								URL url = new URL(endpoint + "/api/updatefilelinecount");
-								HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+								final String body = "{\"line_count\":" + line_count + ",\"file_count\":" + file_count + "}";
+								final URL url = new URL(endpoint + "/api/updatefilelinecount");
+								final HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 								httpCon.setDoOutput(true);
 								httpCon.setRequestMethod("POST");
 								httpCon.setRequestProperty("token", "updatepls");
-								OutputStream os = httpCon.getOutputStream();
-								OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
+								final OutputStream os = httpCon.getOutputStream();
+								final OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");    
 								osw.write(body);
 								osw.flush();
 								osw.close();
 								os.close();
 								httpCon.connect();
 								httpCon.getInputStream();
-							} catch (Exception e) {
-								if (!(e instanceof ConnectException))
+							} catch (final Exception e) {
+								if (!(e instanceof ConnectException)) {
 									e.printStackTrace();
+								}
 							}
 						});
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Logger.logWarning("No file \"files/endpoints.txt\"", LogOrigin.API);
 				}
 			});
 		}
 	}
 	
-	public static void showFiles(File[] files) {
+	public static void showFiles(final File[] files) {
 		line_count = 0;
 		file_count = 0;
 		
 		searchDirectory(files);
 	}
 
-	public static void searchDirectory(File[] files) {
+	public static void searchDirectory(final File[] files) {
 		try {
-			for (File file : files) {
+			for (final File file : files) {
 				if (file.isDirectory()) {
 					searchDirectory(file.listFiles());
 				} else {
 					file_count++;
 					final String fileName = file.getName();
-					if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) continue;
-					BufferedReader reader = new BufferedReader(new FileReader(file));
+					if (fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
+						continue;
+					}
+					final BufferedReader reader = new BufferedReader(new FileReader(file));
 					int count = 0;
-					while (reader.readLine() != null)
+					while (reader.readLine() != null) {
 						count++;
+					}
 					line_count += count;
 					reader.close();
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
