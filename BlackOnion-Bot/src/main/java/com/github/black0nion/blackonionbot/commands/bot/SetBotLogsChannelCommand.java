@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -15,7 +16,7 @@ public class SetBotLogsChannelCommand extends Command {
 	
 	public SetBotLogsChannelCommand() {
 		this.setCommand("setbotlogschannel")
-			.botAdminRequired();
+			.setRequiredCustomPermissions(CustomPermission.ADMIN);
 	}
 
 	@Override

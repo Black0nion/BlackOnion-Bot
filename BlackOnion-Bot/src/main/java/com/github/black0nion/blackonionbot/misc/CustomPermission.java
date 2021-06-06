@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.google.common.collect.Iterables;
-
 public enum CustomPermission {
 
 	ADMIN,
@@ -28,10 +25,10 @@ public enum CustomPermission {
 	 * }
 	 * </pre>
 	 * Explanation: SET_STATUS is <i>INCLUDED in</i> DEVELOPER. DEVELOPERs also have the permission SET_STATUS, and because DEVELOPER has the permission ADMIN admins can also use it
-	 * @param links the minimum permission requirement.
+	 * @param includedIn the minimum permission requirement.
 	 */
-	private CustomPermission(final CustomPermission... links) {
-		this.links.addAll(Arrays.asList(links));
+	private CustomPermission(final CustomPermission... includedIn) {
+		this.links.addAll(Arrays.asList(includedIn));
 	}
 
 	public static List<CustomPermission> parse(final String... input) {
@@ -47,12 +44,8 @@ public enum CustomPermission {
 	 * @param permission
 	 * @return
 	 */
-	public boolean hasPermission(final BlackUser user, final CustomPermission permission) {
-		if (user.getPermissions().contains(permission))
-			return true;
-		else {
-        	final Iterable<CustomPermission> i = user.getPermissions();
-            return Iterables.any(i, s -> s.hasPermission(user, permission));            
-        }
+	public boolean hasPermission(final CustomPermission permission) {
+		// TODO: recursively search
+		return true;
 	}
 }

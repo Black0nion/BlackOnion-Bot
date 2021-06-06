@@ -109,9 +109,16 @@ public class BlackUser extends BlackObject implements User {
 		return permissions;
 	}
 	
+	public boolean hasPermission(final CustomPermission... permissions) {
+		for (final CustomPermission requiredPerm : permissions)
+			if (!hasPermission(requiredPerm)) return false;
+		return true;
+	}
+	
 	public boolean hasPermission(final CustomPermission permission) {
 		for (final CustomPermission perm : this.permissions)
-			if (perm.hasPermission(this, permission)) return true;
+			if (perm.hasPermission(permission))
+				return true;
 		return false;
 	}
 	

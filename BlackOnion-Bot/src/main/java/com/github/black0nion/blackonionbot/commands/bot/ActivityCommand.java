@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -27,7 +28,7 @@ public class ActivityCommand extends Command {
 		this.setCommand("activity")
 			.setSyntax("([playing | watching | listening] <Text>) | clear")
 			.setRequiredArgumentCount(1)
-			.botAdminRequired()
+			.setRequiredCustomPermissions(CustomPermission.ADMIN)
 			.setHidden()
 			.setCategory(Category.BOT);
 	}

@@ -9,6 +9,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
@@ -22,7 +23,7 @@ public class RenameCommand extends Command {
 	public RenameCommand() {
 		this.setCommand("rename", "rn")
 			.setSyntax("<old name> <new name>")
-			.botAdminRequired()
+			.setRequiredCustomPermissions(CustomPermission.ADMIN)
 			.setHidden();
 	}
 	

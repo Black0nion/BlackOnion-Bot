@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
 
 import net.dv8tion.jda.api.Permission;
@@ -24,7 +25,7 @@ public abstract class Command {
 	private int requiredArgumentCount = 0;
 	private Permission[] requiredPermissions = new Permission[] {};
 	private Permission[] requiredBotPermissions = new Permission[] {};
-	private boolean requiresBotAdmin = false;
+	private CustomPermission[] requiredCustomPermissions;
 	private boolean isToggleable = true;
 	private boolean isDashboardCommand = true;
 	private boolean shouldAutoRegister = true;
@@ -119,22 +120,13 @@ public abstract class Command {
 		return this;
 	}
 
-	public boolean requiresBotAdmin() {
-		return requiresBotAdmin;
-	}
-
-	public Command requiresBotAdmin(final boolean requiresBotAdmin) {
-		this.requiresBotAdmin = requiresBotAdmin;
+	public Command setRequiredCustomPermissions(final CustomPermission... permissions) {
+		this.requiredCustomPermissions = permissions;
 		return this;
 	}
 	
-	/**
-	 * Sets requiredBotAdmin to true
-	 * @return self
-	 */
-	public Command botAdminRequired() {
-		this.requiresBotAdmin(true);
-		return this;
+	public CustomPermission[] getRequiredCustomPermissions() {
+		return requiredCustomPermissions;
 	}
 
 	public boolean isToggleable() {
@@ -183,8 +175,9 @@ public abstract class Command {
 		return "Command [command=" + Arrays.toString(command) + ", syntax=" + syntax + ", category=" + category
 				+ ", progress=" + progress + ", visibility=" + visibility + ", requiredArgumentCount="
 				+ requiredArgumentCount + ", requiredPermissions=" + Arrays.toString(requiredPermissions)
-				+ ", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) + ", requiresBotAdmin="
-				+ requiresBotAdmin + ", isToggleable=" + isToggleable + ", isDashboardCommand=" + isDashboardCommand
-				+ ", shouldAutoRegister=" + shouldAutoRegister + "]";
+				+ ", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) + ", requiredCustomPermissions="
+				+ Arrays.toString(requiredCustomPermissions) + ", isToggleable=" + isToggleable
+				+ ", isDashboardCommand=" + isDashboardCommand + ", shouldAutoRegister=" + shouldAutoRegister
+				+ ", isPremium=" + isPremium + "]";
 	}
 }

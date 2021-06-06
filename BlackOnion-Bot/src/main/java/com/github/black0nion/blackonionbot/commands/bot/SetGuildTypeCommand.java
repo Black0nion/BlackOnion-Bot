@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -23,7 +24,7 @@ public class SetGuildTypeCommand extends Command {
 		this.setCommand("setguildtype")
 			.setSyntax("<guildid> <guildtype>")
 			.setRequiredArgumentCount(2)
-			.botAdminRequired();
+			.setRequiredCustomPermissions(CustomPermission.ADMIN);
 	}
 
 	@Override
