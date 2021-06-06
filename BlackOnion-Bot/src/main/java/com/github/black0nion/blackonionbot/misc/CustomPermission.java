@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 public enum CustomPermission {
 
 	ADMIN,
-	DEVELOPER(ADMIN), 
+	DEVELOPER(ADMIN),
+	ALPHA,
+	BETA(ADMIN, ALPHA),
 
 	SET_ACTIVITY(DEVELOPER),
-	RELOAD(DEVELOPER);
+	RELOAD(BETA, DEVELOPER);
 
 	private final List<CustomPermission> links = new ArrayList<>();
 
@@ -39,13 +41,16 @@ public enum CustomPermission {
 		return input.stream().map(perm -> valueOf(perm.toUpperCase())).collect(Collectors.toList());
 	}
 	
-	/**
-	 * Recursivesly searches through the hierarchy to check if a user has permission
-	 * @param permission
-	 * @return
-	 */
-	public boolean hasPermission(final CustomPermission permission) {
-		// TODO: recursively search
-		return true;
+	public static boolean hasRights(final CustomPermission requiredPermission, final List<CustomPermission> permissionsDieErHat) {
+		if (permissionsDieErHat.contains(requiredPermission))
+			return true;
+		if (permissionsDieErHat.size() != 0) {
+			for (final CustomPermission perm : requiredPermission.links) {
+				final boolean hasRights = hasRights(perm, permissionsDieErHat);
+				if (hasRights)
+					return true;
+			}
+		}
+		return false;
 	}
 }

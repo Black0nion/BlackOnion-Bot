@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -55,11 +56,16 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VanityInvite;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.managers.GuildManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
+import net.dv8tion.jda.api.requests.restaction.CommandEditAction;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.requests.restaction.MemberAction;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
 import net.dv8tion.jda.api.requests.restaction.order.CategoryOrderAction;
@@ -104,8 +110,9 @@ public class BlackGuild extends BlackObject implements Guild {
 		try {
 			return guilds.get(guild);
 		} catch (final Exception e) {
-			if (!(e instanceof IllegalStateException))
+			if (!(e instanceof IllegalStateException)) {
 				e.printStackTrace();
+			}
 			return null;
 		}
 	}
@@ -138,8 +145,9 @@ public class BlackGuild extends BlackObject implements Guild {
 		try {
 			Document config = configs.find(this.getIdentifier()).first();
 
-			if (config == null)
+			if (config == null) {
 				config = new Document();
+			}
 
 			this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")),
 					LanguageSystem.defaultLocale);
@@ -157,10 +165,11 @@ public class BlackGuild extends BlackObject implements Guild {
 			this.autoRoles = gOD(config.getList("autoroles", Long.class), new ArrayList<>());
 			this.antiSwearWhitelist = gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
 			final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
-			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) 
+			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
-			else 
+			} else {
 				this.disabledCommands = new ArrayList<>();
+			}
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -216,8 +225,9 @@ public class BlackGuild extends BlackObject implements Guild {
 	@DashboardValue("joinchannel")
 	public void setJoinChannel(final long joinChannel) {
 		this.joinChannel = joinChannel;
-		if (joinChannel == -1)
+		if (joinChannel == -1) {
 			clear("joinchannel");
+		}
 		save("joinChannel", joinChannel);
 	}
 
@@ -238,8 +248,9 @@ public class BlackGuild extends BlackObject implements Guild {
 	@DashboardValue("leavechannel")
 	public void setLeaveChannel(final long leaveChannel) {
 		this.leaveChannel = leaveChannel;
-		if (leaveChannel == -1)
+		if (leaveChannel == -1) {
 			clear("leavechannel");
+		}
 		save("leaveChannel", leaveChannel);
 	}
 
@@ -268,10 +279,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	
 	public boolean setCommandActivated(final Command cmd, final boolean activated) {
 		if  (!cmd.isToggleable()) return false;
-		if (disabledCommands.contains(cmd) && activated)
+		if (disabledCommands.contains(cmd) && activated) {
 			disabledCommands.remove(cmd);
-		else if (activated && !disabledCommands.contains(cmd))
+		} else if (activated && !disabledCommands.contains(cmd)) {
 			disabledCommands.add(cmd);
+		}
 		setDisabledCommands(this.disabledCommands);
 		return true;
 	}
@@ -338,7 +350,9 @@ public class BlackGuild extends BlackObject implements Guild {
 	}
 	
 	public void addAutoRole(final long roleId) {
-		if (!this.autoRoles.contains(roleId)) this.autoRoles.add(roleId);
+		if (!this.autoRoles.contains(roleId)) {
+			this.autoRoles.add(roleId);
+		}
 		saveAutoRoles();
 	}
 	
@@ -1174,5 +1188,66 @@ public class BlackGuild extends BlackObject implements Guild {
 				+ joinMessage + ", joinChannel=" + joinChannel + ", leaveMessage=" + leaveMessage + ", leaveChannel="
 				+ leaveChannel + ", disabledCommands=" + disabledCommands + ", suggestionsChannel=" + suggestionsChannel
 				+ ", autoRoles=" + autoRoles + "]";
+	}
+
+	@Override
+	public RestAction<List<net.dv8tion.jda.api.interactions.commands.Command>> retrieveCommands() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> retrieveCommandById(final String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommandCreateAction upsertCommand(final CommandData command) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommandListUpdateAction updateCommands() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommandEditAction editCommandById(final String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<Void> deleteCommandById(final String commandId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(final String commandId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<Map<String, List<CommandPrivilege>>> retrieveCommandPrivileges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(final String id,
+			final Collection<? extends CommandPrivilege> privileges) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(final Map<String, Collection<? extends CommandPrivilege>> privileges) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
