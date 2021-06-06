@@ -23,7 +23,6 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -70,44 +69,42 @@ public class CommandBase extends ListenerAdapter {
 		addCommands(waiter);
 	}
 	
-	public static void addCommands(EventWaiter newWaiter) {
+	public static void addCommands(final EventWaiter newWaiter) {
 		commands.clear();
 		commandsInCategory.clear();
 		waiter = newWaiter;
-		Reflections reflections = new Reflections(Command.class.getPackage().getName());
-		Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
+		final Reflections reflections = new Reflections(Command.class.getPackage().getName());
+		final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
 
-		for (Class<?> command : annotated) {
+		for (final Class<?> command : annotated)
 			try {
 				final Command newInstance = (Command) command.getConstructor().newInstance();
 				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length-1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 				
-				if (newInstance.shouldAutoRegister()) {					
-					if (newInstance.getCommand() != null) {
+				if (newInstance.shouldAutoRegister())
+					if (newInstance.getCommand() != null)
 						addCommand(newInstance);
-					} else
+					else
 						System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
-				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
-		}
 		
 		Bot.executor.submit(() -> {
 			Dashboard.init();
-			for (Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
-				JSONArray array = new JSONArray();
-				for (Command command : entry.getValue().stream().filter(cmd -> cmd.getVisibility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
-					JSONObject commandJSON = new JSONObject();
+			for (final Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
+				final JSONArray array = new JSONArray();
+				for (final Command command : entry.getValue().stream().filter(cmd -> cmd.getVisibility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {				
+					final JSONObject commandJSON = new JSONObject();
 					commandJSON.put("command", command.getCommand());
 					final String translation = LanguageSystem.getDefaultLanguage().getTranslation("help" + command.getCommand()[0]);
 					commandJSON.put("description", translation != null ? translation : LanguageSystem.getDefaultLanguage().getTranslationNonNull("empty"));
 					commandJSON.put("isToggleable", command.isToggleable());
 					if (Dashboard.hasValues(command)) {
-						JSONArray values = new JSONArray();
-						for (DashboardValue value : Dashboard.getValues(command))
+						final JSONArray values = new JSONArray();
+						for (final DashboardValue value : Dashboard.getValues(command))
 							values.put(value.toJSON());
 						commandJSON.put("values", values);
 					}
@@ -123,12 +120,12 @@ public class CommandBase extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+	public void onGuildMessageUpdate(final GuildMessageUpdateEvent event) {
 		AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
 	}
 	
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
 		messagesLastTenSecs++;
 		ValueManager.save("messagesSent", ValueManager.getInt("messagesSent") + 1);
 		final BlackUser author = BlackUser.from(event.getAuthor());
@@ -157,14 +154,13 @@ public class CommandBase extends ListenerAdapter {
 		PrefixInfo.handle(cmde);
 		
 		if (!args[0].startsWith(prefix)) return;
-		String str = args[0].replace(prefix, "");
+		final String str = args[0].replace(prefix, "");
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 		if (commands.containsKey(str)) {
-			Command cmd = commands.get(str);
+			final Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
-			if (cmd.requiresBotAdmin() && !author.hasPermission(CustomPermission.ADMIN)) {
+			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions()))
 				return;
-			}
 			
 			ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 			commandsLastTenSecs++;
@@ -180,9 +176,9 @@ public class CommandBase extends ListenerAdapter {
 					return;
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
-			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) {
+			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions))
 				return;
-			} else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
 				message.reply(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
@@ -212,15 +208,13 @@ public class CommandBase extends ListenerAdapter {
 	}
 	
 	@Deprecated
-	public static void addCommand(Command c, String... command) {
-		for (String s : command) {
-			if (!commands.containsKey(s)) {
-				commands.put(s, c);				
-			}
-		}
+	public static void addCommand(final Command c, final String... command) {
+		for (final String s : command)
+			if (!commands.containsKey(s))
+				commands.put(s, c);
 	}
 	
-	public static void addCommand(Command c) {
+	public static void addCommand(final Command c) {
 		if (!commandsArray.containsKey(c.getCommand())) {			
 			final Category category = c.getCategory();
 			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
@@ -228,11 +222,9 @@ public class CommandBase extends ListenerAdapter {
 			commandsInCategory.put(category, commandsInCat);
 			commandsArray.put(c.getCommand(), c);
 			
-			for (String command : c.getCommand()) {
-				if (!commands.containsKey(command)) {
+			for (final String command : c.getCommand())
+				if (!commands.containsKey(command))
 					commands.put(command, c);
-				}
-			}
 		}
 	}
 }

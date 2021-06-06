@@ -13,6 +13,7 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,7 +25,7 @@ public class AdminHelpCommand extends Command {
 	
 	public AdminHelpCommand() {
 		this.setCommand("adminhelp")
-			.botAdminRequired()
+			.setRequiredCustomPermissions(CustomPermission.ADMIN)
 			.setHidden()
 			.setCategory(Category.BOT);
 	}

@@ -18,6 +18,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -34,7 +35,7 @@ public class ReloadCommand extends Command {
 	
 	public ReloadCommand() {
 		this.setCommand("reload", "rl")
-			.botAdminRequired()
+			.setRequiredCustomPermissions(CustomPermission.ADMIN)
 			.setHidden();
 	}
 

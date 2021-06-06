@@ -10,6 +10,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -24,7 +25,7 @@ public class BanUsageCommand extends Command {
 	
 	public BanUsageCommand() {
 		this.setCommand("banusage", "usageban")
-		.botAdminRequired()
+		.setRequiredCustomPermissions(CustomPermission.ADMIN)
 		.setHidden()
 		.setSyntax("<u:(userid) | g:(guildid)>");
 	}

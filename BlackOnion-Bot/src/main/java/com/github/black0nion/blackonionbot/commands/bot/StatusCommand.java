@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
@@ -22,13 +23,13 @@ public class StatusCommand extends Command {
 	public StatusCommand() {
 		this.setCommand("status")
 			.setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]")
-			.botAdminRequired()
+			.setRequiredCustomPermissions(CustomPermission.ADMIN)
 			.setHidden()
 			.setRequiredArgumentCount(1);
 	}
 	
 	@Override
-	public void execute(String[] args, CommandEvent cmde, GuildMessageReceivedEvent e, BlackMessage message, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		message.delete().queue();
 		OnlineStatus status = getStatusFromFile();
 		switch (args[1]) {
@@ -62,16 +63,16 @@ public class StatusCommand extends Command {
 	}
 	
 	public static OnlineStatus getStatusFromFile() {
-		String statusType = ValueManager.getString("status");
-		if(statusType.contains("online")) {
+		final String statusType = ValueManager.getString("status");
+		if(statusType.contains("online"))
 			return OnlineStatus.ONLINE;
-		} else if (statusType.contains("afk")) {
+		else if (statusType.contains("afk"))
 			return OnlineStatus.IDLE;
-		} else if (statusType.contains("dnd")) {
+		else if (statusType.contains("dnd"))
 			return OnlineStatus.DO_NOT_DISTURB;
-		} else if (statusType.contains("offline")) {
+		else if (statusType.contains("offline"))
 			return OnlineStatus.OFFLINE;
-		} else {
+		else {
 			System.out.println("Could not read Status from File!");
 			return OnlineStatus.DO_NOT_DISTURB;
 		}
