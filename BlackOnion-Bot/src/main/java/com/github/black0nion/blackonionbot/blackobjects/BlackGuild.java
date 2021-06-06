@@ -1179,7 +1179,57 @@ public class BlackGuild extends BlackObject implements Guild {
 	public CategoryOrderAction modifyVoiceChannelPositions(final Category category) {
 		return this.guild.modifyVoiceChannelPositions(category);
 	}
-
+	
+	@Override
+	public RestAction<List<net.dv8tion.jda.api.interactions.commands.Command>> retrieveCommands() {
+		return this.guild.retrieveCommands();
+	}
+	
+	@Override
+	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> retrieveCommandById(final String id) {
+		return this.guild.retrieveCommandById(id);
+	}
+	
+	@Override
+	public CommandCreateAction upsertCommand(final CommandData command) {
+		return this.guild.upsertCommand(command);
+	}
+	
+	@Override
+	public CommandListUpdateAction updateCommands() {
+		return this.guild.updateCommands();
+	}
+	
+	@Override
+	public CommandEditAction editCommandById(final String id) {
+		return this.guild.editCommandById(id);
+	}
+	
+	@Override
+	public RestAction<Void> deleteCommandById(final String commandId) {
+		return this.guild.deleteCommandById(commandId);
+	}
+	
+	@Override
+	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(final String commandId) {
+		return this.retrieveCommandPrivilegesById(commandId);
+	}
+	
+	@Override
+	public RestAction<Map<String, List<CommandPrivilege>>> retrieveCommandPrivileges() {
+		return this.guild.retrieveCommandPrivileges();
+	}
+	
+	@Override
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(final String id, final Collection<? extends CommandPrivilege> privileges) {
+		return this.guild.updateCommandPrivilegesById(id, privileges);
+	}
+	
+	@Override
+	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(final Map<String, Collection<? extends CommandPrivilege>> privileges) {
+		return this.guild.updateCommandPrivileges(privileges);
+	}
+	
 	@Override
 	public String toString() {
 		return "BlackGuild [guild=" + guild + ", selfBlackMember=" + selfBlackMember + ", language=" + language
@@ -1188,66 +1238,5 @@ public class BlackGuild extends BlackObject implements Guild {
 				+ joinMessage + ", joinChannel=" + joinChannel + ", leaveMessage=" + leaveMessage + ", leaveChannel="
 				+ leaveChannel + ", disabledCommands=" + disabledCommands + ", suggestionsChannel=" + suggestionsChannel
 				+ ", autoRoles=" + autoRoles + "]";
-	}
-
-	@Override
-	public RestAction<List<net.dv8tion.jda.api.interactions.commands.Command>> retrieveCommands() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> retrieveCommandById(final String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CommandCreateAction upsertCommand(final CommandData command) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CommandListUpdateAction updateCommands() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CommandEditAction editCommandById(final String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<Void> deleteCommandById(final String commandId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(final String commandId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<Map<String, List<CommandPrivilege>>> retrieveCommandPrivileges() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(final String id,
-			final Collection<? extends CommandPrivilege> privileges) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(final Map<String, Collection<? extends CommandPrivilege>> privileges) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

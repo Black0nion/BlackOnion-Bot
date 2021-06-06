@@ -474,7 +474,6 @@ public class BlackMessage extends BlackObject implements Message {
 
 	@Override
 	public List<ActionRow> getActionRows() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getActionRows();
 	}
 }
