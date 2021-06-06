@@ -292,4 +292,13 @@ public class Utils {
 	public static <T> Object[] toObjectArray(T[] input) {
 		return Arrays.asList(input).stream().map(map -> (Object) map).toArray();
 	}
+
+	public static String parseDate(final long diff) {
+		final long diffSeconds = diff / 1000 % 60;
+        final long diffMinutes = diff / (60 * 1000) % 60;
+        final long diffHours = diff / (60 * 60 * 1000) % 24;
+        final long diffDays = diff / (24 * 60 * 60 * 1000);
+        
+		return (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : "");
+	}
 }

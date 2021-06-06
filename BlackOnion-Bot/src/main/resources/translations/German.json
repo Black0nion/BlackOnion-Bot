@@ -64,7 +64,7 @@
     "activitycleared": "Aktivität gelöscht!",
     "theactivitygotcleared": "Die Aktivität wurde zurückgesetzt!",
     "newstatus": "Neuer Status",
-    "ping": "Ping!",
+    "pinglong": "Ping!",
     "pong": "Pong :D",
     "myping": "Mein Ping ist **%ping%ms**",
     "reloading": "Reloading...",
@@ -297,5 +297,18 @@
     "validguildtypes": "Mögliche GuildTypes:\n%guildtypes%",
     "guildtypeset": "GuildType gesetzt!",
     "guildtypesetto": "Der GuildType von **%guild%** ist jetzt `%guildtype%`",
-    "thisguildnotfound": "Diese Guild konnte nicht gefunden werden!"
+    "thisguildnotfound": "Diese Guild konnte nicht gefunden werden!",
+    "prefix": "Prefix",
+    "runmode": "RunMode",
+    "os": "OS",
+    "cpuname": "CPU Name",
+    "cpucores": "CPU Cores",
+    "cpuspeed": "CPU Speed",
+    "lines": "Codezeilen",
+    "files": "Dateien",
+    "commandsexecuted": "Befehle ausgeführt",
+    "messagessent": "Nachrichten gesendet",
+    "commands": "Commands",
+    "ping": "Ping",
+    "uptime": "Uptime"
 }
