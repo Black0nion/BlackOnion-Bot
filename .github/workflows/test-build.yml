@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'dependabot/**'
+    tags:
+      - 'testbuild*'
 
 jobs:
   build:
