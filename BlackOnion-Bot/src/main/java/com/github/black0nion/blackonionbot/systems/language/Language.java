@@ -77,4 +77,9 @@ public class Language {
 		for (Placeholder placeholder : placeholders) result = placeholder.process(result);
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return name + " (" + languageCode + ")";
+	}
 }

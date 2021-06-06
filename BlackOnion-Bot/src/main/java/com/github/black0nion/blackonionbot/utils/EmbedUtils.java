@@ -3,16 +3,17 @@ package com.github.black0nion.blackonionbot.utils;
 import java.awt.Color;
 import java.time.Instant;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EmbedUtils {
 	
-	public static EmbedBuilder getErrorEmbed(BlackUser author, BlackGuild guild) {
-		EmbedBuilder builder = new Embed(author, guild)
+	public static BlackEmbed getErrorEmbed(BlackUser author, BlackGuild guild) {
+		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("error")
 				.setColor(Color.RED)
 				.setTimestamp(Instant.now());
@@ -20,14 +21,14 @@ public class EmbedUtils {
 		return builder;
 	}
 	
-	public static EmbedBuilder getErrorEmbed() {
-		return new Embed().setTitle("error")
+	public static BlackEmbed getErrorEmbed() {
+		return new BlackEmbed().setTitle("error")
 				.setColor(Color.RED)
 				.setTimestamp(Instant.now());
 	}
 	
-	public static EmbedBuilder getSuccessEmbed(BlackUser author, BlackGuild guild) {
-		EmbedBuilder builder = new Embed(author, guild)
+	public static BlackEmbed getSuccessEmbed(BlackUser author, BlackGuild guild) {
+		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("success")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
@@ -35,14 +36,14 @@ public class EmbedUtils {
 		return builder;
 	}
 	
-	public static EmbedBuilder getSuccessEmbed() {
-		return new Embed().setTitle("success")
+	public static BlackEmbed getSuccessEmbed() {
+		return new BlackEmbed().setTitle("success")
 				.setColor(Color.getHSBColor(0.8F, 1, 0.5F))
 				.setTimestamp(Instant.now());
 	}
 	
-	public static EmbedBuilder getLoadingEmbed(BlackUser author, BlackGuild guild) {
-		EmbedBuilder builder = new Embed(author, guild)
+	public static BlackEmbed getLoadingEmbed(BlackUser author, BlackGuild guild) {
+		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("loading")
 				.setColor(Color.getHSBColor(0.16F, 1F, 1F))
 				.setTimestamp(Instant.now());
@@ -50,15 +51,15 @@ public class EmbedUtils {
 		return builder;
 	}
 	
-	public static EmbedBuilder getLoadingEmbed() {
-		return new Embed().setTitle("loading")
+	public static BlackEmbed getLoadingEmbed() {
+		return new BlackEmbed().setTitle("loading")
 				.setColor(Color.getHSBColor(0.16F, 1F, 1F))
 				.setTimestamp(Instant.now());
 	}
 	
 	private static final Color premiumColor = new Color(245, 189, 2);
 	public static MessageEmbed premiumRequired(BlackUser author, BlackGuild guild) {
-		EmbedBuilder builder = new Embed(author, guild)
+		BlackEmbed builder = new BlackEmbed(LanguageSystem.getLanguage(author, guild))
 				.setTitle("error")
 				.addField("notpremium", "premiumrequired", false)
 				.setColor(premiumColor)

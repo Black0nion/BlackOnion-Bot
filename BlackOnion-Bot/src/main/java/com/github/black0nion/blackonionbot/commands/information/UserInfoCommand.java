@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.information;
 
 import java.time.format.DateTimeFormatter;
 
+import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
@@ -60,7 +61,7 @@ public class UserInfoCommand extends Command {
 	private static final EmbedBuilder getUserInfo(CommandEvent cmde, BlackUser statsUser, BlackMember statsMember) {
 		String[] flags = statsUser.getFlags().stream().map(entry -> entry.getName()).toArray(String[]::new);
 		
-		EmbedBuilder builder = cmde.success();
+		BlackEmbed builder = cmde.success();
 		builder.setTitle("userinfo");
 		builder.setThumbnail(statsUser.getAvatarUrl());
 		builder.addField("name", Utils.removeMarkdown(statsUser.getName()), true);
