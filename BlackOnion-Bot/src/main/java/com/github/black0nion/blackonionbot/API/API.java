@@ -33,6 +33,8 @@ public class API {
 	postRequests.clear();
 	getRequests.clear();
 	final int port = ValueManager.getInt("api_port");
+	Spark.stop();
+	Spark.awaitStop();
 	Spark.port(port != 0 ? port : 187);
 
 	final Reflections reflections = new Reflections(API.class.getPackage().getName());
