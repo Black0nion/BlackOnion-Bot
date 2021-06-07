@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Warn;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
@@ -36,14 +37,16 @@ public class WarnCommand extends Command {
 	    if (args[1].replace("!", "").equalsIgnoreCase(memberToWarn.getAsMention())) {
 		if (member.canInteract(memberToWarn)) {
 		    Warn warn;
+		    String reason = cmde.getTranslation("empty");
 		    if (args.length > 2) {
-			warn = new Warn(guild.getIdLong(), author.getIdLong(), memberToWarn.getIdLong(), System.currentTimeMillis(), String.join(" ", Utils.removeFirstArg(Utils.removeFirstArg(args))));
+			reason = String.join(" ", Utils.removeFirstArg(Utils.removeFirstArg(args)));
+			warn = new Warn(guild.getIdLong(), author.getIdLong(), memberToWarn.getIdLong(), System.currentTimeMillis(), reason);
 		    } else {
 			warn = new Warn(guild.getIdLong(), author.getIdLong(), memberToWarn.getIdLong(), System.currentTimeMillis());
 		    }
 
 		    memberToWarn.warn(warn);
-		    cmde.success("ys", "hi");
+		    cmde.success("userwarned", "usergotwarned", new Placeholder("user", memberToWarn.getAsMention()), new Placeholder("reason", reason));
 		} else {
 		    cmde.error("usertoopowerful", "loweruserthanu");
 		}

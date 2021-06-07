@@ -1,13 +1,14 @@
+/**
+ *
+ */
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import java.util.Date;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Warn;
@@ -21,10 +22,10 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 /**
  * @author _SIM_
  */
-public class WarnsCommand extends Command {
+public class ClearWarnCommand extends Command {
 
-    public WarnsCommand() {
-	this.setCommand("warns").setSyntax("<@User | UserID>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.KICK_MEMBERS);
+    public ClearWarnCommand() {
+	this.setCommand("clearwarn", "clearwarns").setSyntax("<@User> <warnid>").setRequiredArgumentCount(2).setRequiredPermissions(Permission.KICK_MEMBERS);
     }
 
     @Override
@@ -54,15 +55,20 @@ public class WarnsCommand extends Command {
 	}
 
 	try {
-	    final List<Warn> warns = mentionedMember.getWarns();
-	    String result = "empty";
-	    if (warns.size() != 0) {
-		result = "";
+	    if (Utils.isLong(args[2])) {
+		final long warnId = Long.parseLong(args[2]);
+		final List<Warn> warns = mentionedMember.getWarns();
 		for (final Warn warn : warns) {
-		    result += "\n`- " + BotInformation.datePattern.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason: " + warn.getReason().replace("`", "") + " (ID: " + warn.getDate() + ")`";
+		    if (warn.getDate() == warnId) {
+			mentionedMember.deleteWarn(warn);
+			cmde.success("entrydeleted", "warndeleted");
+			return;
+		    }
 		}
+		cmde.error("notfound", "warnnotfound");
+	    } else {
+		cmde.sendPleaseUse();
 	    }
-	    cmde.success("warns", result);
 	} catch (final Exception ex) {
 	    ex.printStackTrace();
 	}
