@@ -323,5 +323,7 @@
     "savedbotlogschannel": "BotLogsChannel gesetzt!",
     "thisisbotlogschannel": "Ich werde in Zukunft meine Logdaten hier herein senden!",
     "notbeta": "Dieser Server ist kein Beta-Server!",
-    "betatutorial": "Bitte beantrage deinen Beta-Zugang auf dem BlackOnion Discord Server!"
+    "betatutorial": "Bitte beantrage deinen Beta-Zugang auf dem BlackOnion Discord Server!",
+    "usertoopowerful": "Dieser Benutzer ist zu stark!",
+    "loweruserthanu": "Du kannst nur Benutzer auswählen, die niedriger als du sind!"
 }
