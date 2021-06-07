@@ -325,5 +325,9 @@
     "notbeta": "This server isn't a beta-server!",
     "betatutorial": "Please apply for the beta-access on the BlackOnion Discord Server!",
     "usertoopowerful": "Dieser Benutzer ist zu stark!",
-    "loweruserthanu": "Du kannst nur Benutzer auswählen, die niedriger als du sind!"
+    "loweruserthanu": "Du kannst nur Benutzer auswählen, die niedriger als du sind!",
+    "warnnotfound": "Warn nicht gefunden!",
+    "warndeleted": "Warn entfernt!",
+    "userwarned": "Benutzer wurde gewarnt!",
+    "usergotwarned": "Der Benutzer %user% wurde für `%reason%` gewarnt!"
 }
