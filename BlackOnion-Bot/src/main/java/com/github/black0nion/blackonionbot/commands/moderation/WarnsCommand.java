@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.github.black0nion.blackonionbot.commands.moderation;
 
 import java.util.Date;
@@ -36,8 +33,10 @@ public class WarnsCommand extends Command {
 	final BlackMember mentionedMember;
 	if (Utils.isLong(user)) {
 	    mentionedMember = BlackMember.from(guild.retrieveMemberById(user).submit().join());
-	    if (mentionedMember == null) // TODO: invalid userid
+	    if (mentionedMember == null) {
+		cmde.error("usernotfound", "inputnumber");
 		return;
+	    }
 	} else {
 	    @SuppressWarnings("deprecation")
 	    final List<Member> mentionedMembers = message.getMentionedMembers();
@@ -48,8 +47,10 @@ public class WarnsCommand extends Command {
 		    cmde.sendPleaseUse();
 		    return;
 		}
-	    } else // TODO: no user mentioned
+	    } else {
+		cmde.error("nousermentioned", "tagornameuser");
 		return;
+	    }
 	}
 
 	try {
@@ -60,7 +61,6 @@ public class WarnsCommand extends Command {
 		for (final Warn warn : warns) {
 		    result += "\n`- " + BotInformation.datePattern.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason:" + warn.getReason() + "`";
 		}
-		result = result.substring(1);
 	    }
 	    cmde.success("warns", result);
 	} catch (final Exception ex) {
