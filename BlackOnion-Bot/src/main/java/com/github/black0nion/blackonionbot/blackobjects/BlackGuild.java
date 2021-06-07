@@ -134,6 +134,7 @@ public class BlackGuild extends BlackObject implements Guild {
     private List<Command> disabledCommands;
     private long suggestionsChannel;
     private List<Long> autoRoles;
+    private boolean loop;
 
     private BlackGuild(@NotNull final Guild guild) {
 	this.guild = guild;
@@ -157,6 +158,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.suggestionsChannel = gOD(config.getLong("suggestionschannel"), -1L);
 	    this.autoRoles = gOD(config.getList("autoroles", Long.class), new ArrayList<>());
 	    this.antiSwearWhitelist = gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
+	    this.loop = gOD(config.getBoolean("loop"), false);
 	    final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 	    if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 		this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
@@ -366,6 +368,15 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setSelfBlackMember(final BlackMember selfBlackMember) {
 	this.selfBlackMember = selfBlackMember;
+    }
+
+    public boolean loopActivated() {
+	return this.loop;
+    }
+
+    public void setLoop(final boolean loop) {
+	this.loop = loop;
+	save("loop", loop);
     }
 
     // override methods

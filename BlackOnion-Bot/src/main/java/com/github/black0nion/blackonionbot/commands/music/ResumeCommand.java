@@ -1,3 +1,6 @@
+/**
+ *
+ */
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -14,10 +17,13 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class StopCommand extends Command {
+/**
+ * @author _SIM_
+ */
+public class ResumeCommand extends Command {
 
-    public StopCommand() {
-	this.setCommand("stop");
+    public ResumeCommand() {
+	this.setCommand("resume");
     }
 
     @Override
@@ -27,11 +33,9 @@ public class StopCommand extends Command {
 	    final VoiceChannel memberChannel = member.getVoiceState().getChannel();
 	    if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel());
-		musicManager.scheduler.player.stopTrack();
-		musicManager.scheduler.queue.clear();
-		e.getGuild().getAudioManager().closeAudioConnection();
+		musicManager.scheduler.player.setPaused(false);
 
-		cmde.success("musicstopped", "leftvc");
+		cmde.success("musicresumed", "itnowgoeson");
 	    } else {
 		cmde.error("notinsamevc", "dontstopotherpplmusic");
 	    }
