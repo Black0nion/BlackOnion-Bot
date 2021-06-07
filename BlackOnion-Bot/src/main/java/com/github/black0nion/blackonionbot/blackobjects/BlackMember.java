@@ -116,6 +116,11 @@ public class BlackMember extends BlackObject implements Member {
 	warnsCollection.insertOne(doc);
     }
 
+    public void deleteWarn(final Warn w) {
+	this.warns.remove(w);
+	warnsCollection.deleteOne(getIdentifier().append("date", w.getDate()));
+    }
+
     public void saveWarns() {
 	warnsCollection.insertMany(warns.stream().map(warn -> {
 	    final Document doc = new Document();
