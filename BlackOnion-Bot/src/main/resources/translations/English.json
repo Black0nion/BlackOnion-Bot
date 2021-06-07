@@ -329,5 +329,11 @@
     "warnnotfound": "Warn nicht gefunden!",
     "warndeleted": "Warn entfernt!",
     "userwarned": "Benutzer wurde gewarnt!",
-    "usergotwarned": "Der Benutzer %user% wurde für `%reason%` gewarnt!"
+    "usergotwarned": "Der Benutzer %user% wurde für `%reason%` gewarnt!",
+    "loopswitched": "Loop wurde umgeschalten!",
+    "loopisnow": "Loop ist jetzt **%status%**",
+    "musicpaused": "Musik pausiert",
+    "useresume": "Benutze `%command%` um die Musik wieder zu starten!",
+    "musicresumed": "Musik wieder gestartet!",
+    "itnowgoeson": "Es geht jetzt wieder weiter."
 }
