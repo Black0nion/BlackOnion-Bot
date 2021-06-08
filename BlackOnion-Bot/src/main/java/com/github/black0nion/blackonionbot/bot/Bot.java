@@ -79,6 +79,7 @@ public class Bot extends ListenerAdapter {
 
     @SuppressWarnings("resource")
     public void startBot() {
+	Logger.logInfo("BlackOnion-Bot is starting up...");
 	new File("files").mkdir();
 	isJarFile = JarUtils.runningFromJar();
 

@@ -1,7 +1,15 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.error;
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.DISCORD_ERROR;
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.EXCEPTION;
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.INVALID_DISCORD_CODE;
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.INVALID_SCOPES;
+import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.SESSION_NOT_CREATED;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 import org.bson.Document;
 import org.eclipse.jetty.websocket.api.CloseStatus;
@@ -14,6 +22,7 @@ import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.Logger;
+import com.github.black0nion.blackonionbot.API.impl.DashboardWebsocket;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -59,11 +68,31 @@ public class BlackSession implements org.eclipse.jetty.websocket.api.Session {
      * @param code the code discord gave you
      * @return if it worked
      */
-    public boolean loginWithDiscord(final String code) {
-	// TODO: login with discord
-	final boolean createSession = createSession();
-	final JSONObject response = new JSONObject(Utils.getTokenFromCode(code).getBody());
-	return createSession;
+    public DiscordLogin loginWithDiscord(final String code) {
+	try {
+	    final boolean createSession = createSession();
+	    if (!createSession) {
+		Logger.logError("Login with Discord failed! Code: " + code, LogOrigin.DASHBOARD);
+		return error(SESSION_NOT_CREATED);
+	    }
+	    final JSONObject response = new JSONObject(Utils.getTokenFromCode(code).getBody());
+	    if (response.has("error")) return error(INVALID_DISCORD_CODE);
+	    else {
+		final boolean hasScopes = Arrays.asList(String.join(" ", response.getString("scope"))).containsAll(DashboardWebsocket.requiredScopes);
+		if (!hasScopes) return error(INVALID_SCOPES);
+		if (!response.keySet().containsAll(Arrays.asList("access_token", "refresh_token", "expires_in"))) return error(DISCORD_ERROR);
+		final String accessToken = response.getString("access_token");
+		final String refreshToken = response.getString("refresh_token");
+		final int expiresIn = response.getInt("expires_in");
+		final JSONObject userinfo = Utils.getUserInfoFromToken(accessToken);
+		final DiscordLogin login = DiscordLogin.success(userinfo);
+		collection.updateOne(Filters.eq("sessionid", sessionId), new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expiresIn", expiresIn));
+		return login;
+	    }
+	} catch (final Exception e) {
+	    e.printStackTrace();
+	    return error(EXCEPTION);
+	}
     }
 
     /**
