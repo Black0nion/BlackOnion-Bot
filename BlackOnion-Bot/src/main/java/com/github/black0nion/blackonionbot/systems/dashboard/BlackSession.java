@@ -35,7 +35,7 @@ import com.mongodb.client.model.Filters;
  */
 public class BlackSession implements org.eclipse.jetty.websocket.api.Session {
 
-    private static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
+    public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 
     public BlackSession(final Session session) {
 	this.session = session;
@@ -86,7 +86,7 @@ public class BlackSession implements org.eclipse.jetty.websocket.api.Session {
 		final int expiresIn = response.getInt("expires_in");
 		final JSONObject userinfo = Utils.getUserInfoFromToken(accessToken);
 		final DiscordLogin login = DiscordLogin.success(userinfo);
-		collection.updateOne(Filters.eq("sessionid", sessionId), new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expiresIn", expiresIn));
+		collection.updateOne(Filters.eq("sessionid", sessionId), new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
 		return login;
 	    }
 	} catch (final Exception e) {

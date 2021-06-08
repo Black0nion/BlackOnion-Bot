@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.bson.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.reflections.Reflections;
@@ -15,11 +16,12 @@ import org.reflections.Reflections;
 import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSessionInformation;
-import com.github.black0nion.blackonionbot.systems.dashboard.SessionManager;
+import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
+import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
+import com.mongodb.client.model.Filters;
 
 import spark.Spark;
 
@@ -108,6 +110,27 @@ public class API {
 			headers.put(head, request.headers(head));
 		    });
 
+		    final String sessionid = headers.get("sessionid");
+		    if (req.requiresLogin() && sessionid == null) {
+			response.status(401);
+			return new JSONObject().put("success", false).put("reason", 401).toString();
+		    }
+
+		    final Document sessionInformation = BlackSession.collection.find(Filters.eq("sessionid", sessionid)).first();
+		    if (req.requiresLogin() && sessionid == null) {
+			response.status(401);
+			return new JSONObject().put("success", false).put("reason", 401).toString();
+		    }
+
+		    final JSONObject userinfo = Utils.getUserInfoFromToken(sessionInformation.getString("access_token"));
+		    final DiscordLogin login = DiscordLogin.success(userinfo);
+
+		    // TODO: check user permissions
+		    if (!login.success()) {
+			response.status(401);
+			return new JSONObject().put("success", false).put("reason", 401).toString();
+		    }
+
 		    if (!request.headers().containsAll(Arrays.asList(req.requiredParameters()))) {
 			response.status(400);
 			response.type("application/json");
@@ -128,15 +151,7 @@ public class API {
 			}
 		    }
 
-		    final DashboardSessionInformation information = SessionManager.generateSession(request.session());
-		    final DiscordUser user = information != null ? information.getUser() : null;
-
-		    if (req.requiresLogin() && user == null) {
-			response.status(401);
-			return new JSONObject().put("success", false).put("reason", 401).toString();
-		    }
-
-		    return req.handle(request, response, body, headers, user);
+		    return req.handle(request, response, body, headers, login.getUser());
 		} catch (final Exception e) {
 		    API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
 		    if (!(e instanceof JSONException)) {

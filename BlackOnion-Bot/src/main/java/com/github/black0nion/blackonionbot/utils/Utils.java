@@ -9,13 +9,13 @@ import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -68,8 +68,6 @@ public class Utils {
 	alphabet.add('Z');
     }
 
-    private static ArrayList<CachedUserInfo> cachedUserInfo = new ArrayList<>();
-
     public static String removeMarkdown(final String text) {
 	return text.replace("_", "\\_").replace("*", "\\*");
     }
@@ -113,33 +111,12 @@ public class Utils {
 	else return null;
     }
 
-    public static int gc() {
-	final ArrayList<CachedUserInfo> found = new ArrayList<>();
-	for (final CachedUserInfo userInfo : cachedUserInfo) if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2) {
-	    found.add(userInfo);
-	}
-
-	cachedUserInfo.removeAll(found);
-	return found.size();
-    }
-
+    // TODO: cache
+    @Nullable
     public static JSONObject getUserInfoFromToken(final String token) {
-	for (int i = 0; i < cachedUserInfo.size(); i++) {
-	    CachedUserInfo userInfo = cachedUserInfo.get(i);
-	    if (userInfo.getToken().equals(token)) if (Duration.between(userInfo.getRefreshDate().toInstant(), Instant.now()).toHours() >= 2) {
-		cachedUserInfo.remove(i);
-		final CachedUserInfo refreshed = userInfo.refresh(token);
-		cachedUserInfo.add(refreshed);
-		userInfo = userInfo.refresh(token);
-		return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
-	    } else return userInfo.getInfo().has("id") ? userInfo.getInfo() : null;
-	}
+	final JSONObject obj = new JSONObject(getUserInfoFromTokenResponse(token).getBody());
 
-	final CachedUserInfo newInfo = new CachedUserInfo(new JSONObject(getUserInfoFromTokenResponse(token).getBody()), token);
-
-	cachedUserInfo.add(newInfo);
-
-	return newInfo.getInfo().has("id") ? newInfo.getInfo() : null;
+	return obj.has("id") ? obj : null;
     }
 
     public static HttpResponse<String> getUserInfoFromTokenResponse(final String token) {
