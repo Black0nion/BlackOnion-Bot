@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -18,6 +19,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
+import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -31,6 +33,8 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     }
 
     private static boolean logHeartbeats = ValueManager.getBoolean("logHeartbeats");
+
+    public static final List<String> requiredScopes = Arrays.asList("guilds identify");
 
     private static final List<Session> sessions = new ArrayList<>();
 
@@ -90,8 +94,13 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		session.send(success);
 	    } else if (argsDiscord.length == 2) {
 		// the user needs a new session
-		final boolean success = session.loginWithDiscord(argsDiscord[1]);
-		session.send(success);
+		final DiscordLogin success = session.loginWithDiscord(argsDiscord[1]);
+		if (success.success()) {
+		    session.send("id|" + success.success());
+		} else {
+		    final DiscordLogin.SessionError error = success.getError();
+		    session.send("err|" + error.getCode() + (error.getDescription() != null ? "|" + error.getDescription() : ""));
+		}
 	    } else {
 		// failure
 		session.send("nah bro");
