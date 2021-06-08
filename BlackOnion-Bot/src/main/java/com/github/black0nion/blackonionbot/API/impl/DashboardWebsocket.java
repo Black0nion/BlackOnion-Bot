@@ -16,8 +16,12 @@ import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.API.WebSocketEndpoint;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 @WebSocket
 public class DashboardWebsocket extends WebSocketEndpoint {
@@ -29,6 +33,13 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     private static boolean logHeartbeats = ValueManager.getBoolean("logHeartbeats");
 
     private static final List<Session> sessions = new ArrayList<>();
+
+    private static final LoadingCache<Session, BlackSession> blacksessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackSession>() {
+	@Override
+	public BlackSession load(final Session key) throws Exception {
+	    return new BlackSession(key);
+	};
+    });
 
     private static final HashMap<Session, ScheduledFuture<?>> futures = new HashMap<>();
 
@@ -44,18 +55,19 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 
     @OnWebSocketClose
     public void closed(final Session session, final int statusCode, final String reason) {
-	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Disconnected.", LogOrigin.DASHBOARD);
 	sessions.remove(session);
     }
 
     @OnWebSocketMessage
-    public void message(final Session session, final String message) {
+    public void message(final Session sessionUnchecked, final String message) {
+	// TODO: error handling
+	final BlackSession session = blacksessions.getUnchecked(sessionUnchecked);
 	if (message.equals("heartbeat")) {
 	    futures.get(session).cancel(true);
 	    if (logHeartbeats) {
 		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Heartbeat.", LogOrigin.DASHBOARD);
 	    }
-	    send(session, "heartbeat");
+	    session.send("heartbeat");
 	    futures.put(session, Bot.scheduledExecutor.schedule(() -> {
 		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
 		session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
@@ -63,9 +75,26 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    return;
 	} else if (message.startsWith("updatevalue")) {
 	    if (Dashboard.tryUpdateValue(message)) {
-		send(session, "success");
+		session.send("success");
 	    } else {
-		send(session, "failure");
+		session.send("failure");
+	    }
+	} else if (message.startsWith("login")) {
+	    // login|<code> = login with session id
+	    // login><code> = login with discord, generate session id
+	    final String[] argsNormal = message.split("\\|");
+	    final String[] argsDiscord = message.split(">");
+	    if (argsNormal.length == 2) {
+		// the user already created a session id once
+		final boolean success = session.loginToSession(argsNormal[1]);
+		session.send(success);
+	    } else if (argsDiscord.length == 2) {
+		// the user needs a new session
+		final boolean success = session.loginWithDiscord(argsDiscord[1]);
+		session.send(success);
+	    } else {
+		// failure
+		session.send("nah bro");
 	    }
 	}
 
