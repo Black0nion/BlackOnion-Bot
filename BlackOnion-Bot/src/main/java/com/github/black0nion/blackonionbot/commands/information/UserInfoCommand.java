@@ -63,7 +63,8 @@ public class UserInfoCommand extends Command {
 
 	final BlackEmbed builder = cmde.success();
 	builder.setTitle("userinfo");
-	builder.setThumbnail(statsUser.getAvatarUrl());
+	final String avatarUrl = statsUser.getAvatarUrl();
+	builder.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl());
 	builder.addField("name", Utils.removeMarkdown(statsUser.getName()), true);
 	builder.addField("discriminator", statsUser.getDiscriminator(), true);
 	builder.addField("userid", statsUser.getId(), true);
