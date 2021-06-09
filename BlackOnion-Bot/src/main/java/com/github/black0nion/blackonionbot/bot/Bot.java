@@ -37,6 +37,7 @@ import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -48,6 +49,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import spark.Spark;
 
 public class Bot extends ListenerAdapter {
     public static RunMode runMode;
@@ -78,6 +80,7 @@ public class Bot extends ListenerAdapter {
 
     @SuppressWarnings("resource")
     public void startBot() {
+	Utils.printLogo();
 	Logger.logInfo("BlackOnion-Bot is starting up...");
 	new File("files").mkdir();
 	isJarFile = JarUtils.runningFromJar();
@@ -123,15 +126,24 @@ public class Bot extends ListenerAdapter {
 	Newssystem.init();
 
 	executor.submit(() -> {
+	    final Scanner sc = new Scanner(System.in);
 	    while (true) {
-		final Scanner sc = new Scanner(System.in);
 		final String input = sc.nextLine();
-		if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
+		if (input.startsWith("peek ")) {
+		    final String cat = input.replaceFirst("peek ", "");
+		    if (Utils.equalsOneIgnoreCase(cat, LogOrigin.getNames())) {
+			Logger.printForCategory(LogOrigin.valueOf(cat.toUpperCase()));
+		    } else if (cat.equalsIgnoreCase("all")) {
+			Logger.printAll();
+		    }
+		} else if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
 		    Logger.logInfo("Reloading...", LogOrigin.BOT);
 		    ReloadCommand.reload();
 		} else if (input.equalsIgnoreCase("shutdown")) {
 		    Logger.logWarning("Shutting down...", LogOrigin.BOT);
 		    jda.shutdown();
+		    Spark.stop();
+		    Spark.awaitStop();
 		    Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
 		    System.exit(0);
 		}
