@@ -21,6 +21,7 @@ import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
+import com.google.common.util.concurrent.RateLimiter;
 import com.mongodb.client.model.Filters;
 
 import spark.Spark;
@@ -29,6 +30,8 @@ public class API {
 
     private static ArrayList<PostRequest> postRequests = new ArrayList<>();
     private static ArrayList<GetRequest> getRequests = new ArrayList<>();
+
+    private static final HashMap<String, RateLimiter> rateLimiters = new HashMap<>();
 
     @Reloadable("api")
     public static void init() {
@@ -98,7 +101,18 @@ public class API {
 	    }
 	    final String url = "/api/" + req.url();
 	    post(url, (request, response) -> {
+		final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
 		try {
+		    // RATE LIMITING:
+		    if (rateLimiters.containsKey(ip)) {
+			final RateLimiter limiter = rateLimiters.get(ip);
+			if (!limiter.tryAcquire()) {
+			    response.status(429);
+			    return new JSONObject().put("success", false).put("error", "ratelimited").toString();
+			}
+		    } else {
+			rateLimiters.put(ip, RateLimiter.create(2));
+		    }
 		    response.header("Access-Control-Allow-Origin", "*");
 		    JSONObject body = new JSONObject();
 		    if (req.requiredBodyParameters().length != 0) {
@@ -116,19 +130,24 @@ public class API {
 			return new JSONObject().put("success", false).put("reason", 401).toString();
 		    }
 
-		    final Document sessionInformation = BlackSession.collection.find(Filters.eq("sessionid", sessionid)).first();
 		    if (req.requiresLogin() && sessionid == null) {
 			response.status(401);
 			return new JSONObject().put("success", false).put("reason", 401).toString();
 		    }
 
-		    final JSONObject userinfo = Utils.getUserInfoFromToken(sessionInformation.getString("access_token"));
-		    final DiscordLogin login = DiscordLogin.success(userinfo);
+		    // all the information we got saved about the session
+		    final Document sessionInformation = BlackSession.collection.find(Filters.eq("sessionid", sessionid)).first();
+		    // if the request requires login, this won't be null
+		    DiscordLogin login = null;
+		    if (req.requiresLogin()) {
+			final JSONObject userinfo = Utils.getUserInfoFromToken(sessionInformation.getString("access_token"));
+			login = DiscordLogin.success(userinfo);
 
-		    // TODO: check user permissions
-		    if (!login.success()) {
-			response.status(401);
-			return new JSONObject().put("success", false).put("reason", 401).toString();
+			// TODO: check user permissions
+			if (login == null || !login.success()) {
+			    response.status(401);
+			    return new JSONObject().put("success", false).put("reason", 401).toString();
+			}
 		    }
 
 		    if (!request.headers().containsAll(Arrays.asList(req.requiredParameters()))) {
@@ -137,7 +156,7 @@ public class API {
 			return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "missingParameters").toString();
 		    }
 
-		    API.logInfo("Answered POST request (Path: " + url + ") from: " + request.ip() + " with header: " + body.toString());
+		    API.logInfo("Answered POST request (Path: " + url + ") from: " + ip + " with header: " + body.toString());
 
 		    response.type("text/plain");
 		    if (req.isJson()) {
@@ -151,15 +170,21 @@ public class API {
 			}
 		    }
 
-		    return req.handle(request, response, body, headers, login.getUser());
+		    return req.handle(request, response, body, headers, login != null ? login.getUser() : null);
 		} catch (final Exception e) {
-		    API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + request.ip());
+		    API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
 		    if (!(e instanceof JSONException)) {
 			e.printStackTrace();
 		    }
-		    response.status(400);
+
 		    response.type("application/json");
-		    return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
+		    if (e instanceof JSONException) {
+			response.status(400);
+			return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
+		    } else {
+			response.status(500);
+			return new JSONObject().put("success", false).put("reason", 500).put("detailedReason", "exception").toString();
+		    }
 		}
 	    });
 	}
