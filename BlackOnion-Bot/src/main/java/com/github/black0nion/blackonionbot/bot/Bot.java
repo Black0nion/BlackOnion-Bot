@@ -129,16 +129,51 @@ public class Bot extends ListenerAdapter {
 	    final Scanner sc = new Scanner(System.in);
 	    while (true) {
 		final String input = sc.nextLine();
-		if (input.startsWith("peek ")) {
-		    final String cat = input.replaceFirst("peek ", "");
-		    if (Utils.equalsOneIgnoreCase(cat, LogOrigin.getNames())) {
-			Logger.printForCategory(LogOrigin.valueOf(cat.toUpperCase()));
-		    } else if (cat.equalsIgnoreCase("all")) {
-			Logger.printAll();
+		final String[] args = input.split(" ");
+		if (input.startsWith("peek")) {
+		    if (args.length < 2) {
+			System.out.println("Invalid Syntax. Syntax: peek <category> [limit]| Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
+			continue;
+		    } else if (Utils.equalsOneIgnoreCase(args[1], LogOrigin.getNames())) {
+			if (args.length >= 3) {
+			    if (!Utils.isLong(args[2])) {
+				System.out.println("Invalid number!");
+				continue;
+			    } else {
+				Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
+			    }
+			} else {
+			    Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()));
+			}
+		    } else if (Utils.equalsOneIgnoreCase(args[1], LogMode.getNames())) {
+			if (args.length >= 3) {
+			    if (!Utils.isLong(args[2])) {
+				System.out.println("Invalid number!");
+				continue;
+			    } else {
+				Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
+			    }
+			} else {
+			    Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()));
+			}
+		    } else if (args[1].equalsIgnoreCase("all")) {
+			if (args.length >= 3) {
+			    if (!Utils.isLong(args[2])) {
+				System.out.println("Invalid number!");
+				continue;
+			    } else {
+				Logger.printAll(Integer.parseInt(args[2]));
+			    }
+			} else {
+			    Logger.printAll();
+			}
+		    } else {
+			System.out.println("Category not found. Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
 		    }
 		} else if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
 		    Logger.logInfo("Reloading...", LogOrigin.BOT);
 		    ReloadCommand.reload();
+		    Logger.logInfo("Reloading done.", LogOrigin.BOT);
 		} else if (input.equalsIgnoreCase("shutdown")) {
 		    Logger.logWarning("Shutting down...", LogOrigin.BOT);
 		    jda.shutdown();
@@ -146,6 +181,8 @@ public class Bot extends ListenerAdapter {
 		    Spark.awaitStop();
 		    Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
 		    System.exit(0);
+		} else {
+		    System.out.println("Command not recognized.");
 		}
 	    }
 	});
