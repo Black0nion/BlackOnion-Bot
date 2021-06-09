@@ -260,4 +260,8 @@ public class Utils {
 
 	return (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : "");
     }
+
+    public static void printLogo() {
+	System.out.println("   ___  __         __   ____       _                  ___       __ \r\n" + "  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_\r\n" + " / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/\r\n" + "/____/_/\\_|_|\\__/_/\\_\\\\____/_//_/_/\\___/_//_/      /____/\\___/\\__/\n");
+    }
 }
