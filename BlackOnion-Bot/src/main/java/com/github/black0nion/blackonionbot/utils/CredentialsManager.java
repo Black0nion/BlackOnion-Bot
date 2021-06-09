@@ -2,8 +2,8 @@ package com.github.black0nion.blackonionbot.utils;
 
 import java.io.File;
 
-import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
 
 public class CredentialsManager {
 	private Document doc;

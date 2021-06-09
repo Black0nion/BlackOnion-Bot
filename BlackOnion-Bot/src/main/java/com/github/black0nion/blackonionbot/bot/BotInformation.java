@@ -21,12 +21,12 @@ import java.util.List;
 import org.bson.Document;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.OS;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.io.Files;
 import com.mongodb.client.model.Filters;

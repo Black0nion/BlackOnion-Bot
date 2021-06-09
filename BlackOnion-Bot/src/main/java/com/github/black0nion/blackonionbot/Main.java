@@ -1,4 +1,6 @@
-package com.github.black0nion.blackonionbot.bot;
+package com.github.black0nion.blackonionbot;
+
+import com.github.black0nion.blackonionbot.bot.Bot;
 
 public class Main {
 
