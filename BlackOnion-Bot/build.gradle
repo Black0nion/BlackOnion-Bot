@@ -37,7 +37,7 @@ jar {
     archiveBaseName = 'blackonion-bot'
     archiveVersion =  '1.8.7'
     manifest {
-        attributes 'Main-Class': 'com.github.black0nion.blackonionbot.bot.Main'
+        attributes 'Main-Class': 'com.github.black0nion.blackonionbot.Main'
     }
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
