@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot;
+package com.github.black0nion.blackonionbot.systems.logging;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

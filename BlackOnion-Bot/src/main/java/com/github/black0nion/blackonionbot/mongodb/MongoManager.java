@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.bson.Document;
 
-import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;

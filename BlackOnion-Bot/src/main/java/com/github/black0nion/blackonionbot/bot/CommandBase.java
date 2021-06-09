@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.reflections.Reflections;
 
-import com.github.black0nion.blackonionbot.Logger;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
@@ -32,6 +31,8 @@ import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
+import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -55,9 +56,6 @@ public class CommandBase extends ListenerAdapter {
     public static HashMap<String, Command> commands = new HashMap<>();
 
     public static EventWaiter waiter;
-
-    public static int messagesLastTenSecs = 0;
-    public static int commandsLastTenSecs = 0;
 
     private static JSONObject commandsJSON = new JSONObject();
 
@@ -128,7 +126,7 @@ public class CommandBase extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
-	messagesLastTenSecs++;
+	StatisticsManager.messageSent();
 	ValueManager.save("messagesSent", ValueManager.getInt("messagesSent") + 1);
 	final BlackUser author = BlackUser.from(event.getAuthor());
 	if (author.isBot()) return;
@@ -164,7 +162,7 @@ public class CommandBase extends ListenerAdapter {
 	    if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) return;
 
 	    ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
-	    commandsLastTenSecs++;
+	    StatisticsManager.commandExecuted();
 
 	    final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 	    final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
