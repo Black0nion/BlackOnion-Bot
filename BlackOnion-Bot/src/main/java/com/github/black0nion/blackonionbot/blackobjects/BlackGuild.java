@@ -393,7 +393,7 @@ public class BlackGuild extends BlackObject implements Guild {
     public boolean addCustomCommand(final CustomCommand cmd) {
 	if (customCommands.contains(cmd)) return false;
 	this.customCommands.add(cmd);
-	save("customCommands", customCommands.stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
+	save("customcommands", customCommands.stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
 	return true;
     }
 
