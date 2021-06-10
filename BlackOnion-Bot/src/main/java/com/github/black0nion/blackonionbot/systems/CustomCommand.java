@@ -3,6 +3,8 @@
  */
 package com.github.black0nion.blackonionbot.systems;
 
+import java.awt.Color;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +12,10 @@ import org.bson.Document;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
@@ -61,6 +65,11 @@ public class CustomCommand {
 		    embed.addField(field.getString("name"), field.getString("value"), false);
 		}
 	    }
+	    if (embedDoc.containsKey("color")) {
+		final int integer = embedDoc.getInteger("color", EmbedUtils.blackOnionColor.getRGB());
+		embed.setColor(new Color(integer));
+	    }
+	    this.embed = embed;
 	} else if (doc.containsKey("answer")) {
 	    this.answer = doc.getString("answer");
 	} else {
@@ -97,6 +106,10 @@ public class CustomCommand {
 
     public void handle(final GuildMessageReceivedEvent event) {
 	if (embed != null) {
+	    embed.setTimestamp(Instant.now());
+	    final User author = event.getAuthor();
+	    embed.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+
 	    if (reply) {
 		event.getMessage().reply(embed.build()).queue();
 	    } else {
@@ -128,6 +141,9 @@ public class CustomCommand {
 		final List<Document> fieldsDoc = new ArrayList<>();
 		fields.forEach(field -> fieldsDoc.add(new Document().append("name", field.getName()).append("value", field.getValue())));
 		embedDoc.put("fields", fieldsDoc);
+	    }
+	    if (embed.getColor() != null) {
+		embedDoc.put("color", embed.getColor().getRGB());
 	    }
 	    doc.put("embed", embedDoc);
 	} else if (answer != null) {

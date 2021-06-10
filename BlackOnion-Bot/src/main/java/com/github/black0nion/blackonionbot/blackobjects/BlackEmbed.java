@@ -17,6 +17,7 @@ public class BlackEmbed extends EmbedBuilder {
     private final Language lang;
     private String title = null;
     private String url = null;
+    private Color color = null;
 
     public BlackEmbed(final Language lang) {
 	this.lang = lang;
@@ -191,12 +192,14 @@ public class BlackEmbed extends EmbedBuilder {
 
     @Override
     public BlackEmbed setColor(final Color color) {
+	this.color = color;
 	super.setColor(color);
 	return this;
     }
 
     @Override
     public BlackEmbed setColor(final int color) {
+	this.color = new Color(color);
 	super.setColor(color);
 	return this;
     }
@@ -238,8 +241,14 @@ public class BlackEmbed extends EmbedBuilder {
     /**
      * @return the url
      */
-
     public String getUrl() {
 	return url;
+    }
+
+    /**
+     * @return the color
+     */
+    public Color getColor() {
+	return color;
     }
 }
