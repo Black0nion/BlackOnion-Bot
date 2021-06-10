@@ -149,6 +149,8 @@ public class BlackGuild extends BlackObject implements Guild {
 		config = new Document();
 	    }
 
+	    // only to debug the configs
+	    save("name", guild.getName());
 	    this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 	    this.guildType = gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
 	    this.prefix = gOD(config.getString("prefix"), BotInformation.defaultPrefix);
