@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 public class BlackEmbed extends EmbedBuilder {
 
     private final Language lang;
+    private String title = null;
+    private String url = null;
 
     public BlackEmbed(final Language lang) {
 	this.lang = lang;
@@ -53,6 +55,7 @@ public class BlackEmbed extends EmbedBuilder {
 	    title = tempTitle;
 	}
 	super.setTitle(title);
+	this.title = title;
 	return this;
     }
 
@@ -66,6 +69,8 @@ public class BlackEmbed extends EmbedBuilder {
 	    title = tempTitle;
 	}
 	super.setTitle(title, url);
+	this.title = title;
+	this.url = url;
 	return this;
     }
 
@@ -221,5 +226,20 @@ public class BlackEmbed extends EmbedBuilder {
     public BlackEmbed setTimestamp(final TemporalAccessor temporal) {
 	super.setTimestamp(temporal);
 	return this;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    /**
+     * @return the url
+     */
+
+    public String getUrl() {
+	return url;
     }
 }
