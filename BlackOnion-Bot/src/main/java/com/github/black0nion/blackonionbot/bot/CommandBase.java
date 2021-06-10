@@ -26,6 +26,7 @@ import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -198,6 +199,12 @@ public class CommandBase extends ListenerAdapter {
 		cmd.execute(args, cmde, event, message, member, author, guild, channel);
 	    });
 	    return;
+	}
+
+	// no command found
+	final CustomCommand cmd = guild.getCustomCommands().stream().filter(ccmd -> str.equalsIgnoreCase(ccmd.getCommand())).findFirst().orElse(null);
+	if (cmd != null) {
+	    cmd.handle(event);
 	}
 
 	// np blaumeise
