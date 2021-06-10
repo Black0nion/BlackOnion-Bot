@@ -17,4 +17,12 @@ public enum LogMode {
 	}
 	return names.toArray(new String[0]);
     }
+
+    public static final LogMode parse(final String input) {
+	try {
+	    return valueOf(input.toUpperCase());
+	} catch (final Exception e) {
+	    return null;
+	}
+    }
 }
