@@ -336,5 +336,12 @@
     "useresume": "Benutze `%command%` um die Musik wieder zu starten!",
     "musicresumed": "Musik wieder gestartet!",
     "itnowgoeson": "Es geht jetzt wieder weiter.",
-    "commandexisting": "Dieser Befehl existiert bereits!"
+    "commandexisting": "Dieser Befehl existiert bereits!",
+    "inputtype": "Bitte gebe den Antworttyp ein!",
+    "validtypes": "Verfügbar:\n- `raw` > eine normale Nachricht\n- `embed` > ein Embed",
+    "customcommandsetup": "Setup des CustomCommands `%cmd%`",
+    "messagetosend": "Nachricht zu senden",
+    "inputmessage": "Bitte gebe die Nachricht ein, die gesendet werden soll!",
+    "shouldreply": "Soll der Bot auf die Nachricht mit dem Befehl antworten?",
+    "shouldanswer": "Schreibe `true` für ja oder `false` für nein!"
 }
