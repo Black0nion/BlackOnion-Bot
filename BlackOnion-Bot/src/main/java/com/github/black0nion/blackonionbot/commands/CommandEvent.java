@@ -84,15 +84,15 @@ public class CommandEvent {
     }
 
     public void success(final String name, final String value) {
-	reply(successEmbed.addField(name, value, false));
+	reply(success().addField(name, value, false));
     }
 
     public void success(final String title, final String name, final String value) {
-	reply(successEmbed.setTitle(title).addField(name, value, false));
+	reply(success().setTitle(title).addField(name, value, false));
     }
 
     public void success(final String title, final String url, final String name, final String value) {
-	reply(successEmbed.setTitle(title, url).addField(name, value, false));
+	reply(success().setTitle(title, url).addField(name, value, false));
     }
 
     public void success(final String title, final String name, final String value, final Placeholder... placeholders) {
@@ -109,7 +109,7 @@ public class CommandEvent {
 	    value = placeholder.process(value);
 	}
 
-	reply(successEmbed.setTitle(title).addField(name, value, false), success);
+	reply(success().setTitle(title).addField(name, value, false), success);
     }
 
     public void success(String name, String value, final Placeholder... placeholders) {
@@ -120,7 +120,7 @@ public class CommandEvent {
 	    value = placeholder.process(value);
 	}
 
-	reply(successEmbed.addField(name, value, false), null);
+	reply(success().addField(name, value, false), null);
     }
 
     public void success(String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
@@ -131,7 +131,7 @@ public class CommandEvent {
 	    value = placeholder.process(value);
 	}
 
-	reply(successEmbed.addField(name, value, false), success);
+	reply(success().addField(name, value, false), success);
     }
 
     public BlackEmbed loading() {
@@ -139,15 +139,15 @@ public class CommandEvent {
     }
 
     public void loading(final Consumer<? super BlackMessage> success) {
-	reply(loadingEmbed, success);
+	reply(loading(), success);
     }
 
     public void loading(final String name, final String value) {
-	reply(loadingEmbed.addField(name, value, false));
+	reply(loading().addField(name, value, false));
     }
 
     public void loading(final String name, final String value, final Consumer<? super BlackMessage> success) {
-	reply(loadingEmbed.addField(name, value, false), success);
+	reply(loading().addField(name, value, false), success);
     }
 
     public BlackEmbed error() {
@@ -155,15 +155,15 @@ public class CommandEvent {
     }
 
     public void error(final String name, final String value) {
-	reply(errorEmbed.addField(name, value, false));
+	reply(error().addField(name, value, false));
     }
 
     public void error(final String title, final String name, final String value) {
-	reply(errorEmbed.setTitle(title).addField(name, value, false));
+	reply(error().setTitle(title).addField(name, value, false));
     }
 
     public void error(final String name, final String value, final Consumer<? super BlackMessage> success) {
-	reply(errorEmbed.addField(name, value, false), success);
+	reply(error().addField(name, value, false), success);
     }
 
     public void error(String title, String name, String value, final Placeholder... placeholders) {
@@ -236,7 +236,7 @@ public class CommandEvent {
     }
 
     public EmbedBuilder getWrongArgument() {
-	return errorEmbed.addField("wrongargument", "`" + getPleaseUse(this.guild, this.user, this.command) + "`", false);
+	return error().addField("wrongargument", "`" + getPleaseUse(this.guild, this.user, this.command) + "`", false);
     }
 
     public String getTranslation(final String key) {
