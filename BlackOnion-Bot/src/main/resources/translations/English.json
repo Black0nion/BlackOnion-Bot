@@ -335,5 +335,6 @@
     "musicpaused": "Musik pausiert",
     "useresume": "Benutze `%command%` um die Musik wieder zu starten!",
     "musicresumed": "Musik wieder gestartet!",
-    "itnowgoeson": "Es geht jetzt wieder weiter."
+    "itnowgoeson": "Es geht jetzt wieder weiter.",
+    "commandexisting": "Dieser Befehl existiert bereits!"
 }
