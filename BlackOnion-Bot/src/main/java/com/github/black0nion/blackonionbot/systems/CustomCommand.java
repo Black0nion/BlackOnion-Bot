@@ -117,7 +117,7 @@ public class CustomCommand {
 	    }
 	} else if (answer != null) {
 	    if (reply) {
-		event.getMessage().reply(answer);
+		event.getMessage().reply(answer).queue();
 	    } else {
 		event.getChannel().sendMessage(answer).queue();
 	    }

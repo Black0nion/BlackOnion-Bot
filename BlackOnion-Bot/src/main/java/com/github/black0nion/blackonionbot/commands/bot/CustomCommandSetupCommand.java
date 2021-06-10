@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * @author _SIM_
- *
  */
 public class CustomCommandSetupCommand extends Command {
 
@@ -39,17 +38,18 @@ public class CustomCommandSetupCommand extends Command {
     }
 
     private final void askForType(final String command, final CommandEvent cmde) {
-	cmde.success("inputtype", "validtypes", msg -> {
+	cmde.getMessage().reply(cmde.success().addField("inputtype", "validtypes", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
 	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 		    cmde.error("aborting", "byeeee");
 		    return;
 		}
+
 		if (contentRaw.equalsIgnoreCase("raw") || contentRaw.equalsIgnoreCase("message")) {
 		    askForRaw(command, new CommandEvent(e, cmde.getGuild(), BlackMessage.from(e.getMessage()), cmde.getMember(), cmde.getUser()));
 		} else if (contentRaw.equalsIgnoreCase("embed")) {
-
+		    // TODO: add embed
 		} else {
 		    askForType(command, new CommandEvent(e, cmde.getGuild(), BlackMessage.from(e.getMessage()), cmde.getMember(), cmde.getUser()));
 		}
@@ -58,14 +58,41 @@ public class CustomCommandSetupCommand extends Command {
     }
 
     private static final void askForRaw(final String command, final CommandEvent cmde) {
-	cmde.success("messagetosend", "inputmessage", msg -> {
+	cmde.getMessage().reply(cmde.success().addField("messagetosend", "inputmessage", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
 	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 		    cmde.error("aborting", "byeeee");
 		    return;
 		}
+
 		final CustomCommand customCommand = new CustomCommand(cmde.getGuild(), command, contentRaw);
+		askForReply(command, new CommandEvent(e, cmde.getGuild(), BlackMessage.from(e.getMessage()), cmde.getMember(), cmde.getUser()), customCommand);
+	    });
+	});
+    }
+
+    private static final void askForReply(final String command, final CommandEvent cmde, final CustomCommand customCommand) {
+	cmde.getMessage().reply(cmde.success().addField("shouldreply", "shouldanswer", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
+	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+		final String contentRaw = e.getMessage().getContentRaw();
+
+		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+		    cmde.error("aborting", "byeeee");
+		    return;
+		}
+
+		boolean reply;
+		if (contentRaw.equalsIgnoreCase("true")) {
+		    reply = true;
+		} else if (contentRaw.equalsIgnoreCase("false")) {
+		    reply = false;
+		} else {
+		    askForReply(command, new CommandEvent(e, cmde.getGuild(), BlackMessage.from(e.getMessage()), cmde.getMember(), cmde.getUser()), customCommand);
+		    return;
+		}
+
+		customCommand.setReply(reply);
 		cmde.getGuild().addCustomCommand(customCommand);
 		cmde.success("commandadded", "executetutorial", new Placeholder("%cmd%", cmde.getGuild().getPrefix() + customCommand.getCommand()));
 	    });
