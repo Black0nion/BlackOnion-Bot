@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class BlackGuild extends BlackObject implements Guild {
     private long suggestionsChannel;
     private List<Long> autoRoles;
     private boolean loop;
-    private List<CustomCommand> customCommands;
+    private HashMap<String, CustomCommand> customCommands;
 
     private BlackGuild(@NotNull final Guild guild) {
 
@@ -164,7 +165,8 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.autoRoles = gOD(config.getList("autoroles", Long.class), new ArrayList<>());
 	    this.antiSwearWhitelist = gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
 	    this.loop = gOD(config.getBoolean("loop"), false);
-	    this.customCommands = gOD(gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>());
+	    this.customCommands = new HashMap<>();
+	    gOD(gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> customCommands.put(cmd.getCommand(), cmd));
 	    final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 	    if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 		this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
@@ -388,14 +390,14 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * @return the customCommands
      */
-    public List<CustomCommand> getCustomCommands() {
+    public HashMap<String, CustomCommand> getCustomCommands() {
 	return customCommands;
     }
 
     public boolean addCustomCommand(final CustomCommand cmd) {
-	if (customCommands.contains(cmd)) return false;
-	this.customCommands.add(cmd);
-	save("customcommands", customCommands.stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
+	if (customCommands.containsKey(cmd.getCommand())) return false;
+	this.customCommands.put(cmd.getCommand(), cmd);
+	save("customcommands", customCommands.values().stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
 	return true;
     }
 

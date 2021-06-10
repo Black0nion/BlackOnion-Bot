@@ -202,7 +202,7 @@ public class CommandBase extends ListenerAdapter {
 	}
 
 	// no command found
-	final CustomCommand cmd = guild.getCustomCommands().stream().filter(ccmd -> str.equalsIgnoreCase(ccmd.getCommand())).findFirst().orElse(null);
+	final CustomCommand cmd = guild.getCustomCommands().get(str);
 	if (cmd != null) {
 	    cmd.handle(event);
 	}

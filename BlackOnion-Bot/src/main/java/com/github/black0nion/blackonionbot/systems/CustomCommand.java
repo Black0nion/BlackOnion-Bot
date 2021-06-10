@@ -32,20 +32,20 @@ public class CustomCommand {
 
     public CustomCommand(final BlackGuild guild, final String command, final String answer) {
 	this.guild = guild;
-	this.command = command;
+	this.command = command.toLowerCase();
 	this.answer = answer;
     }
 
     public CustomCommand(final BlackGuild guild, final String command, final BlackEmbed answer) {
 	this.guild = guild;
-	this.command = command;
+	this.command = command.toLowerCase();
 	this.embed = answer;
     }
 
     public CustomCommand(final BlackGuild guild, final Document doc) {
 	this.guild = guild;
 	if (doc.containsKey("command")) {
-	    this.command = doc.getString("command");
+	    this.command = doc.getString("command").toLowerCase();
 	} else {
 	    this.command = "";
 	}
