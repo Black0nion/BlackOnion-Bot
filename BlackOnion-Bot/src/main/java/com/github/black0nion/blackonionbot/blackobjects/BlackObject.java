@@ -11,63 +11,68 @@ import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 
 public abstract class BlackObject {
-		
-	abstract Document getIdentifier();
-	
-	abstract MongoCollection<Document> getCollection();
-	
-	@Nonnull
-	public final <T> T gOS(final String key, final T value, final T defaultValue) {
-		if (value == null) save(key, defaultValue);
-		return (value != null ? value : defaultValue);
+
+    abstract Document getIdentifier();
+
+    abstract MongoCollection<Document> getCollection();
+
+    @Nonnull
+    public final <T> T gOS(final String key, final T value, final T defaultValue) {
+	if (value == null) {
+	    save(key, defaultValue);
 	}
-	
-	@Nonnull
-	public final <T> T gOD(final T value, final T defaultValue) {
-		return (value != null ? value : defaultValue);
+	return (value != null ? value : defaultValue);
+    }
+
+    @Nonnull
+    public final <T> T gOD(final T value, final T defaultValue) {
+	return (value != null ? value : defaultValue);
+    }
+
+    @Nullable
+    public Document getConfig() {
+	return getCollection().find(getIdentifier()).first();
+    }
+
+    @Nonnull
+    /**
+     * @return an arraylist containing all configs, empty if none present
+     */
+    public List<Document> getAllConfigs() {
+	return getCollection().find().into(new ArrayList<>());
+    }
+
+    public <T> void saveList(final String key, final List<T> value) {
+	save(new Document(key, value));
+    }
+
+    public <T> T get(final String key, final Class<T> clazz) {
+	return getConfig().get(key, clazz);
+    }
+
+    public <T> void save(final String key, final T value) {
+	save(new Document(key, value));
+    }
+
+    private void save(final Document doc) {
+	if (getCollection().find(getIdentifier()).first() == null) {
+	    final Document newDoc = getIdentifier();
+	    newDoc.putAll(doc);
+	    getCollection().insertOne(newDoc);
+	} else {
+	    getCollection().updateOne(getIdentifier(), new Document("$set", doc));
 	}
-	
-	@Nullable
-	public Document getConfig() {
-		return getCollection().find(getIdentifier()).first();
+    }
+
+    public void clear(final String... keys) {
+	final Document doc = new Document();
+	for (final String key : keys) {
+	    doc.put(key, "");
 	}
-	
-	@Nonnull
-	/**
-	 * @return an arraylist containing all configs, empty if none present
-	 */
-	public List<Document> getAllConfigs() {
-		return getCollection().find().into(new ArrayList<>());
-	}
-	
-	public <T> void saveList(final String key, final List<T> value) {
-		save(new Document(key, value));
-	}
-	
-	public <T> T get(final String key, final Class<T> clazz) {
-		return getConfig().get(key, clazz);
-	}
-	
-	public <T> void save(final String key, final T value) {
-		save(new Document(key, value));
-	}
-	
-	private void save(final Document doc) {
-		if (getCollection().find(getIdentifier()).first() == null) {
-			final Document newDoc = getIdentifier();
-			newDoc.putAll(doc);
-			getCollection().insertOne(newDoc);
-		} else
-			getCollection().updateOne(getIdentifier(), new Document("$set", doc));
-	}
-	
-	public void clear(final String... keys) {
-		final Document doc = new Document();
-		for (final String key : keys) doc.put(key, "");
-		clear(doc);
-	}
-	
-	public void clear(final Document doc) {
-		getCollection().updateOne(getIdentifier(), new Document("$unset", doc));
-	}
+	clear(doc);
+    }
+
+    public void clear(final Document doc) {
+	getCollection().updateOne(getIdentifier(), new Document("$unset", doc));
+    }
 }

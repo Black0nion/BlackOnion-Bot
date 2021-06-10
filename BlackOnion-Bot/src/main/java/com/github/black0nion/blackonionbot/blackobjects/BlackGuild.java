@@ -29,6 +29,7 @@ import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -135,8 +136,10 @@ public class BlackGuild extends BlackObject implements Guild {
     private long suggestionsChannel;
     private List<Long> autoRoles;
     private boolean loop;
+    private List<CustomCommand> customCommands;
 
     private BlackGuild(@NotNull final Guild guild) {
+
 	this.guild = guild;
 
 	try {
@@ -159,6 +162,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.autoRoles = gOD(config.getList("autoroles", Long.class), new ArrayList<>());
 	    this.antiSwearWhitelist = gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
 	    this.loop = gOD(config.getBoolean("loop"), false);
+	    this.customCommands = gOD(gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>());
 	    final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
 	    if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 		this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
@@ -377,6 +381,20 @@ public class BlackGuild extends BlackObject implements Guild {
     public void setLoop(final boolean loop) {
 	this.loop = loop;
 	save("loop", loop);
+    }
+
+    /**
+     * @return the customCommands
+     */
+    public List<CustomCommand> getCustomCommands() {
+	return customCommands;
+    }
+
+    public boolean addCustomCommand(final CustomCommand cmd) {
+	if (customCommands.contains(cmd)) return false;
+	this.customCommands.add(cmd);
+	save("customCommands", customCommands.stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
+	return true;
     }
 
     // override methods
