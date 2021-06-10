@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedList;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.google.common.io.FileWriteMode;
@@ -34,13 +35,19 @@ public class Logger {
 	String consoleLog = log;
 	if (mode == LogMode.ERROR || mode == LogMode.FATAL) {
 	    consoleLog = "\033[91m" + log + "\033[0m";
-	    System.err.println(consoleLog);
+	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
+		System.err.println(consoleLog);
+	    }
 	} else if (mode == LogMode.WARNING) {
 	    consoleLog = "\033[33m" + log + "\033[0m";
-	    System.out.println(consoleLog);
+	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
+		System.out.println(consoleLog);
+	    }
 	} else {
 	    consoleLog = "\033[94m" + log + "\033[0m";
-	    System.out.println(consoleLog);
+	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
+		System.out.println(consoleLog);
+	    }
 	}
 
 	logs.add(consoleLog);
