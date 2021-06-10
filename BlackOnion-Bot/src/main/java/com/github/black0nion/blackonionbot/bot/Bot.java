@@ -5,8 +5,10 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
@@ -14,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+
+import javax.annotation.Nullable;
 
 import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
@@ -54,13 +58,9 @@ import spark.Spark;
 public class Bot extends ListenerAdapter {
     public static RunMode runMode;
 
-    public static JDABuilder builder;
-
     public static ArrayList<String> notifyStatusUsers;
 
     public static JDA jda;
-
-    public static int line_count = 0;
 
     public static boolean isJarFile = false;
 
@@ -78,12 +78,25 @@ public class Bot extends ListenerAdapter {
 
     public static Callable<Object> switchingStatusCallable;
 
+    /**
+     * Null for everything
+     */
+    @Nullable
+    public static final List<LogMode> logLevel = new ArrayList<>();
+    /**
+     * Null for everything
+     */
+    @Nullable
+    public static final List<LogOrigin> logOrigin = new ArrayList<>();
+
     @SuppressWarnings("resource")
     public void startBot() {
 	Utils.printLogo();
 	Logger.logInfo("BlackOnion-Bot is starting up...");
 	new File("files").mkdir();
 	isJarFile = JarUtils.runningFromJar();
+	logLevel.addAll(Arrays.asList(LogMode.values()));
+	logOrigin.addAll(Arrays.asList(LogOrigin.values()));
 
 	new ValueManager();
 	DefaultValues.init();
@@ -95,7 +108,7 @@ public class Bot extends ListenerAdapter {
 	    MongoManager.connect(credentialsManager.getString("mongo_ip"), credentialsManager.getString("mongo_port"), credentialsManager.getString("mongo_authdb"), credentialsManager.getString("mongo_username"), credentialsManager.getString("mongo_password"), credentialsManager.getInt("mongo_timeout"));
 	}
 
-	builder = JDABuilder.createDefault(credentialsManager.getString("token"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE)).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS);
+	final JDABuilder builder = JDABuilder.createDefault(credentialsManager.getString("token"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE)).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS);
 
 	final EventWaiter waiter = new EventWaiter();
 
@@ -128,61 +141,115 @@ public class Bot extends ListenerAdapter {
 	executor.submit(() -> {
 	    final Scanner sc = new Scanner(System.in);
 	    while (true) {
-		final String input = sc.nextLine();
-		final String[] args = input.split(" ");
-		if (input.startsWith("peek")) {
-		    if (args.length < 2) {
-			System.out.println("Invalid Syntax. Syntax: peek <category> [limit]| Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
-			continue;
-		    } else if (Utils.equalsOneIgnoreCase(args[1], LogOrigin.getNames())) {
-			if (args.length >= 3) {
-			    if (!Utils.isLong(args[2])) {
-				System.out.println("Invalid number!");
-				continue;
+		try {
+		    final String input = sc.nextLine();
+		    final String[] args = input.split(" ");
+		    if (input.startsWith("peek")) {
+			if (args.length < 2) {
+			    System.out.println("Invalid Syntax. Syntax: peek <category> [limit]| Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
+			    continue;
+			} else if (Utils.equalsOneIgnoreCase(args[1], LogOrigin.getNames())) {
+			    if (args.length >= 3) {
+				if (!Utils.isLong(args[2])) {
+				    System.out.println("Invalid number!");
+				    continue;
+				} else {
+				    Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
+				}
 			    } else {
-				Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
+				Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()));
+			    }
+			} else if (Utils.equalsOneIgnoreCase(args[1], LogMode.getNames())) {
+			    if (args.length >= 3) {
+				if (!Utils.isLong(args[2])) {
+				    System.out.println("Invalid number!");
+				    continue;
+				} else {
+				    Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
+				}
+			    } else {
+				Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()));
+			    }
+			} else if (args[1].equalsIgnoreCase("all")) {
+			    if (args.length >= 3) {
+				if (!Utils.isLong(args[2])) {
+				    System.out.println("Invalid number!");
+				    continue;
+				} else {
+				    Logger.printAll(Integer.parseInt(args[2]));
+				}
+			    } else {
+				Logger.printAll();
 			    }
 			} else {
-			    Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()));
+			    System.out.println("Category not found. Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
 			}
-		    } else if (Utils.equalsOneIgnoreCase(args[1], LogMode.getNames())) {
-			if (args.length >= 3) {
-			    if (!Utils.isLong(args[2])) {
-				System.out.println("Invalid number!");
-				continue;
-			    } else {
-				Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
-			    }
+		    } else if (input.startsWith("setloglevel")) {
+			if (args.length <= 1) {
+			    System.out.println("Please use setloglevel <level> | Valid levels: " + String.join(", ", LogMode.getNames()));
 			} else {
-			    Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()));
-			}
-		    } else if (args[1].equalsIgnoreCase("all")) {
-			if (args.length >= 3) {
-			    if (!Utils.isLong(args[2])) {
-				System.out.println("Invalid number!");
-				continue;
-			    } else {
-				Logger.printAll(Integer.parseInt(args[2]));
+			    for (final String cat : Utils.removeFirstArg(args)) {
+				if (cat.startsWith("!")) {
+				    final LogMode parsed = LogMode.parse(cat.replace("!", ""));
+				    if (parsed != null) {
+					logLevel.remove(parsed);
+				    } else {
+					System.out.println(cat + " is not a valid LogMode!");
+				    }
+				} else {
+				    final LogMode parsed = LogMode.parse(cat);
+				    if (parsed != null) {
+					if (!logLevel.contains(parsed)) {
+					    logLevel.add(parsed);
+					}
+				    } else {
+					System.out.println(cat + " is not a valid LogMode!");
+				    }
+				}
 			    }
-			} else {
-			    Logger.printAll();
+			    System.out.println("Now printing LogLevels " + logLevel);
 			}
+		    } else if (input.startsWith("setlogorigin")) {
+			if (args.length <= 1) {
+			    System.out.println("Please use setlogorigin <origin> | Valid origins: " + String.join(", ", LogOrigin.getNames()));
+			} else {
+			    for (final String cat : Utils.removeFirstArg(args)) {
+				if (cat.startsWith("!")) {
+				    final LogOrigin parsed = LogOrigin.parse(cat.replace("!", ""));
+				    if (parsed != null) {
+					logOrigin.remove(parsed);
+				    } else {
+					System.out.println(cat + " is not a valid LogOrigin!");
+				    }
+				} else {
+				    final LogOrigin parsed = LogOrigin.parse(cat);
+				    if (parsed != null) {
+					if (!logOrigin.contains(parsed)) {
+					    logOrigin.add(parsed);
+					}
+				    } else {
+					System.out.println(cat + " is not a valid LogOrigin!");
+				    }
+				}
+			    }
+			    System.out.println("Now printing LogOrigin " + logOrigin);
+			}
+		    } else if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
+			Logger.logInfo("Reloading...", LogOrigin.BOT);
+			ReloadCommand.reload();
+			Logger.logInfo("Reloading done.", LogOrigin.BOT);
+		    } else if (input.equalsIgnoreCase("shutdown")) {
+			Logger.logWarning("Shutting down...", LogOrigin.BOT);
+			jda.shutdown();
+			Spark.stop();
+			Spark.awaitStop();
+			Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
+			System.exit(0);
 		    } else {
-			System.out.println("Category not found. Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
+			System.out.println("Command not recognized. Valid Commands: [reload, shutdown, setlogorigin, setloglevel, peek]");
 		    }
-		} else if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
-		    Logger.logInfo("Reloading...", LogOrigin.BOT);
-		    ReloadCommand.reload();
-		    Logger.logInfo("Reloading done.", LogOrigin.BOT);
-		} else if (input.equalsIgnoreCase("shutdown")) {
-		    Logger.logWarning("Shutting down...", LogOrigin.BOT);
-		    jda.shutdown();
-		    Spark.stop();
-		    Spark.awaitStop();
-		    Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
-		    System.exit(0);
-		} else {
-		    System.out.println("Command not recognized.");
+		} catch (final Exception e) {
+		    e.printStackTrace();
 		}
 	    }
 	});

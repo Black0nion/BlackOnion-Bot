@@ -17,4 +17,12 @@ public enum LogOrigin {
 	}
 	return names.toArray(new String[0]);
     }
+
+    public static final LogOrigin parse(final String input) {
+	try {
+	    return valueOf(input.toUpperCase());
+	} catch (final Exception e) {
+	    return null;
+	}
+    }
 }
