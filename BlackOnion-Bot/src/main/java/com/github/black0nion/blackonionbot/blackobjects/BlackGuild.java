@@ -401,6 +401,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	return true;
     }
 
+    public void deleteCustomCommand(final String commandName) {
+	this.customCommands.remove(commandName);
+	save("customcommands", customCommands.values().stream().map(CustomCommand::toDocument).collect(Collectors.toList()));
+    }
+
     // override methods
     @Override
     public Document getIdentifier() {
