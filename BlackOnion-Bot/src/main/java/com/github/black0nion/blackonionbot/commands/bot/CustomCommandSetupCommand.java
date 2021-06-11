@@ -24,11 +24,16 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class CustomCommandSetupCommand extends Command {
 
     public CustomCommandSetupCommand() {
-	this.setCommand("customcommandsetup", "creatcustomcommand", "ccc", "ccs").setSyntax("<command>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
+	this.setCommand("creatcustomcommand", "customcommandsetup", "ccc", "ccs").setSyntax("<command>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
     }
 
     @Override
     public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final int maxCount = guild.getGuildType().getMaxCustomCommands();
+	if (guild.getCustomCommands().size() >= maxCount) {
+	    cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
+	    return;
+	}
 	if (CommandBase.commands.containsKey(args[1].toLowerCase()) || guild.getCustomCommands().containsKey(args[1].toLowerCase())) {
 	    cmde.error("alreadyexisting", "commandexisting");
 	    return;
@@ -38,7 +43,7 @@ public class CustomCommandSetupCommand extends Command {
     }
 
     private final void askForType(final String command, final CommandEvent cmde) {
-	cmde.getMessage().reply(cmde.success().addField("inputtype", "validtypes", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
+	cmde.getMessage().reply(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
 	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
@@ -58,7 +63,7 @@ public class CustomCommandSetupCommand extends Command {
     }
 
     private static final void askForRaw(final String command, final CommandEvent cmde) {
-	cmde.getMessage().reply(cmde.success().addField("messagetosend", "inputmessage", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
+	cmde.getMessage().reply(cmde.success().addField("messagetosend", "inputmessage", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
 	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
@@ -73,7 +78,7 @@ public class CustomCommandSetupCommand extends Command {
     }
 
     private static final void askForReply(final String command, final CommandEvent cmde, final CustomCommand customCommand) {
-	cmde.getMessage().reply(cmde.success().addField("shouldreply", "shouldanswer", false).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
+	cmde.getMessage().reply(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
 	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 
