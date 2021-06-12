@@ -343,5 +343,9 @@
     "messagetosend": "Nachricht zu senden",
     "inputmessage": "Bitte gebe die Nachricht ein, die gesendet werden soll!",
     "shouldreply": "Soll der Bot auf die Nachricht mit dem Befehl antworten?",
-    "shouldanswer": "Schreibe `true` für ja oder `false` für nein!"
+    "shouldanswer": "Schreibe `true` für ja oder `false` für nein!",
+    "commanddeleted": "CustomCommand %cmd% gelöscht!",
+    "leavetutorial": "Antworte mit `leave oder exit` um das Setup abzubrechen!",
+    "toomanycustomcommands": "Dieser Server hat bereits zu viele CustomCommands!",
+    "maxcustomcommands": "Mit dem Status deines Servers kann man maximal `%count%` CustomCommands erstellen."
 }
