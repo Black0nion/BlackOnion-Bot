@@ -43,15 +43,7 @@ public class ReloadCommand extends Command {
 	message.delete().queue();
 
 	if (reloadableMethods == null) {
-	    reloadableMethods = new HashMap<>();
-	    final Reflections reflections = new Reflections(Main.class.getPackage().getName(), new MethodAnnotationsScanner());
-	    try {
-		reflections.getMethodsAnnotatedWith(Reloadable.class).forEach(method -> {
-		    reloadableMethods.put(method.getAnnotation(Reloadable.class).value(), method);
-		});
-	    } catch (final Exception ex) {
-		ex.printStackTrace();
-	    }
+	    initReloadableMethods();
 	}
 
 	// e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID,
@@ -103,7 +95,23 @@ public class ReloadCommand extends Command {
 	}
     }
 
+    @Reloadable("reloadablemethods")
+    private static void initReloadableMethods() {
+	reloadableMethods = new HashMap<>();
+	final Reflections reflections = new Reflections(Main.class.getPackage().getName(), new MethodAnnotationsScanner());
+	try {
+	    reflections.getMethodsAnnotatedWith(Reloadable.class).forEach(method -> {
+		reloadableMethods.put(method.getAnnotation(Reloadable.class).value(), method);
+	    });
+	} catch (final Exception ex) {
+	    ex.printStackTrace();
+	}
+    }
+
     public static void reload() {
+	if (reloadableMethods == null) {
+	    initReloadableMethods();
+	}
 	for (final Method m : reloadableMethods.values()) {
 	    try {
 		m.invoke(m.getClass());

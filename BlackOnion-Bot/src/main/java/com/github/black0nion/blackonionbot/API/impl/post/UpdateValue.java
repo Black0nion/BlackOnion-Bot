@@ -15,34 +15,38 @@ import net.dv8tion.jda.api.entities.Guild;
 import spark.Request;
 import spark.Response;
 
-public class UpdateValue implements PostRequest {
+public class UpdateValue extends PostRequest {
 
-	@Override
-	public String handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, DiscordUser user) {
-		String newValue = headers.get("newValue");
-		String databaseKey = headers.get("databaseKey");
-		String guildId = headers.get("guild");
-		Guild guild;
-		try { guild = Bot.jda.getGuildById(guildId); } catch (Exception e) { return "bing bong request gone"; }
-		DashboardValue value = Dashboard.getDashboardValueFromKey(databaseKey);
-		if (value != null) {
-			value.save(databaseKey, newValue, BlackGuild.from(guild));
-		}
-		return "ding dong done";
+    @Override
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+	final String newValue = headers.get("newValue");
+	final String databaseKey = headers.get("databaseKey");
+	final String guildId = headers.get("guild");
+	Guild guild;
+	try {
+	    guild = Bot.jda.getGuildById(guildId);
+	} catch (final Exception e) {
+	    return "bing bong request gone";
 	}
+	final DashboardValue value = Dashboard.getDashboardValueFromKey(databaseKey);
+	if (value != null) {
+	    value.save(databaseKey, newValue, BlackGuild.from(guild));
+	}
+	return "ding dong done";
+    }
 
-	@Override
-	public String url() {
-		return "updatevalue";
-	}
-	
-	@Override
-	public String[] requiredParameters() {
-		return new String[] { "databaseKey", "newValue" };
-	}
-	
-	@Override
-	public boolean requiresLogin() {
-		return false;
-	}
+    @Override
+    public String url() {
+	return "updatevalue";
+    }
+
+    @Override
+    public String[] requiredParameters() {
+	return new String[] { "databaseKey", "newValue" };
+    }
+
+    @Override
+    public boolean requiresLogin() {
+	return false;
+    }
 }

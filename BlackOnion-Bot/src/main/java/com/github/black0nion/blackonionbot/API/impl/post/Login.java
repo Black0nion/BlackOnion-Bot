@@ -11,7 +11,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import spark.Request;
 import spark.Response;
 
-public class Login implements PostRequest {
+public class Login extends PostRequest {
 
     // TODO: fix lol
     @Override
