@@ -17,7 +17,7 @@ import spark.Response;
  * @author _SIM_
  *
  */
-public class Test implements PostRequest {
+public class Test extends PostRequest {
 
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {

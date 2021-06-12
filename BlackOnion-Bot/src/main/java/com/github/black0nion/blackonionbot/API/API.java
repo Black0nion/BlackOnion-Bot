@@ -1,9 +1,5 @@
 package com.github.black0nion.blackonionbot.API;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
@@ -18,25 +14,23 @@ import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
 import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
+import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
-import com.google.common.util.concurrent.RateLimiter;
 import com.mongodb.client.model.Filters;
 
+import spark.Route;
 import spark.Spark;
 
 public class API {
 
-    private static ArrayList<PostRequest> postRequests = new ArrayList<>();
-    private static ArrayList<GetRequest> getRequests = new ArrayList<>();
+    private static HashMap<String, BlackRequest> requests = new HashMap<>();
 
-    private static final HashMap<String, RateLimiter> rateLimiters = new HashMap<>();
+    private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
 
     @Reloadable("api")
     public static void init() {
-	postRequests.clear();
-	getRequests.clear();
+	requests.clear();
 	final int port = ValueManager.getInt("api_port");
 	Spark.stop();
 	Spark.awaitStop();
@@ -56,22 +50,15 @@ public class API {
 	    }
 	}
 	Spark.init();
-	// -----------------Get Requests-----------------
-	final Set<Class<? extends GetRequest>> getRequestClasses = reflections.getSubTypesOf(GetRequest.class);
+	// -----------------Map Requests-----------------
+	final Set<Class<? extends BlackRequest>> requestClasses = reflections.getSubTypesOf(BlackRequest.class);
 
-	for (final Class<?> req : getRequestClasses) {
+	for (final Class<?> req : requestClasses) {
 	    try {
-		getRequests.add((GetRequest) req.getConstructor().newInstance());
-	    } catch (final Exception e) {
-		e.printStackTrace();
-	    }
-	}
-	// ----------------Post Requests-----------------
-	final Set<Class<? extends PostRequest>> postRequestClasses = reflections.getSubTypesOf(PostRequest.class);
-
-	for (final Class<?> req : postRequestClasses) {
-	    try {
-		postRequests.add((PostRequest) req.getConstructor().newInstance());
+		if (req.getSuperclass() != BlackRequest.class) {
+		    final BlackRequest newInstance = (BlackRequest) req.getConstructor().newInstance();
+		    requests.put(newInstance.url(), newInstance);
+		}
 	    } catch (final Exception e) {
 		e.printStackTrace();
 	    }
@@ -83,6 +70,7 @@ public class API {
 	    response.header("Access-Control-Allow-Origin", "*");
 	    response.type("application/json");
 	    response.status(500);
+	    logError("Some internal server error happened! URL: " + request.url());
 	    return new JSONObject().put("success", false).put("reason", 500).toString();
 	});
 
@@ -93,26 +81,37 @@ public class API {
 	    return new JSONObject().put("success", false).put("reason", 404).toString();
 	});
 
+	Spark.before((req, res) -> {
+	    if (!requests.containsKey(req.contextPath())) {
+		Spark.halt(404, "notfound");
+	    }
+
+	    final BlackRequest request = requests.get(req.contextPath());
+	    // RATE LIMITING:
+	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
+	    if (rateLimiters.containsKey(ip)) {
+		final BlackRateLimiter limiter = rateLimiters.get(ip);
+		if (!limiter.tryAcquire()) {
+		    logWarning(ip + " got ratelimited! Sent " + limiter.getTooMany() + " too many requests!");
+		    res.status(429);
+		    Spark.halt(new JSONObject().put("success", false).put("error", "ratelimited").toString());
+		}
+	    } else {
+		rateLimiters.put(ip, BlackRateLimiter.create(request.rateLimit()));
+	    }
+	});
+
 	// ----------------Post Requests-----------------
-	for (final PostRequest req : postRequests) {
+	for (final BlackRequest req : requests.values()) {
 	    if (req.url() == null) {
-		API.logError("Path is null: " + req.getClass().getName());
+		logError("Path is null: " + req.getClass().getName());
 		continue;
 	    }
+
 	    final String url = "/api/" + req.url();
-	    post(url, (request, response) -> {
+	    final Route route = (request, response) -> {
 		final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
 		try {
-		    // RATE LIMITING:
-		    if (rateLimiters.containsKey(ip)) {
-			final RateLimiter limiter = rateLimiters.get(ip);
-			if (!limiter.tryAcquire()) {
-			    response.status(429);
-			    return new JSONObject().put("success", false).put("error", "ratelimited").toString();
-			}
-		    } else {
-			rateLimiters.put(ip, RateLimiter.create(2));
-		    }
 		    response.header("Access-Control-Allow-Origin", "*");
 		    JSONObject body = new JSONObject();
 		    if (req.requiredBodyParameters().length != 0) {
@@ -156,7 +155,7 @@ public class API {
 			return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "missingParameters").toString();
 		    }
 
-		    API.logInfo("Answered POST request (Path: " + url + ") from: " + ip + " with header: " + body.toString());
+		    logInfo("Answered POST request (Path: " + url + ") from: " + ip + " with header: " + body.toString());
 
 		    response.type("text/plain");
 		    if (req.isJson()) {
@@ -172,7 +171,7 @@ public class API {
 
 		    return req.handle(request, response, body, headers, login != null ? login.getUser() : null);
 		} catch (final Exception e) {
-		    API.logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
+		    logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
 		    if (!(e instanceof JSONException)) {
 			e.printStackTrace();
 		    }
@@ -186,74 +185,17 @@ public class API {
 			return new JSONObject().put("success", false).put("reason", 500).put("detailedReason", "exception").toString();
 		    }
 		}
-	    });
-	}
-	// ----------------------------------------------
-	// -----------------Get Requests-----------------
+	    };
 
-	for (final GetRequest req : getRequests) {
-	    if (req.url() == null) {
-		API.logError("Path is null: " + req.getClass().getName());
-		continue;
+	    final RequestType type = req.type();
+	    if (type == RequestType.GET) {
+		Spark.get(req.url(), route);
+	    } else if (type == RequestType.POST) {
+		Spark.post(req.url(), route);
+	    } else {
+		logError(type.name() + " has no Spark method reference!");
 	    }
-	    final String url = "/api/" + req.url();
-	    get(url, (request, response) -> {
-		try {
-		    response.header("Access-Control-Allow-Origin", "*");
-		    JSONObject body = new JSONObject();
-		    if (req.requiredParameters().length != 0) {
-			body = new JSONObject(request.body());
-		    }
-		    final JSONObject headers = new JSONObject();
-		    request.headers().forEach(head -> {
-			headers.put(head, request.headers(head));
-		    });
-		    API.logInfo("Answered GET request (Path: " + url + ") from: " + request.ip() + " with header: " + body.toString());
-
-		    if (req.isJson()) {
-			response.type("application/json");
-		    }
-
-		    String token = null;
-		    JSONObject userInfo = null;
-		    if (req.requiresLogin()) {
-			if (!headers.has("token")) {
-			    response.status(401);
-			    return new JSONObject().put("success", false).put("reason", 401).toString();
-			}
-
-			token = headers.getString("token");
-
-			if (!Utils.isDiscordUser(token)) {
-			    response.status(401);
-			    return new JSONObject().put("success", false).put("reason", 401).toString();
-			}
-			// TODO: admin check!
-			if (req.requiresAdmin()) {
-			    response.status(403);
-			    return new JSONObject().put("success", false).put("reason", 403).toString();
-			}
-
-			userInfo = Utils.getUserInfoFromToken(token);
-		    }
-
-		    for (final String s : req.requiredParameters()) {
-			if (!body.has(s)) {
-			    response.status(400);
-			    return new JSONObject().put("success", false).put("reason", 400).toString();
-			}
-		    }
-
-		    final DiscordUser user = (userInfo != null ? new DiscordUser(Long.parseLong(userInfo.getString("id")), userInfo.getString("username"), userInfo.getString("avatar"), userInfo.getString("discriminator"), userInfo.getString("locale").toUpperCase(), userInfo.getBoolean("mfa_enabled")) : null);
-		    return req.handle(request, response, null, user);
-		} catch (final JSONException e) {
-		    response.status(400);
-		    response.type("application/json");
-		    return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException: " + e.getMessage()).toString();
-		}
-	    });
 	}
-	// ----------------------------------------------
     }
 
     public static void logInfo(final String logInput) {
