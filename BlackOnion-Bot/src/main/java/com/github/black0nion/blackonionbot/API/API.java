@@ -28,6 +28,11 @@ public class API {
 
     private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
 
+    @Reloadable("ratelimits")
+    public static void clearRateLimits() {
+	rateLimiters.clear();
+    }
+
     @Reloadable("api")
     public static void init() {
 	requests.clear();
@@ -81,6 +86,7 @@ public class API {
 	    return new JSONObject().put("success", false).put("reason", 404).toString();
 	});
 
+	final String ratelimited = new JSONObject().put("success", false).put("error", "ratelimited").toString();
 	Spark.before((req, res) -> {
 	    if (!requests.containsKey(req.uri())) {
 		Spark.halt(404, "notfound");
@@ -94,7 +100,7 @@ public class API {
 		if (!limiter.tryAcquire()) {
 		    logWarning(ip + " got ratelimited! Sent " + limiter.getTooMany() + " too many requests!");
 		    res.status(429);
-		    Spark.halt(new JSONObject().put("success", false).put("error", "ratelimited").toString());
+		    Spark.halt(ratelimited);
 		}
 	    } else {
 		rateLimiters.put(ip, BlackRateLimiter.create(request.rateLimit()));

@@ -12,8 +12,6 @@ public class BlackRateLimiter {
     private int tooMany;
 
     public static BlackRateLimiter create(final Time time) {
-	System.out.println(time.getTime());
-	System.out.println(time.getUnit());
 	return create(time.getTime(), time.getUnit());
     }
 
@@ -40,9 +38,9 @@ public class BlackRateLimiter {
     }
 
     public void schedulePermitReplenishment() {
-	Bot.scheduledExecutor.schedule(() -> {
+	Bot.scheduledExecutor.scheduleAtFixedRate(() -> {
 	    this.semaphore.release(this.maxPermits - this.semaphore.availablePermits());
-	}, 1, this.timePeriod);
+	}, 0, 1, this.timePeriod);
     }
 
     public int getTooMany() {
