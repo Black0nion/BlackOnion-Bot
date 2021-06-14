@@ -74,7 +74,7 @@
     "messagedelete5": "This message deletes itself after 5 seconds!",
     "statussetfail": "Setting the status failed!",
     "statussetsuccess": "Successfully set the status!",
-    "pleaseuse": "Please use %command%!",
+    "pleaseuse": "Bitte benutze `%command%`!",
     "or": "or",
     "pfpof": "Profile picture of",
     "tagornameuser": "Please tag a user!",
@@ -347,5 +347,6 @@
     "commanddeleted": "CustomCommand %cmd% gelöscht!",
     "leavetutorial": "Antworte mit `leave oder exit` um das Setup abzubrechen!",
     "toomanycustomcommands": "Dieser Server hat bereits zu viele CustomCommands!",
-    "maxcustomcommands": "Mit dem Status deines Servers kann man maximal `%count%` CustomCommands erstellen."
+    "maxcustomcommands": "Mit dem Status deines Servers kann man maximal `%count%` CustomCommands erstellen.",
+    "customcommandslist": "Dieser Server hat folgende CustomCommands:"
 }
