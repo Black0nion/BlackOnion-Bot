@@ -8,7 +8,7 @@ public abstract class GetRequest extends BlackRequest {
 
     @Override
     public Time rateLimit() {
-	return Time.MINUTES(20);
+	return Time.MINUTES(40);
     }
 
     @Override

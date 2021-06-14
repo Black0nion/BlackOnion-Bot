@@ -14,7 +14,7 @@ public abstract class PostRequest extends BlackRequest {
 
     @Override
     public Time rateLimit() {
-	return Time.MINUTES(10);
+	return Time.MINUTES(20);
     }
 
     @Override
