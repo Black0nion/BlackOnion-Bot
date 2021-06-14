@@ -236,7 +236,7 @@ public class CommandEvent {
     }
 
     public EmbedBuilder getWrongArgument() {
-	return error().addField("wrongargument", "`" + getPleaseUse(this.guild, this.user, this.command) + "`", false);
+	return error().addField("wrongargument", getPleaseUse(this.guild, this.user, this.command), false);
     }
 
     public String getTranslation(final String key) {

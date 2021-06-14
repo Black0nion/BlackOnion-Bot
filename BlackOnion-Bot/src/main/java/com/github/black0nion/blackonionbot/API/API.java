@@ -57,7 +57,7 @@ public class API {
 	    try {
 		if (req.getSuperclass() != BlackRequest.class) {
 		    final BlackRequest newInstance = (BlackRequest) req.getConstructor().newInstance();
-		    requests.put(newInstance.url(), newInstance);
+		    requests.put("/api/" + newInstance.url(), newInstance);
 		}
 	    } catch (final Exception e) {
 		e.printStackTrace();
@@ -82,11 +82,11 @@ public class API {
 	});
 
 	Spark.before((req, res) -> {
-	    if (!requests.containsKey(req.contextPath())) {
+	    if (!requests.containsKey(req.uri())) {
 		Spark.halt(404, "notfound");
 	    }
 
-	    final BlackRequest request = requests.get(req.contextPath());
+	    final BlackRequest request = requests.get(req.uri());
 	    // RATE LIMITING:
 	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
 	    if (rateLimiters.containsKey(ip)) {
@@ -189,9 +189,9 @@ public class API {
 
 	    final RequestType type = req.type();
 	    if (type == RequestType.GET) {
-		Spark.get(req.url(), route);
+		Spark.get(url, route);
 	    } else if (type == RequestType.POST) {
-		Spark.post(req.url(), route);
+		Spark.post(url, route);
 	    } else {
 		logError(type.name() + " has no Spark method reference!");
 	    }
