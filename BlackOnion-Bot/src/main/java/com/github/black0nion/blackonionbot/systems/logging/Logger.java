@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.systems.logging;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -68,8 +67,8 @@ public class Logger {
 	    final File file = new File("files/logs/log." + origin.name().toLowerCase() + "/" + origin.name().toLowerCase() + "." + mode.name().toLowerCase() + ".log");
 	    file.getParentFile().mkdirs();
 	    file.createNewFile();
-	    Files.asCharSink(file, StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log);
-	    Files.asCharSink(new File("files/logs/bot.log"), StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log);
+	    Files.asCharSink(file, StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log + "\n");
+	    Files.asCharSink(new File("files/logs/bot.log"), StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log + "\n");
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	}
