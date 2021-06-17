@@ -5,6 +5,7 @@ import org.jetbrains.annotations.TestOnly;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
@@ -33,9 +34,14 @@ public class InfluxManager {
 	}
     }
 
+    @Reloadable("influxdb")
     public static void init() {
 	Bot.executor.submit(() -> {
 	    final CredentialsManager manager = Bot.getCredentialsManager();
+	    if (!(manager.has("influx_database-url") && manager.has("influx_token") && manager.has("influx_org"))) {
+		Logger.logError("No credentials for InfluxDB.", LogOrigin.INFLUX_DB);
+		return;
+	    }
 	    if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org"))) return;
 	    Bot.executor.submit(() -> testSaving(new Document().append("test", "moino")));
 
