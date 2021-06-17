@@ -92,13 +92,13 @@ public class BlackMember extends BlackObject implements Member {
 	this.member = member;
 	this.blackGuild = blackGuild;
 
-	save("username", member.getEffectiveName());
-	save("guildname", blackGuild.getName());
-	ImmutableList.copyOf(warnsCollection.find(getIdentifier())).stream().map(doc -> {
+	this.save("username", member.getEffectiveName());
+	this.save("guildname", blackGuild.getName());
+	ImmutableList.copyOf(warnsCollection.find(this.getIdentifier())).stream().map(doc -> {
 	    if (doc.containsKey("reason") && doc.containsKey("issuer") && doc.containsKey("date")) return new Warn(doc.getLong("guildid"), doc.getLong("issuer"), doc.getLong("userid"), doc.getLong("date"), doc.getString("reason"));
 	    else if (doc.containsKey("issuer") && doc.containsKey("date")) return new Warn(doc.getLong("guildid"), doc.getLong("issuer"), doc.getLong("userid"), doc.getLong("date"));
 	    return null;
-	}).filter(warn -> warn != null).forEach(warns::add);
+	}).filter(warn -> warn != null).forEach(this.warns::add);
     }
 
     public Member getMember() {
@@ -108,7 +108,7 @@ public class BlackMember extends BlackObject implements Member {
     public void warn(final Warn w) {
 	this.warns.add(w);
 	final Document doc = new Document();
-	doc.putAll(getIdentifier());
+	doc.putAll(this.getIdentifier());
 	doc.put("issuer", w.getIssuer());
 	final long l = w.getDate();
 	doc.put("date", l);
@@ -120,14 +120,14 @@ public class BlackMember extends BlackObject implements Member {
 
     public void deleteWarn(final Warn w) {
 	this.warns.remove(w);
-	warnsCollection.deleteOne(getIdentifier().append("date", w.getDate()));
+	warnsCollection.deleteOne(this.getIdentifier().append("date", w.getDate()));
     }
 
     public void saveWarns() {
-	warnsCollection.insertMany(warns.stream().map(warn -> {
+	warnsCollection.insertMany(this.warns.stream().map(warn -> {
 	    final Document doc = new Document();
 	    doc.put("issuer", warn.getIssuer());
-	    doc.putAll(getIdentifier());
+	    doc.putAll(this.getIdentifier());
 	    if (warn.getReasonNullable() != null) {
 		doc.put("reason", warn.getReason());
 	    }
@@ -139,7 +139,7 @@ public class BlackMember extends BlackObject implements Member {
      * @return the warns
      */
     public List<Warn> getWarns() {
-	return warns;
+	return this.warns;
     }
 
     // override methods
@@ -352,12 +352,6 @@ public class BlackMember extends BlackObject implements Member {
     @NotNull
     public AuditableRestAction<Void> modifyNickname(final String nickname) {
 	return this.getMember().modifyNickname(nickname);
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFake() {
-	return this.member.isFake();
     }
 
     @Override

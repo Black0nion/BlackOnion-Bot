@@ -79,7 +79,7 @@ public class BlackUser extends BlackObject implements User {
     private BlackUser(final User user) {
 	this.user = user;
 
-	save("name", user.getName());
+	this.save("name", user.getName());
 
 	try {
 	    Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
@@ -88,10 +88,10 @@ public class BlackUser extends BlackObject implements User {
 		config = new Document();
 	    }
 
-	    permissions = CustomPermission.parse(gOD(config.getList("permissions", String.class), new ArrayList<>()));
+	    this.permissions = CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>()));
 
 	    if (config.getString("language") != null) {
-		this.language = gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+		this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 	    } else {
 		this.language = LanguageSystem.getDefaultLanguage();
 	    }
@@ -101,20 +101,20 @@ public class BlackUser extends BlackObject implements User {
     }
 
     public Language getLanguage() {
-	return language;
+	return this.language;
     }
 
     public void setLanguage(final Language language) {
 	this.language = language;
-	save("language", language.getLanguageCode());
+	this.save("language", language.getLanguageCode());
     }
 
     public List<CustomPermission> getPermissions() {
-	return permissions;
+	return this.permissions;
     }
 
     public boolean hasPermission(final CustomPermission... permissions) {
-	for (final CustomPermission requiredPerm : permissions) if (!hasPermission(requiredPerm)) return false;
+	for (final CustomPermission requiredPerm : permissions) if (!this.hasPermission(requiredPerm)) return false;
 	return true;
     }
 
@@ -127,12 +127,12 @@ public class BlackUser extends BlackObject implements User {
 	for (final CustomPermission perm : permissions) if (!perms.contains(perm)) {
 	    perms.add(perm);
 	}
-	setPermissions(perms);
+	this.setPermissions(perms);
     }
 
     public void setPermissions(final List<CustomPermission> permissions) {
 	this.permissions = permissions;
-	save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
+	this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
     }
 
     // override methods
@@ -230,12 +230,6 @@ public class BlackUser extends BlackObject implements User {
     @Override
     public int getFlagsRaw() {
 	return this.user.getFlagsRaw();
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFake() {
-	return this.user.isFake();
     }
 
     @Override
