@@ -11,7 +11,6 @@ import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
 import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
@@ -141,10 +140,18 @@ public class API {
 		    }
 
 		    // all the information we got saved about the session
-		    final Document sessionInformation = BlackSession.collection.find(Filters.eq("sessionid", sessionid)).first();
+		    final Document sessionInformation = BlackWebsocketSession.collection.find(Filters.eq("sessionid", sessionid)).first();
 		    // if the request requires login, this won't be null
-		    DiscordLogin login = null;
 		    if (req.requiresLogin()) {
+			if (sessionInformation == null) {
+			    response.status(401);
+			    return new JSONObject().put("success", false).put("reason", 401).put("detailedReason", "No SessionID Provided").toString();
+			}
+			if (!sessionInformation.containsKey("access_token") || !sessionInformation.containsKey("reload_token")) {
+			    response.status(401);
+			    return new JSONObject().put("success", false).put("reason", 401).put("detailedReason", "Not logged in to discord").toString();
+			}
+
 			final JSONObject userinfo = Utils.getUserInfoFromToken(sessionInformation.getString("access_token"));
 			login = DiscordLogin.success(userinfo);
 
