@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import spark.Request;
 import spark.Response;
@@ -20,7 +20,7 @@ import spark.Response;
 public class Test extends PostRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	return "oh hello there";
     }
 

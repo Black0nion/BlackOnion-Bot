@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.GetRequest;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -17,7 +17,7 @@ import spark.Response;
 public class RefreshToken extends GetRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	final JSONObject tokenResponse = refreshTokenJSON(body.getString("refresh_token"));
 	if (tokenResponse == null) {
 	    response.status(500);

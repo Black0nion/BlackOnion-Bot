@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.GetRequest;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import spark.Request;
 import spark.Response;
@@ -17,7 +17,7 @@ import spark.routematch.RouteMatch;
 public class Paths extends GetRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	final JSONObject obj = new JSONObject();
 
 	final List<String> routes = new ArrayList<String>();

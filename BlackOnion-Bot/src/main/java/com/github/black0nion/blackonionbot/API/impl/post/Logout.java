@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.mongodb.client.model.Filters;
 
 import spark.Request;
@@ -30,7 +29,7 @@ public class Logout extends PostRequest {
     }
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	final Document doc = BlackSession.collection.find(Filters.eq("sessionid", request.headers("sessionid"))).first();
 	if (doc != null) {
 	    BlackSession.collection.deleteOne(Filters.eq("sessionid", request.headers("sessionid")));

@@ -7,10 +7,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
@@ -23,13 +22,15 @@ import spark.Response;
 public class GetGuildsToManage extends GetRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	if (request.headers("token") == null) {
 	    response.status(401);
 	    return new JSONObject().put("success", false).toString();
 	}
 
-	final JSONObject userInfo = Utils.getUserInfoFromToken(request.headers("token"));
+	// final JSONObject userInfo =
+	// OAuthUtils.getUserInfoFromToken(request.headers("token"));
+	final JSONObject userInfo = null;
 
 	final List<Guild> guildsToManage = new ArrayList<>();
 
