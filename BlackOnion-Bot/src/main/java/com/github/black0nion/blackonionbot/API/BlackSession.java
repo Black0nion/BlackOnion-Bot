@@ -1,21 +1,13 @@
 package com.github.black0nion.blackonionbot.API;
 
-import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.error;
-import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.DISCORD_ERROR;
-import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.EXCEPTION;
-import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.INVALID_DISCORD_CODE;
-import static com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin.SessionError.INVALID_SCOPES;
-
-import java.util.Arrays;
-
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.API.impl.DashboardWebsocket;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
+import com.github.black0nion.blackonionbot.utils.Trio;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
@@ -29,6 +21,7 @@ public class BlackSession {
     public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 
     private String sessionId;
+    private DiscordUser user;
 
     public BlackSession() {
 	this.createSession();
@@ -84,25 +77,27 @@ public class BlackSession {
      * @param code the code discord gave you
      * @return if it worked
      */
-    public DiscordLogin loginWithDiscord(final String code) {
+    public boolean loginWithDiscord(final String code) {
 	try {
-	    final JSONObject response = new JSONObject(Utils.getTokenFromCode(code).getBody());
-	    if (response.has("error")) return error(INVALID_DISCORD_CODE);
+	    final Trio<String, String, Integer> response = OAuthUtils.getTokensFromCode(code);
+	    if (response == null) return false;
 	    else {
-		final boolean hasScopes = Arrays.asList(String.join(" ", response.getString("scope"))).containsAll(DashboardWebsocket.requiredScopes);
-		if (!hasScopes) return error(INVALID_SCOPES);
-		if (!response.keySet().containsAll(Arrays.asList("access_token", "refresh_token", "expires_in"))) return error(DISCORD_ERROR);
-		final String accessToken = response.getString("access_token");
-		final String refreshToken = response.getString("refresh_token");
-		final int expiresIn = response.getInt("expires_in");
-		final JSONObject userinfo = Utils.getUserInfoFromToken(accessToken);
-		final DiscordLogin login = DiscordLogin.success(userinfo);
-		collection.updateOne(Filters.eq("sessionid", this.sessionId), new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
-		return login;
+		final String accessToken = response.getFirst();
+		final String refreshToken = response.getSecond();
+		final int expiresIn = response.getThird();
+		final JSONObject userinfo = OAuthUtils.getUserInfoFromToken(accessToken);
+		this.user = new DiscordUser(userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
+		final Bson filter = Filters.eq("sessionid", this.sessionId);
+		if (collection.find(filter).first() != null) {
+		    collection.updateOne(filter, new Document("$set", new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn)));
+		} else {
+		    collection.insertOne(new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
+		}
+		return true;
 	    }
 	} catch (final Exception e) {
 	    e.printStackTrace();
-	    return error(EXCEPTION);
+	    return false;
 	}
     }
 
@@ -122,5 +117,13 @@ public class BlackSession {
 	if (collection.find(Filters.eq("sessionid", generatedId)).first() != null) return generateSessionId();
 
 	return generatedId;
+    }
+
+    public DiscordUser getUser() {
+	return this.user;
+    }
+
+    public final String getSessionId() {
+	return this.sessionId;
     }
 }

@@ -1,21 +1,21 @@
 package com.github.black0nion.blackonionbot.API;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
 import spark.Route;
@@ -26,6 +26,8 @@ public class API {
     private static HashMap<String, BlackRequest> requests = new HashMap<>();
 
     private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
+
+    private static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 
     @Reloadable("ratelimits")
     public static void clearRateLimits() {
@@ -128,61 +130,28 @@ public class API {
 			headers.put(head, request.headers(head));
 		    });
 
-		    final String sessionid = headers.get("sessionid");
-		    if (req.requiresLogin() && sessionid == null) {
-			response.status(401);
-			return new JSONObject().put("success", false).put("reason", 401).toString();
-		    }
-
-		    if (req.requiresLogin() && sessionid == null) {
-			response.status(401);
-			return new JSONObject().put("success", false).put("reason", 401).toString();
-		    }
-
-		    // all the information we got saved about the session
-		    final Document sessionInformation = BlackWebsocketSession.collection.find(Filters.eq("sessionid", sessionid)).first();
-		    // if the request requires login, this won't be null
+		    String sessionId = null;
+		    BlackSession session = null;
 		    if (req.requiresLogin()) {
-			if (sessionInformation == null) {
+			sessionId = request.headers("sessionid");
+			final Bson filter = Filters.eq("sessionid", sessionId);
+			final Document sessionInfo = collection.find(filter).first();
+			if (sessionInfo != null) {
+			    if (!(sessionInfo.containsKey("access_token") && sessionInfo.containsKey("refresh_token"))) {
+				collection.deleteOne(filter);
+				response.status(403);
+				return new JSONObject().append("success", false).append("detailedReason", "Your Session has no Tokens.").toString();
+			    } else {
+				// everything good, the session is existing and even has tokens, great
+				session = new BlackSession(sessionId);
+			    }
+			} else {
 			    response.status(401);
-			    return new JSONObject().put("success", false).put("reason", 401).put("detailedReason", "No SessionID Provided").toString();
-			}
-			if (!sessionInformation.containsKey("access_token") || !sessionInformation.containsKey("reload_token")) {
-			    response.status(401);
-			    return new JSONObject().put("success", false).put("reason", 401).put("detailedReason", "Not logged in to discord").toString();
-			}
-
-			final JSONObject userinfo = Utils.getUserInfoFromToken(sessionInformation.getString("access_token"));
-			login = DiscordLogin.success(userinfo);
-
-			// TODO: check user permissions
-			if (login == null || !login.success()) {
-			    response.status(401);
-			    return new JSONObject().put("success", false).put("reason", 401).toString();
+			    return new JSONObject().append("success", false).append("detailedReason", "Not logged in.").toString();
 			}
 		    }
 
-		    if (!request.headers().containsAll(Arrays.asList(req.requiredParameters()))) {
-			response.status(400);
-			response.type("application/json");
-			return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "missingParameters").toString();
-		    }
-
-		    logInfo("Answered POST request (Path: " + url + ") from: " + ip + " with header: " + body.toString());
-
-		    response.type("text/plain");
-		    if (req.isJson()) {
-			response.type("application/json");
-		    }
-
-		    for (final String s : req.requiredBodyParameters()) {
-			if (!body.has(s)) {
-			    response.status(400);
-			    return new JSONObject().put("success", false).put("reason", 400).toString();
-			}
-		    }
-
-		    return req.handle(request, response, body, headers, login != null ? login.getUser() : null);
+		    return req.handle(request, response, body, headers, session);
 		} catch (final Exception e) {
 		    logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
 		    if (!(e instanceof JSONException)) {

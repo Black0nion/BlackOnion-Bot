@@ -15,21 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.LogMode;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.google.common.hash.Hashing;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -99,49 +91,6 @@ public class Utils {
 
     public static String getCountryFromCode(final String code) {
 	return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream("/countrycodes.json"))).lines().collect(Collectors.joining()))).getString(code);
-    }
-
-    public static boolean isDiscordUser(final String token) {
-	return getUserInfoFromToken(token).has("id");
-    }
-
-    public static String getUserIdFromToken(final String token) {
-	final JSONObject userInfo = getUserInfoFromToken(token);
-	if (userInfo.has("id")) return userInfo.getString("id");
-	else return null;
-    }
-
-    // TODO: cache
-    @Nullable
-    public static JSONObject getUserInfoFromToken(final String token) {
-	final JSONObject obj = new JSONObject(getUserInfoFromTokenResponse(token).getBody());
-
-	return obj.has("id") ? obj : null;
-    }
-
-    public static HttpResponse<String> getUserInfoFromTokenResponse(final String token) {
-	try {
-	    Unirest.setTimeouts(0, 0);
-	    return Unirest.get("https://discord.com/api/users/@me").header("Authorization", "Bearer " + token).asString();
-	} catch (final Exception e) {
-	    e.printStackTrace();
-	}
-	return null;
-    }
-
-    public static HttpResponse<String> getTokenFromCode(final String code) {
-	final CredentialsManager manager = Bot.getCredentialsManager();
-	if (!manager.has("client_id") || !manager.has("client_secret") || !manager.has("redirect_uri")) {
-	    Logger.log(LogMode.ERROR, LogOrigin.API, "DiscordAuthSettings isn't filled correctly!");
-	    return null;
-	}
-	try {
-	    Unirest.setTimeouts(0, 0);
-	    return Unirest.post("https://discord.com/api/oauth2/token").header("Content-Type", "application/x-www-form-urlencoded").field("code", code).field("client_id", manager.getString("client_id")).field("client_secret", manager.getString("client_secret")).field("grant_type", "authorization_code").field("redirect_uri", manager.getString("redirect_uri")).field("scope", "identify").asString();
-	} catch (final Exception e) {
-	    e.printStackTrace();
-	}
-	return null;
     }
 
     public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {

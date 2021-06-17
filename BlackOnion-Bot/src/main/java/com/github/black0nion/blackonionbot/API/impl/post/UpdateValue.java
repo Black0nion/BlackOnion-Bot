@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import net.dv8tion.jda.api.entities.Guild;
 import spark.Request;
@@ -18,7 +18,7 @@ import spark.Response;
 public class UpdateValue extends PostRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	final String newValue = headers.get("newValue");
 	final String databaseKey = headers.get("databaseKey");
 	final String guildId = headers.get("guild");

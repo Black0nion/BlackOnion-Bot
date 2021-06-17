@@ -19,26 +19,26 @@ public class DiscordUser {
     }
 
     public long getUserId() {
-	return userId;
+	return this.userId;
     }
 
     public String getUserName() {
-	return userName;
+	return this.userName;
     }
 
     public String getAvatar() {
-	return avatar;
+	return this.avatar;
     }
 
     public String getDiscriminator() {
-	return discriminator;
+	return this.discriminator;
     }
 
     public String getLocale() {
-	return locale;
+	return this.locale;
     }
 
     public boolean isMfaEnabled() {
-	return mfa_enabled;
+	return this.mfa_enabled;
     }
 }

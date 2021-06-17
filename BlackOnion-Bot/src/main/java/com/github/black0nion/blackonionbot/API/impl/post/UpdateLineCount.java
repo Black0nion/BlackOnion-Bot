@@ -5,9 +5,9 @@ import java.util.HashMap;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.API;
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import spark.Request;
@@ -16,7 +16,7 @@ import spark.Response;
 public class UpdateLineCount extends PostRequest {
 
     @Override
-    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	if (!request.headers("token").equals("updatepls")) {
 	    response.status(403);
 	    return new JSONObject().put("success", false).toString();

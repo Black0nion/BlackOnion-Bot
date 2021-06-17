@@ -6,14 +6,13 @@ import javax.annotation.Nullable;
 
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Time;
 
 import spark.Request;
 import spark.Response;
 
 public abstract class BlackRequest {
-    public abstract String handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, @Nullable DiscordUser user);
+    public abstract String handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, @Nullable BlackSession user);
 
     public abstract String url();
 
