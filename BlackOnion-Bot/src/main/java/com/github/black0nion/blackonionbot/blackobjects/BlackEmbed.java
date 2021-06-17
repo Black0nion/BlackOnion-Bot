@@ -7,7 +7,6 @@ import java.util.List;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
@@ -33,12 +32,12 @@ public class BlackEmbed extends EmbedBuilder {
     }
 
     public Language getLang() {
-	return lang;
+	return this.lang;
     }
 
     @Override
     public BlackEmbed setFooter(String text) {
-	final String tempText = lang.getTranslation(text);
+	final String tempText = this.lang.getTranslation(text);
 	if (tempText != null) {
 	    text = tempText;
 	}
@@ -51,7 +50,7 @@ public class BlackEmbed extends EmbedBuilder {
 	if (title == null) {
 	    title = "NULL";
 	}
-	final String tempTitle = lang.getTranslation(title);
+	final String tempTitle = this.lang.getTranslation(title);
 	if (tempTitle != null) {
 	    title = tempTitle;
 	}
@@ -65,7 +64,7 @@ public class BlackEmbed extends EmbedBuilder {
 	if (title == null) {
 	    title = "NULL";
 	}
-	final String tempTitle = lang.getTranslation(title);
+	final String tempTitle = this.lang.getTranslation(title);
 	if (tempTitle != null) {
 	    title = tempTitle;
 	}
@@ -83,8 +82,8 @@ public class BlackEmbed extends EmbedBuilder {
 	if (value == null) {
 	    value = "NULL";
 	}
-	final String tempName = lang.getTranslation(name);
-	final String tempValue = lang.getTranslation(value);
+	final String tempName = this.lang.getTranslation(name);
+	final String tempValue = this.lang.getTranslation(value);
 	if (tempName != null) {
 	    name = tempName;
 	}
@@ -162,12 +161,6 @@ public class BlackEmbed extends EmbedBuilder {
     }
 
     @Override
-    @Deprecated
-    public boolean isValidLength(final AccountType type) {
-	return super.isValidLength(type);
-    }
-
-    @Override
     public int length() {
 	return super.length();
     }
@@ -235,20 +228,20 @@ public class BlackEmbed extends EmbedBuilder {
      * @return the title
      */
     public String getTitle() {
-	return title;
+	return this.title;
     }
 
     /**
      * @return the url
      */
     public String getUrl() {
-	return url;
+	return this.url;
     }
 
     /**
      * @return the color
      */
     public Color getColor() {
-	return color;
+	return this.color;
     }
 }
