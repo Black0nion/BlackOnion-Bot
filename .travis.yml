@@ -8,3 +8,12 @@ jdk: oraclejdk8
 script:
   - chmod +x ./BlackOnion-Bot/gradlew
   - ./BlackOnion-Bot/gradlew build
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
