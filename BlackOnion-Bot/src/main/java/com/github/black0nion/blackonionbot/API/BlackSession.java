@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.API;
 
+import javax.annotation.Nullable;
+
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -20,20 +20,12 @@ public class BlackSession {
 
     public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
 
+    @Nullable
     private String sessionId;
     private DiscordUser user;
 
-    public BlackSession() {
-	this.createSession();
-    }
-
     public BlackSession(final String sessionId) {
 	this.sessionId = sessionId;
-    }
-
-    public void createSession() {
-	this.sessionId = generateSessionId();
-	collection.insertOne(new Document().append("sessionid", this.sessionId));
     }
 
     /**
@@ -42,19 +34,16 @@ public class BlackSession {
      *
      * Workflow:
      *
-     * - gets session id assigned on connect to WS
-     *
      * - client logs in using that session
-     *
-     * - old session data gets erased (it will only contain default stuff)
      *
      * @param sessionId
      * @return
      */
     public boolean loginToSession(final String sessionId) {
-	if (collection.find(Filters.eq("sessionid", sessionId)).first() != null) {
-	    collection.deleteOne(Filters.eq("sessionid", this.sessionId));
+	final Document doc = collection.find(Filters.eq("sessionid", sessionId)).first();
+	if (doc != null) {
 	    this.sessionId = sessionId;
+	    this.user = OAuthUtils.getUserFromToken(doc.getString("access_token"));
 	    return true;
 	} else return false;
     }
@@ -64,40 +53,25 @@ public class BlackSession {
      * with discord, on reconnect on the same PC (session) use
      * {@link #loginToSession(String)}!
      *
-     * Workflow:
-     *
-     * - connect to websocket
-     *
-     * - gets session id assigned & saved to database on initialize
-     *
-     * - after this method, the entry with the sessionid gets updated
-     *
-     * - when the client comes back, it logs in using that session id
-     *
      * @param code the code discord gave you
-     * @return if it worked
+     * @return session id
      */
-    public boolean loginWithDiscord(final String code) {
+    @Nullable
+    public static String loginWithDiscord(final String code) {
 	try {
 	    final Trio<String, String, Integer> response = OAuthUtils.getTokensFromCode(code);
-	    if (response == null) return false;
+	    if (response == null) return null;
 	    else {
 		final String accessToken = response.getFirst();
 		final String refreshToken = response.getSecond();
 		final int expiresIn = response.getThird();
-		final JSONObject userinfo = OAuthUtils.getUserInfoFromToken(accessToken);
-		this.user = new DiscordUser(userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
-		final Bson filter = Filters.eq("sessionid", this.sessionId);
-		if (collection.find(filter).first() != null) {
-		    collection.updateOne(filter, new Document("$set", new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn)));
-		} else {
-		    collection.insertOne(new Document().append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
-		}
-		return true;
+		final String newSessionId = generateSessionId();
+		collection.insertOne(new Document().append("sessionid", newSessionId).append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
+		return newSessionId;
 	    }
 	} catch (final Exception e) {
 	    e.printStackTrace();
-	    return false;
+	    return null;
 	}
     }
 

@@ -17,11 +17,11 @@ public class Login extends PostRequest {
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 	try {
 	    final String code = request.headers("code");
-	    final BlackSession newSession = new BlackSession();
-	    if (!newSession.loginWithDiscord(code)) {
+	    final String loginWithDiscord = BlackSession.loginWithDiscord(code);
+	    if (loginWithDiscord == null) {
 		response.status(401);
 		return new JSONObject("detailedReason", "Invalid Code").toString();
-	    } else return newSession.getSessionId();
+	    } else return loginWithDiscord;
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	    response.status(500);

@@ -41,4 +41,9 @@ public class DiscordUser {
     public boolean isMfaEnabled() {
 	return this.mfa_enabled;
     }
+
+    @Override
+    public String toString() {
+	return "DiscordUser [userId=" + this.userId + ", userName=" + this.userName + ", avatar=" + this.avatar + ", discriminator=" + this.discriminator + ", locale=" + this.locale + ", mfa_enabled=" + this.mfa_enabled + "]";
+    }
 }

@@ -1,6 +1,8 @@
 package com.github.black0nion.blackonionbot.API;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
@@ -24,6 +26,7 @@ import spark.Spark;
 public class API {
 
     private static HashMap<String, BlackRequest> requests = new HashMap<>();
+    private static final List<String> websocketEndpoints = new ArrayList<>();
 
     private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
 
@@ -50,7 +53,8 @@ public class API {
 	    WebSocketEndpoint endpoint;
 	    try {
 		endpoint = websockets.getConstructor().newInstance();
-		Spark.webSocket("/" + endpoint.getRoute(), websockets);
+		Spark.webSocket("/api/" + endpoint.getRoute(), websockets);
+		websocketEndpoints.add("/api/" + endpoint.getRoute());
 	    } catch (final Exception e) {
 		e.printStackTrace();
 	    }
@@ -90,6 +94,7 @@ public class API {
 	final String ratelimited = new JSONObject().put("success", false).put("error", "ratelimited").toString();
 	Spark.before((req, res) -> {
 	    if (!requests.containsKey(req.uri())) {
+		if (websocketEndpoints.contains(req.uri())) return;
 		Spark.halt(404, "notfound");
 	    }
 

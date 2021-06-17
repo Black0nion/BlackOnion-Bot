@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -42,5 +43,10 @@ public class OAuthUtils {
 	    e.printStackTrace();
 	}
 	return null;
+    }
+
+    public static DiscordUser getUserFromToken(final String accessToken) {
+	final JSONObject userinfo = getUserInfoFromToken(accessToken);
+	return new DiscordUser(userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
     }
 }
