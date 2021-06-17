@@ -6,4 +6,5 @@ dist: trusty
 jdk: oraclejdk8
 
 script:
+  - chmod +x ./BlackOnion-Bot/gradlew
   - ./BlackOnion-Bot/gradlew build
