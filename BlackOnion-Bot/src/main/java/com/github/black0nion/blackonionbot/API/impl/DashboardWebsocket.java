@@ -13,10 +13,10 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+import com.github.black0nion.blackonionbot.API.BlackWebsocketSession;
 import com.github.black0nion.blackonionbot.API.WebSocketEndpoint;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.dashboard.BlackSession;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.dashboard.DiscordLogin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
@@ -38,10 +38,10 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 
     private static final List<Session> sessions = new ArrayList<>();
 
-    private static final LoadingCache<Session, BlackSession> blacksessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackSession>() {
+    private static final LoadingCache<Session, BlackWebsocketSession> BlackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackWebsocketSession>() {
 	@Override
-	public BlackSession load(final Session key) throws Exception {
-	    return new BlackSession(key);
+	public BlackWebsocketSession load(final Session key) throws Exception {
+	    return new BlackWebsocketSession(key);
 	};
     });
 
@@ -65,7 +65,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     @OnWebSocketMessage
     public void message(final Session sessionUnchecked, final String message) {
 	// TODO: error handling
-	final BlackSession session = blacksessions.getUnchecked(sessionUnchecked);
+	final BlackWebsocketSession session = BlackWebsocketSessions.getUnchecked(sessionUnchecked);
 	if (message.equals("heartbeat")) {
 	    futures.get(session).cancel(true);
 	    if (logHeartbeats) {

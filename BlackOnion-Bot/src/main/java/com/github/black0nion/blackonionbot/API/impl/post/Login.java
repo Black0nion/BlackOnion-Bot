@@ -17,23 +17,16 @@ public class Login extends PostRequest {
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final DiscordUser user) {
 	try {
-	    if (request.headers("code") != null) {
-		final JSONObject discordResponse = new JSONObject(Utils.getTokenFromCode(request.headers("code")).getBody());
-		if (!discordResponse.has("access_token")) {
-		    response.status(401);
-		    return new JSONObject().put("success", true).put("reason", 401).toString();
-		} else return new JSONObject().put("success", true).toString();
-	    } else if (request.headers("access_token") != null && request.headers("refresh_token") != null) {
-		if (!Utils.isDiscordUser(request.headers("access_token"))) {
-		    response.status(401);
-		    return new JSONObject().put("success", false).put("reason", 401).toString();
-		}
+	    final JSONObject discordResponse = new JSONObject(Utils.getTokenFromCode(request.headers("code")).getBody());
+	    if (!discordResponse.has("access_token")) {
+		response.status(401);
+		return new JSONObject().put("success", false).put("reason", 401).toString();
+	    } else {
+		// TODO: login
 
+		System.out.println("test");
 		return new JSONObject().put("success", true).toString();
 	    }
-
-	    response.status(400);
-	    return new JSONObject().put("success", false).put("reason", 400).toString();
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	    response.status(500);
@@ -51,4 +44,8 @@ public class Login extends PostRequest {
 	return false;
     }
 
+    @Override
+    public String[] requiredParameters() {
+	return new String[] { "code" };
+    }
 }
