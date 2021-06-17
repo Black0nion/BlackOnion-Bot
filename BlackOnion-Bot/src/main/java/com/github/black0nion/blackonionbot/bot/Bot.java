@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.bot;
 import java.io.File;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -45,11 +44,15 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import javassist.Modifier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -92,14 +95,14 @@ public class Bot extends ListenerAdapter {
     @SuppressWarnings("resource")
     public void startBot() {
 	Utils.printLogo();
-	Logger.logInfo("BlackOnion-Bot is starting up...");
-	new File("files").mkdir();
+	new ValueManager();
+	DefaultValues.init();
 	isJarFile = JarUtils.runningFromJar();
 	logLevel.addAll(Arrays.asList(LogMode.values()));
 	logOrigin.addAll(Arrays.asList(LogOrigin.values()));
+	Logger.log(LogMode.INFORMATION, "Starting BlackOnion-Bot in " + runMode + " mode...");
+	new File("files").mkdir();
 
-	new ValueManager();
-	DefaultValues.init();
 	credentialsManager = new CredentialsManager(runMode.name().toLowerCase());
 
 	if (credentialsManager.has("mongo_connection_string")) {
@@ -118,6 +121,7 @@ public class Bot extends ListenerAdapter {
 	CommandBase.addCommands(waiter);
 	builder.setStatus(StatusCommand.getStatusFromFile());
 	builder.setActivity(ActivityCommand.getActivity());
+	builder.setMaxReconnectDelay(32);
 	try {
 	    jda = builder.build();
 	} catch (final Exception e) {
@@ -314,5 +318,16 @@ public class Bot extends ListenerAdapter {
 
     public static CredentialsManager getCredentialsManager() {
 	return credentialsManager;
+    }
+
+    @Override
+    public void onDisconnect(final DisconnectEvent event) {
+	final CloseCode closeCode = event.getCloseCode();
+	Logger.log(LogMode.FATAL, LogOrigin.BOT, "Disconnected from Discord! Code: " + (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
+    }
+
+    @Override
+    public void onReconnected(final ReconnectedEvent event) {
+	Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Reconnected to Discord.");
     }
 }
