@@ -7,7 +7,7 @@ jdk: oraclejdk8
 
 script:
   - chmod +x ./BlackOnion-Bot/gradlew
-  - ./BlackOnion-Bot/gradlew shadowJar
+  - ./BlackOnion-Bot/gradlew build shadowJar
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
