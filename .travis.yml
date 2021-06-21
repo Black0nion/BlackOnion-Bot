@@ -9,7 +9,8 @@ script:
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
   - sudo apt install adoptopenjdk-8-openj9   # Java 8 / OpenJ9 VM
   - chmod +x ./BlackOnion-Bot/gradlew
-  - ./BlackOnion-Bot/gradlew build shadowJar
+  - ./BlackOnion-Bot/gradlew build
+  - ./BlackOnion-Bot/gradlew shadowJar
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
