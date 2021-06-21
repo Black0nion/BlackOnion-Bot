@@ -8,15 +8,11 @@ script:
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
   - sudo apt install adoptopenjdk-8-openj9   # Java 8 / OpenJ9 VM
-  - sudo update-alternatives --set java /usr/lib/jvm/adoptopenjdk-8-openj9-amd64/bin/java
-  - sudo update-alternatives --set javac /usr/lib/jvm/adoptopenjdk-8-openj9-amd64/bin/javac
+  - sudo update-alternatives --config java
+  - 1
   - java -version
   - chmod +x ./BlackOnion-Bot/gradlew
-  - ./BlackOnion-Bot/gradlew tasks
-  - ./BlackOnion-Bot/gradlew build
-  - ./BlackOnion-Bot/gradlew shadowJar
   - cd ./BlackOnion-Bot
-  - cat settings.gradle
   - ./gradlew shadowJar
 
 before_cache:
