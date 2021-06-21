@@ -26,6 +26,13 @@ public class DiscordUser {
 	return this.userName;
     }
 
+    /**
+     * @return the users full name in Username#Tag format
+     */
+    public String getFullName() {
+	return this.getUserName() + "#" + this.getDiscriminator();
+    }
+
     public String getAvatar() {
 	return this.avatar;
     }

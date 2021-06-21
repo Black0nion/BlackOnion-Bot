@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.API;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nullable;
 
 import org.json.JSONObject;
@@ -8,10 +10,20 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 public class OAuthUtils {
+
+    private static final LoadingCache<String, DiscordUser> cachedUsers = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, DiscordUser>() {
+	@Override
+	public DiscordUser load(final String token) {
+	    return loadUserFromToken(token);
+	}
+    });
 
     /**
      * @param code The code from Discord
@@ -45,8 +57,20 @@ public class OAuthUtils {
 	return null;
     }
 
+    @Nullable
     public static DiscordUser getUserFromToken(final String accessToken) {
+	try {
+	    return cachedUsers.get(accessToken);
+	} catch (final Exception e) {
+	    e.printStackTrace();
+	    return null;
+	}
+    }
+
+    @Nullable
+    private static DiscordUser loadUserFromToken(final String accessToken) {
 	final JSONObject userinfo = getUserInfoFromToken(accessToken);
+	if (userinfo == null) return null;
 	return new DiscordUser(userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
     }
 }

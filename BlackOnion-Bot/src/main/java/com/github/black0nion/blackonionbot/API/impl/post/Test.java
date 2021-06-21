@@ -21,7 +21,8 @@ public class Test extends PostRequest {
 
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
-	return "oh hello there";
+	if (user != null) return "oh hello there, " + user.getUser().getFullName();
+	else return "oh hello there";
     }
 
     @Override
@@ -31,6 +32,6 @@ public class Test extends PostRequest {
 
     @Override
     public boolean requiresLogin() {
-	return false;
+	return true;
     }
 }
