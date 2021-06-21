@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.utils;
 
+import org.json.JSONObject;
+
 public class DiscordUser {
 
     final long userId;
@@ -52,5 +54,9 @@ public class DiscordUser {
     @Override
     public String toString() {
 	return "DiscordUser [userId=" + this.userId + ", userName=" + this.userName + ", avatar=" + this.avatar + ", discriminator=" + this.discriminator + ", locale=" + this.locale + ", mfa_enabled=" + this.mfa_enabled + "]";
+    }
+
+    public JSONObject toJsonObject() {
+	return new JSONObject().put("userid", this.userId).put("username", this.userName).put("avatar", this.avatar).put("discriminator", this.discriminator).put("locale", this.locale).put("mfa_enabled", this.mfa_enabled);
     }
 }

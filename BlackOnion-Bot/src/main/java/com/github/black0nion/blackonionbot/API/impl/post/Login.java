@@ -20,12 +20,12 @@ public class Login extends PostRequest {
 	    final String loginWithDiscord = BlackSession.loginWithDiscord(code);
 	    if (loginWithDiscord == null) {
 		response.status(401);
-		return new JSONObject("detailedReason", "Invalid Code").toString();
+		return "";
 	    } else return loginWithDiscord;
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	    response.status(500);
-	    return new JSONObject().put("detailedReason", "Server Error").toString();
+	    return "";
 	}
     }
 
