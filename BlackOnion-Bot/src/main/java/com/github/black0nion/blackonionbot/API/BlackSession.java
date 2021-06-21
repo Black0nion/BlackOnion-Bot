@@ -25,7 +25,7 @@ public class BlackSession {
     private DiscordUser user;
 
     public BlackSession(final String sessionId) {
-	this.sessionId = sessionId;
+	this.loginToSession(sessionId);
     }
 
     /**
