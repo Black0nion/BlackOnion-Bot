@@ -11,7 +11,7 @@ script:
   - sudo update-alternatives --set java /usr/lib/jvm/adoptopenjdk-8-openj9-amd64/bin/java
   - sudo update-alternatives --auto --set java /usr/lib/adoptopenjdk-8-openj9-amd64/bin/java
   - echo 1 | sudo update-alternatives --config java
-  - sudo update-alternatives --config java
+  - sudo update-alternatives --remove java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
   - java -version
   - chmod +x ./BlackOnion-Bot/gradlew
   - cd ./BlackOnion-Bot
