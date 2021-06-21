@@ -1,8 +1,7 @@
-language: java
 install: skip
 
 os: linux
-dist: trusty
+dist: focal
 
 script:
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
