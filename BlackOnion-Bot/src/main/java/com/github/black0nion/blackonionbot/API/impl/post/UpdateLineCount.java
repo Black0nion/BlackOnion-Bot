@@ -17,9 +17,9 @@ public class UpdateLineCount extends PostRequest {
 
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
-	if (!request.headers("token").equals("updatepls")) {
-	    response.status(403);
-	    return new JSONObject().put("success", false).toString();
+	if (!request.headers("t0k3n").equals("1irS$RYZY4D|?aNyCDIsMUb8z5fk|h5kfvGJ91|!sXd?pTm!Z$idsrUw&#9|HI5sDFWLn")) {
+	    response.status(401);
+	    return "";
 	}
 	final int newLineCount = body.getInt("line_count");
 	final int newFileCount = body.getInt("file_count");

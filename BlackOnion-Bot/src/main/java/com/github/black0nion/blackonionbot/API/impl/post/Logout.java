@@ -33,10 +33,10 @@ public class Logout extends PostRequest {
 	final Document doc = BlackSession.collection.find(Filters.eq("sessionid", request.headers("sessionid"))).first();
 	if (doc != null) {
 	    BlackSession.collection.deleteOne(Filters.eq("sessionid", request.headers("sessionid")));
-	    return new JSONObject().append("error", false).append("success", true).toString();
+	    return "";
 	}
 	response.status(401);
-	return new JSONObject().append("error", true).toString();
+	return "";
     }
 
     @Override

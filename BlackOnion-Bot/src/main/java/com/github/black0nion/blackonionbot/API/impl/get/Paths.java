@@ -3,7 +3,9 @@ package com.github.black0nion.blackonionbot.API.impl.get;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.BlackSession;
@@ -27,7 +29,7 @@ public class Paths extends GetRequest {
 	}
 	obj.put("paths", routes);
 
-	return obj.toString();
+	return new JSONArray(Spark.routes().stream().map(RouteMatch::getMatchUri).collect(Collectors.toList())).toString();
     }
 
     @Override
