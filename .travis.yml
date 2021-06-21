@@ -1,8 +1,13 @@
+language: java
 install: skip
 
 os: linux
 dist: focal
 
+env:
+  matrix:
+    - TRAVIS_JDK=adopt-openj9@1.8
+    
 script:
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
