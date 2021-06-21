@@ -13,6 +13,10 @@ script:
   - chmod +x ./BlackOnion-Bot/gradlew
   - ./BlackOnion-Bot/gradlew tasks
   - ./BlackOnion-Bot/gradlew build
+  - ./BlackOnion-Bot/gradlew tasks
+  - ./BlackOnion-Bot/gradlew projects
+  - ./BlackOnion-Bot/gradlew buildEnvironment
+  - ./BlackOnion-Bot/gradlew dependencies
   - ./BlackOnion-Bot/gradlew shadowJar
 
 before_cache:
