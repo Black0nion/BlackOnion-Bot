@@ -1,4 +1,4 @@
-[![BuildAndRelease](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml)[![Build Status](https://travis-ci.com/Black0nion/BlackOnion-Bot.svg?token=BtqsLLy9uR68mjpAMTwr&branch=main)](https://travis-ci.com/Black0nion/BlackOnion-Bot)
+[![BuildAndRelease](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml)    [![Build Status](https://travis-ci.com/Black0nion/BlackOnion-Bot.svg?token=BtqsLLy9uR68mjpAMTwr&branch=main)](https://travis-ci.com/Black0nion/BlackOnion-Bot)
 # Discord-Bot
 
 The official BlackOnion-Bot!
