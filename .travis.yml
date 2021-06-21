@@ -8,7 +8,7 @@ script:
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
   - sudo apt install adoptopenjdk-8-openj9   # Java 8 / OpenJ9 VM
-  - echo 1 | sudo update-alternatives --config java
+  - alternatives --set java /usr/lib/jvm/adoptopenjdk-8-openj9-amd64/
   - java -version
   - chmod +x ./BlackOnion-Bot/gradlew
   - ./BlackOnion-Bot/gradlew tasks
