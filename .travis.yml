@@ -15,6 +15,9 @@ script:
   - ./BlackOnion-Bot/gradlew tasks
   - ./BlackOnion-Bot/gradlew build
   - ./BlackOnion-Bot/gradlew shadowJar
+  - cd ./BlackOnion-Bot
+  - cat settings.gradle
+  - ./gradlew shadowJar
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
