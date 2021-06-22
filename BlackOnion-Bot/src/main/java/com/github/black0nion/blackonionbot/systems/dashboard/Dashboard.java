@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -23,7 +24,7 @@ public class Dashboard {
     // TODO: better name XD
     public static final HashMap<String, Method> setters = new HashMap<>();
 
-    public static final JSONObject valuesJson = new JSONObject();
+    public static final JSONArray valuesJson = new JSONArray();
 
     public static void init() {
 	setters.clear();
@@ -45,7 +46,7 @@ public class Dashboard {
 			if (settingsInCategory.containsKey(annotation.category())) {
 			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
 			} else {
-			    settingsInCategory.put(annotation.category(), new JSONArray(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
+			    settingsInCategory.put(annotation.category(), new JSONArray().put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
 			}
 		    }
 		}
@@ -54,7 +55,8 @@ public class Dashboard {
 	    }
 	}
 	for (final Map.Entry<DashboardCategory, JSONArray> entry : settingsInCategory.entrySet()) {
-	    valuesJson.put(entry.getKey().name(), entry.getValue());
+	    final DashboardCategory key = entry.getKey();
+	    valuesJson.put(new BlackLinkedHashMap<String, Object>().add("name", key.getName()).add("id", key.getId()).add("pages", entry.getValue()));
 	}
 	System.out.println(valuesJson);
     }
