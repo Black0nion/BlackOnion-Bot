@@ -10,9 +10,7 @@ import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
 import spark.Request;
 import spark.Response;
 
@@ -22,14 +20,21 @@ public class GetGuildsToManage extends GetRequest {
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession session) {
 	final DiscordUser user = session.getUser();
 	final JSONObject guildsObj = new JSONObject(session.getUser());
+
+	final JSONArray guildsResponse = user.getGuilds();
 	final JSONArray guilds = new JSONArray();
-	final long uid = user.getUserId();
-	Bot.jda.getMutualGuilds(User.fromId(uid)).forEach(entry -> {
-	    final Member mem = entry.getMemberById(uid);
-	    if (mem != null && mem.getPermissions().contains(Permission.ADMINISTRATOR)) {
-		final String iconUrl = entry.getIconUrl();
-		final JSONObject append = new JSONObject().put("name", entry.getName()).put("icon", iconUrl != null ? iconUrl : "none");
-		guilds.put(append);
+
+	guildsResponse.forEach(obj -> {
+	    final JSONObject guildAsJson = (JSONObject) obj;
+	    final Guild guild = Bot.jda.getGuildById(guildAsJson.getString("id"));
+	    final long permissions = guildAsJson.getLong("permissions");
+	    if ((permissions & (1 << 3 | 1 << 5)) != 0) {
+		if (guild != null) {
+		    guildAsJson.put("bot_in_guild", true);
+		} else {
+		    guildAsJson.put("bot_in_guild", false);
+		}
+		guilds.put(guildAsJson);
 	    }
 	});
 
