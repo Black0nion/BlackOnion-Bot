@@ -3,21 +3,29 @@ package com.github.black0nion.blackonionbot.systems.dashboard;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.entities.TextChannel;
+
 public class Dashboard {
 
     // TODO: better name XD
     public static final HashMap<String, Method> setters = new HashMap<>();
 
+    public static final JSONArray valuesJson = new JSONArray();
+
     public static void init() {
 	setters.clear();
+	valuesJson.clear();
 
 	final Reflections reflections = new Reflections(BlackObject.class.getPackage().getName());
 	final Set<Class<? extends BlackObject>> annotated = reflections.getSubTypesOf(BlackObject.class);
@@ -29,6 +37,7 @@ public class Dashboard {
 		for (final Method method : objectClass.getDeclaredMethods()) if (method.isAnnotationPresent(com.github.black0nion.blackonionbot.misc.DashboardValue.class)) {
 		    final com.github.black0nion.blackonionbot.misc.DashboardValue annotation = method.getAnnotation(com.github.black0nion.blackonionbot.misc.DashboardValue.class);
 		    setters.put(annotation.value(), method);
+		    valuesJson.put(new JSONObject().put("name", annotation.value()).put("parameters", parseArguments(method.getParameters())));
 		}
 
 		// this is how you invoke methods:
@@ -38,6 +47,7 @@ public class Dashboard {
 		e.printStackTrace();
 	    }
 	}
+	System.out.println(valuesJson);
     }
 
     public static boolean tryUpdateValue(final String message) {
@@ -114,6 +124,32 @@ public class Dashboard {
 	    return Integer.parseInt((String) obj);
 	} catch (final Exception e) {
 	    throw new IllegalArgumentException();
+	}
+    }
+
+    public static JSONArray parseArguments(final Parameter[] parameters) {
+	try {
+	    final JSONArray result = new JSONArray();
+	    for (final Parameter parameter : parameters) {
+		final Class<?> type = parameter.getType();
+		if (type == String.class) {
+		    result.put("STRING");
+		} else if (type == Long.class || type == long.class) {
+		    result.put("LONG");
+		} else if (type == TextChannel.class) {
+		    result.put("CHANNEL");
+		} else if (type.isEnum()) {
+		    result.put(new JSONObject().put("MULTIPLE_CHOICE", type.getEnumConstants()));
+		} else if (type.isArray()) {
+		    result.put(new JSONObject().put("ARRAY", type.getSimpleName().toUpperCase().replace("[]", "")));
+		} else if (List.class.isAssignableFrom(type)) {
+		    result.put(new JSONObject().put("LIST", type));
+		}
+	    }
+	    return result;
+	} catch (final Exception e) {
+	    e.printStackTrace();
+	    return null;
 	}
     }
 }
