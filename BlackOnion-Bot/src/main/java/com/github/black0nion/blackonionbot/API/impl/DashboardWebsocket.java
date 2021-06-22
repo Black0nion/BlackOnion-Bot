@@ -36,7 +36,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 
     private static boolean logHeartbeats = ValueManager.getBoolean("logHeartbeats");
 
-    public static final List<String> requiredScopes = Arrays.asList("guilds identify");
+    public static final List<String> requiredScopes = Arrays.asList("guilds", "identify");
 
     private static final List<Session> sessions = new ArrayList<>();
 
@@ -87,6 +87,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    }
 	} else if (message.startsWith("login")) {
 	    // TODO: implement login
+	    // TODO: check if that todo isn't already done
 	    final Document doc = BlackSession.collection.find(Filters.eq("sessionid", message.replace("login", ""))).first();
 	    if (doc == null) {
 		session.close(4401, "Unauthorized");
@@ -97,6 +98,8 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	} else if (message.startsWith("userinfo")) {
 	    System.out.println(session);
 	    session.send(session.getUser());
+	} else if (message.startsWith("guildsettings")) {
+	    // TODO: implement
 	}
 
 	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + message.replace("\n", "\\n"), LogOrigin.DASHBOARD);
