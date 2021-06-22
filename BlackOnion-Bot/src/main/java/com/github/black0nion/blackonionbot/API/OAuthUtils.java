@@ -71,6 +71,6 @@ public class OAuthUtils {
     private static DiscordUser loadUserFromToken(final String accessToken) {
 	final JSONObject userinfo = getUserInfoFromToken(accessToken);
 	if (userinfo == null) return null;
-	return new DiscordUser(userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
+	return new DiscordUser(accessToken, userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
     }
 }
