@@ -1,11 +1,10 @@
 language: java
 
 os: linux
-dist: focal
+dist: trusty
 
 jdk:
   - openjdk8
-  - oraclejdk8
     
 script:
   - chmod +x ./BlackOnion-Bot/gradlew
