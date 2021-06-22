@@ -33,6 +33,7 @@ import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardCategory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -184,6 +185,10 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @DashboardValue("guildlanguage")
+    public void setLanguage(final String language) {
+	this.setLanguage(LanguageSystem.getLanguageFromName(language));
+    }
+
     public void setLanguage(final Language language) {
 	this.language = language;
 	this.save("language", language.getLanguageCode());
@@ -206,7 +211,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.prefix;
     }
 
-    @DashboardValue("prefix")
+    @DashboardValue(prettyName = "Prefix", id = "prefix", category = DashboardCategory.GENERAL)
     public void setPrefix(final String prefix) {
 	this.prefix = prefix;
 	this.save("prefix", prefix);
@@ -337,7 +342,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.suggestionsChannel;
     }
 
-    @DashboardValue(value = "suggestionschannel", channelSelector = true)
+    @DashboardValue("suggestionschannel")
     public void setSuggestionsChannel(final long suggestionsChannel) {
 	this.suggestionsChannel = suggestionsChannel;
 	this.save("suggestionschannel", suggestionsChannel);
