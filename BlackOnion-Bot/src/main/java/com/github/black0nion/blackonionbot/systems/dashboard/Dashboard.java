@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -21,11 +22,13 @@ public class Dashboard {
     // TODO: better name XD
     public static final HashMap<String, Method> setters = new HashMap<>();
 
-    public static final JSONArray valuesJson = new JSONArray();
+    public static final JSONObject valuesJson = new JSONObject();
 
     public static void init() {
 	setters.clear();
 	valuesJson.clear();
+
+	final HashMap<DashboardCategory, JSONArray> settingsInCategory = new HashMap<>();
 
 	final Reflections reflections = new Reflections(BlackObject.class.getPackage().getName());
 	final Set<Class<? extends BlackObject>> annotated = reflections.getSubTypesOf(BlackObject.class);
@@ -36,16 +39,19 @@ public class Dashboard {
 
 		for (final Method method : objectClass.getDeclaredMethods()) if (method.isAnnotationPresent(com.github.black0nion.blackonionbot.misc.DashboardValue.class)) {
 		    final com.github.black0nion.blackonionbot.misc.DashboardValue annotation = method.getAnnotation(com.github.black0nion.blackonionbot.misc.DashboardValue.class);
-		    setters.put(annotation.value(), method);
-		    valuesJson.put(new JSONObject().put("name", annotation.value()).put("parameters", parseArguments(method.getParameters())));
+		    setters.put(annotation.id(), method);
+		    if (settingsInCategory.containsKey(annotation.category())) {
+			settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
+		    } else {
+			settingsInCategory.put(annotation.category(), new JSONArray(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
+		    }
 		}
-
-		// this is how you invoke methods:
-		// Method method = objectClass.getMethod("setPrefix", String.class);
-		// method.invoke(valueObject, objectToSendIn);
 	    } catch (final Exception e) {
 		e.printStackTrace();
 	    }
+	}
+	for (final Map.Entry<DashboardCategory, JSONArray> entry : settingsInCategory.entrySet()) {
+	    valuesJson.put(entry.getKey().name(), entry.getValue());
 	}
 	System.out.println(valuesJson);
     }
