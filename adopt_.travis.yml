@@ -1,0 +1,22 @@
+language: java
+sudo: required
+
+os: linux
+dist: focal
+    
+script:
+  - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+  - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+  - sudo apt install adoptopenjdk-8-openj9   # Java 8 / OpenJ9 VM
+  - chmod +x ./BlackOnion-Bot/gradlew
+  - cd ./BlackOnion-Bot
+  - ./gradlew shadowJar -Dorg.gradle.java.home=/usr/lib/jvm/adoptopenjdk-8-openj9-amd64 -Dorg.gradle.jvmargs="-Xshareclasses -XX:SharedCachedHardLimit=200m -Xscmx60m -XX:+IdleTuningGcOnIdle -Xquickstart -Xtune:virtualized"
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
