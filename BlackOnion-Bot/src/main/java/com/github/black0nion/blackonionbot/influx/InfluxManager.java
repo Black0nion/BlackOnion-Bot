@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.influx;
 
 import org.bson.Document;
-import org.jetbrains.annotations.TestOnly;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -43,7 +42,6 @@ public class InfluxManager {
 		return;
 	    }
 	    if (!connect(manager.getString("influx_database-url"), manager.getString("influx_token"), manager.getString("influx_org"))) return;
-	    Bot.executor.submit(() -> testSaving(new Document().append("test", "moino")));
 
 	    try {
 		Bot.jda.awaitReady();
@@ -54,20 +52,9 @@ public class InfluxManager {
 	});
     }
 
-    @TestOnly
-    public static void testSaving(final Document args) {
-	for (int i = 0; i < 20; i++) {
-	    final Point point2 = Point.measurement("stats").time(System.currentTimeMillis(), WritePrecision.MS).addField("num", Bot.random.nextInt(32));
-	    influxDB.getWriteApi().writePoint(point2);
-	    try {
-		Thread.sleep(1000);
-	    } catch (final InterruptedException e) {
-		e.printStackTrace();
-	    }
-	}
-    }
-
     public static void save(final String bucket, final Document args) {
-	influxDB.getWriteApi().writePoint(Point.measurement(bucket).time(System.currentTimeMillis(), WritePrecision.MS).addFields(args));
+	if (influxDB != null && args != null && args.size() != 0) {
+	    influxDB.getWriteApi().writePoint(Point.measurement(bucket).time(System.currentTimeMillis(), WritePrecision.MS).addFields(args));
+	}
     }
 }
