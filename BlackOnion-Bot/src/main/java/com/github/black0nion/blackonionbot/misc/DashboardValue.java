@@ -25,4 +25,8 @@ public abstract @interface DashboardValue {
     public String id();
 
     public DashboardCategory category();
+
+    public boolean nullable() default false;
+
+    public boolean premiumFeature() default false;
 }

@@ -184,7 +184,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.language;
     }
 
-    @DashboardValue("guildlanguage")
+    @DashboardValue(prettyName = "Language", id = "language", category = DashboardCategory.GENERAL)
+    public void setLanguage(final LanguageSystem.Languages language) {
+	this.setLanguage(language.getLang());
+    }
+
     public void setLanguage(final String language) {
 	this.setLanguage(LanguageSystem.getLanguageFromName(language));
     }
@@ -221,7 +225,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.joinMessage;
     }
 
-    @DashboardValue("joinmessage")
+    @DashboardValue(prettyName = "JoinMessage", id = "joinmessage", category = DashboardCategory.GENERAL)
     public void setJoinMessage(final String newMessage) {
 	this.joinMessage = newMessage;
 	this.save("joinmessage", this.joinMessage);
@@ -231,7 +235,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.joinChannel;
     }
 
-    @DashboardValue("joinchannel")
+    @DashboardValue(prettyName = "JoinChannel", id = "joinchannel", category = DashboardCategory.GENERAL)
+    public void setJoinChannel(final TextChannel channel) {
+	this.setJoinChannel(channel.getIdLong());
+    }
+
     public void setJoinChannel(final long joinChannel) {
 	this.joinChannel = joinChannel;
 	if (joinChannel == -1) {
@@ -244,7 +252,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveMessage;
     }
 
-    @DashboardValue("leavemessage")
+    @DashboardValue(prettyName = "LeaveMessage", id = "leavemessage", category = DashboardCategory.GENERAL)
     public void setLeaveMessage(final String leaveMessage) {
 	this.leaveMessage = leaveMessage;
 	this.save("leavemessage", leaveMessage);
@@ -254,7 +262,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveChannel;
     }
 
-    @DashboardValue("leavechannel")
+    @DashboardValue(prettyName = "LeaveChannel", id = "leavechannel", category = DashboardCategory.GENERAL)
     public void setLeaveChannel(final long leaveChannel) {
 	this.leaveChannel = leaveChannel;
 	if (leaveChannel == -1) {
@@ -267,8 +275,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.disabledCommands;
     }
 
-    @DashboardValue("disabledcommands")
-    public void setDisabledCommands(final Object[] disabledCommands) {
+    public void setDisabledCommands(final String[] disabledCommands) {
 	this.setDisabledCommands(Arrays.asList(disabledCommands).stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList()));
     }
 
@@ -300,7 +307,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.antiSpoilerType;
     }
 
-    @DashboardValue("antispoilertype")
+    @DashboardValue(prettyName = "AntiSpoiler", id = "antispoiler", category = DashboardCategory.MODERATION)
     public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 	this.antiSpoilerType = antiSpoilerType;
 	this.save("antiSpoiler", antiSpoilerType.name());
@@ -342,7 +349,11 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.suggestionsChannel;
     }
 
-    @DashboardValue("suggestionschannel")
+    @DashboardValue(prettyName = "SuggestionsChannel", id = "suggestionschannel", category = DashboardCategory.MODERATION)
+    public void setSuggestionsChannel(final TextChannel channel) {
+	this.setSuggestionsChannel(channel.getIdLong());
+    }
+
     public void setSuggestionsChannel(final long suggestionsChannel) {
 	this.suggestionsChannel = suggestionsChannel;
 	this.save("suggestionschannel", suggestionsChannel);
