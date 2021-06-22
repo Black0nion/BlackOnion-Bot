@@ -75,7 +75,7 @@ public class CustomCommand {
 	} else {
 	    // TODO: error handling
 	}
-	reply = doc.getBoolean("reply", true);
+	this.reply = doc.getBoolean("reply", true);
     }
 
     public CustomCommand setReply(final boolean reply) {
@@ -87,14 +87,14 @@ public class CustomCommand {
      * @return the command
      */
     public String getCommand() {
-	return command;
+	return this.command;
     }
 
     /**
      * @return the guild
      */
     public BlackGuild getGuild() {
-	return guild;
+	return this.guild;
     }
 
     /**
@@ -105,49 +105,49 @@ public class CustomCommand {
     }
 
     public void handle(final GuildMessageReceivedEvent event) {
-	if (embed != null) {
-	    embed.setTimestamp(Instant.now());
+	if (this.embed != null) {
+	    this.embed.setTimestamp(Instant.now());
 	    final User author = event.getAuthor();
-	    embed.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
+	    this.embed.setFooter(author.getName() + "#" + author.getDiscriminator(), author.getEffectiveAvatarUrl());
 
-	    if (reply) {
-		event.getMessage().reply(embed.build()).queue();
+	    if (this.reply) {
+		event.getMessage().replyEmbeds(this.embed.build()).queue();
 	    } else {
-		event.getChannel().sendMessage(embed.build()).queue();
+		event.getChannel().sendMessageEmbeds(this.embed.build()).queue();
 	    }
-	} else if (answer != null) {
-	    if (reply) {
-		event.getMessage().reply(answer).queue();
+	} else if (this.answer != null) {
+	    if (this.reply) {
+		event.getMessage().reply(this.answer).queue();
 	    } else {
-		event.getChannel().sendMessage(answer).queue();
+		event.getChannel().sendMessage(this.answer).queue();
 	    }
 	} else throw new NullPointerException("Both embed and Answer is null!");
     }
 
     public Document toDocument() {
 	final Document doc = new Document();
-	doc.put("command", command);
-	doc.put("reply", reply);
-	if (embed != null) {
+	doc.put("command", this.command);
+	doc.put("reply", this.reply);
+	if (this.embed != null) {
 	    final Document embedDoc = new Document();
-	    if (embed.getTitle() != null) {
-		embedDoc.put("title", embed.getTitle());
+	    if (this.embed.getTitle() != null) {
+		embedDoc.put("title", this.embed.getTitle());
 	    }
-	    if (embed.getUrl() != null) {
-		embedDoc.put("url", embed.getUrl());
+	    if (this.embed.getUrl() != null) {
+		embedDoc.put("url", this.embed.getUrl());
 	    }
-	    final List<Field> fields = embed.getFields();
+	    final List<Field> fields = this.embed.getFields();
 	    if (fields.size() != 0) {
 		final List<Document> fieldsDoc = new ArrayList<>();
 		fields.forEach(field -> fieldsDoc.add(new Document().append("name", field.getName()).append("value", field.getValue())));
 		embedDoc.put("fields", fieldsDoc);
 	    }
-	    if (embed.getColor() != null) {
-		embedDoc.put("color", embed.getColor().getRGB());
+	    if (this.embed.getColor() != null) {
+		embedDoc.put("color", this.embed.getColor().getRGB());
 	    }
 	    doc.put("embed", embedDoc);
-	} else if (answer != null) {
-	    doc.put("answer", answer);
+	} else if (this.answer != null) {
+	    doc.put("answer", this.answer);
 	} else {
 	    // TODO: error handling
 	}
@@ -157,6 +157,6 @@ public class CustomCommand {
     @Override
     public boolean equals(final Object obj) {
 	final CustomCommand cmd = (CustomCommand) obj;
-	return cmd.getCommand().equalsIgnoreCase(getCommand()) && cmd.getGuild().getIdLong() == getGuild().getIdLong();
+	return cmd.getCommand().equalsIgnoreCase(this.getCommand()) && cmd.getGuild().getIdLong() == this.getGuild().getIdLong();
     }
 }

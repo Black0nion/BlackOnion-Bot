@@ -38,10 +38,10 @@ public class SuggestCommand extends Command {
 		cmde.error("suggestionschannelnotfound", "pleaseresetsuggestionschannel");
 		return;
 	    } else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION))) {
-		channel.sendMessage(Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION)).queue();
+		channel.sendMessageEmbeds(Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION)).queue();
 	    } else {
 		// all good, we can send the suggestion
-		suggestionsChannel.sendMessage(cmde.success().setTitle("suggestion").setDescription(String.join(" ", Utils.removeFirstArg(args))).build()).queue(msg -> {
+		suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle("suggestion").setDescription(String.join(" ", Utils.removeFirstArg(args))).build()).queue(msg -> {
 		    msg.addReaction("U+1F44D").queue();
 		    msg.addReaction("U+1F44E").queue();
 		});

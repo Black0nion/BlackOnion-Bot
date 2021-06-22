@@ -28,22 +28,22 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void queue(final AudioTrack track, final AudioManager manager, final VoiceChannel vc) {
 	manager.openAudioConnection(vc);
-	if (!player.startTrack(track, true)) {
-	    queue.offer(track);
-	} else if (guild.loopActivated()) {
-	    queue.offer(track.makeClone());
+	if (!this.player.startTrack(track, true)) {
+	    this.queue.offer(track);
+	} else if (this.guild.loopActivated()) {
+	    this.queue.offer(track.makeClone());
 	}
     }
 
     public void nextTrack() {
-	final AudioTrack poll = queue.poll();
-	if (guild.loopActivated()) {
-	    queue.offer(poll.makeClone());
+	final AudioTrack poll = this.queue.poll();
+	if (this.guild.loopActivated()) {
+	    this.queue.offer(poll.makeClone());
 	}
 	if (poll == null) {
 	    this.guild.getAudioManager().closeAudioConnection();
 	} else {
-	    player.startTrack(poll, false);
+	    this.player.startTrack(poll, false);
 	}
     }
 
@@ -57,17 +57,17 @@ public class TrackScheduler extends AudioEventAdapter {
 	final long hours = minutes / 60;
 	minutes %= 60;
 	seconds %= 60;
-	if (!(queue.size() == 1 && guild.loopActivated())) {
-	    guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())).sendMessage(EmbedUtils.getSuccessEmbed(null, guild).setTitle(LanguageSystem.getTranslation("nowplaying", null, guild) + info.title, info.uri).addField("By: " + info.author, info.isStream ? "STREAM" : LanguageSystem.getTranslation("length", null, guild) + (hours > 0 ? hours + "h " : "") + minutes + "min " + seconds + "s", false).build()).queue();
+	if (!(this.queue.size() == 1 && this.guild.loopActivated())) {
+	    this.guild.getTextChannelById(MusicSystem.channels.get(this.guild.getIdLong())).sendMessageEmbeds(EmbedUtils.getSuccessEmbed(null, this.guild).setTitle(LanguageSystem.getTranslation("nowplaying", null, this.guild) + info.title, info.uri).addField("By: " + info.author, info.isStream ? "STREAM" : LanguageSystem.getTranslation("length", null, this.guild) + (hours > 0 ? hours + "h " : "") + minutes + "min " + seconds + "s", false).build()).queue();
 	}
     }
 
     @Override
     public void onTrackEnd(final AudioPlayer player, final AudioTrack track, final AudioTrackEndReason endReason) {
 	if (endReason.mayStartNext) {
-	    nextTrack();
-	} else if (queue.isEmpty()) {
-	    guild.getAudioManager().closeAudioConnection();
+	    this.nextTrack();
+	} else if (this.queue.isEmpty()) {
+	    this.guild.getAudioManager().closeAudioConnection();
 	}
     }
 }

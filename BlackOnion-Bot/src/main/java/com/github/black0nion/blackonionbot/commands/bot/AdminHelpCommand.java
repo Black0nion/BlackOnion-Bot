@@ -22,30 +22,25 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class AdminHelpCommand extends Command {
-	
-	public AdminHelpCommand() {
-		this.setCommand("adminhelp")
-			.setRequiredCustomPermissions(CustomPermission.ADMIN)
-			.setHidden()
-			.setCategory(Category.BOT);
+
+    public AdminHelpCommand() {
+	this.setCommand("adminhelp").setRequiredCustomPermissions(CustomPermission.ADMIN).setHidden().setCategory(Category.BOT);
+    }
+
+    @Override
+    public String[] getCommand() {
+	return new String[] { "adminhelp" };
+    }
+
+    @Override
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	message.delete().queue();
+	final EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild).setTitle("Adminhilfe").setColor(Color.getHSBColor(0.8F, 1, 0.5F));
+
+	for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) if (entry.getValue().getVisibility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != this.getCommand()[0]) {
+	    builder.addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
 	}
 
-	@Override
-	public String[] getCommand() {
-		return new String[] { "adminhelp" };
-	}
-
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		message.delete().queue();
-		final EmbedBuilder builder = EmbedUtils.getErrorEmbed(author, guild)
-				.setTitle("Adminhilfe")
-				.setColor(Color.getHSBColor(0.8F, 1, 0.5F));
-		
-		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet())
-			if (entry.getValue().getVisibility() == CommandVisibility.HIDDEN && entry.getValue().getCommand()[0] != getCommand()[0])
-				builder.addField(CommandEvent.getCommandHelp(guild, author, entry.getValue()), "help" + entry.getValue().getCommand()[0].toLowerCase(), false);
-		
-		channel.sendMessage(builder.build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
-	}
+	channel.sendMessageEmbeds(builder.build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
+    }
 }
