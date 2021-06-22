@@ -90,7 +90,6 @@ public class DiscordUser {
 		System.out.println("Reloading Guilds for user " + DiscordUser.this.getFullName() + "...");
 		Unirest.setTimeouts(0, 0);
 		final String body = Unirest.get("https://discord.com/api/users/@me/guilds").header("Authorization", "Bearer " + DiscordUser.this.accessToken).asString().getBody();
-		System.out.println(body);
 		return new JSONArray(body);
 	    } catch (final Exception e) {
 		e.printStackTrace();
