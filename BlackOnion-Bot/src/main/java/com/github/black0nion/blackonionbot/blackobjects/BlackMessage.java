@@ -338,9 +338,8 @@ public class BlackMessage extends BlackObject implements Message {
     }
 
     @Override
-    @Deprecated
     public MessageAction editMessage(final MessageEmbed newContent) {
-	return this.message.editMessage(newContent);
+	return this.message.editMessageEmbeds(newContent);
     }
 
     @Override
@@ -481,5 +480,10 @@ public class BlackMessage extends BlackObject implements Message {
     @Override
     public MessageAction editMessageEmbeds(final Collection<? extends MessageEmbed> embeds) {
 	return this.message.editMessageEmbeds(embeds);
+    }
+
+    @Override
+    public MessageAction reply(final MessageEmbed content) {
+	return this.message.replyEmbeds(content);
     }
 }

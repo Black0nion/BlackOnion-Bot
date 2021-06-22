@@ -3,14 +3,11 @@ package com.github.black0nion.blackonionbot.bot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -30,8 +27,6 @@ import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.dashboard.values.DashboardValue;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -57,8 +52,6 @@ public class CommandBase extends ListenerAdapter {
     public static HashMap<String, Command> commands = new HashMap<>();
 
     public static EventWaiter waiter;
-
-    private static JSONObject commandsJSON = new JSONObject();
 
     /**
      * Don't call on init!
@@ -94,29 +87,10 @@ public class CommandBase extends ListenerAdapter {
 
 	Bot.executor.submit(() -> {
 	    Dashboard.init();
-	    for (final Map.Entry<Category, List<Command>> entry : commandsInCategory.entrySet()) {
-		final JSONArray array = new JSONArray();
-		for (final Command command : entry.getValue().stream().filter(cmd -> cmd.getVisibility() == CommandVisibility.SHOWN && cmd.isDashboardCommand()).collect(Collectors.toList())) {
-		    final JSONObject commandJSON = new JSONObject();
-		    commandJSON.put("command", command.getCommand());
-		    final String translation = LanguageSystem.getDefaultLanguage().getTranslation("help" + command.getCommand()[0]);
-		    commandJSON.put("description", translation != null ? translation : LanguageSystem.getDefaultLanguage().getTranslationNonNull("empty"));
-		    commandJSON.put("isToggleable", command.isToggleable());
-		    if (Dashboard.hasValues(command)) {
-			final JSONArray values = new JSONArray();
-			for (final DashboardValue value : Dashboard.getValues(command)) {
-			    values.put(value.toJSON());
-			}
-			commandJSON.put("values", values);
-		    }
-		    array.put(commandJSON);
-		}
-		commandsJSON.put(entry.getKey().name(), array);
-	    }
-//			StringSelection stringSelection = new StringSelection(commandsJSON.toString());
-//			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-//			clipboard.setContents(stringSelection, null);
-//			System.out.println(commandsJSON);
+	    //			StringSelection stringSelection = new StringSelection(commandsJSON.toString());
+	    //			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    //			clipboard.setContents(stringSelection, null);
+	    //			System.out.println(commandsJSON);
 	});
     }
 

@@ -56,7 +56,7 @@ public class ReloadCommand extends Command {
 		    final Method meth = entry.getValue();
 		    reloadableMethodsString += "\n" + entry.getKey() + ": " + meth.getDeclaringClass().getSimpleName() + "." + meth.getName();
 		}
-		channel.sendMessage(cmde.success().addField("reloadables", reloadableMethodsString + "```", false).build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
+		channel.sendMessageEmbeds(cmde.success().addField("reloadables", reloadableMethodsString + "```", false).build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
 		return;
 	    }
 	    boolean invalidConfigs = false;
@@ -64,7 +64,7 @@ public class ReloadCommand extends Command {
 		final Method method = reloadableMethods.get(argument);
 		try {
 		    method.invoke(method.getClass());
-		    channel.sendMessage(cmde.success().addField(cmde.getTranslation("configreload", new Placeholder("config", argument.toUpperCase())), "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		    channel.sendMessageEmbeds(cmde.success().addField(cmde.getTranslation("configreload", new Placeholder("config", argument.toUpperCase())), "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} catch (final Exception ex) {
 		    cmde.exception();
 		}
@@ -74,12 +74,12 @@ public class ReloadCommand extends Command {
 	    if (invalidConfigs) {
 		final String translation = cmde.getTranslation("availableconfigs", new Placeholder("configs", reloadableMethods.toString()));
 		System.out.println(translation);
-		channel.sendMessage(cmde.error().addField("invalidconfig", translation, false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		channel.sendMessageEmbeds(cmde.error().addField("invalidconfig", translation, false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 	    }
 	} else {
-	    channel.sendMessage(cmde.success().addField("reloading", "messagedelete5", false).build()).queue(msg -> {
+	    channel.sendMessageEmbeds(cmde.success().addField("reloading", "messagedelete5", false).build()).queue(msg -> {
 		final ScheduledFuture<?> task = Bot.scheduledExecutor.schedule(() -> {
-		    msg.editMessage(cmde.error().addField("i fucked up", "lol reload command broken XD go fix it dumbass", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		    msg.editMessageEmbeds(cmde.error().addField("i fucked up", "lol reload command broken XD go fix it dumbass", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}, 5, TimeUnit.SECONDS);
 
 		reload();
@@ -87,9 +87,9 @@ public class ReloadCommand extends Command {
 
 		final MessageEmbed builder = cmde.success().addField("configsreload", "messagedelete5", false).build();
 		if (msg == null) {
-		    channel.sendMessage(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		    channel.sendMessageEmbeds(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		} else {
-		    msg.editMessage(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		    msg.editMessageEmbeds(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		}
 	    });
 	}

@@ -166,7 +166,7 @@ public class Utils {
 	    if (!guild.getSelfMember().hasPermission(permissions)) return true;
 	} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 	    if (channel != null) {
-		channel.sendMessage(Utils.noRights(guild, author, permissions)).queue();
+		channel.sendMessageEmbeds(Utils.noRights(guild, author, permissions)).queue();
 	    }
 	    return true;
 	}

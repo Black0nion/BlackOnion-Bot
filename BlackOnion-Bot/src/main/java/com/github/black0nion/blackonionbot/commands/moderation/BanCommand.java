@@ -42,7 +42,7 @@ public class BanCommand extends Command {
 		final String finalBanMessage = banMessage;
 		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(cmde.getTranslation("usergotbanned"), cmde.getTranslation("message", new Placeholder("msg", banMessage)), false).build()).queue();
 		userToBan.getBlackUser().openPrivateChannel().queue(c -> {
-		    c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(author.getLanguage().getTranslation("yougotbanned"), author.getLanguage().getTranslation("message", new Placeholder("msg", finalBanMessage)), false).build()).queue();
+		    c.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(author.getLanguage().getTranslation("yougotbanned"), author.getLanguage().getTranslation("message", new Placeholder("msg", finalBanMessage)), false).build()).queue();
 		});
 	    } else {
 		cmde.error("usertoopowerful", "loweruserthanu");

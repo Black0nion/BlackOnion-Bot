@@ -115,7 +115,7 @@ public class AntiSwearSystem {
 			    }
 			});
 		    } else {
-			channel.sendMessage(EmbedUtils.getErrorEmbed(user, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+			channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(user, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
 		    }
 		} catch (final Exception e) {
 		    e.printStackTrace();
