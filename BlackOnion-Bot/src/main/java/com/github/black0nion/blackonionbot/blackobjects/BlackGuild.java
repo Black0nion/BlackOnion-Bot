@@ -235,7 +235,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.joinChannel;
     }
 
-    @DashboardValue(prettyName = "JoinChannel", id = "joinchannel", category = DashboardCategory.GENERAL)
+    @DashboardValue(prettyName = "JoinChannel", id = "joinchannel", category = DashboardCategory.GENERAL, nullable = true)
     public void setJoinChannel(final TextChannel channel) {
 	this.setJoinChannel(channel.getIdLong());
     }
@@ -262,7 +262,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveChannel;
     }
 
-    @DashboardValue(prettyName = "LeaveChannel", id = "leavechannel", category = DashboardCategory.GENERAL)
+    @DashboardValue(prettyName = "LeaveChannel", id = "leavechannel", category = DashboardCategory.GENERAL, nullable = true)
     public void setLeaveChannel(final long leaveChannel) {
 	this.leaveChannel = leaveChannel;
 	if (leaveChannel == -1) {
