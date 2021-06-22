@@ -38,13 +38,15 @@ public class Dashboard {
 	    try {
 		final Class<?> objectClass = Class.forName(blackobject.getName());
 
-		for (final Method method : objectClass.getDeclaredMethods()) if (method.isAnnotationPresent(DashboardValue.class)) {
-		    final DashboardValue annotation = method.getAnnotation(DashboardValue.class);
-		    setters.put(annotation.id(), method);
-		    if (settingsInCategory.containsKey(annotation.category())) {
-			settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
-		    } else {
-			settingsInCategory.put(annotation.category(), new JSONArray(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
+		for (final Method method : objectClass.getDeclaredMethods()) {
+		    if (method.isAnnotationPresent(DashboardValue.class)) {
+			final DashboardValue annotation = method.getAnnotation(DashboardValue.class);
+			setters.put(annotation.id(), method);
+			if (settingsInCategory.containsKey(annotation.category())) {
+			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
+			} else {
+			    settingsInCategory.put(annotation.category(), new JSONArray(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
+			}
 		    }
 		}
 	    } catch (final Exception e) {
@@ -151,7 +153,7 @@ public class Dashboard {
 		    result.put(new JSONObject().put("ARRAY", type.getSimpleName().toUpperCase().replace("[]", "")));
 		} else if (List.class.isAssignableFrom(type)) {
 		    result.put(new JSONObject().put("LIST", type));
-		}
+		} else return null;
 	    }
 	    return result;
 	} catch (final Exception e) {
