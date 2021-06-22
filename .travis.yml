@@ -2,9 +2,12 @@ language: java
 
 os: linux
 dist: focal
+
+jdk:
+  - openjdk8
+  - oraclejdk8
     
 script:
-  - jdk_switcher use openjdk8
   - chmod +x ./BlackOnion-Bot/gradlew
   - cd ./BlackOnion-Bot
   - ./gradlew shadowJar -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
