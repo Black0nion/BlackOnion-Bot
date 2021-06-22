@@ -13,6 +13,7 @@ import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
+import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -37,8 +38,8 @@ public class Dashboard {
 	    try {
 		final Class<?> objectClass = Class.forName(blackobject.getName());
 
-		for (final Method method : objectClass.getDeclaredMethods()) if (method.isAnnotationPresent(com.github.black0nion.blackonionbot.misc.DashboardValue.class)) {
-		    final com.github.black0nion.blackonionbot.misc.DashboardValue annotation = method.getAnnotation(com.github.black0nion.blackonionbot.misc.DashboardValue.class);
+		for (final Method method : objectClass.getDeclaredMethods()) if (method.isAnnotationPresent(DashboardValue.class)) {
+		    final DashboardValue annotation = method.getAnnotation(DashboardValue.class);
 		    setters.put(annotation.id(), method);
 		    if (settingsInCategory.containsKey(annotation.category())) {
 			settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
