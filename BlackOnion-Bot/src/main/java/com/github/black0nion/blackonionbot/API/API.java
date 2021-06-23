@@ -93,13 +93,14 @@ public class API {
 
 	final String ratelimited = new JSONObject().put("success", false).put("error", "ratelimited").toString();
 	Spark.before((req, res) -> {
+	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
+	    logInfo("IP " + ip + " tried to connect to " + req.url());
 	    if (!requests.containsKey(req.uri())) {
 		if (websocketEndpoints.contains(req.uri())) return;
 		// will error
 	    } else {
 		final BlackRequest request = requests.get(req.uri());
 		// RATE LIMITING:
-		final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
 		if (rateLimiters.containsKey(ip)) {
 		    final BlackRateLimiter limiter = rateLimiters.get(ip);
 		    if (!limiter.tryAcquire()) {
