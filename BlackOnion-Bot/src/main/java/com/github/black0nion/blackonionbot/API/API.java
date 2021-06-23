@@ -53,8 +53,8 @@ public class API {
 	    WebSocketEndpoint endpoint;
 	    try {
 		endpoint = websockets.getConstructor().newInstance();
-		Spark.webSocket("/api/" + endpoint.getRoute(), websockets);
-		websocketEndpoints.add("/api/" + endpoint.getRoute());
+		Spark.webSocket("/ws/" + endpoint.getRoute(), websockets);
+		websocketEndpoints.add("/ws/" + endpoint.getRoute());
 	    } catch (final Exception e) {
 		e.printStackTrace();
 	    }
@@ -95,21 +95,21 @@ public class API {
 	Spark.before((req, res) -> {
 	    if (!requests.containsKey(req.uri())) {
 		if (websocketEndpoints.contains(req.uri())) return;
-		Spark.halt(404, "notfound");
-	    }
-
-	    final BlackRequest request = requests.get(req.uri());
-	    // RATE LIMITING:
-	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
-	    if (rateLimiters.containsKey(ip)) {
-		final BlackRateLimiter limiter = rateLimiters.get(ip);
-		if (!limiter.tryAcquire()) {
-		    logWarning(ip + " got ratelimited! Sent " + limiter.getTooMany() + " too many requests!");
-		    res.status(429);
-		    Spark.halt(ratelimited);
-		}
+		// will error
 	    } else {
-		rateLimiters.put(ip, BlackRateLimiter.create(request.rateLimit()));
+		final BlackRequest request = requests.get(req.uri());
+		// RATE LIMITING:
+		final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
+		if (rateLimiters.containsKey(ip)) {
+		    final BlackRateLimiter limiter = rateLimiters.get(ip);
+		    if (!limiter.tryAcquire()) {
+			logWarning(ip + " got ratelimited! Sent " + limiter.getTooMany() + " too many requests!");
+			res.status(429);
+			Spark.halt(ratelimited);
+		    }
+		} else {
+		    rateLimiters.put(ip, BlackRateLimiter.create(request.rateLimit()));
+		}
 	    }
 	});
 

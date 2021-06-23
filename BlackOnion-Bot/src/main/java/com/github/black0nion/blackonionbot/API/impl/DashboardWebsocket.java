@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.BlackSession;
@@ -106,11 +104,12 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    // TODO: permissions
 	    final JSONObject response = new JSONObject();
 	    final String[] args = message.split("\\|");
+	    final BlackGuild guild = BlackGuild.from(Long.parseLong(args[1]));
 	    for (int i = 2; i < args.length; i++) {
 		try {
 		    final String arg = args[i];
-		    response.put(arg, Dashboard.getters.get(arg).invoke(BlackGuild.from(Long.parseLong(args[1]))));
-		} catch (JSONException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		    response.put(arg, Dashboard.getters.get(arg).invoke(guild));
+		} catch (final Exception e) {
 		    e.printStackTrace();
 		}
 	    }
