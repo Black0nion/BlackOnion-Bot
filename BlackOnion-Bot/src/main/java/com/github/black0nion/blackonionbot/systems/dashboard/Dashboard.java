@@ -14,15 +14,14 @@ import org.reflections.Reflections;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
-import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class Dashboard {
 
-    // TODO: better name XD
     public static final HashMap<String, Method> setters = new HashMap<>();
+    public static final HashMap<String, Method> getters = new HashMap<>();
 
     public static final JSONArray valuesJson = new JSONArray();
 
@@ -40,8 +39,15 @@ public class Dashboard {
 		final Class<?> objectClass = Class.forName(blackobject.getName());
 
 		for (final Method method : objectClass.getDeclaredMethods()) {
-		    if (method.isAnnotationPresent(DashboardValue.class)) {
-			final DashboardValue annotation = method.getAnnotation(DashboardValue.class);
+		    if (method.isAnnotationPresent(DashboardGetter.class)) {
+			final DashboardGetter annotation = method.getAnnotation(DashboardGetter.class);
+			getters.put(annotation.value(), method);
+		    }
+		}
+
+		for (final Method method : objectClass.getDeclaredMethods()) {
+		    if (method.isAnnotationPresent(DashboardSetter.class)) {
+			final DashboardSetter annotation = method.getAnnotation(DashboardSetter.class);
 			setters.put(annotation.id(), method);
 			if (settingsInCategory.containsKey(annotation.category())) {
 			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
@@ -63,8 +69,8 @@ public class Dashboard {
 
     public static boolean tryUpdateValue(final String message) {
 	// should be only "updatevalue"
-	final String[] input = message.split(" ");
-	// syntax: guildid key values...
+	final String[] input = message.split("|");
+	// syntax: guildid|key|values...
 	final String[] args = Utils.removeFirstArg(input);
 	final String guildid = args[0];
 	if (args.length < 3 || !Utils.isLong(guildid)) return false;
