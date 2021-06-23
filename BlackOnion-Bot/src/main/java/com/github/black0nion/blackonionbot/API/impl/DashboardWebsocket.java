@@ -52,13 +52,29 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     private static final HashMap<Session, ScheduledFuture<?>> futures = new HashMap<>();
 
     @OnWebSocketConnect
-    public void connected(final Session session) {
-	sessions.add(session);
-	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
-	futures.put(session, Bot.scheduledExecutor.schedule(() -> {
-	    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
-	    session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
-	}, 1, TimeUnit.MINUTES));
+    public void connected(final Session sessionRaw) {
+	try {
+	    final String sessionId = sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
+	    if (sessionId == null) {
+		sessionRaw.close(4401, "Unauthorized");
+		return;
+	    }
+	    final Document doc = BlackSession.collection.find(Filters.eq("sessionid", sessionId)).first();
+	    if (doc == null) {
+		sessionRaw.close(4401, "Unauthorized");
+		return;
+	    }
+	    final BlackWebsocketSession session = BlackWebsocketSessions.get(sessionRaw);
+	    session.send("worked yay");
+	    sessions.add(session);
+	    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
+	    futures.put(session, Bot.scheduledExecutor.schedule(() -> {
+		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
+		session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
+	    }, 1, TimeUnit.MINUTES));
+	} catch (final Exception e) {
+	    e.printStackTrace();
+	}
     }
 
     @OnWebSocketClose
@@ -87,18 +103,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    } else {
 		session.send("failure");
 	    }
-	} else if (message.startsWith("login")) {
-	    // TODO: implement login
-	    // TODO: check if that todo isn't already done
-	    final Document doc = BlackSession.collection.find(Filters.eq("sessionid", message.replace("login", ""))).first();
-	    if (doc == null) {
-		session.close(4401, "Unauthorized");
-	    } else {
-		session.loginToSession(doc.getString("access_token"));
-		session.send("worked yay");
-	    }
 	} else if (message.startsWith("userinfo")) {
-	    System.out.println(session);
 	    session.send(session.getUser());
 	} else if (message.startsWith("guildsettings")) {
 	    // TODO: permissions
