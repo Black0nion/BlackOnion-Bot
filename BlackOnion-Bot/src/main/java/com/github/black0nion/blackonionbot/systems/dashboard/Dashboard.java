@@ -26,6 +26,7 @@ public class Dashboard {
     public static final JSONArray valuesJson = new JSONArray();
 
     public static void init() {
+	getters.clear();
 	setters.clear();
 	valuesJson.clear();
 
