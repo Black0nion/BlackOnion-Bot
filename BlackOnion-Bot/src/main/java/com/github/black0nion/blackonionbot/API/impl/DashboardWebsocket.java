@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,10 +14,13 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.BlackWebsocketSession;
 import com.github.black0nion.blackonionbot.API.WebSocketEndpoint;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -99,7 +103,18 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    System.out.println(session);
 	    session.send(session.getUser());
 	} else if (message.startsWith("guildsettings")) {
-	    // TODO: implement
+	    // TODO: permissions
+	    final JSONObject response = new JSONObject();
+	    final String[] args = message.split("\\|");
+	    for (int i = 2; i < args.length; i++) {
+		try {
+		    final String arg = args[i];
+		    response.put(arg, Dashboard.getters.get(arg).invoke(BlackGuild.from(Long.parseLong(args[1]))));
+		} catch (JSONException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		    e.printStackTrace();
+		}
+	    }
+	    session.send(response.toString());
 	}
 
 	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + message.replace("\n", "\\n"), LogOrigin.DASHBOARD);
