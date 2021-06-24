@@ -84,8 +84,8 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    final BlackWebsocketSession session = BlackWebsocketSessions.get(sessionRaw);
 	    session.send("worked yay");
 	    sessions.add(session);
+	    futures.put(sessionRaw, this.scheduleTimeout(session));
 	    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
-	    futures.put(session, this.scheduleTimeout(session));
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	}
@@ -163,16 +163,15 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		    reply(session, null, JSON_ERROR.getJson());
 		}
 	    }
-	} else if (messageRaw.charAt(0) == 'n') {
-	    if (messageRaw.equals("heartbeat")) {
-		futures.get(sessionUnchecked).cancel(true);
-		if (logHeartbeats) {
-		    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Heartbeat.", LogOrigin.DASHBOARD);
-		}
-		session.send("heartbeat");
-		futures.put(session, this.scheduleTimeout(session));
-		return;
+	} else if (messageRaw.startsWith("heartbeat")) {
+	    futures.get(sessionUnchecked).cancel(true);
+	    futures.put(sessionUnchecked, this.scheduleTimeout(session));
+	    if (logHeartbeats) {
+		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Heartbeat.", LogOrigin.DASHBOARD);
 	    }
+	    final String id = messageRaw.substring(9);
+	    session.send("heartbeat" + id);
+	    return;
 	} else {
 	    reply(session, null, INVALID_TYPE.getJson());
 	}
