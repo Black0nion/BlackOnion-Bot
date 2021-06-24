@@ -34,6 +34,7 @@ import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardCategory;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardReadonlyGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -199,6 +200,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("language", language.getLanguageCode());
     }
 
+    @DashboardReadonlyGetter(category = DashboardCategory.GENERAL, id = "guildtype", prettyName = "GuildType")
     public GuildType getGuildType() {
 	return this.guildType;
     }
