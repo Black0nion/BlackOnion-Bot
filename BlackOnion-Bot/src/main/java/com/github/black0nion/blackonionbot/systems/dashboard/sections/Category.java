@@ -1,18 +1,18 @@
 /**
  *
  */
-package com.github.black0nion.blackonionbot.systems.dashboard;
+package com.github.black0nion.blackonionbot.systems.dashboard.sections;
 
 /**
  * @author _SIM_
  */
-public enum DashboardCategory {
+public enum Category {
     GENERAL("General", "general"), MODERATION("Moderation", "moderation");
 
     private final String id;
     private final String name;
 
-    private DashboardCategory(final String name, final String id) {
+    private Category(final String name, final String id) {
 	this.name = name;
 	this.id = id;
     }
