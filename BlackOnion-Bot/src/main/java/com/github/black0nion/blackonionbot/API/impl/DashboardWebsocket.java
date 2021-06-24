@@ -1,5 +1,14 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.FAIL;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.INVALID_TYPE;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.JSON_ERROR;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_ACTION;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_GUILD;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.SUCCESS;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.UNAUTHORIZED;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.WRONG_ARGUMENTS;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
 
 import org.bson.Document;
 import org.eclipse.jetty.websocket.api.Session;
@@ -91,44 +102,47 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + messageRaw.replace("\n", "\\n"), LogOrigin.DASHBOARD);
 	if (messageRaw.charAt(0) == 'r') {
 	    try {
-		final JSONObject message = new JSONObject(messageRaw.substring(1));
-		if (!message.has("action")) {
-		    session.send("nope");
+		final JSONObject request = new JSONObject(messageRaw.substring(1));
+		if (!request.has("action")) {
+		    NO_ACTION.send(session, request);
 		    return;
 		}
-		final String command = message.getString("action");
+		final String command = request.getString("action");
 		if (command.equalsIgnoreCase("updatesetting")) {
-		    if (Dashboard.tryUpdateValue(message, session.getUser())) {
-			session.send("success");
+		    if (Dashboard.tryUpdateValue(request, session.getUser())) {
+			SUCCESS.send(session, request);
 		    } else {
-			session.send("failure");
+			FAIL.send(session, request);
 		    }
 		} else if (command.equalsIgnoreCase("userinfo")) {
 		    session.send(session.getUser());
 		} else if (command.equalsIgnoreCase("guildsettings")) {
-		    if (!(message.has("guildid") && message.has("settings"))) {
-			session.send("wrong arguments");
+		    if (!(request.has("guildid") && request.has("settings"))) {
+			WRONG_ARGUMENTS.send(session, request);
 			return;
 		    }
-		    final Object guildid = message.get("guildid");
+		    final Object guildid = request.get("guildid");
 		    BlackGuild guild;
 		    if (guildid instanceof String) {
 			guild = BlackGuild.from(Long.parseLong((String) guildid));
 		    } else if (guildid instanceof Long) {
 			guild = BlackGuild.from((Long) guildid);
 		    } else {
-			session.send("No guild specified.");
+			NO_GUILD.send(session, request);
 			return;
 		    }
 		    guild.retrieveMemberById(session.getUser().getUserId()).queue(member -> {
 			if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
-			    session.send("Unauthorized.");
+			    UNAUTHORIZED.send(session, request);
 			    return;
 			}
 			final JSONObject response = new JSONObject();
-			final JSONArray settings = message.getJSONArray("settings");
+			final JSONArray settings = request.getJSONArray("settings");
 			for (int i = 0; i < settings.length(); i++) {
 			    try {
+				if (!(settings.get(i) instanceof String)) {
+				    continue;
+				}
 				final String arg = settings.getString(i);
 				if (!Dashboard.getters.containsKey(arg)) {
 				    response.put(arg, "null");
@@ -139,14 +153,14 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 				e.printStackTrace();
 			    }
 			}
-			session.send(response.toString());
+			reply(session, request, response);
 		    });
 		}
 	    } catch (final Exception e) {
 		if (!(e instanceof JSONException)) {
 		    e.printStackTrace();
 		} else {
-		    session.send("JSON Error");
+		    reply(session, null, JSON_ERROR.getJson());
 		}
 	    }
 	} else if (messageRaw.charAt(0) == 'n') {
@@ -160,7 +174,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		return;
 	    }
 	} else {
-	    session.send("invalid type.");
+	    reply(session, null, INVALID_TYPE.getJson());
 	}
     }
 
@@ -183,5 +197,16 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
 	    session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
 	}, 1, TimeUnit.MINUTES);
+    }
+
+    public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable JSONObject response) {
+	if (response == null) {
+	    response = new JSONObject();
+	}
+	if (request != null && request.has("id")) {
+	    session.send("a" + response.put("id", request.getInt("id")));
+	} else {
+	    session.send("a" + response);
+	}
     }
 }
