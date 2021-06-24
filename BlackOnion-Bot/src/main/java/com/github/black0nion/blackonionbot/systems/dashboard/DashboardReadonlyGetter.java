@@ -11,6 +11,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
+
 /**
  * Date: 27.05.2021
  * Copyright 2021 BlackOnion
@@ -25,5 +27,5 @@ public abstract @interface DashboardReadonlyGetter {
 
     public String id();
 
-    public DashboardCategory category();
+    public Category category();
 }
