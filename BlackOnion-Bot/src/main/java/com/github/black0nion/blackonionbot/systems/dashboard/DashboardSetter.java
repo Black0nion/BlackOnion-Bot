@@ -11,6 +11,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
+
 /**
  * @author _SIM_ Date: 27.05.2021 Copyright 2021 BlackOnion Class Name:
  *         DashboardSetter
@@ -22,7 +24,7 @@ public abstract @interface DashboardSetter {
 
     public String id();
 
-    public DashboardCategory category();
+    public Category category();
 
     public boolean nullable() default false;
 
