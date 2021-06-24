@@ -15,6 +15,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import net.dv8tion.jda.api.Permission;
@@ -32,7 +33,7 @@ public class Dashboard {
 	setters.clear();
 	valuesJson.clear();
 
-	final HashMap<DashboardCategory, JSONArray> settingsInCategory = new HashMap<>();
+	final HashMap<Category, JSONArray> settingsInCategory = new HashMap<>();
 
 	final Reflections reflections = new Reflections(BlackObject.class.getPackage().getName());
 	final Set<Class<? extends BlackObject>> annotated = reflections.getSubTypesOf(BlackObject.class);
@@ -71,8 +72,8 @@ public class Dashboard {
 		e.printStackTrace();
 	    }
 	}
-	for (final Map.Entry<DashboardCategory, JSONArray> entry : settingsInCategory.entrySet()) {
-	    final DashboardCategory key = entry.getKey();
+	for (final Map.Entry<Category, JSONArray> entry : settingsInCategory.entrySet()) {
+	    final Category key = entry.getKey();
 	    valuesJson.put(new BlackLinkedHashMap<String, Object>().add("name", key.getName()).add("id", key.getId()).add("pages", entry.getValue()));
 	}
 	System.out.println(valuesJson);

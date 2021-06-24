@@ -32,10 +32,10 @@ import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardCategory;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardReadonlyGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -45,7 +45,6 @@ import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
@@ -101,7 +100,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param  guild
+     * @param guild
      * @return
      */
     @Reloadable("guildcache")
@@ -186,7 +185,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.language;
     }
 
-    @DashboardSetter(prettyName = "Language", id = "language", category = DashboardCategory.GENERAL)
+    @DashboardSetter(prettyName = "Language", id = "language", category = Category.GENERAL)
     public void setLanguage(final LanguageSystem.Languages language) {
 	this.setLanguage(language.getLang());
     }
@@ -200,7 +199,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("language", language.getLanguageCode());
     }
 
-    @DashboardReadonlyGetter(category = DashboardCategory.GENERAL, id = "guildtype", prettyName = "GuildType")
+    @DashboardReadonlyGetter(category = Category.GENERAL, id = "guildtype", prettyName = "GuildType")
     public GuildType getGuildType() {
 	return this.guildType;
     }
@@ -219,7 +218,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.prefix;
     }
 
-    @DashboardSetter(prettyName = "Prefix", id = "prefix", category = DashboardCategory.GENERAL)
+    @DashboardSetter(prettyName = "Prefix", id = "prefix", category = Category.GENERAL)
     public void setPrefix(final String prefix) {
 	this.prefix = prefix;
 	this.save("prefix", prefix);
@@ -230,7 +229,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.joinMessage;
     }
 
-    @DashboardSetter(prettyName = "JoinMessage", id = "joinmessage", category = DashboardCategory.GENERAL)
+    @DashboardSetter(prettyName = "JoinMessage", id = "joinmessage", category = Category.GENERAL)
     public void setJoinMessage(final String newMessage) {
 	this.joinMessage = newMessage;
 	this.save("joinmessage", this.joinMessage);
@@ -241,7 +240,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.joinChannel;
     }
 
-    @DashboardSetter(prettyName = "JoinChannel", id = "joinchannel", category = DashboardCategory.GENERAL, nullable = true)
+    @DashboardSetter(prettyName = "JoinChannel", id = "joinchannel", category = Category.GENERAL, nullable = true)
     public void setJoinChannel(final TextChannel channel) {
 	this.setJoinChannel(channel.getIdLong());
     }
@@ -259,7 +258,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveMessage;
     }
 
-    @DashboardSetter(prettyName = "LeaveMessage", id = "leavemessage", category = DashboardCategory.GENERAL)
+    @DashboardSetter(prettyName = "LeaveMessage", id = "leavemessage", category = Category.GENERAL)
     public void setLeaveMessage(final String leaveMessage) {
 	this.leaveMessage = leaveMessage;
 	this.save("leavemessage", leaveMessage);
@@ -270,7 +269,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveChannel;
     }
 
-    @DashboardSetter(prettyName = "LeaveChannel", id = "leavechannel", category = DashboardCategory.GENERAL, nullable = true)
+    @DashboardSetter(prettyName = "LeaveChannel", id = "leavechannel", category = Category.GENERAL, nullable = true)
     public void setLeaveChannel(final TextChannel channel) {
 	this.setLeaveChannel(channel.getIdLong());
     }
@@ -320,7 +319,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.antiSpoilerType;
     }
 
-    @DashboardSetter(prettyName = "AntiSpoiler", id = "antispoiler", category = DashboardCategory.MODERATION)
+    @DashboardSetter(prettyName = "AntiSpoiler", id = "antispoiler", category = Category.MODERATION)
     public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 	this.antiSpoilerType = antiSpoilerType;
 	this.save("antiSpoiler", antiSpoilerType.name());
@@ -363,7 +362,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.suggestionsChannel;
     }
 
-    @DashboardSetter(prettyName = "SuggestionsChannel", id = "suggestionschannel", category = DashboardCategory.MODERATION)
+    @DashboardSetter(prettyName = "SuggestionsChannel", id = "suggestionschannel", category = Category.MODERATION)
     public void setSuggestionsChannel(final TextChannel channel) {
 	this.setSuggestionsChannel(channel.getIdLong());
     }
@@ -680,19 +679,19 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public Category getCategoryById(@NotNull final String id) {
+    public net.dv8tion.jda.api.entities.Category getCategoryById(@NotNull final String id) {
 	return this.guild.getCategoryById(id);
     }
 
     @Override
     @NotNull
-    public List<Category> getCategories() {
+    public List<net.dv8tion.jda.api.entities.Category> getCategories() {
 	return this.guild.getCategories();
     }
 
     @NotNull
     @Override
-    public SortedSnowflakeCacheView<Category> getCategoryCache() {
+    public SortedSnowflakeCacheView<net.dv8tion.jda.api.entities.Category> getCategoryCache() {
 	return this.guild.getCategoryCache();
     }
 
@@ -1137,7 +1136,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @Override
     @NotNull
-    public ChannelAction<Category> createCategory(@NotNull final String name) {
+    public ChannelAction<net.dv8tion.jda.api.entities.Category> createCategory(@NotNull final String name) {
 	return this.guild.createCategory(name);
     }
 
@@ -1228,22 +1227,22 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public ChannelAction<TextChannel> createTextChannel(final String name, final Category parent) {
+    public ChannelAction<TextChannel> createTextChannel(final String name, final net.dv8tion.jda.api.entities.Category parent) {
 	return this.guild.createTextChannel(name, parent);
     }
 
     @Override
-    public ChannelAction<VoiceChannel> createVoiceChannel(final String name, final Category parent) {
+    public ChannelAction<VoiceChannel> createVoiceChannel(final String name, final net.dv8tion.jda.api.entities.Category parent) {
 	return this.guild.createVoiceChannel(name, parent);
     }
 
     @Override
-    public CategoryOrderAction modifyTextChannelPositions(final Category category) {
+    public CategoryOrderAction modifyTextChannelPositions(final net.dv8tion.jda.api.entities.Category category) {
 	return this.guild.modifyTextChannelPositions(category);
     }
 
     @Override
-    public CategoryOrderAction modifyVoiceChannelPositions(final Category category) {
+    public CategoryOrderAction modifyVoiceChannelPositions(final net.dv8tion.jda.api.entities.Category category) {
 	return this.guild.modifyVoiceChannelPositions(category);
     }
 
