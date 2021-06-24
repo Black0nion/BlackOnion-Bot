@@ -14,8 +14,10 @@ import org.reflections.Reflections;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class Dashboard {
@@ -68,18 +70,15 @@ public class Dashboard {
 	System.out.println(valuesJson);
     }
 
-    public static boolean tryUpdateValue(final String message) {
-	// should be only "updatevalue"
-	final String[] input = message.split("|");
-	// syntax: guildid|key|values...
-	final String[] args = Utils.removeFirstArg(input);
-	final String guildid = args[0];
-	if (args.length < 3 || !Utils.isLong(guildid)) return false;
-	final Method method = setters.get(args[1]);
+    public static boolean tryUpdateValue(final JSONObject message, final DiscordUser user) {
+	if (!(message.has("guildid") && message.has("setting") && message.has("values"))) return false;
+	final Method method = setters.get(message.getString("setting"));
 	if (method == null) return false;
-	final BlackGuild guild = BlackGuild.from(Long.parseLong(guildid));
+	final BlackGuild guild = BlackGuild.from(message.getLong("guildid"));
 	if (guild == null) return false;
-	return saveValue(guild, method, Utils.toObjectArray(Utils.subArray(args, 2)));
+	if (!guild.retrieveMemberById(user.getUserId()).submit().join().hasPermission(Permission.MANAGE_SERVER)) return false;
+	final List<Object> list = message.getJSONArray("values").toList();
+	return saveValue(guild, method, list.toArray());
     }
 
     public static final boolean saveValue(final Object objectToInvokeMethodIn, final Method method, final Object... args) {
@@ -88,8 +87,17 @@ public class Dashboard {
 	    final Parameter[] parameters = method.getParameters();
 	    for (int i = 0; i < args.length; i++) {
 		final Class<?> parameterType = parameters[i].getType();
-		if (parameterType == boolean.class || parameterType == Boolean.class) {
+		if (parameterType == String.class) {
+		    parsed[i] = String.valueOf(args[i]);
+		} else if (parameterType == boolean.class || parameterType == Boolean.class) {
 		    parsed[i] = (boolean) args[i];
+		} else if (parameterType == TextChannel.class) {
+		    final Object arg = args[i];
+		    if (arg instanceof String) {
+			parsed[i] = Bot.jda.getTextChannelById((String) arg);
+		    } else if (arg instanceof Long) {
+			parsed[i] = Bot.jda.getTextChannelById((Long) arg);
+		    }
 		} else if (parameterType == long.class || parameterType == Long.class) {
 		    parsed[i] = parseLong(args[i]);
 		} else if (parameterType == int.class || parameterType == Integer.class) {
