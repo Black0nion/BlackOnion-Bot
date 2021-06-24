@@ -45,6 +45,14 @@ public class Dashboard {
 		    if (method.isAnnotationPresent(DashboardGetter.class)) {
 			final DashboardGetter annotation = method.getAnnotation(DashboardGetter.class);
 			getters.put(annotation.value(), method);
+		    } else if (method.isAnnotationPresent(DashboardReadonlyGetter.class)) {
+			final DashboardReadonlyGetter annotation = method.getAnnotation(DashboardReadonlyGetter.class);
+			getters.put(annotation.id(), method);
+			if (settingsInCategory.containsKey(annotation.category())) {
+			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("readonly", true));
+			} else {
+			    settingsInCategory.put(annotation.category(), new JSONArray().put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("readonly", true)));
+			}
 		    }
 		}
 
