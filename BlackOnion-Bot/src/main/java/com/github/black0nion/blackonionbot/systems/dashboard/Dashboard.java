@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -79,15 +80,31 @@ public class Dashboard {
 	System.out.println(valuesJson);
     }
 
-    public static boolean tryUpdateValue(final JSONObject message, final DiscordUser user) {
-	if (!(message.has("guildid") && message.has("setting") && message.has("values"))) return false;
+    public static void tryUpdateValue(final JSONObject message, final DiscordUser user, final Consumer<ResponseCode> callback) {
+	if (!(message.has("guildid") && message.has("setting") && message.has("values"))) {
+	    callback.accept(ResponseCode.WRONG_ARGUMENTS);
+	    return;
+	}
 	final Method method = setters.get(message.getString("setting"));
-	if (method == null) return false;
+	if (method == null) {
+	    callback.accept(ResponseCode.WRONG_SETTING);
+	    return;
+	}
 	final BlackGuild guild = BlackGuild.from(message.getLong("guildid"));
-	if (guild == null) return false;
-	if (!guild.retrieveMemberById(user.getUserId()).submit().join().hasPermission(Permission.MANAGE_SERVER)) return false;
+	if (guild == null) {
+	    callback.accept(ResponseCode.NO_GUILD);
+	    return;
+	}
+	if (!guild.retrieveMemberById(user.getUserId()).submit().join().hasPermission(Permission.MANAGE_SERVER)) {
+	    callback.accept(ResponseCode.NO_PERMISSIONS);
+	    return;
+	}
 	final List<Object> list = message.getJSONArray("values").toList();
-	return saveValue(guild, method, list.toArray());
+	if (saveValue(guild, method, list.toArray())) {
+	    callback.accept(ResponseCode.SUCCESS);
+	} else {
+	    callback.accept(ResponseCode.PARSE_ERROR);
+	}
     }
 
     public static final boolean saveValue(final Object objectToInvokeMethodIn, final Method method, final Object... args) {
@@ -133,7 +150,6 @@ public class Dashboard {
 	    method.invoke(objectToInvokeMethodIn, parsed);
 	    return true;
 	} catch (final Exception e) {
-	    e.printStackTrace();
 	    if (!(e instanceof IllegalArgumentException)) {
 		e.printStackTrace();
 	    }

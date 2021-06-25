@@ -26,8 +26,8 @@ public class OAuthUtils {
     });
 
     /**
-     * @param code The code from Discord
-     * @return a trio with the values: AccessToken | RefreshToken | ExpiresIn
+     * @param  code The code from Discord
+     * @return      a trio with the values: AccessToken | RefreshToken | ExpiresIn
      */
     @Nullable
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {
@@ -62,6 +62,7 @@ public class OAuthUtils {
 	try {
 	    return cachedUsers.get(accessToken);
 	} catch (final Exception e) {
+	    if (e instanceof NullPointerException) return null;
 	    e.printStackTrace();
 	    return null;
 	}
