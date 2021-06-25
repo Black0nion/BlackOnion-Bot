@@ -187,7 +187,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     }
 
     /**
-     * @param  session
+     * @param session
      * @return
      */
     private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
@@ -202,9 +202,9 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    response = new JSONObject();
 	}
 	if (request != null && request.has("id")) {
-	    session.send("a" + response.put("id", request.getInt("id")));
+	    session.send("a" + new JSONObject().put("id", request.get("id")).put("data", response));
 	} else {
-	    session.send("a" + response);
+	    session.send("n" + response);
 	}
     }
 }
