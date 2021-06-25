@@ -12,6 +12,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Page;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Section;
+
 /**
  * Date: 27.05.2021
  * Copyright 2021 BlackOnion
@@ -28,5 +33,19 @@ public abstract @interface DashboardGetter {
      *
      * @return The id of the Getter
      */
-    public String value();
+    public String id();
+
+    public String prettyName();
+
+    public Category category();
+
+    public Page page();
+
+    public Section section();
+
+    public boolean readonly() default false;
+
+    public boolean nullable() default false;
+
+    public GuildType requiredGuildType() default GuildType.NORMAL;
 }
