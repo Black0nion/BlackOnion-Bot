@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
@@ -64,6 +66,7 @@ public class LanguageSystem {
 	return defaultLocale;
     }
 
+    @Nullable
     public static Language getLanguageFromName(final String name) {
 	if (name == null || !languages.containsKey(name.toUpperCase())) return null;
 	return languages.get(name.toUpperCase());
@@ -97,23 +100,5 @@ public class LanguageSystem {
      */
     public static String getReplacedTranslation(final String key, final BlackUser author, final BlackGuild guild, final String toReplace, final String replacement) {
 	return getTranslation(key, author, guild).replace(toReplace, getTranslation(replacement, author, guild));
-    }
-
-    public static enum Languages {
-
-	GERMAN(german), ENGLISH(english);
-
-	private final Language lang;
-
-	private Languages(final Language lang) {
-	    this.lang = lang;
-	}
-
-	/**
-	 * @return the lang
-	 */
-	public Language getLang() {
-	    return this.lang;
-	}
     }
 }
