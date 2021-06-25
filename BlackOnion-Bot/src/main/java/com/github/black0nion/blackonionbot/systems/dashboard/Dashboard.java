@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -13,11 +12,10 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
+import com.github.black0nion.blackonionbot.blackobjects.BlackHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
@@ -29,14 +27,12 @@ public class Dashboard {
     public static final HashMap<String, Method> setters = new HashMap<>();
     public static final HashMap<String, Method> getters = new HashMap<>();
 
-    public static final JSONArray dashboardJson = new JSONArray();
+    public static final JSONObject dashboardJson = new JSONObject();
 
     public static void init() {
 	getters.clear();
 	setters.clear();
 	dashboardJson.clear();
-
-	final HashMap<Category, JSONArray> settingsInCategory = new HashMap<>();
 
 	final Reflections reflections = new Reflections(BlackObject.class.getPackage().getName());
 	final Set<Class<? extends BlackObject>> annotated = reflections.getSubTypesOf(BlackObject.class);
@@ -46,38 +42,45 @@ public class Dashboard {
 		final Class<?> objectClass = Class.forName(blackobject.getName());
 
 		for (final Method method : objectClass.getDeclaredMethods()) {
-		    if (method.isAnnotationPresent(DashboardGetter.class)) {
-			final DashboardGetter annotation = method.getAnnotation(DashboardGetter.class);
-			getters.put(annotation.value(), method);
-		    } else if (method.isAnnotationPresent(DashboardReadonlyGetter.class)) {
-			final DashboardReadonlyGetter annotation = method.getAnnotation(DashboardReadonlyGetter.class);
-			getters.put(annotation.id(), method);
-			if (settingsInCategory.containsKey(annotation.category())) {
-			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("readonly", true));
-			} else {
-			    settingsInCategory.put(annotation.category(), new JSONArray().put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("readonly", true)));
-			}
+		    if (method.isAnnotationPresent(DashboardSetter.class)) {
+			final DashboardSetter annotation = method.getAnnotation(DashboardSetter.class);
+			setters.put(annotation.value(), method);
 		    }
 		}
 
 		for (final Method method : objectClass.getDeclaredMethods()) {
-		    if (method.isAnnotationPresent(DashboardSetter.class)) {
-			final DashboardSetter annotation = method.getAnnotation(DashboardSetter.class);
-			setters.put(annotation.id(), method);
-			if (settingsInCategory.containsKey(annotation.category())) {
-			    settingsInCategory.get(annotation.category()).put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature()));
-			} else {
-			    settingsInCategory.put(annotation.category(), new JSONArray().put(new JSONObject().put("id", annotation.id()).put("name", annotation.prettyName()).put("parameters", parseArguments(method.getParameters())).put("nullable", annotation.nullable()).put("premium_feature", annotation.premiumFeature())));
+		    if (method.isAnnotationPresent(DashboardGetter.class)) {
+			final DashboardGetter annotation = method.getAnnotation(DashboardGetter.class);
+
+			final String categoryId = annotation.category().getId();
+			if (!dashboardJson.has(categoryId)) {
+			    dashboardJson.put(categoryId, new JSONObject());
 			}
+
+			final JSONObject includingPages = dashboardJson.getJSONObject(categoryId);
+			final String pageId = annotation.page().getId();
+			if (!includingPages.has(pageId)) {
+			    includingPages.put(pageId, new JSONObject());
+			}
+
+			final JSONObject includingSections = includingPages.getJSONObject(pageId);
+			final String sectionId = annotation.section().getId();
+			if (!includingSections.has(sectionId)) {
+
+			}
+
+			final BlackHashMap<Object, Object> methObj = new BlackHashMap<>().add("id", annotation.id()).add("prettyName", annotation.prettyName()).add("nullable", annotation.nullable());
+			if (setters.get(annotation.id()) == null) {
+			    methObj.put("readonly", true);
+			} else {
+			    methObj.put("readonly", annotation.readonly());
+			}
+			pagesObj.getJSONArray(pageId).put(methObj);
 		    }
 		}
 	    } catch (final Exception e) {
 		e.printStackTrace();
 	    }
-	}
-	for (final Map.Entry<Category, JSONArray> entry : settingsInCategory.entrySet()) {
-	    final Category key = entry.getKey();
-	    dashboardJson.put(new BlackLinkedHashMap<String, Object>().add("name", key.getName()).add("id", key.getId()).add("pages", entry.getValue()));
 	}
 	Logger.logInfo("Generated Dashboard JSON: " + dashboardJson, LogOrigin.DASHBOARD);
     }

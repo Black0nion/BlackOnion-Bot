@@ -33,9 +33,10 @@ import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardReadonlyGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Page;
+import com.github.black0nion.blackonionbot.systems.dashboard.sections.Section;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -100,7 +101,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param guild
+     * @param  guild
      * @return
      */
     @Reloadable("guildcache")
@@ -185,7 +186,12 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.language;
     }
 
-    @DashboardSetter(prettyName = "Language", id = "language", category = Category.GENERAL)
+    @DashboardGetter(prettyName = "Language", id = "language", category = Category.GENERAL, page = Page.SETUP, section = Section.LANGUAGE)
+    public String getLanguageString() {
+	return this.language.getName();
+    }
+
+    @DashboardSetter("language")
     public void setLanguage(final LanguageSystem.Languages language) {
 	this.setLanguage(language.getLang());
     }
@@ -199,7 +205,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("language", language.getLanguageCode());
     }
 
-    @DashboardReadonlyGetter(category = Category.GENERAL, id = "guildtype", prettyName = "GuildType")
+    @DashboardGetter(id = "guildtype", prettyName = "GuildType", readonly = true, category = Category.GENERAL, page = Page.OVERVIEW, section = Section.GUILD_TYPE)
     public GuildType getGuildType() {
 	return this.guildType;
     }
@@ -213,34 +219,34 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
     }
 
-    @DashboardGetter("prefix")
+    @DashboardGetter(id = "prefix", prettyName = "Prefix", category = Category.GENERAL, page = Page.SETUP, section = Section.PREFIX)
     public String getPrefix() {
 	return this.prefix;
     }
 
-    @DashboardSetter(prettyName = "Prefix", id = "prefix", category = Category.GENERAL)
+    @DashboardSetter("prefix")
     public void setPrefix(final String prefix) {
 	this.prefix = prefix;
 	this.save("prefix", prefix);
     }
 
-    @DashboardGetter("joinmessage")
+    @DashboardGetter(id = "joinmessage", prettyName = "JoinMessage", category = Category.GENERAL, page = Page.ACTIONS, section = Section.JOIN)
     public String getJoinMessage() {
 	return this.joinMessage;
     }
 
-    @DashboardSetter(prettyName = "JoinMessage", id = "joinmessage", category = Category.GENERAL)
+    @DashboardSetter("joinmessage")
     public void setJoinMessage(final String newMessage) {
 	this.joinMessage = newMessage;
 	this.save("joinmessage", this.joinMessage);
     }
 
-    @DashboardGetter("joinchannel")
+    @DashboardGetter(id = "joinchannel", prettyName = "JoinChannel", category = Category.GENERAL, page = Page.ACTIONS, section = Section.JOIN, nullable = true)
     public long getJoinChannel() {
 	return this.joinChannel;
     }
 
-    @DashboardSetter(prettyName = "JoinChannel", id = "joinchannel", category = Category.GENERAL, nullable = true)
+    @DashboardSetter("joinchannel")
     public void setJoinChannel(final TextChannel channel) {
 	this.setJoinChannel(channel.getIdLong());
     }
@@ -253,23 +259,23 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("joinChannel", joinChannel);
     }
 
-    @DashboardGetter("leavemessage")
+    @DashboardGetter(id = "leavemessage", prettyName = "LeaveMessage", category = Category.GENERAL, page = Page.ACTIONS, section = Section.LEAVE)
     public String getLeaveMessage() {
 	return this.leaveMessage;
     }
 
-    @DashboardSetter(prettyName = "LeaveMessage", id = "leavemessage", category = Category.GENERAL)
+    @DashboardSetter("leavemessage")
     public void setLeaveMessage(final String leaveMessage) {
 	this.leaveMessage = leaveMessage;
 	this.save("leavemessage", leaveMessage);
     }
 
-    @DashboardGetter("leavechannel")
+    @DashboardGetter(prettyName = "LeaveChannel", id = "leavechannel", category = Category.GENERAL, page = Page.ACTIONS, section = Section.LEAVE, nullable = true)
     public long getLeaveChannel() {
 	return this.leaveChannel;
     }
 
-    @DashboardSetter(prettyName = "LeaveChannel", id = "leavechannel", category = Category.GENERAL, nullable = true)
+    @DashboardSetter("leavechannel")
     public void setLeaveChannel(final TextChannel channel) {
 	this.setLeaveChannel(channel.getIdLong());
     }
@@ -314,12 +320,10 @@ public class BlackGuild extends BlackObject implements Guild {
 	return true;
     }
 
-    @DashboardGetter("antispoiler")
     public AntiSpoilerType getAntiSpoilerType() {
 	return this.antiSpoilerType;
     }
 
-    @DashboardSetter(prettyName = "AntiSpoiler", id = "antispoiler", category = Category.MODERATION)
     public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 	this.antiSpoilerType = antiSpoilerType;
 	this.save("antiSpoiler", antiSpoilerType.name());
@@ -357,12 +361,10 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.saveList("antiswearwhitelist", this.antiSwearWhitelist);
     }
 
-    @DashboardGetter("suggestionschannel")
     public long getSuggestionsChannel() {
 	return this.suggestionsChannel;
     }
 
-    @DashboardSetter(prettyName = "SuggestionsChannel", id = "suggestionschannel", category = Category.MODERATION)
     public void setSuggestionsChannel(final TextChannel channel) {
 	this.setSuggestionsChannel(channel.getIdLong());
     }
