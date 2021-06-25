@@ -1,11 +1,10 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
-import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.FAIL;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.INVALID_TYPE;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.JSON_ERROR;
+import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.LOGGED_IN;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_ACTION;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_GUILD;
-import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.SUCCESS;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.UNAUTHORIZED;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.WRONG_ARGUMENTS;
 
@@ -82,7 +81,11 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		return;
 	    }
 	    final BlackWebsocketSession session = BlackWebsocketSessions.get(sessionRaw);
-	    session.send("worked yay");
+	    if (session.getUser() == null) {
+		sessionRaw.close(4401, "Unauthorized");
+		return;
+	    }
+	    LOGGED_IN.send(session, null);
 	    sessions.add(session);
 	    futures.put(sessionRaw, this.scheduleTimeout(session));
 	    Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
@@ -109,11 +112,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		}
 		final String command = request.getString("action");
 		if (command.equalsIgnoreCase("updatesetting")) {
-		    if (Dashboard.tryUpdateValue(request, session.getUser())) {
-			SUCCESS.send(session, request);
-		    } else {
-			FAIL.send(session, request);
-		    }
+		    Dashboard.tryUpdateValue(request, session.getUser(), code -> code.send(session, request));
 		} else if (command.equalsIgnoreCase("userinfo")) {
 		    session.send(session.getUser());
 		} else if (command.equalsIgnoreCase("guildsettings")) {

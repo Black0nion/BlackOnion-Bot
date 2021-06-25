@@ -14,7 +14,7 @@ import com.github.black0nion.blackonionbot.API.impl.DashboardWebsocket;
  */
 public enum ResponseCode {
 
-    SUCCESS(true), FAIL("bruh"), NO_ACTION("No action specified."), WRONG_ARGUMENTS, UNAUTHORIZED, JSON_ERROR("Invalid JSON Syntax."), NO_GUILD("No guild specified."), INVALID_TYPE("This type doesn't exist.");
+    SUCCESS(true), FAIL("bruh"), NO_ACTION("No action specified."), WRONG_ARGUMENTS, UNAUTHORIZED, JSON_ERROR("Invalid JSON Syntax."), NO_GUILD("No guild specified."), INVALID_TYPE("This type doesn't exist."), WRONG_SETTING("This setting doesn't exist."), NO_PERMISSIONS("You are not allowed to do that."), PARSE_ERROR("A argument has the wrong type."), LOGGED_IN(true, "You got logged in.");
 
     private final JSONObject json;
 
