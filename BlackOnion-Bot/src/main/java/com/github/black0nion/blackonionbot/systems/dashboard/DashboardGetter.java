@@ -13,14 +13,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Page;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Section;
 
 /**
- * Date: 27.05.2021
- * Copyright 2021 BlackOnion
- * Class Name: DashboardGetter
+ * Date: 27.05.2021 Copyright 2021 BlackOnion Class Name: DashboardGetter
  *
  * @author _SIM_
  */
@@ -28,24 +23,19 @@ import com.github.black0nion.blackonionbot.systems.dashboard.sections.Section;
 @Target(ElementType.METHOD)
 public abstract @interface DashboardGetter {
     /**
-     * How this works: Make a DashboardSetter and make properties for it. Then you make a
-     * DashboardGetter and set the id to the id of the previously created DashboardSetter
+     * How this works: Make a DashboardSetter and make properties for it. Then you
+     * make a DashboardGetter and set the id to the id of the previously created
+     * DashboardSetter
      *
      * @return The id of the Getter
      */
-    public String id();
+    public String value();
 
-    public String prettyName();
-
-    public Category category();
-
-    public Page page();
-
-    public Section section();
-
-    public boolean readonly() default false;
+    /**
+     * The guild type required to get a information, will return unauthorized when
+     * not allowed to
+     */
+    public GuildType guildTypeRequired() default GuildType.NORMAL;
 
     public boolean nullable() default false;
-
-    public GuildType requiredGuildType() default GuildType.NORMAL;
 }

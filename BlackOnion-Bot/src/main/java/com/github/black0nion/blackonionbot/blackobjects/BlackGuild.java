@@ -34,9 +34,6 @@ import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Page;
-import com.github.black0nion.blackonionbot.systems.dashboard.sections.Section;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -101,7 +98,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param  guild
+     * @param guild
      * @return
      */
     @Reloadable("guildcache")
@@ -186,30 +183,28 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.language;
     }
 
-    @DashboardGetter(prettyName = "Language", id = "language", category = Category.GENERAL, page = Page.SETUP, section = Section.LANGUAGE)
+    @DashboardGetter("setup.language")
     public String getLanguageString() {
 	return this.language.getName();
     }
 
-    @DashboardSetter("language")
-    public void setLanguage(final LanguageSystem.Languages language) {
-	this.setLanguage(language.getLang());
-    }
-
+    @DashboardSetter("setup.language")
     public void setLanguage(final String language) {
 	this.setLanguage(LanguageSystem.getLanguageFromName(language));
     }
 
     public void setLanguage(final Language language) {
+	if (language == null) return;
 	this.language = language;
 	this.save("language", language.getLanguageCode());
     }
 
-    @DashboardGetter(id = "guildtype", prettyName = "GuildType", readonly = true, category = Category.GENERAL, page = Page.OVERVIEW, section = Section.GUILD_TYPE)
+    @DashboardGetter("setup.guildtype")
     public GuildType getGuildType() {
 	return this.guildType;
     }
 
+    @DashboardSetter("test")
     public void setGuildType(final GuildType type) {
 	this.guildType = type;
 	this.save("guildtype", type.name());
@@ -219,34 +214,34 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
     }
 
-    @DashboardGetter(id = "prefix", prettyName = "Prefix", category = Category.GENERAL, page = Page.SETUP, section = Section.PREFIX)
+    @DashboardGetter("general.prefix")
     public String getPrefix() {
 	return this.prefix;
     }
 
-    @DashboardSetter("prefix")
+    @DashboardSetter("general.prefix")
     public void setPrefix(final String prefix) {
 	this.prefix = prefix;
 	this.save("prefix", prefix);
     }
 
-    @DashboardGetter(id = "joinmessage", prettyName = "JoinMessage", category = Category.GENERAL, page = Page.ACTIONS, section = Section.JOIN)
+    @DashboardGetter("utils.joinleave.join.message")
     public String getJoinMessage() {
 	return this.joinMessage;
     }
 
-    @DashboardSetter("joinmessage")
+    @DashboardSetter("utils.joinleave.join.message")
     public void setJoinMessage(final String newMessage) {
 	this.joinMessage = newMessage;
 	this.save("joinmessage", this.joinMessage);
     }
 
-    @DashboardGetter(id = "joinchannel", prettyName = "JoinChannel", category = Category.GENERAL, page = Page.ACTIONS, section = Section.JOIN, nullable = true)
+    @DashboardGetter(value = "utils.joinleave.join.channel", nullable = true)
     public long getJoinChannel() {
 	return this.joinChannel;
     }
 
-    @DashboardSetter("joinchannel")
+    @DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
     public void setJoinChannel(final TextChannel channel) {
 	this.setJoinChannel(channel.getIdLong());
     }
@@ -259,23 +254,23 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("joinChannel", joinChannel);
     }
 
-    @DashboardGetter(id = "leavemessage", prettyName = "LeaveMessage", category = Category.GENERAL, page = Page.ACTIONS, section = Section.LEAVE)
+    @DashboardGetter("utils.joinleave.leave.message")
     public String getLeaveMessage() {
 	return this.leaveMessage;
     }
 
-    @DashboardSetter("leavemessage")
+    @DashboardSetter("utils.joinleave.leave.message")
     public void setLeaveMessage(final String leaveMessage) {
 	this.leaveMessage = leaveMessage;
 	this.save("leavemessage", leaveMessage);
     }
 
-    @DashboardGetter(prettyName = "LeaveChannel", id = "leavechannel", category = Category.GENERAL, page = Page.ACTIONS, section = Section.LEAVE, nullable = true)
+    @DashboardGetter(value = "utils.joinleave.join.channel", nullable = true)
     public long getLeaveChannel() {
 	return this.leaveChannel;
     }
 
-    @DashboardSetter("leavechannel")
+    @DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
     public void setLeaveChannel(final TextChannel channel) {
 	this.setLeaveChannel(channel.getIdLong());
     }
