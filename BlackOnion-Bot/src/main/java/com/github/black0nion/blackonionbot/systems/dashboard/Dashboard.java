@@ -16,7 +16,9 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedHashMap;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.sections.Category;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 
 import net.dv8tion.jda.api.Permission;
@@ -27,12 +29,12 @@ public class Dashboard {
     public static final HashMap<String, Method> setters = new HashMap<>();
     public static final HashMap<String, Method> getters = new HashMap<>();
 
-    public static final JSONArray valuesJson = new JSONArray();
+    public static final JSONArray dashboardJson = new JSONArray();
 
     public static void init() {
 	getters.clear();
 	setters.clear();
-	valuesJson.clear();
+	dashboardJson.clear();
 
 	final HashMap<Category, JSONArray> settingsInCategory = new HashMap<>();
 
@@ -75,9 +77,9 @@ public class Dashboard {
 	}
 	for (final Map.Entry<Category, JSONArray> entry : settingsInCategory.entrySet()) {
 	    final Category key = entry.getKey();
-	    valuesJson.put(new BlackLinkedHashMap<String, Object>().add("name", key.getName()).add("id", key.getId()).add("pages", entry.getValue()));
+	    dashboardJson.put(new BlackLinkedHashMap<String, Object>().add("name", key.getName()).add("id", key.getId()).add("pages", entry.getValue()));
 	}
-	System.out.println(valuesJson);
+	Logger.logInfo("Generated Dashboard JSON: " + dashboardJson, LogOrigin.DASHBOARD);
     }
 
     public static void tryUpdateValue(final JSONObject message, final DiscordUser user, final Consumer<ResponseCode> callback) {
