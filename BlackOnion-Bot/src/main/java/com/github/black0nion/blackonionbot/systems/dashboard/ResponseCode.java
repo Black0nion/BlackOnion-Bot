@@ -35,15 +35,11 @@ public enum ResponseCode {
     }
 
     private ResponseCode(final boolean success, final String message) {
-	this.json = new JSONObject().put("success", success).put("code", this.name()).put("message", message);
+	this.json = new JSONObject().put("code", (success ? "S_" : "E_") + this.name()).put("message", message);
     }
 
     private ResponseCode(final boolean success) {
-	this.json = new JSONObject().put("success", success).put("code", this.name());
-    }
-
-    private ResponseCode(final JSONObject json) {
-	this.json = json;
+	this.json = new JSONObject().put("code", (success ? "S_" : "E_") + this.name());
     }
 
     /**

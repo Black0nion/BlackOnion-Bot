@@ -66,7 +66,7 @@ public class Dashboard {
 			final JSONObject includingSections = includingPages.getJSONObject(pageId);
 			final String sectionId = annotation.section().getId();
 			if (!includingSections.has(sectionId)) {
-
+			    includingSections.put(sectionId, new JSONObject());
 			}
 
 			final BlackHashMap<Object, Object> methObj = new BlackHashMap<>().add("id", annotation.id()).add("prettyName", annotation.prettyName()).add("nullable", annotation.nullable());
@@ -75,7 +75,7 @@ public class Dashboard {
 			} else {
 			    methObj.put("readonly", annotation.readonly());
 			}
-			pagesObj.getJSONArray(pageId).put(methObj);
+			includingSections.getJSONObject(sectionId).put(annotation.id(), methObj);
 		    }
 		}
 	    } catch (final Exception e) {
