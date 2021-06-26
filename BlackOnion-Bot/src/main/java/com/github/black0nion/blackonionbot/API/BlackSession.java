@@ -65,6 +65,8 @@ public class BlackSession {
 		final String accessToken = response.getFirst();
 		final String refreshToken = response.getSecond();
 		final int expiresIn = response.getThird();
+		final Document find = collection.find(Filters.and(Filters.eq("access_token", accessToken), Filters.eq("refresh_token", refreshToken), Filters.exists("sessionid"))).first();
+		if (find != null) return find.getString("sessionid");
 		final String newSessionId = generateSessionId();
 		collection.insertOne(new Document().append("sessionid", newSessionId).append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
 		return newSessionId;
