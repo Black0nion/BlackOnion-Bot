@@ -156,8 +156,8 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 	    this.guildType = this.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
 	    this.prefix = this.gOD(config.getString("prefix"), BotInformation.defaultPrefix);
-	    this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
-	    this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
+	    this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
+	    this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
 	    this.joinMessage = this.gOD(config.getString("joinmessage"), this.language.getTranslationNonNull("defaultjoinmessage"));
 	    this.joinChannel = this.gOD(config.getLong("joinchannel"), -1L);
 	    this.leaveMessage = this.gOD(config.getString("leavemessage"), this.language.getTranslationNonNull("defaultleavemessage"));
@@ -168,7 +168,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.loop = this.gOD(config.getBoolean("loop"), false);
 	    this.customCommands = new HashMap<>();
 	    this.gOD(this.gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> this.customCommands.put(cmd.getCommand(), cmd));
-	    final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
+	    final List<String> disabledCommandsString = config.getList("disabledcommands", String.class);
 	    if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 		this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
 	    } else {
@@ -204,7 +204,6 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.guildType;
     }
 
-    @DashboardSetter("test")
     public void setGuildType(final GuildType type) {
 	this.guildType = type;
 	this.save("guildtype", type.name());
@@ -243,15 +242,20 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
     public void setJoinChannel(final TextChannel channel) {
-	this.setJoinChannel(channel.getIdLong());
+	if (channel == null) {
+	    this.setJoinChannel(-1);
+	} else {
+	    this.setJoinChannel(channel.getIdLong());
+	}
     }
 
     public void setJoinChannel(final long joinChannel) {
 	this.joinChannel = joinChannel;
 	if (joinChannel == -1) {
 	    this.clear("joinchannel");
+	} else {
+	    this.save("joinchannel", joinChannel);
 	}
-	this.save("joinChannel", joinChannel);
     }
 
     @DashboardGetter("utils.joinleave.leave.message")
@@ -265,22 +269,27 @@ public class BlackGuild extends BlackObject implements Guild {
 	this.save("leavemessage", leaveMessage);
     }
 
-    @DashboardGetter(value = "utils.joinleave.join.channel", nullable = true)
+    @DashboardGetter(value = "utils.joinleave.leave.channel", nullable = true)
     public long getLeaveChannel() {
 	return this.leaveChannel;
     }
 
-    @DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
+    @DashboardSetter(value = "utils.joinleave.leave.channel", nullable = true)
     public void setLeaveChannel(final TextChannel channel) {
-	this.setLeaveChannel(channel.getIdLong());
+	if (channel == null) {
+	    this.setLeaveChannel(-1);
+	} else {
+	    this.setLeaveChannel(channel.getIdLong());
+	}
     }
 
     public void setLeaveChannel(final long leaveChannel) {
 	this.leaveChannel = leaveChannel;
 	if (leaveChannel == -1) {
 	    this.clear("leavechannel");
+	} else {
+	    this.save("leavechannel", leaveChannel);
 	}
-	this.save("leaveChannel", leaveChannel);
     }
 
     public List<Command> getDisabledCommands() {
@@ -297,7 +306,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setDisabledCommands(final List<Command> disabledCommands) {
 	this.disabledCommands = disabledCommands;
-	this.saveList("disabledCommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
+	this.saveList("disabledcommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
     }
 
     public boolean isCommandActivated(final Command cmd) {
@@ -321,7 +330,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 	this.antiSpoilerType = antiSpoilerType;
-	this.save("antiSpoiler", antiSpoilerType.name());
+	this.save("antispoiler", antiSpoilerType.name());
     }
 
     public AntiSwearType getAntiSwearType() {
@@ -330,7 +339,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setAntiSwearType(final AntiSwearType antiSwearType) {
 	this.antiSwearType = antiSwearType;
-	this.save("antiSwear", antiSwearType.name());
+	this.save("antiswear", antiSwearType.name());
     }
 
     public List<String> getAntiSwearWhitelist() {
@@ -1275,7 +1284,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @Override
     public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(final String commandId) {
-	return this.retrieveCommandPrivilegesById(commandId);
+	return this.guild.retrieveCommandPrivilegesById(commandId);
     }
 
     @Override
@@ -1300,13 +1309,11 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @Override
     public RestAction<List<Template>> retrieveTemplates() {
-	// TODO Auto-generated method stub
-	return null;
+	return this.guild.retrieveTemplates();
     }
 
     @Override
     public RestAction<Template> createTemplate(final String name, final String description) {
-	// TODO Auto-generated method stub
-	return null;
+	return this.guild.createTemplate(name, description);
     }
 }

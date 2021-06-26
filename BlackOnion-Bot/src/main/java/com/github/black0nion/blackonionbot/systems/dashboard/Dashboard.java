@@ -14,6 +14,8 @@ import org.reflections.Reflections;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackObject;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
@@ -88,8 +90,9 @@ public class Dashboard {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static final boolean saveValue(final Object objectToInvokeMethodIn, final Method method, final Object... args) {
 	try {
-	    final Object[] parsed = new Object[args.length];
 	    final Parameter[] parameters = method.getParameters();
+	    final Object[] parsed = new Object[parameters.length];
+	    boolean hasArray = false;
 	    for (int i = 0; i < args.length; i++) {
 		final Class<?> parameterType = parameters[i].getType();
 		if (parameterType == String.class) {
@@ -102,6 +105,8 @@ public class Dashboard {
 			parsed[i] = Bot.jda.getTextChannelById((String) arg);
 		    } else if (arg instanceof Long) {
 			parsed[i] = Bot.jda.getTextChannelById((Long) arg);
+		    } else {
+			args[i] = null;
 		    }
 		} else if (parameterType == long.class || parameterType == Long.class) {
 		    parsed[i] = parseLong(args[i]);
@@ -115,16 +120,41 @@ public class Dashboard {
 			parsed[i] = Enum.valueOf((Class<? extends Enum>) parameterType, (String) args[i]);
 		    }
 		} else if (parameterType.isArray()) {
-		    final Object[] newObject = new Object[args.length - i];
-		    for (int j = i; j < args.length; j++) {
-			newObject[i] = args[j];
+		    hasArray = true;
+		    final Class<?> clazz = parameterType.getComponentType();
+		    if (clazz == String.class) {
+			final String[] obj = new String[args.length - i];
+			for (int j = i; j < args.length; j++) {
+			    obj[j - i] = String.valueOf(args[j]);
+			}
+			parsed[i] = obj;
+		    } else if (clazz == Long.class) {
+			parsed[i] = parseLong(i, args);
+		    } else if (clazz == long.class) {
+			parsed[i] = parseLongPrimitive(i, args);
+		    } else if (clazz == Integer.class) {
+			parsed[i] = parseInteger(i, args);
+		    } else if (clazz == int.class) {
+			parsed[i] = parseIntegerPrimitive(i, args);
+		    } else if (clazz == Object.class) {
+			final Object[] obj = new Object[args.length - i];
+			for (int j = i; j < args.length; j++) {
+			    obj[j - i] = args[j];
+			}
+			parsed[i] = obj;
+		    } else {
+			Logger.logError("No array casting way provided for " + clazz, LogOrigin.DASHBOARD);
 		    }
-		    parsed[i] = newObject;
 		    break;
 		} else {
 		    parsed[i] = getValue(parameterType, args[i]);
 		}
 		if ((parsed[i] == null || (Utils.isLong(parsed[i]) && (Long) parsed[i] == -1)) && !nullableSetters.contains(method)) throw new IllegalArgumentException("args[" + i + "] is null, should be of type " + parameterType.getName() + "!");
+	    }
+	    if (hasArray) {
+		for (int i = 0; i < parsed.length; i++) {
+		    if ((parsed[i] == null || (Utils.isLong(parsed[i]) && (Long) parsed[i] == -1)) && !nullableSetters.contains(method)) throw new IllegalArgumentException("args[" + i + "] is null!");
+		}
 	    }
 	    method.invoke(objectToInvokeMethodIn, parsed);
 	    return true;
@@ -134,6 +164,102 @@ public class Dashboard {
 	    }
 	    return false;
 	}
+    }
+
+    private static Integer[] parseInteger(final int i, final Object... args) {
+	final Integer[] obj = new Integer[args.length - i];
+	for (int j = i; j < args.length; j++) {
+	    final int index = j - i;
+	    final Object arg = args[j];
+	    if (arg == null) {
+		obj[index] = null;
+	    } else if (arg instanceof Integer) {
+		obj[index] = (Integer) arg;
+	    } else if (arg instanceof Long) {
+		obj[index] = (Integer) arg;
+	    } else if (arg instanceof String) {
+		if (Utils.isInteger(String.valueOf(arg))) {
+		    obj[index] = Integer.valueOf(String.valueOf(arg));
+		} else {
+		    obj[index] = null;
+		}
+	    } else {
+		obj[index] = null;
+	    }
+	}
+	return obj;
+    }
+
+    private static int[] parseIntegerPrimitive(final int i, final Object... args) {
+	final int[] obj = new int[args.length - i];
+	for (int j = i; j < args.length; j++) {
+	    final int index = j - i;
+	    final Object arg = args[j];
+	    if (arg == null) {
+		obj[index] = -1;
+	    } else if (arg instanceof Integer) {
+		obj[index] = (int) arg;
+	    } else if (arg instanceof Long) {
+		obj[index] = (int) arg;
+	    } else if (arg instanceof String) {
+		if (Utils.isInteger(String.valueOf(arg))) {
+		    obj[index] = Integer.valueOf(String.valueOf(arg));
+		} else {
+		    obj[index] = -1;
+		}
+	    } else {
+		obj[index] = -1;
+	    }
+	}
+	return obj;
+    }
+
+    private static long[] parseLongPrimitive(final int i, final Object... args) {
+	final long[] obj = new long[args.length - i];
+	for (int j = i; j < args.length; j++) {
+	    final int index = j - i;
+	    final Object arg = args[j];
+	    if (arg == null) {
+		obj[index] = -1;
+	    } else if (arg instanceof Integer) {
+		obj[index] = ((Integer) arg).longValue();
+	    } else if (arg instanceof Long) {
+		obj[index] = (long) arg;
+	    } else if (arg instanceof String) {
+		if (Utils.isLong(arg)) {
+		    obj[index] = Long.parseLong(String.valueOf(arg));
+		} else {
+		    obj[index] = -1;
+		}
+	    } else {
+		obj[index] = -1;
+	    }
+	}
+	return obj;
+    }
+
+    private static Long[] parseLong(final int i, final Object... args) {
+	final Long[] obj = new Long[args.length - i];
+	for (int j = i; j < args.length; j++) {
+	    final int index = j - i;
+	    final Object arg = args[j];
+	    if (arg == null) {
+		obj[index] = null;
+	    } else if (arg instanceof Integer) {
+		obj[index] = ((Integer) arg).longValue();
+	    } else if (arg instanceof Long) {
+		obj[index] = (Long) arg;
+	    } else if (arg instanceof String) {
+		if (Utils.isLong(arg)) {
+		    obj[index] = Long.parseLong(String.valueOf(arg));
+		} else {
+		    obj[index] = null;
+		}
+	    } else {
+		obj[index] = null;
+	    }
+	}
+	return obj;
     }
 
     private static <T> T getValue(final Class<T> desiredType, final Object o) {
