@@ -127,6 +127,15 @@ public class Utils {
 	}
     }
 
+    public static boolean isInteger(final String input) {
+	try {
+	    Integer.parseInt(input);
+	    return true;
+	} catch (final Exception e) {
+	    return false;
+	}
+    }
+
     /**
      * @return if the given Object equals to one of the other given Objects
      */

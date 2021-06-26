@@ -327,31 +327,31 @@ public class BlackMember extends BlackObject implements Member {
     @Override
     @NotNull
     public AuditableRestAction<Void> ban(final int delDays) {
-	return this.getMember().ban(delDays);
+	return this.member.ban(delDays);
     }
 
     @Override
     @NotNull
     public AuditableRestAction<Void> ban(final int delDays, final String reason) {
-	return this.getMember().ban(delDays, reason);
+	return this.member.ban(delDays, reason);
     }
 
     @Override
     @NotNull
     public AuditableRestAction<Void> kick() {
-	return this.getMember().kick();
+	return this.member.kick();
     }
 
     @Override
     @NotNull
     public AuditableRestAction<Void> kick(final String reason) {
-	return this.getMember().kick(reason);
+	return this.member.kick(reason);
     }
 
     @Override
     @NotNull
     public AuditableRestAction<Void> modifyNickname(final String nickname) {
-	return this.getMember().modifyNickname(nickname);
+	return this.member.modifyNickname(nickname);
     }
 
     @Override
@@ -362,13 +362,13 @@ public class BlackMember extends BlackObject implements Member {
 
     @Override
     public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
-	this.getMember().formatTo(formatter, flags, width, precision);
+	this.member.formatTo(formatter, flags, width, precision);
     }
 
     @Override
     @NotNull
     public String getId() {
-	return this.getMember().getId();
+	return this.member.getId();
     }
 
     @Override
@@ -379,7 +379,7 @@ public class BlackMember extends BlackObject implements Member {
     @Override
     @NotNull
     public OffsetDateTime getTimeCreated() {
-	return this.getMember().getTimeCreated();
+	return this.member.getTimeCreated();
     }
 
     @Override

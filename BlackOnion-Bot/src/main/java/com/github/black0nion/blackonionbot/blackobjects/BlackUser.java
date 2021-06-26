@@ -39,8 +39,7 @@ public class BlackUser extends BlackObject implements User {
     private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<User, BlackUser>() {
 	@Override
 	public BlackUser load(final User user) {
-	    final BlackUser blacc = new BlackUser(user);
-	    return blacc;
+	    return new BlackUser(user);
 	}
     });
 
