@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +75,7 @@ public class CommandBase extends ListenerAdapter {
 		final String[] packageName = command.getPackage().getName().split("\\.");
 		final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 		newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
+		newInstance.setCommand(Arrays.asList(newInstance.getCommand()).stream().map(String::toLowerCase).toArray(String[]::new));
 
 		if (newInstance.shouldAutoRegister()) if (newInstance.getCommand() != null) {
 		    addCommand(newInstance);
@@ -87,10 +89,11 @@ public class CommandBase extends ListenerAdapter {
 
 	Bot.executor.submit(() -> {
 	    Dashboard.init();
-	    //			StringSelection stringSelection = new StringSelection(commandsJSON.toString());
-	    //			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-	    //			clipboard.setContents(stringSelection, null);
-	    //			System.out.println(commandsJSON);
+	    // StringSelection stringSelection = new
+	    // StringSelection(commandsJSON.toString());
+	    // Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    // clipboard.setContents(stringSelection, null);
+	    // System.out.println(commandsJSON);
 	});
     }
 
@@ -129,7 +132,7 @@ public class CommandBase extends ListenerAdapter {
 	PrefixInfo.handle(cmde);
 
 	if (!args[0].startsWith(prefix)) return;
-	final String str = args[0].replace(prefix, "");
+	final String str = args[0].replace(prefix, "").toLowerCase();
 	if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 	if (commands.containsKey(str)) {
 	    final Command cmd = commands.get(str);
