@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.API.impl;
 
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.INVALID_TYPE;
-import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.JSON_ERROR;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.LOGGED_IN;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_ACTION;
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.NO_GUILD;
@@ -37,6 +36,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -105,7 +105,13 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + messageRaw.replace("\n", "\\n"), LogOrigin.DASHBOARD);
 	if (messageRaw.charAt(0) == 'r') {
 	    try {
-		final JSONObject request = new JSONObject(messageRaw.substring(1));
+		final String[] args = messageRaw.split(" ");
+		final int id = args[0].length();
+		if (args.length < 2 || !Utils.isInteger(messageRaw.substring(1, id))) {
+		    WRONG_ARGUMENTS.send(session, null);
+		    return;
+		}
+		final JSONObject request = new JSONObject(messageRaw.substring(id)).put("id", messageRaw.substring(1, id));
 		if (!request.has("action")) {
 		    NO_ACTION.send(session, request);
 		    return;
@@ -159,7 +165,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		if (!(e instanceof JSONException)) {
 		    e.printStackTrace();
 		} else {
-		    reply(session, null, JSON_ERROR.getJson());
+		    session.close(4400, "wrong json dumbass");
 		}
 	    }
 	} else if (messageRaw.startsWith("heartbeat")) {
@@ -202,7 +208,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	    response = new JSONObject();
 	}
 	if (request != null && request.has("id")) {
-	    session.send("a" + new JSONObject().put("id", request.get("id")).put("data", response));
+	    session.send("a" + request.getInt("id") + " " + response);
 	} else {
 	    session.send("n" + response);
 	}
