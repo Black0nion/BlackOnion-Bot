@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class TestCommand extends Command {
 
     public TestCommand() {
-	this.setCommand("test", "tet");
+	this.setCommand("test", "tet").setHidden();
     }
 
     @Override

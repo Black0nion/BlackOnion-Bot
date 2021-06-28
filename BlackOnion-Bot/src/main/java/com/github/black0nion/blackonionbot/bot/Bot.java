@@ -19,9 +19,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Nullable;
 
 import com.github.black0nion.blackonionbot.API.API;
-import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;

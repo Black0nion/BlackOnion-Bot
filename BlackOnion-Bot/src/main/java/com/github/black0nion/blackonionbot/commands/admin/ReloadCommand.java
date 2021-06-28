@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.bot;
+package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -18,7 +18,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -34,7 +33,7 @@ public class ReloadCommand extends Command {
     private static HashMap<String, Method> reloadableMethods = null;
 
     public ReloadCommand() {
-	this.setCommand("reload", "rl").setRequiredCustomPermissions(CustomPermission.ADMIN).setHidden();
+	this.setCommand("reload", "rl").setHidden();
     }
 
     @Override

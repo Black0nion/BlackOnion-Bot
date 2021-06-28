@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.bot;
+package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.time.Duration;
 
@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
@@ -21,7 +20,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class StatusCommand extends Command {
 
     public StatusCommand() {
-	this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setRequiredCustomPermissions(CustomPermission.ADMIN).setHidden().setRequiredArgumentCount(1);
+	this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setHidden().setRequiredArgumentCount(1);
     }
 
     @Override
