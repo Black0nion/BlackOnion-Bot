@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.bot;
+package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.time.Duration;
 

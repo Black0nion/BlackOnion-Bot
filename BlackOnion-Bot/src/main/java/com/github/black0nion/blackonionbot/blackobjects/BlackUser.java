@@ -88,7 +88,7 @@ public class BlackUser extends BlackObject implements User {
 		config = new Document();
 	    }
 
-	    this.permissions = CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>()));
+	    this.permissions = this.gOD(CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
 
 	    if (config.getString("language") != null) {
 		this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
@@ -114,7 +114,11 @@ public class BlackUser extends BlackObject implements User {
     }
 
     public boolean hasPermission(final CustomPermission... permissions) {
-	for (final CustomPermission requiredPerm : permissions) if (!this.hasPermission(requiredPerm)) return false;
+	if (permissions == null || permissions.length == 0) return true;
+	if (this.permissions == null || this.permissions.size() == 0) return false;
+	for (final CustomPermission requiredPerm : permissions) {
+	    if (!this.hasPermission(requiredPerm)) return false;
+	}
 	return true;
     }
 
@@ -124,8 +128,20 @@ public class BlackUser extends BlackObject implements User {
 
     public void addPermissions(final CustomPermission... permissions) {
 	final List<CustomPermission> perms = this.permissions;
-	for (final CustomPermission perm : permissions) if (!perms.contains(perm)) {
-	    perms.add(perm);
+	for (final CustomPermission perm : permissions) {
+	    if (!perms.contains(perm)) {
+		perms.add(perm);
+	    }
+	}
+	this.setPermissions(perms);
+    }
+
+    public void removePermissions(final CustomPermission... permissions) {
+	final List<CustomPermission> perms = this.permissions;
+	for (final CustomPermission perm : permissions) {
+	    if (perms.contains(perm)) {
+		perms.remove(perm);
+	    }
 	}
 	this.setPermissions(perms);
     }
