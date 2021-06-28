@@ -185,7 +185,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @DashboardGetter("setup.language")
     public String getLanguageString() {
-	return this.language.getName();
+	return this.language.getLanguageCode();
     }
 
     @DashboardSetter("setup.language")
