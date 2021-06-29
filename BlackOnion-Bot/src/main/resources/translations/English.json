@@ -348,5 +348,11 @@
     "leavetutorial": "Antworte mit `leave oder exit` um das Setup abzubrechen!",
     "toomanycustomcommands": "Dieser Server hat bereits zu viele CustomCommands!",
     "maxcustomcommands": "Mit dem Status deines Servers kann man maximal `%count%` CustomCommands erstellen.",
-    "customcommandslist": "Dieser Server hat folgende CustomCommands:"
+    "customcommandslist": "Dieser Server hat folgende CustomCommands:",
+    "permissionsof": "Permissions von: %user%",
+    "removedperms": "Permissions entfernt!",
+    "removedpermslist": "Folgende Permissions wurden von %user% entfernt: `%perms%`",
+    "addedperms": "Permissions hinzugefügt!",
+    "addedpermslist": "Folgende Permissions wurden %user% hinzugefügt: `%perms%`",
+    "permissions": "Permissions"
 }
