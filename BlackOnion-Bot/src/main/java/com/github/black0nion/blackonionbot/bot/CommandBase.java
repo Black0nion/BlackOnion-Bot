@@ -65,6 +65,7 @@ public class CommandBase extends ListenerAdapter {
     public static void addCommands(final EventWaiter newWaiter) {
 	commands.clear();
 	commandsInCategory.clear();
+	commandsArray.clear();
 	waiter = newWaiter;
 	final Reflections reflections = new Reflections(Command.class.getPackage().getName());
 	final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
@@ -157,11 +158,11 @@ public class CommandBase extends ListenerAdapter {
 		message.reply(EmbedUtils.premiumRequired(author, guild)).queue();
 		return;
 	    } else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), "`" + CommandEvent.getPleaseUse(guild, author, cmd) + "`", false).build()).queue(msg -> {
+		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
 		    final CustomPermission[] customPermission = cmd.getRequiredCustomPermissions();
 		    if (customPermission != null && customPermission.length != 0) {
 			msg.delete().queueAfter(3, TimeUnit.SECONDS);
-			message.delete().queueAfter(3, TimeUnit.SECONDS);
+			message.delete().queue();
 		    }
 		});
 		return;
