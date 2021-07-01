@@ -41,12 +41,12 @@ public class Logger {
 	} else if (mode == LogMode.WARNING) {
 	    consoleLog = "\033[33m" + log + "\033[0m";
 	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
-		System.out.println(consoleLog);
+		Bot.out.println(consoleLog);
 	    }
 	} else {
 	    consoleLog = "\033[94m" + log + "\033[0m";
 	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
-		System.out.println(consoleLog);
+		Bot.out.println(consoleLog);
 	    }
 	}
 
