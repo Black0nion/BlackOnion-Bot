@@ -9,51 +9,45 @@ package com.github.black0nion.blackonionbot.utils;
 import java.io.PrintStream;
 
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
+import com.github.black0nion.blackonionbot.systems.plugins.Caller;
 
 public class CatchLogs extends PrintStream {
 
     private static final PrintStream originalSystemOut = System.out;
-    private static CatchLogs systemOutToLogger;
-
-    public static void enableForClass(final Class<?> className) {
-	systemOutToLogger = new CatchLogs(originalSystemOut, className.getName());
-	System.setOut(systemOutToLogger);
-    }
-
-    public static void enableForPackage(final String packageToLog) {
-	systemOutToLogger = new CatchLogs(originalSystemOut, packageToLog);
-	System.setOut(systemOutToLogger);
-    }
+    private static final Pair<Caller, StackTraceElement> idk = new Pair<>(Caller.IDK, null);
 
     public static void disable() {
 	System.setOut(originalSystemOut);
-	systemOutToLogger = null;
     }
 
-    private final String packageOrClassToLog;
+    @Reloadable("catchlogs")
+    public static void init() {
+	System.setOut(new CatchLogs(originalSystemOut));
+    }
 
-    private CatchLogs(final PrintStream original, final String packageOrClassToLog) {
+    private CatchLogs(final PrintStream original) {
 	super(original);
-	this.packageOrClassToLog = packageOrClassToLog;
     }
 
     @Override
     public void println(final String line) {
 	final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-	final StackTraceElement caller = this.findCallerToLog(stack);
-	if (caller == null) {
-	    super.println(line);
-	    return;
+	final Pair<Caller, StackTraceElement> callerPair = findCallerToLog(stack);
+	final Caller caller = callerPair.getKey();
+	if (caller == Caller.IDK) {
+	    Logger.logInfo(line);
+	} else if (caller == Caller.PLUGIN) {
+	    Logger.logInfo("[" + callerPair.getValue().getClassName() + "] " + line, LogOrigin.PLUGINS);
 	}
-
-	Logger.logInfo(line, LogOrigin.PLUGINS);
     }
 
-    public StackTraceElement findCallerToLog(final StackTraceElement[] stack) {
+    private static Pair<Caller, StackTraceElement> findCallerToLog(final StackTraceElement[] stack) {
 	for (final StackTraceElement element : stack) {
-	    if (element.getClassName().startsWith(this.packageOrClassToLog)) return element;
+	    // TODO: add check if it comes from a Plugin or something else
+	    if (element.getMethodName().equalsIgnoreCase("onEnable")) return new Pair<>(Caller.PLUGIN, element);
 	}
-	return null;
+	return idk;
     }
 }

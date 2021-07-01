@@ -36,7 +36,7 @@ public class Logger {
 	if (mode == LogMode.ERROR || mode == LogMode.FATAL) {
 	    consoleLog = "\033[91m" + log + "\033[0m";
 	    if (Bot.logLevel.contains(mode) && Bot.logOrigin.contains(origin)) {
-		System.err.println(consoleLog);
+		Bot.err.println(consoleLog);
 	    }
 	} else if (mode == LogMode.WARNING) {
 	    consoleLog = "\033[33m" + log + "\033[0m";
