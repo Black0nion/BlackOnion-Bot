@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
@@ -40,6 +40,7 @@ import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
+import com.github.black0nion.blackonionbot.utils.CatchLogs;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -84,21 +85,23 @@ public class Bot extends ListenerAdapter {
     public static Callable<Object> switchingStatusCallable;
 
     /**
-     * Null for everything
+     * Empty for everything
      */
-    @Nullable
+    @Nonnull
     public static final List<LogMode> logLevel = new ArrayList<>();
     /**
-     * Null for everything
+     * Empty for everything
      */
-    @Nullable
+    @Nonnull
     public static final List<LogOrigin> logOrigin = new ArrayList<>();
 
     public static final PrintStream out = System.out;
+    public static final PrintStream err = System.err;
 
     @SuppressWarnings("resource")
     public void startBot() {
 	Utils.printLogo();
+	CatchLogs.init();
 	new ValueManager();
 	DefaultValues.init();
 	isJarFile = JarUtils.runningFromJar();
