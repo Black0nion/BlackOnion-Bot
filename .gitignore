@@ -56,5 +56,7 @@ BlackOnion-Bot/files/*
 !BlackOnion-Bot/files/translations
 BlackOnion-Bot/.classpath
 Testbot
+Testplugin
 BlackOnion-Bot/.classpath
 BlackOnion-Bot/version
+BlackOnion-Bot/plugins
