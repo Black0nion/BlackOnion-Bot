@@ -23,8 +23,10 @@ import io.github.classgraph.ScanResult;
 public class PluginSystem {
 
     private static final List<Plugin> plugins = new ArrayList<>();
+    private static final List<String> pluginNames = new ArrayList<>();
 
     private static void loadPlugin(final File jarFile) {
+	final String jarName = jarFile.getName();
 	final ScanResult scanResult = new ClassGraph().enableAnnotationInfo().overrideClasspath(jarFile.getAbsolutePath()).scan();
 
 	final String superclass = Plugin.class.getName();
@@ -32,7 +34,7 @@ public class PluginSystem {
 	final Optional<ClassInfo> optionalClassInfo = scanResult.getAllClasses().stream().filter(classInfo -> classInfo.extendsSuperclass(superclass)).findFirst();
 
 	if (!optionalClassInfo.isPresent()) {
-	    Logger.logError("No Plugin-Superclass found in " + jarFile.getName() + ".", LogOrigin.PLUGINS);
+	    Logger.logError("No plugin detected in file \"" + jarName + "\".", LogOrigin.PLUGINS);
 	    return;
 	}
 
@@ -40,15 +42,17 @@ public class PluginSystem {
 
 	try {
 	    final Plugin plugin = (Plugin) Class.forName(classInfo.getName(), true, new URLClassLoader(new URL[] { jarFile.toURI().toURL() })).getDeclaredConstructor().newInstance();
+	    final String pluginName = plugin.getName();
 
-	    Logger.logInfo("Loading Plugin \"" + plugin.getName() + "\"...", LogOrigin.PLUGINS);
+	    Logger.logInfo("Loading Plugin \"" + pluginName + "\" stored in file \"" + jarName + "\"...", LogOrigin.PLUGINS);
 
-	    getPlugins().add(plugin);
+	    plugins.add(plugin);
+	    pluginNames.add(classInfo.getName());
 	    plugin.onEnable();
 
-	    Logger.logInfo("The Plugin \"" + plugin.getName() + "\" got loaded successfully!", LogOrigin.PLUGINS);
+	    Logger.logInfo("The Plugin \"" + pluginName + "\" stored in file \"" + jarName + "\" got loaded successfully!", LogOrigin.PLUGINS);
 	} catch (final Exception e) {
-	    Logger.logError("Plugin " + jarFile.getName() + " couldn't get loaded! Stack Trace: " + e.toString() + "\n" + e.fillInStackTrace(), LogOrigin.PLUGINS);
+	    Logger.logError("Plugin " + jarName + " couldn't get loaded! Stack Trace: " + e.toString() + "\n" + e.fillInStackTrace(), LogOrigin.PLUGINS);
 	    e.printStackTrace();
 	}
     }
@@ -56,6 +60,7 @@ public class PluginSystem {
     public static void disablePlugins() {
 	plugins.forEach(Plugin::onDisable);
 	plugins.clear();
+	pluginNames.clear();
     }
 
     @Reloadable("plugins")
@@ -93,5 +98,12 @@ public class PluginSystem {
      */
     public static List<Plugin> getPlugins() {
 	return plugins;
+    }
+
+    /**
+     * @return the pluginnames
+     */
+    public static List<String> getPluginNames() {
+	return pluginNames;
     }
 }
