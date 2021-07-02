@@ -27,7 +27,6 @@ public class SuggestCommand extends Command {
 
     @Override
     public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	// TODO: translate
 	final long suggestionsChannelId = guild.getSuggestionsChannel();
 	if (suggestionsChannelId == -1) {
 	    cmde.error("suggestionsoff", "nosuggestionfeature");
