@@ -253,6 +253,7 @@
     "success": "Success",
     "error": "Error",
     "loading": "Loading...",
+    "close": "Schließen",
     "errorhappened": "A error happened!",
     "somethingwentwrong": "Something went wrong :(",
     "setleavemessage": "Leave message set!",
@@ -354,5 +355,6 @@
     "removedpermslist": "Folgende Permissions wurden von %user% entfernt: `%perms%`",
     "addedperms": "Permissions hinzugefügt!",
     "addedpermslist": "Folgende Permissions wurden %user% hinzugefügt: `%perms%`",
-    "permissions": "Permissions"
+    "permissions": "Permissions",
+    "helpmenuexpired": "Dieses Hilfe-Menü ist abgelaufen. Bitte benutze `%cmd%` um ein neues zu bekommen!"
 }
