@@ -13,8 +13,8 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -31,22 +31,18 @@ public class BanUsageCommand extends Command {
 
     @Override
     public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	// TODO: this is a fucking old system, fix that shit soon
 	message.delete().queue();
 	if (args.length >= 2) {
 	    final String stuffToBan = args[2];
 	    if (stuffToBan.startsWith("u:")) {
 		MongoManager.insertOne(collection, new Document().append("userid", stuffToBan.replace("u:", "")));
-		channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslation("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
-		return;
 	    } else if (stuffToBan.contains("g:")) {
 		MongoManager.insertOne(collection, new Document().append("guildid", stuffToBan.replace("u:", "")));
-		channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("bannedusage", LanguageSystem.getTranslation("cantusecommandsanymore", author, guild).replace("%userorguild", stuffToBan), false).build()).queue();
-		return;
 	    } else {
-		channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		channel.sendMessageEmbeds(cmde.success().addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		return;
 	    }
+	    channel.sendMessageEmbeds(cmde.success().addField("bannedusage", cmde.getTranslation("cantusecommandsanymore", new Placeholder("userorguild", stuffToBan)), false).build()).queue();
 	} else {
 	    channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 	    return;
