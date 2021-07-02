@@ -19,7 +19,7 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
 import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CommandVisibility;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -65,6 +65,7 @@ public class CommandBase extends ListenerAdapter {
     public static void addCommands(final EventWaiter newWaiter) {
 	commands.clear();
 	commandsInCategory.clear();
+	commandsArray.clear();
 	waiter = newWaiter;
 	final Reflections reflections = new Reflections(Command.class.getPackage().getName());
 	final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
@@ -75,7 +76,7 @@ public class CommandBase extends ListenerAdapter {
 		final String[] packageName = command.getPackage().getName().split("\\.");
 		final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 		newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
-		newInstance.setCommand(Arrays.asList(newInstance.getCommand()).stream().map(String::toLowerCase).toArray(String[]::new));
+		newInstance.setCommand(Arrays.asList(newInstance.getCommand()).stream().filter(s -> s != null).map(String::toLowerCase).toArray(String[]::new));
 
 		if (newInstance.shouldAutoRegister()) if (newInstance.getCommand() != null) {
 		    addCommand(newInstance);
@@ -149,7 +150,7 @@ public class CommandBase extends ListenerAdapter {
 	    if (!guild.isCommandActivated(cmd)) return;
 
 	    if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
-		if (cmd.getVisibility() != CommandVisibility.SHOWN) return;
+		if (!cmd.isVisible(author)) return;
 		cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 		return;
 	    } else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
@@ -157,10 +158,11 @@ public class CommandBase extends ListenerAdapter {
 		message.reply(EmbedUtils.premiumRequired(author, guild)).queue();
 		return;
 	    } else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), "`" + CommandEvent.getPleaseUse(guild, author, cmd) + "`", false).build()).queue(msg -> {
-		    if (cmd.getVisibility() != CommandVisibility.SHOWN) {
+		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+		    final CustomPermission[] customPermission = cmd.getRequiredCustomPermissions();
+		    if (customPermission != null && customPermission.length != 0) {
 			msg.delete().queueAfter(3, TimeUnit.SECONDS);
-			message.delete().queueAfter(3, TimeUnit.SECONDS);
+			message.delete().queue();
 		    }
 		});
 		return;

@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.commands.bot;
+package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.time.Duration;
 
@@ -8,9 +8,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
@@ -21,7 +19,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class StatusCommand extends Command {
 
     public StatusCommand() {
-	this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setRequiredCustomPermissions(CustomPermission.ADMIN).setHidden().setRequiredArgumentCount(1);
+	this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setHidden().setRequiredArgumentCount(1);
     }
 
     @Override
@@ -49,11 +47,10 @@ public class StatusCommand extends Command {
 	    status = OnlineStatus.DO_NOT_DISTURB;
 	    break;
 	default:
-	    // TODO: delete after x seconds
-	    channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	    channel.sendMessageEmbeds(cmde.success().addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 	    return;
 	}
-	channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	channel.sendMessageEmbeds(cmde.success().addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 
 	e.getJDA().getPresence().setStatus(status);
     }
