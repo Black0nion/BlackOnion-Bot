@@ -18,6 +18,7 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.common.collect.Lists;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -79,15 +80,16 @@ public class HelpCommand extends Command {
 		    if (commandsInCategory.length() <= 2) {
 			continue;
 		    }
+		    final String categoryName = Utils.firstLetterUppercase((category != null ? category.name() : cmde.getTranslation("modules")).toLowerCase());
 		    if (category != null) {
-			builder.addField(category.name(), commandsInCategory.substring(1), false);
-			buttons.add(Button.primary(category.name(), category.name()));
+			builder.addField(categoryName, commandsInCategory.substring(1), false);
+			buttons.add(Button.primary(category.name(), categoryName));
 		    } else {
 			builder.addField(cmde.getTranslation("modules"), commandsInCategory.substring(1), false);
-			buttons.add(Button.success("overview", cmde.getTranslation("modules").toUpperCase()));
+			buttons.add(Button.success("overview", cmde.getTranslation("modules")));
 		    }
 		}
-		buttons.add(Button.danger("close", cmde.getTranslation("close").toUpperCase()));
+		buttons.add(Button.danger("close", cmde.getTranslation("close")));
 		message.reply(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
 		    this.waitForHelpCatSelection(BlackMessage.from(msg), member, cmde);
 		});
@@ -133,7 +135,7 @@ public class HelpCommand extends Command {
 		    if (commandsInCategory.length() <= 2) {
 			continue;
 		    }
-		    builder.addField((category != null ? " " + category.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
+		    builder.addField(Utils.firstLetterUppercase((category != null ? category.name() : LanguageSystem.getTranslation("modules", user, guild)).toLowerCase()), commandsInCategory.substring(1), false);
 		}
 	    } else if (button.getId().equals("close")) {
 		msg.delete().queue();
