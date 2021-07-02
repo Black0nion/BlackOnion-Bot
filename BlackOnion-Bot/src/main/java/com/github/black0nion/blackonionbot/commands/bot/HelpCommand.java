@@ -90,7 +90,7 @@ public class HelpCommand extends Command {
 		    }
 		}
 		buttons.add(Button.danger("close", cmde.getTranslation("close")));
-		message.reply(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
+		channel.sendMessageEmbeds(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
 		    this.waitForHelpCatSelection(BlackMessage.from(msg), member, cmde);
 		});
 	    }
@@ -122,7 +122,7 @@ public class HelpCommand extends Command {
 		    String commandsInCategory = "";
 		    Category category = null;
 		    if (i == 0) {
-			commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", user, guild);
+			commandsInCategory = ", " + cmde.getTranslationOrEmpty("helpmodules");
 		    } else {
 			category = cats[i - 1];
 			for (final Command c : CommandBase.commandsInCategory.get(category)) {
@@ -144,11 +144,7 @@ public class HelpCommand extends Command {
 		final Category category = Category.valueOf(button.getId());
 		builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
 		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) if (entry.getValue().isVisible(user) && (entry.getValue().getCategory() == category)) if (entry.getValue().getProgress() == Progress.DONE) {
-		    final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
-		    if (commandHelp == null) {
-			System.out.println("Help for " + entry.getKey()[0] + " not set!");
-		    }
-		    builder.addField(CommandEvent.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
+		    builder.addField(CommandEvent.getCommandHelp(guild, user, entry.getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getCommand()[0]), false);
 		}
 
 		for (final Progress pr : Progress.values()) {
@@ -158,11 +154,11 @@ public class HelpCommand extends Command {
 		    for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 			final Command command = entry.getValue();
 			if (command.isVisible(user) && (command.getCategory() == category) && command.getProgress() == pr) {
-			    final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
+			    final String commandHelp = cmde.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase());
 			    if (commandHelp == null) {
 				System.out.println("Help for " + entry.getKey()[0] + " not set!");
 			    }
-			    builder.addField(pr.name().toUpperCase() + ": " + CommandEvent.getCommandHelp(guild, user, entry.getValue()), commandHelp != null ? commandHelp : "empty", false);
+			    builder.addField(pr.name().toUpperCase() + ": " + CommandEvent.getCommandHelp(guild, user, entry.getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getCommand()[0]), false);
 			}
 		    }
 		}

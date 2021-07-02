@@ -76,7 +76,7 @@ public class CommandEvent {
      * @return the language, user -> guild -> default
      */
     public Language getLanguage() {
-	return language;
+	return this.language;
     }
 
     public BlackEmbed success() {
@@ -84,54 +84,54 @@ public class CommandEvent {
     }
 
     public void success(final String name, final String value) {
-	reply(success().addField(name, value, false));
+	this.reply(this.success().addField(name, value, false));
     }
 
     public void success(final String title, final String name, final String value) {
-	reply(success().setTitle(title).addField(name, value, false));
+	this.reply(this.success().setTitle(title).addField(name, value, false));
     }
 
     public void success(final String title, final String url, final String name, final String value) {
-	reply(success().setTitle(title, url).addField(name, value, false));
+	this.reply(this.success().setTitle(title, url).addField(name, value, false));
     }
 
     public void success(final String title, final String name, final String value, final Placeholder... placeholders) {
-	success(title, name, value, null, placeholders);
+	this.success(title, name, value, null, placeholders);
     }
 
     public void success(String title, String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
-	title = language.getTranslationNonNull(title);
-	name = language.getTranslationNonNull(name);
-	value = language.getTranslationNonNull(value);
+	title = this.language.getTranslationNonNull(title);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
 	    title = placeholder.process(title);
 	    name = placeholder.process(name);
 	    value = placeholder.process(value);
 	}
 
-	reply(success().setTitle(title).addField(name, value, false), success);
+	this.reply(this.success().setTitle(title).addField(name, value, false), success);
     }
 
     public void success(String name, String value, final Placeholder... placeholders) {
-	name = language.getTranslationNonNull(name);
-	value = language.getTranslationNonNull(value);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
 	    name = placeholder.process(name);
 	    value = placeholder.process(value);
 	}
 
-	reply(success().addField(name, value, false), null);
+	this.reply(this.success().addField(name, value, false), null);
     }
 
     public void success(String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
-	name = language.getTranslationNonNull(name);
-	value = language.getTranslationNonNull(value);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
 	    name = placeholder.process(name);
 	    value = placeholder.process(value);
 	}
 
-	reply(success().addField(name, value, false), success);
+	this.reply(this.success().addField(name, value, false), success);
     }
 
     public BlackEmbed loading() {
@@ -139,15 +139,15 @@ public class CommandEvent {
     }
 
     public void loading(final Consumer<? super BlackMessage> success) {
-	reply(loading(), success);
+	this.reply(this.loading(), success);
     }
 
     public void loading(final String name, final String value) {
-	reply(loading().addField(name, value, false));
+	this.reply(this.loading().addField(name, value, false));
     }
 
     public void loading(final String name, final String value, final Consumer<? super BlackMessage> success) {
-	reply(loading().addField(name, value, false), success);
+	this.reply(this.loading().addField(name, value, false), success);
     }
 
     public BlackEmbed error() {
@@ -155,59 +155,59 @@ public class CommandEvent {
     }
 
     public void error(final String name, final String value) {
-	reply(error().addField(name, value, false));
+	this.reply(this.error().addField(name, value, false));
     }
 
     public void error(final String title, final String name, final String value) {
-	reply(error().setTitle(title).addField(name, value, false));
+	this.reply(this.error().setTitle(title).addField(name, value, false));
     }
 
     public void error(final String name, final String value, final Consumer<? super BlackMessage> success) {
-	reply(error().addField(name, value, false), success);
+	this.reply(this.error().addField(name, value, false), success);
     }
 
     public void error(String title, String name, String value, final Placeholder... placeholders) {
-	title = language.getTranslationNonNull(title);
-	name = language.getTranslationNonNull(name);
-	value = language.getTranslationNonNull(value);
+	title = this.language.getTranslationNonNull(title);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
 	    title = placeholder.process(title);
 	    name = placeholder.process(name);
 	    value = placeholder.process(value);
 	}
 
-	error(title, name, value);
+	this.error(title, name, value);
     }
 
     public void error(String name, String value, final Placeholder... placeholders) {
-	name = language.getTranslationNonNull(name);
-	value = language.getTranslationNonNull(value);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
 	    name = placeholder.process(name);
 	    value = placeholder.process(value);
 	}
 
-	error(name, value);
+	this.error(name, value);
     }
 
     public void exception() {
-	error("errorhappened", "somethingwentwrong");
+	this.error("errorhappened", "somethingwentwrong");
     }
 
     public void selfDestructingException() {
-	error("errorhappened", "somethingwentwrong", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+	this.error("errorhappened", "somethingwentwrong", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
     }
 
     public void reply(final EmbedBuilder builder) {
-	reply(builder, null, null);
+	this.reply(builder, null, null);
     }
 
     public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success) {
-	reply(builder, success, null);
+	this.reply(builder, success, null);
     }
 
     public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
-	message.reply(builder.build()).queue(msg -> {
+	this.message.reply(builder.build()).queue(msg -> {
 	    if (success != null) {
 		success.accept(BlackMessage.from(msg));
 	    }
@@ -215,15 +215,15 @@ public class CommandEvent {
     }
 
     public void sendPleaseUse() {
-	sendPleaseUse(null, null);
+	this.sendPleaseUse(null, null);
     }
 
     public void sendPleaseUse(final Consumer<? super BlackMessage> success) {
-	sendPleaseUse(success, null);
+	this.sendPleaseUse(success, null);
     }
 
     public void sendPleaseUse(final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
-	reply(getWrongArgument(), success, error);
+	this.reply(this.getWrongArgument(), success, error);
     }
 
     public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final Command command) {
@@ -236,15 +236,15 @@ public class CommandEvent {
     }
 
     public EmbedBuilder getWrongArgument() {
-	return error().addField("wrongargument", getPleaseUse(this.guild, this.user, this.command), false);
+	return this.error().addField("wrongargument", getPleaseUse(this.guild, this.user, this.command), false);
     }
 
     public String getTranslation(final String key) {
-	return language.getTranslationNonNull(key);
+	return this.language.getTranslationNonNull(key);
     }
 
     public String getTranslation(final String key, final Placeholder... placeholders) {
-	String result = getTranslation(key);
+	String result = this.getTranslation(key);
 	for (final Placeholder placeholder : placeholders) {
 	    result = placeholder.process(result);
 	}
@@ -252,41 +252,41 @@ public class CommandEvent {
     }
 
     public String getTranslationOrEmpty(final String key) {
-	final String translation = language.getTranslation(key);
-	return translation != null ? translation : language.getTranslationNonNull("empty");
+	final String translation = this.language.getTranslation(key);
+	return translation != null ? translation : this.language.getTranslationNonNull("empty");
     }
 
     public BlackMessage getMessage() {
-	return message;
+	return this.message;
     }
 
     public TextChannel getChannel() {
-	return channel;
+	return this.channel;
     }
 
     public Command getCommand() {
-	return command;
+	return this.command;
     }
 
     public BlackUser getUser() {
-	return user;
+	return this.user;
     }
 
     public BlackGuild getGuild() {
-	return guild;
+	return this.guild;
     }
 
     public BlackMember getMember() {
-	return member;
+	return this.member;
     }
 
     @Nullable
     public GuildMessageReceivedEvent getEvent() {
-	return event;
+	return this.event;
     }
 
     public JDA getJda() {
-	return jda;
+	return this.jda;
     }
 
     public void setCommand(final Command cmd) {
