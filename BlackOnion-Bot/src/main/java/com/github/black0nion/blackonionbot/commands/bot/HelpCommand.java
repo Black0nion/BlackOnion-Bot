@@ -1,8 +1,11 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
@@ -14,14 +17,15 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.google.common.collect.Lists;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 public class HelpCommand extends Command {
 
@@ -32,6 +36,7 @@ public class HelpCommand extends Command {
     @Override
     public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
+	    message.delete().queue();
 	    if (args.length >= 2) {
 		// a command
 		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
@@ -57,6 +62,7 @@ public class HelpCommand extends Command {
 		final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + cmde.getTranslation("modules")).setDescription(cmde.getTranslation("onlyexecutorcancontrol"));
 
 		final Category[] cats = Category.values();
+		final List<Button> buttons = new LinkedList<>();
 		for (int i = 0; i <= cats.length; i++) {
 		    String commandsInCategory = "";
 		    Category category = null;
@@ -73,13 +79,17 @@ public class HelpCommand extends Command {
 		    if (commandsInCategory.length() <= 2) {
 			continue;
 		    }
-		    builder.addField(Utils.emojis[i] + (category != null ? " " + category.name() : " " + cmde.getTranslation("modules")), commandsInCategory.substring(1), false);
-		}
-		message.reply(builder.build()).queue(msg -> {
-		    for (int i = 0; i <= cats.length; i++) {
-			msg.addReaction(Utils.numbersUnicode.get(i)).queue();
+		    if (category != null) {
+			builder.addField(category.name(), commandsInCategory.substring(1), false);
+			buttons.add(Button.primary(category.name(), category.name()));
+		    } else {
+			builder.addField(cmde.getTranslation("modules"), commandsInCategory.substring(1), false);
+			buttons.add(Button.success("overview", cmde.getTranslation("modules").toUpperCase()));
 		    }
-		    this.waitForHelpCatSelection(BlackMessage.from(msg), member, cats.length + 1);
+		}
+		buttons.add(Button.danger("close", cmde.getTranslation("close").toUpperCase()));
+		message.reply(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
+		    this.waitForHelpCatSelection(BlackMessage.from(msg), member, cmde);
 		});
 	    }
 	} catch (final Exception ex) {
@@ -88,26 +98,21 @@ public class HelpCommand extends Command {
 		ex.printStackTrace();
 	    } else {
 		ex.printStackTrace();
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("What just happend?", "hau did u do that???", false).build()).queue();
+		message.reply(cmde.error().addField("What just happend?", "hau did u do that???", false).build()).queue();
 	    }
 	}
     }
 
-    private final void waitForHelpCatSelection(final BlackMessage msg, final BlackMember author, final int catCount) {
-	CommandBase.waiter.waitForEvent(MessageReactionAddEvent.class, event -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUserIdLong() == author.getIdLong(), event -> {
-	    event.getReaction().removeReaction(event.getUser()).queue();
-	    Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().get().getKey();
+    private final void waitForHelpCatSelection(final BlackMessage msg, final BlackMember author, final CommandEvent cmde) {
+	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, event -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
+	    final Button button = event.getButton();
 
-	    if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || catCount < emojiReactionNum) {
-		this.waitForHelpCatSelection(msg, author, catCount);
-	    }
+	    final BlackGuild guild = cmde.getGuild();
+	    final BlackUser user = cmde.getUser();
 
-	    final BlackGuild guild = msg.getBlackGuild();
-	    final BlackUser user = author.getBlackUser();
+	    final EmbedBuilder builder = cmde.success().setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", user, guild));
 
-	    final EmbedBuilder builder = EmbedUtils.getSuccessEmbed(user, guild).setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", user, guild));
-
-	    if (emojiReactionNum == 0) {
+	    if (button.getId().equals("overview")) {
 		builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + LanguageSystem.getTranslation("modules", user, guild));
 
 		final Category[] cats = Category.values();
@@ -118,16 +123,23 @@ public class HelpCommand extends Command {
 			commandsInCategory = ", " + LanguageSystem.getTranslation("helpmodules", user, guild);
 		    } else {
 			category = cats[i - 1];
-			for (final Command c : CommandBase.commandsInCategory.get(category)) if (c.isVisible(user)) {
-			    commandsInCategory += ", " + c.getCommand()[0];
+			for (final Command c : CommandBase.commandsInCategory.get(category)) {
+			    if (c.isVisible(user)) {
+				commandsInCategory += ", " + c.getCommand()[0];
+			    }
 			}
 		    }
 
-		    builder.addField(Utils.emojis[i] + (category != null ? " " + category.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
+		    if (commandsInCategory.length() <= 2) {
+			continue;
+		    }
+		    builder.addField((category != null ? " " + category.name() : " " + LanguageSystem.getTranslation("modules", user, guild)), commandsInCategory.substring(1), false);
 		}
+	    } else if (button.getId().equals("close")) {
+		msg.delete().queue();
+		return;
 	    } else {
-		emojiReactionNum--;
-		final Category category = Category.values()[emojiReactionNum];
+		final Category category = Category.valueOf(button.getId());
 		builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
 		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) if (entry.getValue().isVisible(user) && (entry.getValue().getCategory() == category)) if (entry.getValue().getProgress() == Progress.DONE) {
 		    final String commandHelp = LanguageSystem.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase(), user, guild);
@@ -154,10 +166,10 @@ public class HelpCommand extends Command {
 		}
 	    }
 
-	    msg.editMessage(builder.build()).queue();
-	    this.waitForHelpCatSelection(msg, author, catCount);
+	    event.editMessageEmbeds(builder.build()).queue();
+	    this.waitForHelpCatSelection(msg, author, cmde);
 	}, 5, TimeUnit.MINUTES, () -> {
-	    msg.delete().queue();
+	    msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getCommand()[0]))).setEmbeds().setActionRows().queue();
 	});
     }
 }
