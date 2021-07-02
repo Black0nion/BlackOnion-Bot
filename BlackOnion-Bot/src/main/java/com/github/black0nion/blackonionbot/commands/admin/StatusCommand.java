@@ -9,7 +9,6 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
@@ -48,11 +47,10 @@ public class StatusCommand extends Command {
 	    status = OnlineStatus.DO_NOT_DISTURB;
 	    break;
 	default:
-	    // TODO: delete after x seconds
-	    channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	    channel.sendMessageEmbeds(cmde.success().addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 	    return;
 	}
-	channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	channel.sendMessageEmbeds(cmde.success().addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 
 	e.getJDA().getPresence().setStatus(status);
     }

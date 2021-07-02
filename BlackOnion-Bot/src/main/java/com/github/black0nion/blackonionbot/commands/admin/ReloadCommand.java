@@ -47,7 +47,6 @@ public class ReloadCommand extends Command {
 
 	// e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID,
 	// "k").queue();
-	// TODO: delete after x seconds
 	if (args.length >= 2) {
 	    if (args[1].equalsIgnoreCase("list") || args[1].equalsIgnoreCase("ls")) {
 		String reloadableMethodsString = "```";
