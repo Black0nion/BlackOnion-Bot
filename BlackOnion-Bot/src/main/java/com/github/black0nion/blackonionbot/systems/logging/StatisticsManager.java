@@ -34,7 +34,6 @@ public class StatisticsManager {
 
     @Reloadable("statistics")
     public static void init() {
-	// TODO: test, i don't have a javadoc here XD
 	Bot.scheduledExecutor.scheduleAtFixedRate(() -> {
 	    saveStats();
 	}, 0, 10, TimeUnit.SECONDS);
