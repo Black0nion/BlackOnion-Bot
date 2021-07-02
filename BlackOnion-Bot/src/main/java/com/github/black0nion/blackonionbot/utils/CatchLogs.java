@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.plugins.Caller;
+import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 
 public class CatchLogs extends PrintStream {
 
@@ -45,8 +46,8 @@ public class CatchLogs extends PrintStream {
 
     private static Pair<Caller, StackTraceElement> findCallerToLog(final StackTraceElement[] stack) {
 	for (final StackTraceElement element : stack) {
-	    // TODO: add check if it comes from a Plugin or something else
-	    if (element.getMethodName().equalsIgnoreCase("onEnable") || element.getMethodName().equalsIgnoreCase("onDisable")) return new Pair<>(Caller.PLUGIN, element);
+	    final String methodName = element.getMethodName();
+	    if ((methodName.equalsIgnoreCase("onEnable") || methodName.equalsIgnoreCase("onDisable")) && PluginSystem.getPluginNames().contains(element.getClassName())) return new Pair<>(Caller.PLUGIN, element);
 	}
 	return idk;
     }
