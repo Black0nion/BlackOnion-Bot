@@ -46,7 +46,7 @@ public class CatchLogs extends PrintStream {
     private static Pair<Caller, StackTraceElement> findCallerToLog(final StackTraceElement[] stack) {
 	for (final StackTraceElement element : stack) {
 	    // TODO: add check if it comes from a Plugin or something else
-	    if (element.getMethodName().equalsIgnoreCase("onEnable")) return new Pair<>(Caller.PLUGIN, element);
+	    if (element.getMethodName().equalsIgnoreCase("onEnable") || element.getMethodName().equalsIgnoreCase("onDisable")) return new Pair<>(Caller.PLUGIN, element);
 	}
 	return idk;
     }

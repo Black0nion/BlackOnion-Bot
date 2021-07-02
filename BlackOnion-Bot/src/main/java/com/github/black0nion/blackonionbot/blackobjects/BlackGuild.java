@@ -98,7 +98,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param guild
+     * @param  guild
      * @return
      */
     @Reloadable("guildcache")
@@ -1268,19 +1268,17 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public String toString() {
-	return "BlackGuild [guild=" + this.guild + ", selfBlackMember=" + this.selfBlackMember + ", language=" + this.language + ", guildType=" + this.guildType + ", antiSpoilerType=" + this.antiSpoilerType + ", antiSwearType=" + this.antiSwearType + ", antiSwearWhitelist=" + this.antiSwearWhitelist + ", prefix=" + this.prefix + ", joinMessage=" + this.joinMessage + ", joinChannel=" + this.joinChannel + ", leaveMessage=" + this.leaveMessage + ", leaveChannel=" + this.leaveChannel + ", disabledCommands=" + this.disabledCommands + ", suggestionsChannel=" + this.suggestionsChannel + ", autoRoles=" + this.autoRoles + "]";
-    }
-
-    @Override
     public RestAction<List<Template>> retrieveTemplates() {
-	// TODO Auto-generated method stub
-	return null;
+	return this.guild.retrieveTemplates();
     }
 
     @Override
     public RestAction<Template> createTemplate(final String name, final String description) {
-	// TODO Auto-generated method stub
-	return null;
+	return this.guild.createTemplate(name, description);
+    }
+
+    @Override
+    public String toString() {
+	return "BlackGuild [guild=" + this.guild + ", selfBlackMember=" + this.selfBlackMember + ", language=" + this.language + ", guildType=" + this.guildType + ", antiSpoilerType=" + this.antiSpoilerType + ", antiSwearType=" + this.antiSwearType + ", antiSwearWhitelist=" + this.antiSwearWhitelist + ", prefix=" + this.prefix + ", joinMessage=" + this.joinMessage + ", joinChannel=" + this.joinChannel + ", leaveMessage=" + this.leaveMessage + ", leaveChannel=" + this.leaveChannel + ", disabledCommands=" + this.disabledCommands + ", suggestionsChannel=" + this.suggestionsChannel + ", autoRoles=" + this.autoRoles + "]";
     }
 }
