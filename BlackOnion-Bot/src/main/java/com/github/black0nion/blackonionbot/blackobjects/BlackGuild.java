@@ -43,6 +43,7 @@ import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
