@@ -73,7 +73,7 @@ public class CustomCommand {
 	} else if (doc.containsKey("answer")) {
 	    this.answer = doc.getString("answer");
 	} else {
-	    // TODO: error handling
+	    System.err.println("CustomCommand " + this.getCommand() + " in Guild " + this.getGuild().getName() + " has no handler set!");
 	}
 	this.reply = doc.getBoolean("reply", true);
     }
@@ -149,7 +149,8 @@ public class CustomCommand {
 	} else if (this.answer != null) {
 	    doc.put("answer", this.answer);
 	} else {
-	    // TODO: error handling
+	    System.err.println("CustomCommand " + this.getCommand() + " in Guild " + this.getGuild().getName() + " has no handler set!");
+	    return null;
 	}
 	return doc;
     }
