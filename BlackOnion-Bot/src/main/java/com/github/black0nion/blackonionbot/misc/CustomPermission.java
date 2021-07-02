@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 public enum CustomPermission {
 
-    ADMIN, DEVELOPER(ADMIN), ALPHA, BETA(ADMIN, ALPHA),
+    ADMIN, DEVELOPER(ADMIN), ALPHA(ADMIN), BETA(ADMIN, ALPHA),
 
-    SET_ACTIVITY(DEVELOPER), RELOAD(BETA, DEVELOPER);
+    SET_ACTIVITY(DEVELOPER), RELOAD(DEVELOPER);
 
     private final List<CustomPermission> links = new ArrayList<>();
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum LogOrigin {
-    API, BOT, DISCORD, MONGODB, OTHER, INFLUX_DB, DASHBOARD;
+    API, BOT, DISCORD, MONGODB, OTHER, INFLUX_DB, DASHBOARD, PLUGINS;
 
     private static final List<String> names = new ArrayList<>();
 

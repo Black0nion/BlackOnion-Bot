@@ -52,6 +52,7 @@ import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.ListedEmote;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.StageChannel;
 import net.dv8tion.jda.api.entities.StoreChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -98,7 +99,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param guild
+     * @param  guild
      * @return
      */
     @Reloadable("guildcache")
@@ -1303,11 +1304,6 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public String toString() {
-	return "BlackGuild [guild=" + this.guild + ", selfBlackMember=" + this.selfBlackMember + ", language=" + this.language + ", guildType=" + this.guildType + ", antiSpoilerType=" + this.antiSpoilerType + ", antiSwearType=" + this.antiSwearType + ", antiSwearWhitelist=" + this.antiSwearWhitelist + ", prefix=" + this.prefix + ", joinMessage=" + this.joinMessage + ", joinChannel=" + this.joinChannel + ", leaveMessage=" + this.leaveMessage + ", leaveChannel=" + this.leaveChannel + ", disabledCommands=" + this.disabledCommands + ", suggestionsChannel=" + this.suggestionsChannel + ", autoRoles=" + this.autoRoles + "]";
-    }
-
-    @Override
     public RestAction<List<Template>> retrieveTemplates() {
 	return this.guild.retrieveTemplates();
     }
@@ -1315,5 +1311,30 @@ public class BlackGuild extends BlackObject implements Guild {
     @Override
     public RestAction<Template> createTemplate(final String name, final String description) {
 	return this.guild.createTemplate(name, description);
+    }
+
+    @Override
+    public Task<Void> cancelRequestToSpeak() {
+	return this.guild.cancelRequestToSpeak();
+    }
+
+    @Override
+    public ChannelAction<StageChannel> createStageChannel(final String name, final Category parent) {
+	return this.guild.createStageChannel(name, parent);
+    }
+
+    @Override
+    public ChannelAction<StageChannel> createStageChannel(final String name) {
+	return this.guild.createStageChannel(name);
+    }
+
+    @Override
+    public Task<Void> requestToSpeak() {
+	return this.guild.requestToSpeak();
+    }
+
+    @Override
+    public String toString() {
+	return "BlackGuild [guild=" + this.guild + ", selfBlackMember=" + this.selfBlackMember + ", language=" + this.language + ", guildType=" + this.guildType + ", antiSpoilerType=" + this.antiSpoilerType + ", antiSwearType=" + this.antiSwearType + ", antiSwearWhitelist=" + this.antiSwearWhitelist + ", prefix=" + this.prefix + ", joinMessage=" + this.joinMessage + ", joinChannel=" + this.joinChannel + ", leaveMessage=" + this.leaveMessage + ", leaveChannel=" + this.leaveChannel + ", disabledCommands=" + this.disabledCommands + ", suggestionsChannel=" + this.suggestionsChannel + ", autoRoles=" + this.autoRoles + "]";
     }
 }

@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,12 +17,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.github.black0nion.blackonionbot.API.API;
-import com.github.black0nion.blackonionbot.commands.bot.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.bot.StatusCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -38,6 +39,8 @@ import com.github.black0nion.blackonionbot.systems.logging.EventEndpoint;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
+import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
+import com.github.black0nion.blackonionbot.utils.CatchLogs;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -82,19 +85,23 @@ public class Bot extends ListenerAdapter {
     public static Callable<Object> switchingStatusCallable;
 
     /**
-     * Null for everything
+     * Empty for everything
      */
-    @Nullable
+    @Nonnull
     public static final List<LogMode> logLevel = new ArrayList<>();
     /**
-     * Null for everything
+     * Empty for everything
      */
-    @Nullable
+    @Nonnull
     public static final List<LogOrigin> logOrigin = new ArrayList<>();
+
+    public static final PrintStream out = System.out;
+    public static final PrintStream err = System.err;
 
     @SuppressWarnings("resource")
     public void startBot() {
 	Utils.printLogo();
+	CatchLogs.init();
 	new ValueManager();
 	DefaultValues.init();
 	isJarFile = JarUtils.runningFromJar();
@@ -138,9 +145,17 @@ public class Bot extends ListenerAdapter {
 	PlayerManager.init();
 	// MusicSystem.init();
 
-	API.init();
+	executor.submit(() -> {
+	    Newssystem.init();
+	});
 
-	Newssystem.init();
+	executor.submit(() -> {
+	    API.init();
+	});
+
+	executor.submit(() -> {
+	    PluginSystem.loadPlugins();
+	});
 
 	executor.submit(() -> {
 	    final Scanner sc = new Scanner(System.in);
@@ -150,12 +165,12 @@ public class Bot extends ListenerAdapter {
 		    final String[] args = input.split(" ");
 		    if (input.startsWith("peek")) {
 			if (args.length < 2) {
-			    System.out.println("Invalid Syntax. Syntax: peek <category> [limit]| Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
+			    out.println("Invalid Syntax. Syntax: peek <category> [limit]| Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
 			    continue;
 			} else if (Utils.equalsOneIgnoreCase(args[1], LogOrigin.getNames())) {
 			    if (args.length >= 3) {
 				if (!Utils.isLong(args[2])) {
-				    System.out.println("Invalid number!");
+				    out.println("Invalid number!");
 				    continue;
 				} else {
 				    Logger.printForCategory(LogOrigin.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
@@ -166,7 +181,7 @@ public class Bot extends ListenerAdapter {
 			} else if (Utils.equalsOneIgnoreCase(args[1], LogMode.getNames())) {
 			    if (args.length >= 3) {
 				if (!Utils.isLong(args[2])) {
-				    System.out.println("Invalid number!");
+				    out.println("Invalid number!");
 				    continue;
 				} else {
 				    Logger.printForLevel(LogMode.valueOf(args[1].toUpperCase()), Integer.parseInt(args[2]));
@@ -177,7 +192,7 @@ public class Bot extends ListenerAdapter {
 			} else if (args[1].equalsIgnoreCase("all")) {
 			    if (args.length >= 3) {
 				if (!Utils.isLong(args[2])) {
-				    System.out.println("Invalid number!");
+				    out.println("Invalid number!");
 				    continue;
 				} else {
 				    Logger.printAll(Integer.parseInt(args[2]));
@@ -186,11 +201,11 @@ public class Bot extends ListenerAdapter {
 				Logger.printAll();
 			    }
 			} else {
-			    System.out.println("Category not found. Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
+			    out.println("Category not found. Valid Categories: " + String.join(", ", LogOrigin.getNames()) + ", valid LogModes: " + String.join(", ", LogMode.getNames()));
 			}
 		    } else if (input.startsWith("setloglevel")) {
 			if (args.length <= 1) {
-			    System.out.println("Please use setloglevel <level> | Valid levels: " + String.join(", ", LogMode.getNames()));
+			    out.println("Please use setloglevel <level> | Valid levels: " + String.join(", ", LogMode.getNames()));
 			} else {
 			    for (final String cat : Utils.removeFirstArg(args)) {
 				if (cat.startsWith("!")) {
@@ -198,7 +213,7 @@ public class Bot extends ListenerAdapter {
 				    if (parsed != null) {
 					logLevel.remove(parsed);
 				    } else {
-					System.out.println(cat + " is not a valid LogMode!");
+					out.println(cat + " is not a valid LogMode!");
 				    }
 				} else {
 				    final LogMode parsed = LogMode.parse(cat);
@@ -207,15 +222,15 @@ public class Bot extends ListenerAdapter {
 					    logLevel.add(parsed);
 					}
 				    } else {
-					System.out.println(cat + " is not a valid LogMode!");
+					out.println(cat + " is not a valid LogMode!");
 				    }
 				}
 			    }
-			    System.out.println("Now printing LogLevels " + logLevel);
+			    out.println("Now printing LogLevels " + logLevel);
 			}
 		    } else if (input.startsWith("setlogorigin")) {
 			if (args.length <= 1) {
-			    System.out.println("Please use setlogorigin <origin> | Valid origins: " + String.join(", ", LogOrigin.getNames()));
+			    out.println("Please use setlogorigin <origin> | Valid origins: " + String.join(", ", LogOrigin.getNames()));
 			} else {
 			    for (final String cat : Utils.removeFirstArg(args)) {
 				if (cat.startsWith("!")) {
@@ -223,7 +238,7 @@ public class Bot extends ListenerAdapter {
 				    if (parsed != null) {
 					logOrigin.remove(parsed);
 				    } else {
-					System.out.println(cat + " is not a valid LogOrigin!");
+					out.println(cat + " is not a valid LogOrigin!");
 				    }
 				} else {
 				    final LogOrigin parsed = LogOrigin.parse(cat);
@@ -232,11 +247,11 @@ public class Bot extends ListenerAdapter {
 					    logOrigin.add(parsed);
 					}
 				    } else {
-					System.out.println(cat + " is not a valid LogOrigin!");
+					out.println(cat + " is not a valid LogOrigin!");
 				    }
 				}
 			    }
-			    System.out.println("Now printing LogOrigin " + logOrigin);
+			    out.println("Now printing LogOrigin " + logOrigin);
 			}
 		    } else if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
 			Logger.logInfo("Reloading...", LogOrigin.BOT);
@@ -246,11 +261,12 @@ public class Bot extends ListenerAdapter {
 			Logger.logWarning("Shutting down...", LogOrigin.BOT);
 			jda.shutdown();
 			Spark.stop();
+			PluginSystem.disablePlugins();
 			Spark.awaitStop();
 			Logger.logWarning("Successfully disconnected!", LogOrigin.BOT);
 			System.exit(0);
 		    } else {
-			System.out.println("Command not recognized. Valid Commands: [reload, shutdown, setlogorigin, setloglevel, peek]");
+			out.println("Command not recognized. Valid Commands: [reload, shutdown, setlogorigin, setloglevel, peek]");
 		    }
 		} catch (final Exception e) {
 		    e.printStackTrace();

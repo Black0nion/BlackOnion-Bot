@@ -2,11 +2,14 @@ package com.github.black0nion.blackonionbot.blackobjects;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
 
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +20,7 @@ import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -64,7 +68,7 @@ public class BlackUser extends BlackObject implements User {
     /**
      * Deprecated as a warning
      *
-     * @param guild
+     * @param  guild
      * @return
      */
     @Reloadable("usercache")
@@ -87,7 +91,7 @@ public class BlackUser extends BlackObject implements User {
 		config = new Document();
 	    }
 
-	    this.permissions = CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>()));
+	    this.permissions = this.gOD(CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
 
 	    if (config.getString("language") != null) {
 		this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
@@ -113,7 +117,11 @@ public class BlackUser extends BlackObject implements User {
     }
 
     public boolean hasPermission(final CustomPermission... permissions) {
-	for (final CustomPermission requiredPerm : permissions) if (!this.hasPermission(requiredPerm)) return false;
+	if (permissions == null || permissions.length == 0) return true;
+	if (this.permissions == null || this.permissions.size() == 0) return false;
+	for (final CustomPermission requiredPerm : permissions) {
+	    if (!this.hasPermission(requiredPerm)) return false;
+	}
 	return true;
     }
 
@@ -121,17 +129,51 @@ public class BlackUser extends BlackObject implements User {
 	return CustomPermission.hasRights(permission, this.permissions);
     }
 
-    public void addPermissions(final CustomPermission... permissions) {
+    public List<CustomPermission> addPermissions(final CustomPermission... permissions) {
+	return this.addPermissions(Arrays.asList(permissions));
+    }
+
+    public List<CustomPermission> addPermissions(final List<CustomPermission> permissions) {
 	final List<CustomPermission> perms = this.permissions;
-	for (final CustomPermission perm : permissions) if (!perms.contains(perm)) {
-	    perms.add(perm);
+	final List<CustomPermission> addedPerms = new ArrayList<>();
+	for (final CustomPermission perm : permissions) {
+	    if (!perms.contains(perm)) {
+		perms.add(perm);
+		addedPerms.add(perm);
+	    }
 	}
 	this.setPermissions(perms);
+	return addedPerms;
+    }
+
+    public List<CustomPermission> removePermissions(final CustomPermission... permissions) {
+	return this.removePermissions(Arrays.asList(permissions));
+    }
+
+    public List<CustomPermission> removePermissions(final List<CustomPermission> permissions) {
+	final List<CustomPermission> perms = this.permissions;
+	final List<CustomPermission> removedPerms = new ArrayList<>();
+	for (final CustomPermission perm : permissions) {
+	    if (perms.contains(perm)) {
+		perms.remove(perm);
+		removedPerms.add(perm);
+	    }
+	}
+	this.setPermissions(perms);
+	return removedPerms;
     }
 
     public void setPermissions(final List<CustomPermission> permissions) {
 	this.permissions = permissions;
 	this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
+    }
+
+    @Nonnull
+    /**
+     * @return Full name WITH REPLACED MARKDOWN
+     */
+    public String getFullName() {
+	return Utils.removeMarkdown(this.getName() + "#" + this.getDiscriminator());
     }
 
     // override methods
