@@ -155,11 +155,11 @@ public class Utils {
     }
 
     /**
-     * @param guild
-     * @param author
-     * @param channel
-     * @param permissions
-     * @return missing permissions?
+     * @param  guild
+     * @param  author
+     * @param  channel
+     * @param  permissions
+     * @return             missing permissions?
      */
     public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, final Permission... permissions) {
 	if (channel == null) {
@@ -208,6 +208,10 @@ public class Utils {
 	final long diffDays = diff / (24 * 60 * 60 * 1000);
 
 	return (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : "");
+    }
+
+    public static String firstLetterUppercase(final String input) {
+	return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 
     public static void printLogo() {
