@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +77,7 @@ public class CommandBase extends ListenerAdapter {
 		final String[] packageName = command.getPackage().getName().split("\\.");
 		final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 		newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
-		newInstance.setCommand(Arrays.asList(newInstance.getCommand()).stream().filter(s -> s != null).map(String::toLowerCase).toArray(String[]::new));
+		newInstance.setCommand(Arrays.asList(newInstance.getCommand()).stream().filter(Objects::nonNull).map(String::toLowerCase).toArray(String[]::new));
 
 		if (newInstance.shouldAutoRegister()) if (newInstance.getCommand() != null) {
 		    addCommand(newInstance);
