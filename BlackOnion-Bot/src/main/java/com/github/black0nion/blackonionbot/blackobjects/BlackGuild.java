@@ -100,7 +100,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param  guild
+     * @param guild
      * @return
      */
     @Reloadable("guildcache")
