@@ -26,13 +26,14 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.misc.DashboardValue;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
+import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.cache.CacheBuilder;
@@ -157,8 +158,8 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 	    this.guildType = this.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
 	    this.prefix = this.gOD(config.getString("prefix"), BotInformation.defaultPrefix);
-	    this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antiSpoiler")), AntiSpoilerType.OFF);
-	    this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiSwear")), AntiSwearType.OFF);
+	    this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
+	    this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
 	    this.joinMessage = this.gOD(config.getString("joinmessage"), this.language.getTranslationNonNull("defaultjoinmessage"));
 	    this.joinChannel = this.gOD(config.getLong("joinchannel"), -1L);
 	    this.leaveMessage = this.gOD(config.getString("leavemessage"), this.language.getTranslationNonNull("defaultleavemessage"));
@@ -169,7 +170,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.loop = this.gOD(config.getBoolean("loop"), false);
 	    this.customCommands = new HashMap<>();
 	    this.gOD(this.gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> this.customCommands.put(cmd.getCommand(), cmd));
-	    final List<String> disabledCommandsString = config.getList("disabledCommands", String.class);
+	    final List<String> disabledCommandsString = config.getList("disabledcommands", String.class);
 	    if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 		this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());
 	    } else {
@@ -184,12 +185,23 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.language;
     }
 
-    @DashboardValue("guildlanguage")
+    @DashboardGetter("setup.language")
+    public String getLanguageString() {
+	return this.language.getLanguageCode();
+    }
+
+    @DashboardSetter("setup.language")
+    public void setLanguage(final String language) {
+	this.setLanguage(LanguageSystem.getLanguageFromName(language));
+    }
+
     public void setLanguage(final Language language) {
+	if (language == null) return;
 	this.language = language;
 	this.save("language", language.getLanguageCode());
     }
 
+    @DashboardGetter("setup.guildtype")
     public GuildType getGuildType() {
 	return this.guildType;
     }
@@ -203,68 +215,90 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
     }
 
+    @DashboardGetter("general.prefix")
     public String getPrefix() {
 	return this.prefix;
     }
 
-    @DashboardValue("prefix")
+    @DashboardSetter("general.prefix")
     public void setPrefix(final String prefix) {
 	this.prefix = prefix;
 	this.save("prefix", prefix);
     }
 
+    @DashboardGetter("utils.joinleave.join.message")
     public String getJoinMessage() {
 	return this.joinMessage;
     }
 
-    @DashboardValue("joinmessage")
+    @DashboardSetter("utils.joinleave.join.message")
     public void setJoinMessage(final String newMessage) {
 	this.joinMessage = newMessage;
 	this.save("joinmessage", this.joinMessage);
     }
 
+    @DashboardGetter(value = "utils.joinleave.join.channel", nullable = true)
     public long getJoinChannel() {
 	return this.joinChannel;
     }
 
-    @DashboardValue("joinchannel")
+    @DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
+    public void setJoinChannel(final TextChannel channel) {
+	if (channel == null) {
+	    this.setJoinChannel(-1);
+	} else {
+	    this.setJoinChannel(channel.getIdLong());
+	}
+    }
+
     public void setJoinChannel(final long joinChannel) {
 	this.joinChannel = joinChannel;
 	if (joinChannel == -1) {
 	    this.clear("joinchannel");
+	} else {
+	    this.save("joinchannel", joinChannel);
 	}
-	this.save("joinchannel", joinChannel);
     }
 
+    @DashboardGetter("utils.joinleave.leave.message")
     public String getLeaveMessage() {
 	return this.leaveMessage;
     }
 
-    @DashboardValue("leavemessage")
+    @DashboardSetter("utils.joinleave.leave.message")
     public void setLeaveMessage(final String leaveMessage) {
 	this.leaveMessage = leaveMessage;
 	this.save("leavemessage", leaveMessage);
     }
 
+    @DashboardGetter(value = "utils.joinleave.leave.channel", nullable = true)
     public long getLeaveChannel() {
 	return this.leaveChannel;
     }
 
-    @DashboardValue("leavechannel")
+    @DashboardSetter(value = "utils.joinleave.leave.channel", nullable = true)
+    public void setLeaveChannel(final TextChannel channel) {
+	if (channel == null) {
+	    this.setLeaveChannel(-1);
+	} else {
+	    this.setLeaveChannel(channel.getIdLong());
+	}
+    }
+
     public void setLeaveChannel(final long leaveChannel) {
 	this.leaveChannel = leaveChannel;
 	if (leaveChannel == -1) {
 	    this.clear("leavechannel");
+	} else {
+	    this.save("leavechannel", leaveChannel);
 	}
-	this.save("leavechannel", leaveChannel);
     }
 
     public List<Command> getDisabledCommands() {
 	return this.disabledCommands;
     }
 
-    @DashboardValue("disabledcommands")
-    public void setDisabledCommands(final Object[] disabledCommands) {
+    public void setDisabledCommands(final String[] disabledCommands) {
 	this.setDisabledCommands(Arrays.asList(disabledCommands).stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList()));
     }
 
@@ -274,7 +308,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setDisabledCommands(final List<Command> disabledCommands) {
 	this.disabledCommands = disabledCommands;
-	this.saveList("disabledCommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
+	this.saveList("disabledcommands", disabledCommands.stream().map(cmd -> cmd.getCommand()[0]).collect(Collectors.toList()));
     }
 
     public boolean isCommandActivated(final Command cmd) {
@@ -296,10 +330,9 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.antiSpoilerType;
     }
 
-    @DashboardValue("antispoilertype")
     public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
 	this.antiSpoilerType = antiSpoilerType;
-	this.save("antiSpoiler", antiSpoilerType.name());
+	this.save("antispoiler", antiSpoilerType.name());
     }
 
     public AntiSwearType getAntiSwearType() {
@@ -308,7 +341,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     public void setAntiSwearType(final AntiSwearType antiSwearType) {
 	this.antiSwearType = antiSwearType;
-	this.save("antiSwear", antiSwearType.name());
+	this.save("antiswear", antiSwearType.name());
     }
 
     public List<String> getAntiSwearWhitelist() {
@@ -338,7 +371,10 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.suggestionsChannel;
     }
 
-    @DashboardValue(value = "suggestionschannel", channelSelector = true)
+    public void setSuggestionsChannel(final TextChannel channel) {
+	this.setSuggestionsChannel(channel.getIdLong());
+    }
+
     public void setSuggestionsChannel(final long suggestionsChannel) {
 	this.suggestionsChannel = suggestionsChannel;
 	this.save("suggestionschannel", suggestionsChannel);
@@ -651,19 +687,19 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public Category getCategoryById(@NotNull final String id) {
+    public net.dv8tion.jda.api.entities.Category getCategoryById(@NotNull final String id) {
 	return this.guild.getCategoryById(id);
     }
 
     @Override
     @NotNull
-    public List<Category> getCategories() {
+    public List<net.dv8tion.jda.api.entities.Category> getCategories() {
 	return this.guild.getCategories();
     }
 
     @NotNull
     @Override
-    public SortedSnowflakeCacheView<Category> getCategoryCache() {
+    public SortedSnowflakeCacheView<net.dv8tion.jda.api.entities.Category> getCategoryCache() {
 	return this.guild.getCategoryCache();
     }
 
@@ -1108,7 +1144,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @Override
     @NotNull
-    public ChannelAction<Category> createCategory(@NotNull final String name) {
+    public ChannelAction<net.dv8tion.jda.api.entities.Category> createCategory(@NotNull final String name) {
 	return this.guild.createCategory(name);
     }
 
@@ -1199,22 +1235,22 @@ public class BlackGuild extends BlackObject implements Guild {
     }
 
     @Override
-    public ChannelAction<TextChannel> createTextChannel(final String name, final Category parent) {
+    public ChannelAction<TextChannel> createTextChannel(final String name, final net.dv8tion.jda.api.entities.Category parent) {
 	return this.guild.createTextChannel(name, parent);
     }
 
     @Override
-    public ChannelAction<VoiceChannel> createVoiceChannel(final String name, final Category parent) {
+    public ChannelAction<VoiceChannel> createVoiceChannel(final String name, final net.dv8tion.jda.api.entities.Category parent) {
 	return this.guild.createVoiceChannel(name, parent);
     }
 
     @Override
-    public CategoryOrderAction modifyTextChannelPositions(final Category category) {
+    public CategoryOrderAction modifyTextChannelPositions(final net.dv8tion.jda.api.entities.Category category) {
 	return this.guild.modifyTextChannelPositions(category);
     }
 
     @Override
-    public CategoryOrderAction modifyVoiceChannelPositions(final Category category) {
+    public CategoryOrderAction modifyVoiceChannelPositions(final net.dv8tion.jda.api.entities.Category category) {
 	return this.guild.modifyVoiceChannelPositions(category);
     }
 
@@ -1250,7 +1286,7 @@ public class BlackGuild extends BlackObject implements Guild {
 
     @Override
     public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(final String commandId) {
-	return this.retrieveCommandPrivilegesById(commandId);
+	return this.guild.retrieveCommandPrivilegesById(commandId);
     }
 
     @Override

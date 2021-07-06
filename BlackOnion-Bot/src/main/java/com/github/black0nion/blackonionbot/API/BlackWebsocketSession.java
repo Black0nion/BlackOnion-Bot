@@ -23,9 +23,9 @@ import com.github.black0nion.blackonionbot.systems.logging.Logger;
  */
 public class BlackWebsocketSession extends BlackSession implements org.eclipse.jetty.websocket.api.Session {
 
-    public BlackWebsocketSession(final Session session) {
-	super(null);
-	this.session = session;
+    public BlackWebsocketSession(final Session sessionRaw) {
+	super(sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol"));
+	this.session = sessionRaw;
     }
 
     private final Session session;

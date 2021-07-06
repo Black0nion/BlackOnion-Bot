@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 
 import org.bson.Document;
 
+import com.github.black0nion.blackonionbot.API.impl.post.Login;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
-import com.github.black0nion.blackonionbot.utils.Trio;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
@@ -30,7 +30,7 @@ public class BlackSession {
 
     /**
      * The websocket will connect and then provide a session id to login to. If the
-     * websocket connection isn't logged in, use {@link #loginWithDiscord(String)}
+     * websocket connection isn't logged in, use {@link Login#loginWithDiscord(String)}
      *
      * Workflow:
      *
@@ -46,33 +46,6 @@ public class BlackSession {
 	    this.user = OAuthUtils.getUserFromToken(doc.getString("access_token"));
 	    return true;
 	} else return false;
-    }
-
-    /**
-     * call once to generate token from code and save that shit, only on first login
-     * with discord, on reconnect on the same PC (session) use
-     * {@link #loginToSession(String)}!
-     *
-     * @param code the code discord gave you
-     * @return session id
-     */
-    @Nullable
-    public static String loginWithDiscord(final String code) {
-	try {
-	    final Trio<String, String, Integer> response = OAuthUtils.getTokensFromCode(code);
-	    if (response == null) return null;
-	    else {
-		final String accessToken = response.getFirst();
-		final String refreshToken = response.getSecond();
-		final int expiresIn = response.getThird();
-		final String newSessionId = generateSessionId();
-		collection.insertOne(new Document().append("sessionid", newSessionId).append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
-		return newSessionId;
-	    }
-	} catch (final Exception e) {
-	    e.printStackTrace();
-	    return null;
-	}
     }
 
     public static String generateSessionId() {

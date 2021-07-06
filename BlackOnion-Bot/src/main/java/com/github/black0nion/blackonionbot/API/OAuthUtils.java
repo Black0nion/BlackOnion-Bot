@@ -12,9 +12,11 @@ import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
 import com.google.common.cache.LoadingCache;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.mongodb.client.model.Filters;
 
 public class OAuthUtils {
 
@@ -62,6 +64,11 @@ public class OAuthUtils {
 	try {
 	    return cachedUsers.get(accessToken);
 	} catch (final Exception e) {
+	    if (e instanceof NullPointerException) return null;
+	    if (e instanceof InvalidCacheLoadException) {
+		BlackSession.collection.deleteOne(Filters.eq("access_token", accessToken));
+		return null;
+	    }
 	    e.printStackTrace();
 	    return null;
 	}
