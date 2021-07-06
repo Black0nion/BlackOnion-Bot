@@ -108,6 +108,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		final String[] args = messageRaw.split(" ");
 		final int id = args[0].length();
 		if (args.length < 2 || !Utils.isInteger(messageRaw.substring(1, id))) {
+		    System.out.println("error");
 		    WRONG_ARGUMENTS.send(session, null);
 		    return;
 		}
@@ -136,6 +137,10 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 			NO_GUILD.send(session, request);
 			return;
 		    }
+		    if (guild == null) {
+			NO_GUILD.send(session, request);
+			return;
+		    }
 		    guild.retrieveMemberById(session.getUser().getUserId()).queue(member -> {
 			if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
 			    UNAUTHORIZED.send(session, request);
@@ -159,6 +164,34 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 			    }
 			}
 			reply(session, request, response);
+		    });
+		} else if (command.equalsIgnoreCase("guildchannels")) {
+		    if (!(request.has("guildid"))) {
+			WRONG_ARGUMENTS.send(session, request);
+			return;
+		    }
+		    final Object guildid = request.get("guildid");
+		    BlackGuild guild;
+		    if (guildid instanceof String) {
+			guild = BlackGuild.from(Long.parseLong((String) guildid));
+		    } else if (guildid instanceof Long) {
+			guild = BlackGuild.from((Long) guildid);
+		    } else {
+			NO_GUILD.send(session, request);
+			return;
+		    }
+		    if (guild == null) {
+			NO_GUILD.send(session, request);
+			return;
+		    }
+		    guild.retrieveMemberById(session.getUser().getUserId()).queue(member -> {
+			if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
+			    UNAUTHORIZED.send(session, request);
+			    return;
+			}
+			final JSONArray response = new JSONArray();
+			guild.getTextChannels().forEach(ch -> response.put(new JSONObject().put("name", ch.getName()).put("id", ch.getIdLong())));
+			reply(session, request, new JSONObject().put("channels", response));
 		    });
 		}
 	    } catch (final Exception e) {
