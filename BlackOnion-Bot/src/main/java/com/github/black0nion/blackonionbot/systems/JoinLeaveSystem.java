@@ -143,15 +143,15 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	    innerBox.setComposite(AlphaComposite.Src);
 	    innerBox.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    innerBox.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) separatorTransparency));
-	    innerBox.fill(new RoundRectangle2D.Float(20, 10, 670, 180, 10, 10));
+	    innerBox.fill(new RoundRectangle2D.Float(10, 10, 799, 180, 10, 10));
 	    innerBox.setComposite(AlphaComposite.SrcAtop);
 	} finally {
 	    innerBox.dispose();
 	}
 
-	if (user.getAvatarUrl() != null) {
+	if (user.getEffectiveAvatarUrl() != null) {
 	    final Graphics2D avatar = bufferedImage.createGraphics();
-	    final URL url = new URL(user.getAvatarUrl());
+	    final URL url = new URL(user.getEffectiveAvatarUrl() + "?size=256");
 	    final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31");
 	    try {
@@ -165,15 +165,15 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 	final Graphics2D newGraphics = bufferedImage.createGraphics();
 	newGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-	newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
-	newGraphics.setColor(Color.DARK_GRAY);
+	newGraphics.setFont(new Font("Arial", Font.PLAIN, 60));
+	newGraphics.setColor(Color.BLACK);
 	final String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslation("welcome", user, guild) : LanguageSystem.getTranslation("goodbye", user, guild);
-	newGraphics.drawString(message, 205, 55);
-	newGraphics.setFont(new Font("Arial", Font.BOLD, 80));
+	newGraphics.drawString(message, 205, 75);
 	newGraphics.setColor(textColor);
 	final String userName = user.getName();
+	newGraphics.setFont(new Font("Arial Unicode MS", Font.BOLD, 68 - userName.length()));
 	final int width = newGraphics.getFontMetrics().stringWidth(userName);
-	newGraphics.drawString(userName, 190 + (500 - width) / 2, 145);
+	newGraphics.drawString(userName, 190 + (619 - width) / 2, 145);
 
 	final File file = new File("tmp/joinleave/" + user.getId() + ".png");
 
