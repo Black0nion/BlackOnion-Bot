@@ -99,7 +99,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param  guild
+     * @param guild
      * @return
      */
     @Reloadable("guildcache")
@@ -233,7 +233,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	if (joinChannel == -1) {
 	    this.clear("joinchannel");
 	}
-	this.save("joinChannel", joinChannel);
+	this.save("joinchannel", joinChannel);
     }
 
     public String getLeaveMessage() {
@@ -256,7 +256,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	if (leaveChannel == -1) {
 	    this.clear("leavechannel");
 	}
-	this.save("leaveChannel", leaveChannel);
+	this.save("leavechannel", leaveChannel);
     }
 
     public List<Command> getDisabledCommands() {
