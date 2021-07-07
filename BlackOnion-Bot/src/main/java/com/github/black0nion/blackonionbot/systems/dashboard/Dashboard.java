@@ -74,6 +74,7 @@ public class Dashboard {
 	    return;
 	}
 	guild.retrieveMemberById(user.getUserId()).queue(member -> {
+	    // TODO advanced permissions
 	    if (!member.hasPermission(Permission.MANAGE_SERVER)) {
 		callback.accept(ResponseCode.NO_PERMISSIONS);
 		return;
