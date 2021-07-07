@@ -38,7 +38,7 @@ public class UpdateLineCount extends PostRequest {
 
     @Override
     public String[] requiredParameters() {
-	return new String[] { "token" };
+	return new String[] { "t0k3n" };
     }
 
     @Override
