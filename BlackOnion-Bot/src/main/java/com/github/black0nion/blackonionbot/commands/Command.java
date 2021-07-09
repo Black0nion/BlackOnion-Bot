@@ -18,7 +18,7 @@ public abstract class Command {
 
     private String[] command = null;
     private String syntax = null;
-    private Category category = Category.OTHER;
+    private Category category = null;
     private Progress progress = Progress.DONE;
     private int requiredArgumentCount = 0;
     private Permission[] requiredPermissions = new Permission[] {};
