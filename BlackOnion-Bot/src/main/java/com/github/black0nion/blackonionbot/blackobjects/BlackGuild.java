@@ -26,6 +26,8 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.misc.ConfigGetter;
+import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -42,6 +44,7 @@ import com.google.common.cache.LoadingCache;
 import com.mongodb.client.MongoCollection;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.Region;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Emote;
@@ -100,7 +103,7 @@ public class BlackGuild extends BlackObject implements Guild {
     /**
      * Deprecated as a warning
      *
-     * @param guild
+     * @param  guild
      * @return
      */
     @Reloadable("guildcache")
@@ -276,7 +279,14 @@ public class BlackGuild extends BlackObject implements Guild {
 	return this.leaveChannel;
     }
 
+    @ConfigGetter(key = "leavechannel", requiredPermissions = { Permission.MANAGE_SERVER }, description = "Set the Channel the Message on leave should be sent to")
+    public TextChannel getLeaveChannelAsChannel() {
+	if (this.leaveChannel == -1) return null;
+	return this.guild.getTextChannelById(this.leaveChannel);
+    }
+
     @DashboardSetter(value = "utils.joinleave.leave.channel", nullable = true)
+    @ConfigSetter(argumentsDescription = { "The Channel where the message should get sent to" }, key = "leavechannel", requiredPermissions = { Permission.MANAGE_SERVER }, nullable = true)
     public void setLeaveChannel(final TextChannel channel) {
 	if (channel == null) {
 	    this.setLeaveChannel(-1);
