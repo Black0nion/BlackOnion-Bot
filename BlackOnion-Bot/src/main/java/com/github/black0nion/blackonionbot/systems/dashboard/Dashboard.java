@@ -167,7 +167,7 @@ public class Dashboard {
 	}
     }
 
-    private static Integer[] parseInteger(final int i, final Object... args) {
+    public static Integer[] parseInteger(final int i, final Object... args) {
 	final Integer[] obj = new Integer[args.length - i];
 	for (int j = i; j < args.length; j++) {
 	    final int index = j - i;
@@ -191,7 +191,7 @@ public class Dashboard {
 	return obj;
     }
 
-    private static int[] parseIntegerPrimitive(final int i, final Object... args) {
+    public static int[] parseIntegerPrimitive(final int i, final Object... args) {
 	final int[] obj = new int[args.length - i];
 	for (int j = i; j < args.length; j++) {
 	    final int index = j - i;
@@ -215,7 +215,7 @@ public class Dashboard {
 	return obj;
     }
 
-    private static long[] parseLongPrimitive(final int i, final Object... args) {
+    public static long[] parseLongPrimitive(final int i, final Object... args) {
 	final long[] obj = new long[args.length - i];
 	for (int j = i; j < args.length; j++) {
 	    final int index = j - i;
@@ -239,7 +239,7 @@ public class Dashboard {
 	return obj;
     }
 
-    private static Long[] parseLong(final int i, final Object... args) {
+    public static Long[] parseLong(final int i, final Object... args) {
 	final Long[] obj = new Long[args.length - i];
 	for (int j = i; j < args.length; j++) {
 	    final int index = j - i;
@@ -263,12 +263,12 @@ public class Dashboard {
 	return obj;
     }
 
-    private static <T> T getValue(final Class<T> desiredType, final Object o) {
+    public static <T> T getValue(final Class<T> desiredType, final Object o) {
 	if (o.getClass().isAssignableFrom(desiredType)) return desiredType.cast(o);
 	else throw new IllegalArgumentException();
     }
 
-    private static long parseLong(final Object obj) {
+    public static long parseLong(final Object obj) {
 	try {
 	    return Long.parseLong((String) obj);
 	} catch (final Exception e) {
@@ -276,7 +276,7 @@ public class Dashboard {
 	}
     }
 
-    private static int parseInt(final Object obj) {
+    public static int parseInt(final Object obj) {
 	try {
 	    return Integer.parseInt((String) obj);
 	} catch (final Exception e) {

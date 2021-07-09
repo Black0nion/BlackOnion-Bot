@@ -12,15 +12,15 @@ import net.dv8tion.jda.api.Permission;
 @Target(METHOD)
 /**
  * Annotate a Method with this annotation and it will automatically get
- * registered as a valid config for the
+ * registered as a valid config getter for the
  * {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
  *
  * @author _SIM_
  */
-public @interface Config {
+public @interface ConfigGetter {
     public String key();
 
-    public String[] argumentsDescription();
-
     public Permission[] requiredPermissions() default Permission.EMPTY_PERMISSIONS;
+
+    public String description() default "EMPTY";
 }

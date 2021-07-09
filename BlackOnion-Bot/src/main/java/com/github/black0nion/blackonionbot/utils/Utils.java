@@ -129,9 +129,18 @@ public class Utils {
 
     public static boolean isInteger(final String input) {
 	try {
-	    Integer.parseInt(input);
+	    Integer.parseInt(input.trim());
 	    return true;
 	} catch (final Exception e) {
+	    return false;
+	}
+    }
+
+    public static boolean isInteger(final Object input) {
+	try {
+	    Integer.parseInt(((String) input).trim());
+	    return true;
+	} catch (final Exception ignored) {
 	    return false;
 	}
     }
