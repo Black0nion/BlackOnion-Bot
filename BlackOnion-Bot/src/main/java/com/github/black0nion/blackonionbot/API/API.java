@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.API;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -126,15 +127,20 @@ public class API {
 		final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
 		try {
 		    response.header("Access-Control-Allow-Origin", "*");
+
+		    final HashMap<String, String> headers = new HashMap<>();
+		    request.headers().forEach(head -> {
+			headers.put(head.toLowerCase(), request.headers(head));
+		    });
+		    if (!headers.keySet().containsAll(Arrays.asList(req.requiredParameters()))) {
+			response.status(400);
+			return "";
+		    }
+
 		    JSONObject body = new JSONObject();
 		    if (req.requiredBodyParameters().length != 0) {
 			body = new JSONObject(request.body());
 		    }
-
-		    final HashMap<String, String> headers = new HashMap<>();
-		    request.headers().forEach(head -> {
-			headers.put(head, request.headers(head));
-		    });
 
 		    String sessionId = null;
 		    BlackSession session = null;
