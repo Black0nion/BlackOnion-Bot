@@ -75,32 +75,38 @@ public class Logger {
 	}
     }
 
-    public static void logInfo(final String logInput, final LogOrigin origin) {
-	log(LogMode.INFORMATION, origin, logInput);
-    }
-
-    public static void logWarning(final String logInput, final LogOrigin origin) {
-	log(LogMode.WARNING, origin, logInput);
-    }
-
-    public static void logError(final String logInput, final LogOrigin origin) {
-	log(LogMode.ERROR, origin, logInput);
-    }
-
-    public static void log(final LogMode mode, final String logInput) {
-	log(mode, LogOrigin.BOT, logInput);
-    }
-
     public static void logInfo(final String logInput) {
 	log(LogMode.INFORMATION, LogOrigin.BOT, logInput);
+    }
+
+    public static void logInfo(final String logInput, final LogOrigin origin) {
+	log(LogMode.INFORMATION, origin, logInput);
     }
 
     public static void logWarning(final String logInput) {
 	log(LogMode.WARNING, LogOrigin.BOT, logInput);
     }
 
+    public static void logWarning(final String logInput, final LogOrigin origin) {
+	log(LogMode.WARNING, origin, logInput);
+    }
+
     public static void logError(final String logInput) {
 	log(LogMode.ERROR, LogOrigin.BOT, logInput);
+    }
+
+    public static void logError(final String logInput, final LogOrigin origin) {
+	log(LogMode.ERROR, origin, logInput);
+    }
+
+    /**
+     * Logs with LogOrigin BOT
+     *
+     * @param mode
+     * @param logInput
+     */
+    public static void log(final LogMode mode, final String logInput) {
+	log(mode, LogOrigin.BOT, logInput);
     }
 
     /**

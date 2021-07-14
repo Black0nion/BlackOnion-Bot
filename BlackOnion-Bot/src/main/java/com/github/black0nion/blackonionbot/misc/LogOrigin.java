@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
+
 public enum LogOrigin {
     API, BOT, DISCORD, MONGODB, OTHER, INFLUX_DB, DASHBOARD, PLUGINS;
 
@@ -24,5 +26,41 @@ public enum LogOrigin {
 	} catch (final Exception e) {
 	    return null;
 	}
+    }
+
+    /**
+     * Logs a message with the current log origin
+     *
+     * @param input The input to log
+     */
+    public void info(final String input) {
+	Logger.log(LogMode.INFORMATION, this, input);
+    }
+
+    /**
+     * Logs a message with the current log origin
+     *
+     * @param input The input to log
+     */
+    public void warn(final String input) {
+	Logger.log(LogMode.WARNING, this, input);
+    }
+
+    /**
+     * Logs a message with the current log origin
+     *
+     * @param input The input to log
+     */
+    public void error(final String input) {
+	Logger.log(LogMode.ERROR, this, input);
+    }
+
+    /**
+     * Logs a message with the current log origin
+     *
+     * @param input The input to log
+     */
+    public void fatal(final String input) {
+	Logger.log(LogMode.FATAL, this, input);
     }
 }

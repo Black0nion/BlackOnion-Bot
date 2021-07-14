@@ -28,7 +28,7 @@ public class UpdateLineCount extends PostRequest {
 	BotInformation.line_count = newLineCount;
 	BotInformation.file_count = newFileCount;
 	API.logWarning("New file / line count! " + newLineCount + " and " + newFileCount);
-	return new JSONObject().put("success", true).put("line_count", newLineCount).put("file_count", newFileCount).toString();
+	return new JSONObject().put("line_count", newLineCount).put("file_count", newFileCount).toString();
     }
 
     @Override
@@ -39,6 +39,11 @@ public class UpdateLineCount extends PostRequest {
     @Override
     public String[] requiredParameters() {
 	return new String[] { "t0k3n" };
+    }
+
+    @Override
+    public boolean requiresLogin() {
+	return false;
     }
 
     @Override
