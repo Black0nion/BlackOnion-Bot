@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
@@ -34,6 +35,7 @@ public class OAuthUtils {
     @Nullable
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {
 	try {
+	    LogOrigin.API.info("Getting a token from code...");
 	    Unirest.setTimeouts(0, 0);
 	    final CredentialsManager manager = Bot.getCredentialsManager();
 	    final HttpResponse<String> responseRaw = Unirest.post("https://discord.com/api/v9/oauth2/token").header("Content-Type", "application/x-www-form-urlencoded").field("client_id", manager.getString("client_id")).field("client_secret", manager.getString("client_secret")).field("grant_type", "authorization_code").field("code", code).field("redirect_uri", manager.getString("redirect_uri")).asString();
@@ -78,6 +80,8 @@ public class OAuthUtils {
     private static DiscordUser loadUserFromToken(final String accessToken) {
 	final JSONObject userinfo = getUserInfoFromToken(accessToken);
 	if (userinfo == null) return null;
-	return new DiscordUser(accessToken, userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
+	final DiscordUser discordUser = new DiscordUser(accessToken, userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
+	LogOrigin.API.info("Loaded user " + discordUser.getFullName() + "!");
+	return discordUser;
     }
 }

@@ -15,7 +15,6 @@ import org.reflections.Reflections;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.mongodb.client.MongoCollection;
@@ -60,7 +59,7 @@ public class API {
 		e.printStackTrace();
 	    }
 	}
-	Spark.init();
+	//Spark.init();
 	// -----------------Map Requests-----------------
 	final Set<Class<? extends BlackRequest>> requestClasses = reflections.getSubTypesOf(BlackRequest.class);
 
@@ -82,17 +81,18 @@ public class API {
 	    response.type("application/json");
 	    response.status(500);
 	    logError("Some internal server error happened! URL: " + request.url());
-	    return new JSONObject().put("success", false).put("reason", 500).toString();
+	    return new JSONObject().put("reason", 500).toString();
 	});
 
 	Spark.notFound((request, response) -> {
+	    System.out.println("nd found");
 	    response.header("Access-Control-Allow-Origin", "*");
 	    response.type("application/json");
 	    response.status(404);
-	    return new JSONObject().put("success", false).put("reason", 404).toString();
+	    return new JSONObject().put("reason", 404).toString();
 	});
 
-	final String ratelimited = new JSONObject().put("success", false).put("error", "ratelimited").toString();
+	final String ratelimited = new JSONObject().put("error", "ratelimited").toString();
 	Spark.before((req, res) -> {
 	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
 	    logInfo("IP " + ip + " tried to connect to " + req.url());
@@ -142,24 +142,24 @@ public class API {
 			body = new JSONObject(request.body());
 		    }
 
-		    String sessionId = null;
 		    BlackSession session = null;
 		    if (req.requiresLogin()) {
-			sessionId = request.headers("sessionid");
+			final String sessionId = request.headers("sessionid");
 			final Bson filter = Filters.eq("sessionid", sessionId);
 			final Document sessionInfo = collection.find(filter).first();
 			if (sessionInfo != null) {
 			    if (!(sessionInfo.containsKey("access_token") && sessionInfo.containsKey("refresh_token"))) {
 				collection.deleteOne(filter);
 				response.status(403);
-				return new JSONObject().append("success", false).append("detailedReason", "Your Session has no Tokens.").toString();
+				return new JSONObject().put("reason", "Your Session has no Tokens.").toString();
 			    } else {
 				// everything good, the session is existing and even has tokens, great
 				session = new BlackSession(sessionId);
 			    }
-			} else {
+			}
+			if (session == null || session.getUser() == null) {
 			    response.status(401);
-			    return new JSONObject().append("success", false).append("detailedReason", "Not logged in.").toString();
+			    return new JSONObject().put("reason", "Not logged in.").toString();
 			}
 		    }
 
@@ -173,10 +173,10 @@ public class API {
 		    response.type("application/json");
 		    if (e instanceof JSONException) {
 			response.status(400);
-			return new JSONObject().put("success", false).put("reason", 400).put("detailedReason", "jsonException").toString();
+			return new JSONObject().put("reason", 400).put("reason", "jsonException").toString();
 		    } else {
 			response.status(500);
-			return new JSONObject().put("success", false).put("reason", 500).put("detailedReason", "exception").toString();
+			return new JSONObject().put("reason", 500).put("reason", "exception").toString();
 		    }
 		}
 	    };
@@ -193,14 +193,14 @@ public class API {
     }
 
     public static void logInfo(final String logInput) {
-	Logger.logInfo(logInput, LogOrigin.API);
+	LogOrigin.API.info(logInput);
     }
 
     public static void logWarning(final String logInput) {
-	Logger.logWarning(logInput, LogOrigin.API);
+	LogOrigin.API.warn(logInput);
     }
 
     public static void logError(final String logInput) {
-	Logger.logError(logInput, LogOrigin.API);
+	LogOrigin.API.error(logInput);
     }
 }
