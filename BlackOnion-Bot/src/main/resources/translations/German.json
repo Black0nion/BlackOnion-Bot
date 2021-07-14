@@ -235,7 +235,7 @@
     "pleaseremoveprofanity": "Bitte entferne alle unangebrachten Wörter aus deiner Nachricht!",
     "foundabug": "Du hast einen Bug gefunden?",
     "plsreportbug": "Dann melde ihn doch bitte!",
-    "inourgitrepo": "Erstelle bitte eine Issue in diesem Repository: %repo%",
+    "inourgithubrepo": "Erstelle bitte eine Issue in diesem Repository: %repo%",
     "antiswearstatus": "AntiSwear ist gerade %status%",
     "howtoantiswearstatustoggle": "Um AntiSwear ein oder aus zu schalten, benutze %command%",
     "bannedusage": "Die Benutzung der Befehle wurde untersagt!",
