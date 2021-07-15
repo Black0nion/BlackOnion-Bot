@@ -25,7 +25,7 @@ import spark.Spark;
 
 public class API {
 
-    private static HashMap<String, BlackRequest> requests = new HashMap<>();
+    private static final HashMap<String, BlackRequest> requests = new HashMap<>();
     private static final List<String> websocketEndpoints = new ArrayList<>();
 
     private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
@@ -59,7 +59,8 @@ public class API {
 		e.printStackTrace();
 	    }
 	}
-	//Spark.init();
+	Spark.init();
+
 	// -----------------Map Requests-----------------
 	final Set<Class<? extends BlackRequest>> requestClasses = reflections.getSubTypesOf(BlackRequest.class);
 
@@ -84,21 +85,11 @@ public class API {
 	    return new JSONObject().put("reason", 500).toString();
 	});
 
-	Spark.notFound((request, response) -> {
-	    System.out.println("nd found");
-	    response.header("Access-Control-Allow-Origin", "*");
-	    response.type("application/json");
-	    response.status(404);
-	    return new JSONObject().put("reason", 404).toString();
-	});
-
 	final String ratelimited = new JSONObject().put("error", "ratelimited").toString();
 	Spark.before((req, res) -> {
 	    final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
 	    logInfo("IP " + ip + " tried to connect to " + req.url());
-	    if (!requests.containsKey(req.uri())) {
-		if (websocketEndpoints.contains(req.uri())) return;
-		// will error
+	    if (!requests.containsKey(req.uri()) && !websocketEndpoints.contains(req.uri())) {
 	    } else {
 		final BlackRequest request = requests.get(req.uri());
 		// RATE LIMITING:
@@ -190,6 +181,18 @@ public class API {
 		logError(type.name() + " has no Spark method reference!");
 	    }
 	}
+
+	final String notFoundJson = new JSONObject().put("reason", 404).toString();
+	final Route notFoundRoute = (request, response) -> {
+	    response.header("Access-Control-Allow-Origin", "*");
+	    response.type("application/json");
+	    response.status(404);
+	    return notFoundJson;
+	};
+
+	Spark.notFound(notFoundRoute);
+	Spark.get("*", notFoundRoute);
+	Spark.post("*", notFoundRoute);
     }
 
     public static void logInfo(final String logInput) {
