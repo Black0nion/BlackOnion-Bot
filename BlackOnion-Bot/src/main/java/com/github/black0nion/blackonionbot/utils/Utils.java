@@ -9,10 +9,12 @@ import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,9 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class Utils {
 
-    public static List<Character> alphabet = new ArrayList<>();
+    public static final List<Character> alphabet = new ArrayList<>();
+
+    public static final Permission[] EMPTY_PERMISSIONS = new Permission[0];
 
     static {
 	alphabet.add('A');
@@ -182,11 +186,11 @@ public class Utils {
     }
 
     /**
-     * @param  guild
-     * @param  author
-     * @param  channel
-     * @param  permissions
-     * @return             missing permissions?
+     * @param guild
+     * @param author
+     * @param channel
+     * @param permissions
+     * @return missing permissions?
      */
     public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, final Permission... permissions) {
 	if (channel == null) {
@@ -243,5 +247,15 @@ public class Utils {
 
     public static void printLogo() {
 	System.out.println("   ___  __         __   ____       _                  ___       __ \r\n" + "  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_\r\n" + " / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/\r\n" + "/____/_/\\_|_|\\__/_/\\_\\\\____/_//_/_/\\___/_//_/      /____/\\___/\\__/\n");
+    }
+
+    private static final DecimalFormat ROUNDED_DOUBLE_DECIMALFORMAT;
+
+    static {
+	final DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
+	otherSymbols.setDecimalSeparator('.');
+	otherSymbols.setGroupingSeparator(',');
+	ROUNDED_DOUBLE_DECIMALFORMAT = new DecimalFormat("####0.00", otherSymbols);
+	ROUNDED_DOUBLE_DECIMALFORMAT.setGroupingUsed(false);
     }
 }
