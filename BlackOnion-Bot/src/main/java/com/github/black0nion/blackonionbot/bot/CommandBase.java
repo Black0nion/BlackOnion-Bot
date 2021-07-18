@@ -180,6 +180,7 @@ public class CommandBase extends ListenerAdapter {
 		cmde.setCommand(cmd);
 		cmd.execute(args, cmde, event, message, member, author, guild, channel);
 	    });
+
 	    return;
 	}
 

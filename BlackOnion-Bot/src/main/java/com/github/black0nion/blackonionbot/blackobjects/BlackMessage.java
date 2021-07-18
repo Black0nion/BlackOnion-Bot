@@ -39,6 +39,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ComponentLayout;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -485,5 +486,10 @@ public class BlackMessage extends BlackObject implements Message {
     @Override
     public MessageAction reply(final MessageEmbed content) {
 	return this.message.replyEmbeds(content);
+    }
+
+    @Override
+    public MessageAction editMessageComponents(final Collection<? extends ComponentLayout> components) {
+	return this.message.editMessageComponents(components);
     }
 }
