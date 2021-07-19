@@ -1,30 +1,18 @@
 package com.github.black0nion.blackonionbot.API;
 
-import org.json.JSONObject;
+import com.github.black0nion.blackonionbot.utils.Time;
 
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
+public abstract class GetRequest extends BlackRequest {
+    @Override
+    public abstract String url();
 
-import spark.Request;
-import spark.Response;
+    @Override
+    public Time rateLimit() {
+	return Time.MINUTES(40);
+    }
 
-public interface GetRequest {
-	String handle(Request request, Response response, JSONObject body, DiscordUser user);
-	
-	default boolean requiresLogin() {
-		return false;
-	}
-	
-	default boolean requiresAdmin() {
-		return false;
-	}
-	
-	default boolean isJson() {
-		return true;
-	}
-	
-	String url();
-	
-	default String[] requiredParameters() {
-		return new String[] {};
-	}
+    @Override
+    public RequestType type() {
+	return RequestType.GET;
+    }
 }

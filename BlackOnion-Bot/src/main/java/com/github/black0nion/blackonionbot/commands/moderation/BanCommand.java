@@ -17,33 +17,37 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class BanCommand extends Command {
-	
-	public BanCommand() {
-		this.setCommand("ban", "permayeet")
-			.setSyntax("<@User> [reason]")
-			.setRequiredArgumentCount(1)
-			.setRequiredPermissions(Permission.BAN_MEMBERS)
-			.setRequiredBotPermissions(Permission.BAN_MEMBERS);
-	}
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
-		if (mentionedMembers.size() == 0) {
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("tagornameuser"), false).build()).queue();
-			return;
+    public BanCommand() {
+	this.setCommand("ban", "permayeet").setSyntax("<@User> [reason]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.BAN_MEMBERS).setRequiredBotPermissions(Permission.BAN_MEMBERS);
+    }
+
+    @Override
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
+	if (mentionedMembers.size() == 0) {
+	    message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("tagornameuser"), false).build()).queue();
+	    return;
+	} else {
+	    String banMessage = author.getLanguage().getTranslationNonNull("yougotbanned");
+	    final BlackMember userToBan = mentionedMembers.get(0);
+
+	    if (member.canInteract(userToBan)) {
+		if (args.length >= 3) {
+		    banMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+		    guild.ban(userToBan, 0, banMessage).queue();
 		} else {
-			String banMessage = author.getLanguage().getTranslationNonNull("yougotbanned");
-			if (args.length >= 3) {
-				banMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-				guild.ban(mentionedMembers.get(0), 0, banMessage).queue();
-			} else
-				guild.ban(mentionedMembers.get(0), 0).queue();
-			final String finalBanMessage = banMessage;
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(cmde.getTranslation("usergotbanned"), cmde.getTranslation("message", new Placeholder("msg", banMessage)), false).build()).queue();
-			mentionedMembers.get(0).getBlackUser().openPrivateChannel().queue(c -> {
-				c.sendMessage(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(author.getLanguage().getTranslation("yougotbanned"), author.getLanguage().getTranslation("message", new Placeholder("msg", finalBanMessage)), false).build()).queue();
-			});
+		    guild.ban(userToBan, 0).queue();
 		}
+		final String finalBanMessage = banMessage;
+		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(cmde.getTranslation("usergotbanned"), cmde.getTranslation("message", new Placeholder("msg", banMessage)), false).build()).queue();
+		userToBan.getBlackUser().openPrivateChannel().queue(c -> {
+		    c.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(author.getLanguage().getTranslation("yougotbanned"), author.getLanguage().getTranslation("message", new Placeholder("msg", finalBanMessage)), false).build()).queue();
+		});
+	    } else {
+		cmde.error("usertoopowerful", "loweruserthanu");
+		return;
+	    }
 	}
+    }
 }

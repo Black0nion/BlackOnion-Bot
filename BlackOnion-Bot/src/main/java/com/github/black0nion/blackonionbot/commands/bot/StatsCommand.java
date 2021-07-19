@@ -49,7 +49,8 @@ public class StatsCommand extends Command {
 				.addField("messagessent", String.valueOf(ValueManager.getInt("messagesSent")), true)
 				.addField("commands", String.valueOf(CommandBase.commandsArray.size()), true)
 				.addField("ping", e.getJDA().getGatewayPing() + "ms", true)
-				.addField("uptime", Utils.parseDate(diff), false)
+				.addField("uptime", Utils.parseDate(diff), true)
+				.addField("version", BotInformation.version, true)
 				.setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 				.setTimestamp(Instant.now());
 			cmde.reply(builder);

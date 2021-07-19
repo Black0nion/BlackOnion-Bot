@@ -1,70 +1,54 @@
 package com.github.black0nion.blackonionbot.API.impl.get;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
-import com.github.black0nion.blackonionbot.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 import spark.Request;
 import spark.Response;
 
-public class GetGuildsToManage implements GetRequest {
+public class GetGuildsToManage extends GetRequest {
 
-	@Override
-	public String handle(Request request, Response response, JSONObject body, DiscordUser user) {
-		if (request.headers("token") == null) {
-			response.status(401);
-			return new JSONObject().put("success", false).toString();
+    @Override
+    public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession session) {
+	final DiscordUser user = session.getUser();
+	final JSONObject guildsObj = new JSONObject(session.getUser());
+
+	final JSONArray guildsResponse = user.getGuilds();
+	final JSONArray guilds = new JSONArray();
+
+	guildsResponse.forEach(obj -> {
+	    final JSONObject guildAsJson = (JSONObject) obj;
+	    final Guild guild = Bot.jda.getGuildById(guildAsJson.getString("id"));
+	    final long permissions = guildAsJson.getLong("permissions");
+	    if ((permissions & (1 << 3 | 1 << 5)) != 0) {
+		if (guild != null) {
+		    guildAsJson.put("bot_in_guild", true);
+		} else {
+		    guildAsJson.put("bot_in_guild", false);
 		}
-		
-		JSONObject userInfo = Utils.getUserInfoFromToken(request.headers("token"));
-		
-		List<Guild> guildsToManage = new ArrayList<>();
-		
-		try {
-			Unirest.setTimeouts(0, 0);
-			HttpResponse<String> resp = Unirest.get("https://discord.com/api/users/@me/guilds")
-			  .header("Authorization", "Bot " + Bot.getCredentialsManager().getString("token"))
-			  .asString();
-			
-			JSONArray jsonResponse = new JSONArray(resp.getBody());
-			
-			for (int i = 0; i < jsonResponse.length(); i++) {
-				JSONObject obj = jsonResponse.getJSONObject(i);
-				System.out.println(obj + "\n\n");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		Bot.jda.getMutualGuilds(User.fromId(userInfo.getString("id"))).forEach(entry -> {
-			if (entry.getMemberById(userInfo.getString("id")) != null && entry.getMemberById(userInfo.getString("id")).getPermissions().contains(Permission.ADMINISTRATOR)) guildsToManage.add(entry);
-		});
-		
-		System.out.println(guildsToManage);
-		
-		return new JSONObject().toString();
-	}
+		guilds.put(guildAsJson);
+	    }
+	});
 
-	@Override
-	public String url() {
-		return "getguildstomanage";
-	}
-	
-	@Override
-	public String[] requiredParameters() {
-		return new String[0];
-	}
+	guildsObj.put("guilds", guilds);
+	return guildsObj.toString();
+    }
 
+    @Override
+    public String url() {
+	return "guilds";
+    }
+
+    @Override
+    public boolean requiresLogin() {
+	return true;
+    }
 }

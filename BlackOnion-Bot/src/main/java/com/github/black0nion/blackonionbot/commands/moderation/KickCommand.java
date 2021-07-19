@@ -16,28 +16,31 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class KickCommand extends Command {
-	
-	public KickCommand() {
-		this.setCommand("kick", "yeet")
-			.setSyntax("<@User> [reason]")
-			.setRequiredArgumentCount(1)
-			.setRequiredPermissions(Permission.KICK_MEMBERS)
-			.setRequiredBotPermissions(Permission.KICK_MEMBERS);
-	}
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
-		if (mentionedMembers.size() == 0) {
-			cmde.error("wrongargument", "tagornameuser");
-			return;
-		} else {
-			guild.kick(mentionedMembers.get(0)).queue();
-			final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : cmde.getTranslation("yougotkicked");
-			cmde.success("kick", "usergotkicked", "message", new Placeholder("msg", kickMessage));
-			mentionedMembers.get(0).getBlackUser().openPrivateChannel().queue(c -> {
-				cmde.error("kick", "yougotkicked", "message", new Placeholder("msg", kickMessage));
-			});
-		}
+    public KickCommand() {
+	this.setCommand("kick", "yeet").setSyntax("<@User> [reason]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.KICK_MEMBERS).setRequiredBotPermissions(Permission.KICK_MEMBERS);
+    }
+
+    @Override
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
+	if (mentionedMembers.size() == 0) {
+	    cmde.error("wrongargument", "tagornameuser");
+	    return;
+	} else {
+	    final BlackMember userToKick = mentionedMembers.get(0);
+
+	    if (member.canInteract(userToKick)) {
+		guild.kick(userToKick).queue();
+		final String kickMessage = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : cmde.getTranslation("yougotkicked");
+		cmde.success("kick", "usergotkicked", "message", new Placeholder("msg", kickMessage));
+		userToKick.getBlackUser().openPrivateChannel().queue(c -> {
+		    cmde.error("kick", "yougotkicked", "message", new Placeholder("msg", kickMessage));
+		});
+	    } else {
+		cmde.error("usertoopowerful", "loweruserthanu");
+		return;
+	    }
 	}
+    }
 }
