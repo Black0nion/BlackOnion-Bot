@@ -122,10 +122,9 @@ public class Bot extends ListenerAdapter {
 
 	final EventWaiter waiter = new EventWaiter();
 
-	builder.addEventListeners(new CommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new EventEndpoint(), waiter);
+	builder.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new EventEndpoint(), waiter);
 
 	LanguageSystem.init();
-	CommandBase.addCommands(waiter);
 	builder.setStatus(StatusCommand.getStatusFromFile());
 	builder.setActivity(ActivityCommand.getActivity());
 	builder.setMaxReconnectDelay(32);
@@ -138,6 +137,8 @@ public class Bot extends ListenerAdapter {
 	    System.exit(-1);
 	}
 
+	CommandBase.addCommands(waiter);
+	SlashCommandBase.addCommands(waiter);
 	InfluxManager.init();
 	BotInformation.init();
 	BirthdaySystem.init();
