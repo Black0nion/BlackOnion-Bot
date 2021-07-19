@@ -356,5 +356,7 @@
     "addedperms": "Permissions hinzugefügt!",
     "addedpermslist": "Folgende Permissions wurden %user% hinzugefügt: `%perms%`",
     "permissions": "Permissions",
-    "helpmenuexpired": "Dieses Hilfe-Menü ist abgelaufen. Bitte benutze `%cmd%` um ein neues zu bekommen!"
+    "helpmenuexpired": "Dieses Hilfe-Menü ist abgelaufen. Bitte benutze `%cmd%` um ein neues zu bekommen!",
+    "notwitchurl": "Keine gültige Livestream-URL angegeben!",
+    "pleasevalidtwitchurl": "Die URL muss im Format `https://twitch.tv/` oder `https://youtube.com/watch?v=` sein."
 }
