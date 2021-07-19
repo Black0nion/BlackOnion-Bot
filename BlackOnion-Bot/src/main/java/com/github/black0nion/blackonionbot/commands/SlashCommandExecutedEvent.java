@@ -77,6 +77,10 @@ public class SlashCommandExecutedEvent {
 	this.reply(this.success().addField(name, value, false));
     }
 
+    public void successPrivate(final String name, final String value) {
+	this.replyPrivate(this.success().addField(name, value, false));
+    }
+
     public void success(final String title, final String name, final String value) {
 	this.reply(this.success().setTitle(title).addField(name, value, false));
     }
@@ -161,8 +165,16 @@ public class SlashCommandExecutedEvent {
 	this.event.replyEmbeds(builder.build()).queue();
     }
 
+    public void replyPrivate(final EmbedBuilder builder) {
+	this.event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+    }
+
     public void sendPleaseUse() {
 	this.reply(this.getWrongArgument());
+    }
+
+    public void sendPleaseUsePrivate() {
+	this.replyPrivate(this.getWrongArgument());
     }
 
     public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final SlashCommand command) {

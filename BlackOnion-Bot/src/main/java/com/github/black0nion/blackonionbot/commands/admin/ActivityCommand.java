@@ -1,16 +1,14 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -19,28 +17,30 @@ import com.github.black0nion.blackonionbot.utils.ValueManager;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class ActivityCommand extends Command {
+public class ActivityCommand extends SlashCommand {
 
     public ActivityCommand() {
-	this.setCommand("activity").setSyntax("([playing | watching | listening] <Text>) | clear").setRequiredArgumentCount(1).setHidden().setCategory(Category.BOT);
+	this.setData(new CommandData("activity", "Sets the activity of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The type of the activity", true).addChoice("Playing", "playing").addChoice("Watching", "watching").addChoice("Listening", "listening"), new OptionData(OptionType.STRING, "message", "The custom message to stand after the type"))).setHidden();
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	message.delete().queue();
-	final String activityType = args[1].toLowerCase();
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final String activityType = e.getOptionsByName("type").get(0).getAsString();
 
 	if (activityType.equalsIgnoreCase("clear")) {
 	    ValueManager.remove("activityType");
 	    Bot.restartSwitchingStatus(e.getJDA());
-	    message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("activitycleared", "theactivitygotcleared", false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
+	    cmde.successPrivate("activitycleared", "theactivitygotcleared");
 	    return;
 	}
 
-	if (args.length < 2) {
-	    cmde.sendPleaseUse(msg -> msg.delete().queueAfter(3, TimeUnit.SECONDS));
+	if (e.getOptionsByName("message").size() == 0) {
+	    cmde.sendPleaseUsePrivate();
 	    return;
 	}
 

@@ -32,8 +32,9 @@ public abstract class SlashCommand {
 	return this.data;
     }
 
-    public void setData(final CommandData data) {
+    public SlashCommand setData(final CommandData data) {
 	this.data = data;
+	return this;
     }
 
     public Category getCategory() {
