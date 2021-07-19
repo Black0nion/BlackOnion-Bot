@@ -1,56 +1,52 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import java.time.Duration;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class StatusCommand extends Command {
+public class StatusCommand extends SlashCommand {
 
     public StatusCommand() {
-	this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setHidden().setRequiredArgumentCount(1);
+	this.setData(new CommandData("status", "Set the status of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The status to set the bot to", true).addChoice("Online", "online").addChoice("Offline", "offline").addChoice("Away from Keyboard (AFK)", "afk").addChoice("Do not disturb", "dnd"))).setHidden();
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	message.delete().queue();
-	OnlineStatus status = getStatusFromFile();
-	switch (args[1]) {
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	OnlineStatus status = null;
+	switch (e.getOption("type").getAsString()) {
 	case "online":
 	    ValueManager.save("status", "online");
 	    status = OnlineStatus.ONLINE;
 	    break;
-	case "invisible":
 	case "offline":
 	    ValueManager.save("status", "offline");
 	    status = OnlineStatus.OFFLINE;
 	    break;
-	case "idle":
 	case "afk":
 	    ValueManager.save("status", "afk");
 	    status = OnlineStatus.IDLE;
 	    break;
 	case "dnd":
-	case "donotdisturb":
 	    ValueManager.save("status", "dnd");
 	    status = OnlineStatus.DO_NOT_DISTURB;
 	    break;
 	default:
-	    channel.sendMessageEmbeds(cmde.success().addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	    // shouldn't happen, if it does, punch @simulatan
+	    cmde.errorPrivate("simulatan is dumb", "bruh what lol");
 	    return;
 	}
-	channel.sendMessageEmbeds(cmde.success().addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+	cmde.successPrivate("statussetsuccess", cmde.getTranslation("newstatus", new Placeholder("status", status.name().toUpperCase())));
 
 	e.getJDA().getPresence().setStatus(status);
     }

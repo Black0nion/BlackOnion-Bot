@@ -1,21 +1,14 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import java.time.Duration;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,7 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class ActivityCommand extends SlashCommand {
 
     public ActivityCommand() {
-	this.setData(new CommandData("activity", "Sets the activity of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The type of the activity", true).addChoice("Playing", "playing").addChoice("Watching", "watching").addChoice("Listening", "listening"), new OptionData(OptionType.STRING, "message", "The custom message to stand after the type"))).setHidden();
+	this.setData(new CommandData("activity", "Sets the activity of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The type of the activity", true).addChoice("Playing", "playing").addChoice("Watching", "watching").addChoice("Listening", "listening"), new OptionData(OptionType.STRING, "message", "The custom message to stand after the type", true))).setHidden();
     }
 
     @Override
@@ -44,7 +37,7 @@ public class ActivityCommand extends SlashCommand {
 	    return;
 	}
 
-	final String status = String.join(" ", Utils.subArray(args, 2));
+	final String status = e.getOptionsByName("message").get(0).getAsString();
 
 	if (activityType.contains("playing")) {
 	    e.getJDA().getPresence().setActivity(Activity.playing(status));
@@ -53,11 +46,11 @@ public class ActivityCommand extends SlashCommand {
 	} else if (activityType.contains("listening")) {
 	    e.getJDA().getPresence().setActivity(Activity.listening(status));
 	} else {
-	    message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("wrongargument", author, guild), CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
+	    cmde.errorPrivate("wrongargument", SlashCommandExecutedEvent.getPleaseUse(guild, author, this));
 	    return;
 	}
-	message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
-	ValueManager.save("activityType", args[1]);
+	cmde.successPrivate("newactivity", activityType + " " + status);
+	ValueManager.save("activityType", activityType);
 	ValueManager.save("activity", status);
     }
 

@@ -102,6 +102,19 @@ public class SlashCommandExecutedEvent {
 	this.reply(this.success().setTitle(title).addField(name, value, false));
     }
 
+    public void successPrivate(String title, String name, String value, final Placeholder... placeholders) {
+	title = this.language.getTranslationNonNull(title);
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
+	for (final Placeholder placeholder : placeholders) {
+	    title = placeholder.process(title);
+	    name = placeholder.process(name);
+	    value = placeholder.process(value);
+	}
+
+	this.replyPrivate(this.success().setTitle(title).addField(name, value, false));
+    }
+
     public void success(String name, String value, final Placeholder... placeholders) {
 	name = this.language.getTranslationNonNull(name);
 	value = this.language.getTranslationNonNull(value);
@@ -111,6 +124,17 @@ public class SlashCommandExecutedEvent {
 	}
 
 	this.reply(this.success().addField(name, value, false));
+    }
+
+    public void successPrivate(String name, String value, final Placeholder... placeholders) {
+	name = this.language.getTranslationNonNull(name);
+	value = this.language.getTranslationNonNull(value);
+	for (final Placeholder placeholder : placeholders) {
+	    name = placeholder.process(name);
+	    value = placeholder.process(value);
+	}
+
+	this.replyPrivate(this.success().addField(name, value, false));
     }
 
     public BlackEmbed loading() {
@@ -123,6 +147,10 @@ public class SlashCommandExecutedEvent {
 
     public void error(final String name, final String value) {
 	this.reply(this.error().addField(name, value, false));
+    }
+
+    public void errorPrivate(final String name, final String value) {
+	this.replyPrivate(this.error().addField(name, value, false));
     }
 
     public void error(final String title, final String name, final String value) {
