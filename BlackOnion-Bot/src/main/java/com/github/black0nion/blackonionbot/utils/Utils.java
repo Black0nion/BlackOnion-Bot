@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.google.common.hash.Hashing;
 
@@ -212,6 +213,14 @@ public class Utils {
 	String output = "```";
 	for (int i = 0; i < permissions.length; i++) {
 	    output += "- " + permissions[i].getName() + (i == permissions.length - 1 ? "```" : "\n");
+	}
+	return output;
+    }
+
+    public static String getPermissionString(final CustomPermission... permissions) {
+	String output = "```";
+	for (int i = 0; i < permissions.length; i++) {
+	    output += "- " + permissions[i].name() + (i == permissions.length - 1 ? "```" : "\n");
 	}
 	return output;
     }

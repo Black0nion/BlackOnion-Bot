@@ -35,6 +35,7 @@ public class Language {
 		return;
 	    }
 
+	    System.out.println(translations.keySet());
 	    for (final String key : translations.keySet()) {
 		if (!key.toLowerCase().equals(key)) {
 		    System.out.println(key + " is not entirely in lower case! Please correct in " + fileName + ".json!");

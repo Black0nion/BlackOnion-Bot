@@ -98,6 +98,11 @@ public abstract class SlashCommand {
 	return this;
     }
 
+    public SlashCommand permissions(final CustomPermission... permissions) {
+	this.requiredCustomPermissions = permissions;
+	return this;
+    }
+
     public SlashCommand setRequiredCustomPermissions(final CustomPermission... permissions) {
 	this.requiredCustomPermissions = permissions;
 	return this;

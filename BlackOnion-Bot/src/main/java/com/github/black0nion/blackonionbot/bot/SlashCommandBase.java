@@ -116,7 +116,10 @@ public class SlashCommandBase extends ListenerAdapter {
 	if (commands.containsKey(event.getName())) {
 	    final SlashCommand cmd = commands.get(event.getName()).getValue();
 	    FileUtils.appendToFile("files/logs/commandUsages.log", log);
-	    if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) return;
+	    if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
+		cmde.errorPrivate("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredCustomPermissions()));
+		return;
+	    }
 
 	    ValueManager.save("commandsExecuted", ValueManager.getInt("commandsExecuted") + 1);
 	    StatisticsManager.commandExecuted();

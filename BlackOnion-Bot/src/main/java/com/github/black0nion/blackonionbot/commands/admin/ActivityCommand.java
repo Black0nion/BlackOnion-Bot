@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.entities.Activity;
@@ -19,7 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class ActivityCommand extends SlashCommand {
 
     public ActivityCommand() {
-	this.setData(new CommandData("activity", "Sets the activity of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The type of the activity", true).addChoice("Playing", "playing").addChoice("Watching", "watching").addChoice("Listening", "listening").addChoice("Streaming", "streaming").addChoice("Competing", "competing"), new OptionData(OptionType.STRING, "message", "The custom message to stand after the type", true), new OptionData(OptionType.STRING, "url", "The URL of the stream (required for the STREAMING status)"))).setHidden();
+	this.setData(new CommandData("activity", "Sets the activity of the bot").addOptions(new OptionData(OptionType.STRING, "type", "The type of the activity", true).addChoice("Playing", "playing").addChoice("Watching", "watching").addChoice("Listening", "listening").addChoice("Streaming", "streaming").addChoice("Competing", "competing"), new OptionData(OptionType.STRING, "message", "The custom message to stand after the type", true), new OptionData(OptionType.STRING, "url", "The URL of the stream (required for the STREAMING status)"))).permissions(CustomPermission.SET_ACTIVITY);
     }
 
     @Override

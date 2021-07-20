@@ -1,12 +1,11 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -21,7 +20,6 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -47,50 +45,45 @@ public class ReloadCommand extends SlashCommand {
 	// "k").queue();
 	final List<OptionMapping> showlist = e.getOptionsByName("showlist");
 	if (showlist.size() != 0 && showlist.get(0).getAsBoolean()) {
-	    String reloadableMethodsString = "```";
-	    for (final Map.Entry<String, Method> entry : reloadableMethods.entrySet()) {
-		final Method meth = entry.getValue();
-		reloadableMethodsString += "\n" + entry.getKey() + ": " + meth.getDeclaringClass().getSimpleName() + "." + meth.getName();
-	    }
-	    channel.sendMessageEmbeds(cmde.success().addField("reloadables", reloadableMethodsString + "```", false).build()).delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
+	    cmde.successPrivate("reloadables", getReloadableMethodsString());
 	    return;
 	} else {
 	    final List<OptionMapping> toreload = e.getOptionsByName("toreload");
 	    if (toreload.size() == 0 || toreload.get(0).getAsString().equals("")) {
-		channel.sendMessageEmbeds(cmde.success().addField("reloading", "messagedelete5", false).build()).queue(msg -> {
+		e.replyEmbeds(cmde.loading().build()).setEphemeral(true).queue(msg -> {
 		    final ScheduledFuture<?> task = Bot.scheduledExecutor.schedule(() -> {
-			msg.editMessageEmbeds(cmde.error().addField("i fucked up", "lol reload command broken XD go fix it dumbass", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			cmde.errorPrivate("i fuckd up", "rl command broken");
 		    }, 5, TimeUnit.SECONDS);
 
 		    reload();
 		    task.cancel(true);
 
 		    final MessageEmbed builder = cmde.success().addField("configsreload", "messagedelete5", false).build();
-		    if (msg == null) {
-			channel.sendMessageEmbeds(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-		    } else {
-			msg.editMessageEmbeds(builder).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-		    }
+		    e.getHook().editOriginalEmbeds(builder).queue();
 		});
 	    } else {
 		boolean invalidConfigs = false;
-		for (final String argument : toreload.get(0).getAsString().split(" ")) {
+		final String[] split = toreload.get(0).getAsString().split(" ");
+		for (final String argument : split) {
 		    if (reloadableMethods.containsKey(argument)) {
 			final Method method = reloadableMethods.get(argument);
 			try {
 			    method.invoke(method.getClass());
-			    channel.sendMessageEmbeds(cmde.success().addField(cmde.getTranslation("configreload", new Placeholder("config", argument.toUpperCase())), "messagedelete5", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			    // channel.sendMessageEmbeds(cmde.success().addField(cmde.getTranslation("configreload",
+			    // new Placeholder("config", argument.toUpperCase())), "messagedelete5",
+			    // false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			} catch (final Exception ex) {
-			    cmde.exception();
+			    cmde.privateException();
 			}
 		    } else {
 			invalidConfigs = true;
 		    }
 		}
 		if (invalidConfigs) {
-		    final String translation = cmde.getTranslation("availableconfigs", new Placeholder("configs", reloadableMethods.toString()));
-		    System.out.println(translation);
-		    channel.sendMessageEmbeds(cmde.error().addField("invalidconfig", translation, false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		    final String translation = cmde.getTranslation("availableconfigs", new Placeholder("configs", getReloadableMethodsString()));
+		    cmde.errorPrivate("invalidconfig", translation);
+		} else {
+		    cmde.successPrivate("configsreloaded", "configreload", new Placeholder("config", String.join(" ", split).toUpperCase()));
 		}
 	    }
 	}
@@ -120,5 +113,12 @@ public class ReloadCommand extends SlashCommand {
 		e.printStackTrace();
 	    }
 	}
+    }
+
+    private static String getReloadableMethodsString() {
+	return "```" + reloadableMethods.entrySet().stream().map(entry -> {
+	    final Method value = entry.getValue();
+	    return entry.getKey() + ": " + value.getDeclaringClass().getSimpleName() + "." + value.getName();
+	}).collect(Collectors.joining("\n")) + "```";
     }
 }
