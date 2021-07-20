@@ -92,8 +92,10 @@ public class BlackMember extends BlackObject implements Member {
 	this.member = member;
 	this.blackGuild = blackGuild;
 
-	this.save("username", member.getEffectiveName());
-	this.save("guildname", blackGuild.getName());
+	if (configs.find(this.getIdentifier()).first() != null) {
+	    this.save("username", member.getEffectiveName());
+	    this.save("guildname", blackGuild.getName());
+	}
 	ImmutableList.copyOf(warnsCollection.find(this.getIdentifier())).stream().map(doc -> {
 	    if (doc.containsKey("reason") && doc.containsKey("issuer") && doc.containsKey("date")) return new Warn(doc.getLong("guildid"), doc.getLong("issuer"), doc.getLong("userid"), doc.getLong("date"), doc.getString("reason"));
 	    else if (doc.containsKey("issuer") && doc.containsKey("date")) return new Warn(doc.getLong("guildid"), doc.getLong("issuer"), doc.getLong("userid"), doc.getLong("date"));

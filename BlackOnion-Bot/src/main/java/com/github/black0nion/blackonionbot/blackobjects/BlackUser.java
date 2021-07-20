@@ -68,7 +68,7 @@ public class BlackUser extends BlackObject implements User {
     /**
      * Deprecated as a warning
      *
-     * @param  guild
+     * @param guild
      * @return
      */
     @Reloadable("usercache")
@@ -82,13 +82,13 @@ public class BlackUser extends BlackObject implements User {
     private BlackUser(final User user) {
 	this.user = user;
 
-	this.save("name", user.getName());
-
 	try {
 	    Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
 
 	    if (config == null) {
 		config = new Document();
+	    } else {
+		this.save("name", user.getName());
 	    }
 
 	    this.permissions = this.gOD(CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
