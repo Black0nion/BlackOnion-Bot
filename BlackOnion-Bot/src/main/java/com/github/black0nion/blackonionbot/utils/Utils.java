@@ -218,9 +218,9 @@ public class Utils {
     }
 
     public static String getPermissionString(final CustomPermission... permissions) {
-	String output = "```";
+	String output = "";
 	for (int i = 0; i < permissions.length; i++) {
-	    output += "- " + permissions[i].name() + (i == permissions.length - 1 ? "```" : "\n");
+	    output += "- `" + permissions[i].name() + "`";
 	}
 	return output;
     }

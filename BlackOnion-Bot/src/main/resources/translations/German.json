@@ -69,7 +69,7 @@
     "pong": "Pong :D",
     "myping": "Mein Ping ist **%ping%ms**",
     "reloading": "Reloading...",
-    "configreload": "Die Configs %config% wurden reloaded!",
+    "configreload": "Die Configs `%config%` wurden reloaded!",
     "configsreloaded": "Configs wurden reloaded!",
     "configsreload": "Alle Configs wurden reloaded!",
     "invalidconfig": "Ungültige Config!",

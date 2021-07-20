@@ -27,7 +27,6 @@ public class TestCommand extends Command {
     public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
 	    final List<CommandData> collect = SlashCommandBase.commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList());
-	    System.out.println("coll: " + collect);
 	    guild.updateCommands().addCommands(collect).queue(yeet -> {
 		System.out.println(yeet);
 	    }, Throwable::printStackTrace);

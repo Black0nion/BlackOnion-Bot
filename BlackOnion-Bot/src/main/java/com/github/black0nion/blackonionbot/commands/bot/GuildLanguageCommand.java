@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -36,16 +35,10 @@ public class GuildLanguageCommand extends SlashCommand {
 	    if (newLanguage != null) {
 		guild.setLanguage(newLanguage);
 		cmde.success(newLanguage.getTranslation("languageupdated"), newLanguage.getTranslation("newlanguage"), new Placeholder("newlang", newLanguage.getFullName()));
+	    } else if (optionAsString.equalsIgnoreCase("list")) {
+		cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
 	    } else {
-		String validLanguages = "\n";
-		for (final Map.Entry<String, Language> entry : LanguageSystem.getLanguages().entrySet()) {
-		    validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
-		}
-		if (optionAsString.equalsIgnoreCase("list")) {
-		    cmde.success("Languages", "Valid Languages:", validLanguages);
-		} else {
-		    cmde.error("Language doesn't exist!", "Valid Languages:", validLanguages);
-		}
+		cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
 	    }
 	} else {
 	    String language = "";
@@ -55,7 +48,7 @@ public class GuildLanguageCommand extends SlashCommand {
 	    } else {
 		language = LanguageSystem.getDefaultLanguage().getFullName();
 	    }
-	    cmde.reply(cmde.success().setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use \n`/" + this.getData().getName() + " " + SlashCommandExecutedEvent.getCommandHelp(guild, author, this) + "`\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false));
+	    cmde.reply(cmde.success().setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use \n`/" + this.getData().getName() + " " + SlashCommandExecutedEvent.getCommandHelp(guild, author, this) + "`", false));
 	}
     }
 }

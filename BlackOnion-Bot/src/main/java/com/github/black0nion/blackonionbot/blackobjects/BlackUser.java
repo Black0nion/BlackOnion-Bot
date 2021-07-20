@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.blackobjects;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.List;
@@ -130,12 +131,14 @@ public class BlackUser extends BlackObject implements User {
     }
 
     public List<CustomPermission> addPermissions(final CustomPermission... permissions) {
+	if (permissions.length == 0) return Collections.emptyList();
 	return this.addPermissions(Arrays.asList(permissions));
     }
 
     public List<CustomPermission> addPermissions(final List<CustomPermission> permissions) {
-	final List<CustomPermission> perms = this.permissions;
 	final List<CustomPermission> addedPerms = new ArrayList<>();
+	if (permissions.isEmpty()) return addedPerms;
+	final List<CustomPermission> perms = this.permissions;
 	for (final CustomPermission perm : permissions) {
 	    if (!perms.contains(perm)) {
 		perms.add(perm);
@@ -165,7 +168,11 @@ public class BlackUser extends BlackObject implements User {
 
     public void setPermissions(final List<CustomPermission> permissions) {
 	this.permissions = permissions;
-	this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
+	if (permissions.isEmpty()) {
+	    this.clear("permissions");
+	} else {
+	    this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
+	}
     }
 
     @Nonnull

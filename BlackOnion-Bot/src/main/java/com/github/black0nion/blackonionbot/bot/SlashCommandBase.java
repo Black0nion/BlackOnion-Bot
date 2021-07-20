@@ -117,7 +117,7 @@ public class SlashCommandBase extends ListenerAdapter {
 	    final SlashCommand cmd = commands.get(event.getName()).getValue();
 	    FileUtils.appendToFile("files/logs/commandUsages.log", log);
 	    if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
-		cmde.errorPrivate("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredCustomPermissions()));
+		cmde.errorPrivate("missingpermissions", cmde.getTranslation("requiredcustompermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredCustomPermissions()));
 		return;
 	    }
 
@@ -139,7 +139,7 @@ public class SlashCommandBase extends ListenerAdapter {
 	    }
 
 	    Bot.executor.submit(() -> {
-		// cmde.setSlashCommand(cmd);
+		cmde.setCommand(cmd);
 		cmd.execute(cmde, event, member, author, guild, channel);
 	    });
 	    return;

@@ -17,6 +17,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -27,7 +28,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class PermissionsCommand extends SlashCommand {
 
     public PermissionsCommand() {
-	this.setData(new CommandData("permissions", "Sets the permissions for a specific user").addOptions(new OptionData(OptionType.STRING, "type", "The sub command", true).addChoice("Add", "add").addChoice("Remove", "remove").addChoice("List", "list"), new OptionData(OptionType.USER, "user", "The user to perform the action on", true), new OptionData(OptionType.STRING, "permissions", "The permissions to add / remove (required for add and remove)"))).setHidden();
+	this.setData(new CommandData("permissions", "Sets the permissions for a specific user").addOptions(new OptionData(OptionType.STRING, "mode", "The sub command", true).addChoice("Add", "add").addChoice("Remove", "remove").addChoice("List", "list"), new OptionData(OptionType.USER, "user", "The user to perform the action on", true), new OptionData(OptionType.STRING, "permissions", "The permissions to add / remove (required for add and remove)"))).setHidden();
     }
 
     @Override
@@ -37,15 +38,16 @@ public class PermissionsCommand extends SlashCommand {
 	    final BlackUser user = BlackUser.from(e.getOptionsByType(OptionType.USER).get(0).getAsUser());
 	    if (mode.equalsIgnoreCase("list")) {
 		final List<CustomPermission> perms = user.getPermissions();
-		cmde.success("permissions", "permissionsof", perms.size() != 0 ? ("`[" + perms.stream().map(CustomPermission::name).collect(Collectors.joining(", ")) + "]`") : "empty", new Placeholder("user", user.getFullName()));
+		cmde.successPrivate("permissions", "permissionsof", perms.size() != 0 ? (perms.stream().map(perm -> "- `" + perm + "`").collect(Collectors.joining("\n"))) : "empty", new Placeholder("user", user.getFullName()));
 	    } else {
-		if (e.getOptionsByName("permissions").size() == 0) {
-		    cmde.sendPleaseUsePrivate();
+		final List<OptionMapping> optionsByName = e.getOptionsByName("permissions");
+		if (optionsByName.size() == 0) {
+		    cmde.errorPrivate("wrongargument", "nopermissionsgiven");
 		    return;
 		}
-		final String inputRaw = e.getOptionsByName("permissions").get(0).getAsString();
+		final String inputRaw = optionsByName.get(0).getAsString();
 		if (inputRaw.equals("") || inputRaw.length() == 0) {
-		    cmde.sendPleaseUsePrivate();
+		    cmde.errorPrivate("wrongargument", "nopermissionsgiven");
 		    return;
 		}
 		final String[] input = inputRaw.split(" ");

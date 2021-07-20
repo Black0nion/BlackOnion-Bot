@@ -2,34 +2,31 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class PrefixCommand extends Command {
-	
-	public PrefixCommand() {
-		this.setCommand("prefix", "changeprefix", "setprefix")
-			.setSyntax("<new prefix, no spaces, less than 10 characters>")
-			.setRequiredPermissions(Permission.ADMINISTRATOR)
-			.setRequiredArgumentCount(1);
-	}
+public class PrefixCommand extends SlashCommand {
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		if (args[1].toCharArray().length > 10) {
-			cmde.error("toolong", "undertenchars");
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();
-			return;
-		}
-		guild.setPrefix(args[1]);
-		cmde.success("prefixchanged", "myprefixis", new Placeholder("prefix", guild.getPrefix()));
+    public PrefixCommand() {
+	this.setData(new CommandData("prefix", "Sets the prefix of the bot for this server").addOption(OptionType.STRING, "prefix", "The new prefix", true)).setRequiredPermissions(Permission.ADMINISTRATOR);
+    }
+
+    @Override
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final String newPrefix = e.getOption("prefix").getAsString();
+	if (newPrefix.toCharArray().length > 10) {
+	    cmde.error("toolong", "undertenchars");
+	    return;
 	}
+	guild.setPrefix(newPrefix.replace(" ", ""));
+	cmde.success("prefixchanged", "myprefixis", new Placeholder("prefix", guild.getPrefix()));
+    }
 }

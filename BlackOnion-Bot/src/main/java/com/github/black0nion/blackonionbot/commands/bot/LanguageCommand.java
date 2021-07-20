@@ -1,44 +1,53 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
+import java.util.stream.Collectors;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class LanguageCommand extends Command {
-	
-	public LanguageCommand() {
-		this.setCommand("language", "lang", "locale", "sprache")
-			.setSyntax("[language code | list]");
-	}
+public class LanguageCommand extends SlashCommand {
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		if (args.length >= 2) {
-			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
-				final Language newLang = LanguageSystem.getLanguageFromName(args[1]);
-				author.setLanguage(newLang);
-				cmde.success(newLang.getTranslationNonNull("languageupdated"), newLang.getTranslationNonNull("newlanguage"), new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
-			} else if (args[1].equalsIgnoreCase("list"))
-				cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
-			else
-				cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
-		} else {
-			String language = "";
-			final Language userLanguage = author.getLanguage();
-			if (userLanguage != null)
-				language = userLanguage.getName() + " (" + userLanguage.getLanguageCode() + ")";
-			else
-				language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
-			cmde.success("Languages", "Your Language: " + language, "To change your language, use `" + CommandEvent.getCommandHelp(guild, author, this) + "`.\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list" + "`");
-		}
+    public LanguageCommand() {
+	this.setData(new CommandData("language", "Set your language").addOptions(new OptionData(OptionType.STRING, "lang", "The language code of your desired language", false).addChoices(LanguageSystem.getLanguages().entrySet().stream().map(entry -> new Command.Choice(entry.getValue().getFullName(), entry.getKey())).collect(Collectors.toList()))));
+    }
+
+    @Override
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final OptionMapping option = e.getOption("lang");
+	if (option != null) {
+	    final String optionAsString = option.getAsString();
+	    final Language newLanguage = LanguageSystem.getLanguageFromName(optionAsString.toUpperCase());
+	    if (newLanguage != null) {
+		author.setLanguage(newLanguage);
+		cmde.success(newLanguage.getTranslation("languageupdated"), newLanguage.getTranslation("newlanguage"), new Placeholder("newlang", newLanguage.getFullName()));
+	    } else if (optionAsString.equalsIgnoreCase("list")) {
+		cmde.success("Languages", "Valid Languages:", LanguageSystem.validLanguages);
+	    } else {
+		cmde.error("Language doesn't exist!", "Valid Languages:", LanguageSystem.validLanguages);
+	    }
+	} else {
+	    String language = "";
+	    final Language userLanguage = author.getLanguage();
+	    if (userLanguage != null) {
+		language = userLanguage.getFullName();
+	    } else {
+		language = LanguageSystem.getDefaultLanguage().getFullName();
+	    }
+	    cmde.success("Languages", "Your Language: " + language, "To change your language, use\n`/" + SlashCommandExecutedEvent.getCommandHelp(guild, author, this) + "`.");
 	}
+    }
 }

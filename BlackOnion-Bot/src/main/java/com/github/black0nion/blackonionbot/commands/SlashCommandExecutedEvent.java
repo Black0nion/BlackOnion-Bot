@@ -194,7 +194,11 @@ public class SlashCommandExecutedEvent {
     }
 
     public void replyPrivate(final EmbedBuilder builder) {
-	this.event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+	try {
+	    this.event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+	} catch (final Exception e) {
+	    e.printStackTrace();
+	}
     }
 
     public void sendPleaseUse() {
@@ -206,7 +210,7 @@ public class SlashCommandExecutedEvent {
     }
 
     public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final SlashCommand command) {
-	return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, author, command));
+	return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", "\n" + getCommandHelp(guild, author, command));
     }
 
     public static String getCommandHelp(final BlackGuild guild, final BlackUser author, final SlashCommand command) {
