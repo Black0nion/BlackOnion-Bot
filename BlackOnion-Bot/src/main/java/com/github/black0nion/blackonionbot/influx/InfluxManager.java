@@ -10,6 +10,7 @@ import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
+import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 
@@ -19,11 +20,14 @@ public class InfluxManager {
 
     public static boolean connect(final String databaseURL, final String token, final String org) {
 	if (influxDB != null) {
+	    writeApi.flush();
+	    writeApi.close();
 	    influxDB.close();
 	}
 	try {
 	    influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
 	    influxDB.getWriteApiBlocking().writePoint(Point.measurement("startupshutdown").addField("online", true));
+	    writeApi = influxDB.getWriteApi();
 	    Logger.logInfo("Connected.", LogOrigin.INFLUX_DB);
 	    return true;
 	} catch (final Exception e) {
@@ -52,9 +56,11 @@ public class InfluxManager {
 	});
     }
 
+    private static WriteApi writeApi = null;
+
     public static void save(final String bucket, final Document args) {
 	if (influxDB != null && args != null && args.size() != 0) {
-	    influxDB.getWriteApi().writePoint(Point.measurement(bucket).time(System.currentTimeMillis(), WritePrecision.MS).addFields(args));
+	    writeApi.writePoint(Point.measurement(bucket).time(System.currentTimeMillis(), WritePrecision.MS).addFields(args));
 	}
     }
 }

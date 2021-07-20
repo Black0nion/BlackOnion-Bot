@@ -74,6 +74,11 @@ public class BlackEmbed extends EmbedBuilder {
 	return this;
     }
 
+    public BlackEmbed noTitle() {
+	super.setTitle(null, null);
+	return this;
+    }
+
     @Override
     public BlackEmbed addField(String name, String value, final boolean inline) {
 	if (name == null) {

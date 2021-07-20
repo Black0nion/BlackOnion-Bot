@@ -29,7 +29,6 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
-import com.github.black0nion.blackonionbot.systems.BirthdaySystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
@@ -141,7 +140,7 @@ public class Bot extends ListenerAdapter {
 	SlashCommandBase.addCommands(waiter);
 	InfluxManager.init();
 	BotInformation.init();
-	BirthdaySystem.init();
+	// BirthdaySystem.init();
 	GiveawaySystem.init();
 	PlayerManager.init();
 	// MusicSystem.init();

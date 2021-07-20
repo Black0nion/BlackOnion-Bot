@@ -106,7 +106,7 @@ public class HelpCommand extends Command {
     }
 
     private final void waitForHelpCatSelection(final BlackMessage msg, final BlackMember author, final CommandEvent cmde) {
-	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, event -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
+	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 	    final Button button = event.getButton();
 
 	    final BlackGuild guild = cmde.getGuild();

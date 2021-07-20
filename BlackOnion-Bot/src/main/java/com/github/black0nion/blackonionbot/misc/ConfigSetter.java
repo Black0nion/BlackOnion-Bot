@@ -22,7 +22,7 @@ public @interface ConfigSetter {
 
     public String[] argumentsDescription();
 
-    public Permission[] requiredPermissions() default Permission.EMPTY_PERMISSIONS;
+    public Permission[] requiredPermissions() default {};
 
     public boolean nullable() default false;
 }

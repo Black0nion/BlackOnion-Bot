@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.Permission;
 public @interface ConfigGetter {
     public String key();
 
-    public Permission[] requiredPermissions() default Permission.EMPTY_PERMISSIONS;
+    public Permission[] requiredPermissions() default {};
 
     public String description() default "EMPTY";
 }

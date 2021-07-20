@@ -57,7 +57,7 @@ public class ClearCommand extends Command {
 		    }
 		    channel.deleteMessages(messages).queue(succ -> {
 			if (messages.size() != amount) {
-			    message.reply(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", messages.size() - amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			    message.reply(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", amount - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			} else {
 			    message.reply(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			}
