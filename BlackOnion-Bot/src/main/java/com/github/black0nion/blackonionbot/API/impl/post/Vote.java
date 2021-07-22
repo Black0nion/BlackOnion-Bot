@@ -27,7 +27,10 @@ public class Vote extends PostRequest {
 
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession u) {
-	if (!headers.get("authorization").equals(Bot.getCredentialsManager().getString("topgg_authorization", "PEeKSqJ%Xz-7_UIVS3s!Jc4-U9NSCi2!Hz!Y_XAq9DPPt8-gAKv15pW8VtqVucI&#qZOk"))) {
+	final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
+	if (!ip.equals("159.203.105.187") || !headers
+		.get("authorization")
+		.equals(Bot.getCredentialsManager().getString("topgg_authorization", "PEeKSqJ%Xz-7_UIVS3s!Jc4-U9NSCi2!Hz!Y_XAq9DPPt8-gAKv15pW8VtqVucI&#qZOk"))) {
 	    response.status(401);
 	    return "get outta here";
 	}
@@ -38,10 +41,26 @@ public class Vote extends PostRequest {
 		final String userid = body.getString("user");
 		Bot.jda.getGuildById(781214445778894898L).retrieveMemberById(userid).queue(member -> {
 		    final User user = member.getUser();
-		    channel.sendMessageEmbeds(new BlackEmbed().setColor(EmbedUtils.blackOnionColor).setDescription("**" + Utils.removeMarkdown(user.getName()) + "#" + user.getDiscriminator() + "** (" + user.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!").setFooter("Thanks for voting!", user.getEffectiveAvatarUrl()).setTimestamp(Instant.now()).build()).queue();
+		    channel
+			    .sendMessageEmbeds(new BlackEmbed()
+				    .setColor(EmbedUtils.blackOnionColor)
+				    .setDescription("**" + Utils.removeMarkdown(user.getName()) + "#" + user.getDiscriminator() + "** (" + user
+					    .getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
+				    .setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
+				    .setTimestamp(Instant.now())
+				    .build())
+			    .queue();
 		}, bruh -> {
 		    Bot.jda.retrieveUserById(userid).queue(user -> {
-			channel.sendMessageEmbeds(new BlackEmbed().setColor(EmbedUtils.blackOnionColor).setDescription("**" + Utils.removeMarkdown(user.getName()) + "#" + user.getDiscriminator() + "** (" + user.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!").setFooter("Thanks for voting!", user.getEffectiveAvatarUrl()).setTimestamp(Instant.now()).build()).queue();
+			channel
+				.sendMessageEmbeds(new BlackEmbed()
+					.setColor(EmbedUtils.blackOnionColor)
+					.setDescription("**" + Utils.removeMarkdown(user.getName()) + "#" + user.getDiscriminator() + "** (" + user
+						.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
+					.setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
+					.setTimestamp(Instant.now())
+					.build())
+				.queue();
 		    });
 		});
 	    }

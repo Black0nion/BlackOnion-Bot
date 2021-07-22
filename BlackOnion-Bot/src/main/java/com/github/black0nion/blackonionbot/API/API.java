@@ -137,6 +137,13 @@ public class API {
 			body = new JSONObject(request.body());
 		    }
 
+		    for (final String parameter : req.requiredBodyParameters()) {
+			if (!body.has(parameter)) {
+			    response.status(400);
+			    return "";
+			}
+		    }
+
 		    BlackSession session = null;
 		    if (req.requiresLogin()) {
 			final String sessionId = request.headers("sessionid");
@@ -157,7 +164,6 @@ public class API {
 			    return new JSONObject().put("reason", "Not logged in.").toString();
 			}
 		    }
-
 		    return req.handle(request, response, body, headers, session);
 		} catch (final Exception e) {
 		    logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
