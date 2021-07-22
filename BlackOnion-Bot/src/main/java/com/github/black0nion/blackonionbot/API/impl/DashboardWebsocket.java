@@ -41,6 +41,7 @@ import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.gson.Gson;
 import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.Permission;
@@ -58,12 +59,15 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 
     private static final List<Session> sessions = new ArrayList<>();
 
-    private static final LoadingCache<Session, BlackWebsocketSession> BlackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackWebsocketSession>() {
-	@Override
-	public BlackWebsocketSession load(final Session key) throws Exception {
-	    return new BlackWebsocketSession(key);
-	};
-    });
+    private static final LoadingCache<Session, BlackWebsocketSession> BlackWebsocketSessions = CacheBuilder
+	    .newBuilder()
+	    .expireAfterAccess(1, TimeUnit.MINUTES)
+	    .build(new CacheLoader<Session, BlackWebsocketSession>() {
+		@Override
+		public BlackWebsocketSession load(final Session key) throws Exception {
+		    return new BlackWebsocketSession(key);
+		};
+	    });
 
     private static final HashMap<Session, ScheduledFuture<?>> futures = new HashMap<>();
 
@@ -108,7 +112,6 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		final String[] args = messageRaw.split(" ");
 		final int id = args[0].length();
 		if (args.length < 2 || !Utils.isInteger(messageRaw.substring(1, id))) {
-		    System.out.println("error");
 		    WRONG_ARGUMENTS.send(session, null);
 		    return;
 		}
@@ -121,7 +124,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		if (command.equalsIgnoreCase("updatesetting")) {
 		    Dashboard.tryUpdateValue(request, session.getUser(), code -> code.send(session, request));
 		} else if (command.equalsIgnoreCase("userinfo")) {
-		    session.send(session.getUser());
+		    reply(session, request, session.getUser());
 		} else if (command.equalsIgnoreCase("guildsettings")) {
 		    if (!(request.has("guildid") && request.has("settings"))) {
 			WRONG_ARGUMENTS.send(session, request);
@@ -236,10 +239,13 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	}, 1, TimeUnit.MINUTES);
     }
 
-    public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable JSONObject response) {
+    public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable Object response) {
 	if (response == null) {
 	    response = new JSONObject();
+	} else if (!(response instanceof JSONObject)) {
+	    response = new Gson().toJson(response);
 	}
+
 	if (request != null && request.has("id")) {
 	    session.send("a" + request.getInt("id") + " " + response);
 	} else {
