@@ -315,6 +315,8 @@
     "messagessent": "Messages sent",
     "commands": "Commands",
     "ping": "Ping",
+    "usercount": "Usercount",
+    "guildcount": "Guildcount",
     "uptime": "Uptime",
     "version": "Version",
     "addedtoguild": "I got added to a Server  :partying_face:",
