@@ -23,6 +23,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -73,16 +74,16 @@ public class TicTacToeCommand extends Command {
 
     public void rerun(final TicTacToe game, final TextChannel channel) {
 	final BlackGuild guild = BlackGuild.from(channel.getGuild());
-	CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, answerEvent -> answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
-	    final String msg = answerEvent.getMessage().getContentRaw();
-	    final BlackUser author = BlackUser.from(answerEvent.getAuthor());
-	    answerEvent.getMessage().delete().queue();
-	    if (Utils.equalsOneIgnoreCase(msg, "exit", "stop", "cancel", "leave")) {
-		game.getMessage().editMessageEmbeds(EmbedUtils.getSuccessEmbed().setTitle(getTranslation("gaveup", author, guild)).addField(getTranslation("usergaveup", author, guild).replace("%user%", Utils.removeMarkdown(author.getName())), getTranslation("sadloose", author, guild), false).build()).queue();
+	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, answerEvent -> answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && answerEvent.getMessage().getIdLong() == game.getMessage().getIdLong() && game.isPlayer(answerEvent.getUser().getId()), answerEvent -> {
+	    answerEvent.deferEdit().queue();
+	    final BlackUser author = BlackUser.from(answerEvent.getUser());
+	    final String id = answerEvent.getButton().getId();
+	    if (id.equalsIgnoreCase("leave")) {
+		game.getMessage().editMessageEmbeds(EmbedUtils.getSuccessEmbed().setTitle(getTranslation("gaveup", author, guild)).addField(getTranslation("usergaveup", author, guild).replace("%user%", Utils.removeMarkdown(author.getName())), getTranslation("sadloose", author, guild), false).build()).setActionRows().queue();
 		TicTacToeGameManager.deleteGame(game);
 		return;
 	    } else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
-		game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed().setTitle(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).addField(getTranslation("currentstate", author, guild), game.getFieldString(), false).setDescription(getTranslation("wrongturn", author, guild)).build()).queue();
+		game.getMessage().editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.X ? game.getPlayerX().getName() : game.getPlayerY().getName()))).setDescription(getTranslation("wrongturn", author, guild)).queue();
 		this.rerun(game, channel);
 		return;
 	    } else if (game.isValidInput(msg)) {
