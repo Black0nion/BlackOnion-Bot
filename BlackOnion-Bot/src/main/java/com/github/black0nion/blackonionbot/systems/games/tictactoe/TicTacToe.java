@@ -1,16 +1,19 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Pair;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 public class TicTacToe {
     Message message;
@@ -21,6 +24,16 @@ public class TicTacToe {
     TextChannel channel;
     BlackGuild guild;
     int moves = 0;
+    private static final List<ActionRow> rows = new ArrayList<>();
+
+    static {
+	IntStream.range(0, 3).forEach(horizontal -> {
+	    final List<Button> row = new ArrayList<>();
+	    IntStream.range(0, 3).forEach(vertical -> row.add(Button.primary(horizontal + "" + vertical, "")));
+	    rows.add(ActionRow.of(row));
+	});
+	rows.add(ActionRow.of(Button.danger("leave", "Leave")));
+    }
 
     public TicTacToe(final TextChannel channel, final TicTacToePlayer playerX, final TicTacToePlayer playerY) {
 	this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
@@ -36,7 +49,7 @@ public class TicTacToe {
 
 	final BlackUser currentUser = BlackUser.from(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser()));
 
-	channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(currentUser, this.guild).setTitle(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + " | " + Utils.removeMarkdown((this.currentPlayer == FieldType.X ? playerX.getName() : playerY.getName()))).addField("currentstate", this.getFieldString(), false).build()).queue(success -> this.message = success);
+	channel.sendMessage(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setActionRows(rows).queue(success -> this.message = success);
 	this.channel = channel;
 	this.playerX = playerX;
 	this.playerY = playerY;
@@ -121,44 +134,11 @@ public class TicTacToe {
 	return false;
     }
 
-    public static Pair<Integer, Integer> getCoordinatesFromString(final String input) {
-	final char[] charInput = input.toCharArray();
-	return new Pair<Integer, Integer>(Integer.parseInt(String.valueOf(charInput[1])) - 1, Utils.alphabet.indexOf(charInput[0]));
-    }
-
-    public boolean isValidInput(final String input) {
-	final char[] charInput = input.toCharArray();
-	try {
-	    final int numbAtOne = Integer.parseInt(String.valueOf(charInput[1])) - 1;
-	    if (Utils.alphabet.contains(charInput[0]) && Utils.alphabet.indexOf(charInput[0]) < TicTacToeGameManager.SIZE && numbAtOne >= 0 && numbAtOne < TicTacToeGameManager.SIZE) return true;
-	} catch (final Exception ignored) {
-	}
-	return false;
-    }
-
     public void nextUser() {
 	if (this.currentPlayer == FieldType.X) {
 	    this.currentPlayer = FieldType.O;
 	} else {
 	    this.currentPlayer = FieldType.X;
 	}
-    }
-
-    public String getFieldString() {
-	String output = "```";
-	output += "    A   B   C\n  ┌───┬───┬───┐\n";
-	for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
-	    output += (y + 1);
-	    for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
-		output += " │" + (this.field[y][x] == FieldType.EMPTY ? "  " : " " + this.field[y][x].name());
-	    }
-	    if (y != TicTacToeGameManager.SIZE - 1) {
-		output += " │\n  ├───┼───┼───┤\n";
-	    } else {
-		output += " │\n  └───┴───┴───┘";
-	    }
-
-	}
-	return output + "```";
     }
 }
