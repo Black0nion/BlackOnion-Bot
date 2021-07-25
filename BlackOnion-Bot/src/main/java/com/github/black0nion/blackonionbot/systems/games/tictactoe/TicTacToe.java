@@ -30,7 +30,7 @@ public class TicTacToe {
 		try {
 			IntStream.range(0, 3).forEach(horizontal -> {
 				final List<Button> row = new ArrayList<>();
-				IntStream.range(0, 3).forEach(vertical -> row.add(Button.primary(horizontal + "" + vertical, " ")));
+				IntStream.range(0, 3).forEach(vertical -> row.add(Button.secondary(horizontal + "" + vertical, " ")));
 				initialRows.add(ActionRow.of(row));
 			});
 			initialRows.add(ActionRow.of(Button.danger("leave", "Leave")));
