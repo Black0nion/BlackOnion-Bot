@@ -1,188 +1,144 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.Pair;
 
 public class TicTacToeBot {
-	
+
+	public static final FieldType ai = FieldType.O;
+	public static final FieldType human = FieldType.X;
+
 	public static Pair<Integer, Integer> move(final TicTacToe game) {
-		
 		final FieldType[][] board = game.getField();
-	    boolean mademove = false;
-	    final FieldType humanMarker = FieldType.X;
-	    final FieldType botSymbol = FieldType.O;
 
-	    // check if you can take a win horizontally
-		for (int i = 0; i < 3; i++)
-			if (board[0][i].equals(board[1][i]) && board[0][i].equals(botSymbol))
-				if (board[2][i] != humanMarker && board[2][i] != botSymbol) {
-	                board[2][i] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(2, i);
-	            }
+		Pair<Integer, Integer> bestMove = null;
+		int bestScore = -100;
+		for (final Pair<Integer, Integer> position : getAvailablePositions(board)) {
+			board[position.getKey()][position.getValue()] = ai;
+			final int score = minimax(board);
+			board[position.getKey()][position.getValue()] = FieldType.EMPTY;
+			if (score > bestScore) {
+				bestScore = score;
+				bestMove = position;
+			}
+		}
+		return bestMove;
+	}
 
-	    for (int i = 0; i < 3; i++)
-			if (board[2][i].equals(board[1][i]) && board[2][i].equals(botSymbol))
-				if (board[0][i] != humanMarker && board[0][i] != botSymbol) {
-	                board[0][i] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(0, i);
-	            }
+	public static int minimax(final FieldType[][] board) {
+		final FieldType winner = checkWon(board);
+		int score;
+		if (winner != null) {
+			if (winner == ai) {
+				score = 1;
+				return score;
+			} else if (winner == FieldType.EMPTY) {
+				score = 0;
+				return score;
+			} else {
+				score = -1;
+				return score;
+			}
+		}
 
+		int aiCount = 0;
+		int humanCount = 0;
 
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				if (board[i][j] == ai) {
+					aiCount++;
+				} else if (board[i][j] == human) {
+					humanCount++;
+				}
+			}
+		}
 
-	    // check if you can take a win horizontally
-	    for (int i = 0; i < 3; i++)
-			if (board[i][0].equals(board[i][1]) && board[i][0].equals(botSymbol))
-				if (board[i][2] != humanMarker && board[i][2] != botSymbol) {
-	                board[i][2] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(i, 2);
-	            }
+		int bestScore;
+		if (humanCount > aiCount) {
+			bestScore = -1;
+		} else {
+			bestScore = 1;
+		}
 
-	    for (int i = 0; i < 3; i++)
-			if (board[i][2].equals(board[i][1]) && board[i][2].equals(botSymbol))
-				if (board[i][0] != humanMarker && board[i][0] != botSymbol) {
-	                board[i][0] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(i, 0);
-	            }
+		for (final Pair<Integer, Integer> position : getAvailablePositions(board)) {
+			board[position.getKey()][position.getValue()] = humanCount > aiCount ? ai : human;
+			final int currentScore = minimax(board);
+			board[position.getKey()][position.getValue()] = FieldType.EMPTY;
+			if (humanCount > aiCount ? currentScore > bestScore : currentScore < bestScore) {
+				bestScore = currentScore;
+			}
+		}
+		return bestScore;
+	}
 
+	private static List<Pair<Integer, Integer>> getAvailablePositions(final FieldType[][] board) {
+		final List<Pair<Integer, Integer>> availablePositions = new ArrayList<>();
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				if (board[i][j] == FieldType.EMPTY) {
+					availablePositions.add(new Pair<>(i, j));
+				}
+			}
+		}
+		return availablePositions;
+	}
 
-	    // check if you can take a win diagonally bottom
+	private static FieldType checkWon(final FieldType[][] board) {
+		FieldType checkingPlayer;
 
+		// check columns
+		for (int i = 0; i < board.length; i++) {
+			checkingPlayer = board[0][i];
+			if (checkingPlayer == FieldType.EMPTY) {
+				continue;
+			}
+			for (int j = 0; j < board[i].length; j++) {
+				if (board[j][i] != checkingPlayer) {
+					checkingPlayer = null;
+					break;
+				}
+			}
+			if (checkingPlayer != null)
+				return checkingPlayer;
+		}
 
-	    if (board[0][0].equals(board[1][1]) && board[0][0].equals(botSymbol))
-			if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
-	            board[2][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 2);
-	        }
+		// check rows
+		for (final FieldType[] cellStates : board) {
+			checkingPlayer = cellStates[0];
+			if (checkingPlayer == FieldType.EMPTY) {
+				continue;
+			}
+			for (final FieldType cellState : cellStates) {
+				if (cellState != checkingPlayer) {
+					checkingPlayer = null;
+					break;
+				}
+			}
+			if (checkingPlayer != null)
+				return checkingPlayer;
+		}
 
-	    if (board[2][2].equals(board[1][1]) && board[2][2].equals(botSymbol))
-			if (board[0][0] != humanMarker && board[0][0] != botSymbol) {
-	            board[0][0] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(0, 0);
-	        }
+		// check diagonals
+		checkingPlayer = board[0][0];
+		if (board[1][1] == checkingPlayer && board[2][2] == checkingPlayer && checkingPlayer != FieldType.EMPTY)
+			return checkingPlayer;
 
-	    if (board[0][0].equals(board[1][1]) && board[0][0].equals(botSymbol))
-			if (board[2][2] != humanMarker && board[2][2] != botSymbol) {
-	            board[2][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 2);
-	        }
+		checkingPlayer = board[2][0];
+		if (board[1][1] == checkingPlayer && board[0][2] == checkingPlayer && checkingPlayer != FieldType.EMPTY)
+			return checkingPlayer;
 
-	    if (board[0][2].equals(board[1][1]) && board[0][2].equals(botSymbol))
-			if (board[2][0] != humanMarker && board[2][0] != botSymbol) {
-	            board[2][0] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 0);
-	        }
+		// check tie;
+		for (final FieldType[] cellStates : board) {
+			for (final FieldType cellState : cellStates) {
+				if (cellState == FieldType.EMPTY)
+					return null;
+			}
+		}
 
-	    if (board[2][0].equals(board[1][1]) && board[2][0].equals(botSymbol))
-			if (board[0][2] != humanMarker && board[0][2] != botSymbol) {
-	            board[0][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(0, 2);
-	        }
-
-
-	    // BLOCKS!!!! //
-
-	    // check if you can block a win horizontally
-	    for (int i = 0; i < 3; i++)
-			if (board[0][i].equals(board[1][i]) && board[0][i].equals(humanMarker))
-				if (board[2][i] != botSymbol && board[2][i] != humanMarker) {
-	                board[2][i] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(2, i);
-	            }
-
-	    for (int i = 0; i < 3; i++)
-			if (board[2][i].equals(board[1][i]) && board[0][i].equals(humanMarker))
-				if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
-	                board[0][i] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(0, i);
-	            }
-
-	    // check if you can block a win vertically
-	    for (int i = 0; i < 3; i++)
-			if (board[i][0].equals(board[i][1]) && board[i][0].equals(humanMarker))
-				if (board[i][2] != botSymbol && board[i][2] != humanMarker) {
-	                board[i][2] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(i, 2);
-	            }
-
-	    for (int i = 0; i < 3; i++)
-			if (board[i][2].equals(board[i][1]) && board[i][2].equals(humanMarker))
-				if (board[i][0] != botSymbol && board[i][0] != humanMarker) {
-	                board[i][0] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(i, 0);
-	            }
-
-	    for (int i = 0; i < 3; i++)
-			if (board[2][i].equals(board[1][i]) && board[2][i].equals(humanMarker))
-				if (board[0][i] != botSymbol && board[0][i] != humanMarker) {
-	                board[0][i] = botSymbol;
-	                mademove = true;
-	                return new Pair<Integer, Integer>(0, i);
-	            }
-	    
-	    // check if you can block a win diagonally 
-	    if (board[0][0].equals(board[1][1]) && board[0][0].equals(humanMarker))
-			if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
-	            board[2][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 2);
-	        }
-
-	    if (board[2][2].equals(board[1][1]) && board[2][2].equals(humanMarker))
-			if (board[0][0] != botSymbol && board[0][0] != humanMarker) {
-	            board[0][0] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(0, 0);
-	        }
-
-	    if (board[0][0].equals(board[1][1]) && board[0][0].equals(humanMarker))
-			if (board[2][2] != botSymbol && board[2][2] != humanMarker) {
-	            board[2][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 2);
-	        }
-
-	    if (board[0][2].equals(board[1][1]) && board[0][2].equals(humanMarker))
-			if (board[2][0] != botSymbol && board[2][0] != humanMarker) {
-	            board[2][0] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(2, 0);
-	        }
-
-	    if (board[2][0].equals(board[1][1]) && board[2][0].equals(humanMarker))
-			if (board[0][2] != botSymbol && board[0][2] != humanMarker) {
-	            board[0][2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(0, 2);
-	        }
-	    
-	    // make random move if above rules dont apply
-	    int rand1 = 0;
-	    int rand2 = 0;
-
-	    while (!mademove) {
-	        rand1 = (int) (Math.random() * 3);
-	        rand2 = (int) (Math.random() * 3);
-
-	        if (board[rand1][rand2] != FieldType.X && board[rand1][rand2] != FieldType.O) {
-	            board[rand1][rand2] = botSymbol;
-	            mademove = true;
-	            return new Pair<Integer, Integer>(rand1, rand2);
-	        }
-	    }
-	    // theoretically, this should never get called
-	    return null;
+		return FieldType.EMPTY;
 	}
 }

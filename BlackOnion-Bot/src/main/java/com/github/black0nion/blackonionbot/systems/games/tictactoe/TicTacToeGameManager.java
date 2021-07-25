@@ -19,7 +19,6 @@ public class TicTacToeGameManager {
 	 */
 	public static TicTacToe createGame(final TextChannel channel, final TicTacToePlayer playerX, final TicTacToePlayer playerY) {
 		final TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
-		System.out.println(newGame);
 		games.add(newGame);
 		return newGame;
 	}

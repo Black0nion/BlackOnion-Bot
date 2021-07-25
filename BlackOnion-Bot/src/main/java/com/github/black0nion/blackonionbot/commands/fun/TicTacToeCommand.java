@@ -5,6 +5,7 @@ import static com.github.black0nion.blackonionbot.systems.language.LanguageSyste
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
@@ -21,7 +22,6 @@ import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeGame
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToePlayer;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Pair;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
 public class TicTacToeCommand extends Command {
 
@@ -113,14 +114,22 @@ public class TicTacToeCommand extends Command {
 			if (this.handleWin(game, coords))
 				return;
 
-			final List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);
+			List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);
+			if (game.getPlayerY().isBot()) {
+				placeAt = placeAt.stream().map(row -> ActionRow.of(row.getButtons().stream().map(b -> {
+					if (!b.getId().equals("leave"))
+						return b.asDisabled();
+					else
+						return b;
+				}).collect(Collectors.toList()))).collect(Collectors.toList());
+			}
 			game.setRows(placeAt);
-			message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.O ? game.getPlayerX().getName() : game.getPlayerY().getName()))).setActionRows(placeAt).queue();
+			message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setActionRows(placeAt).queue();
 			game.nextUser();
 
 			if (game.getPlayerY().isBot()) {
 				try {
-					Thread.sleep(Bot.random.nextInt(1500) + 1000 * (game.getMoves() / 2 + 1));
+					Thread.sleep(Bot.random.nextInt(1000) + 1000 * (game.getMoves() / 2 + 1));
 				} catch (final InterruptedException ex) {
 					ex.printStackTrace();
 				}
@@ -132,9 +141,14 @@ public class TicTacToeCommand extends Command {
 				if (this.handleWin(game, coords))
 					return;
 
-				final List<ActionRow> placeAtBot = placeAt(game.getRows(), coords, game.currentPlayer);
+				final List<ActionRow> placeAtBot = placeAt(game.getRows(), coords, game.currentPlayer).stream().map(row -> ActionRow.of(row.getButtons().stream().map(b -> {
+					if (b.getLabel().equals(" "))
+						return b.asEnabled();
+					else
+						return b;
+				}).collect(Collectors.toList()))).collect(Collectors.toList());
 				game.setRows(placeAtBot);
-				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + Utils.removeMarkdown((game.currentPlayer == FieldType.O ? game.getPlayerX().getName() : game.getPlayerY().getName()))).setActionRows(placeAtBot).queue();
+				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setActionRows(placeAtBot).queue();
 				game.nextUser();
 				this.rerun(game, channel);
 				return;
@@ -152,7 +166,7 @@ public class TicTacToeCommand extends Command {
 	private static List<ActionRow> placeAt(final List<ActionRow> actionRowsRaw, final Pair<Integer, Integer> coords, final FieldType currentPlayer) {
 		final List<ActionRow> actionRows = new ArrayList<>(actionRowsRaw);
 		final List<Button> buttons = new ArrayList<>(actionRows.get(coords.getKey()).getButtons());
-		buttons.set(coords.getValue(), Button.primary(coords.getKey() + "" + coords.getValue(), currentPlayer.name()));
+		buttons.set(coords.getValue(), Button.of(currentPlayer == FieldType.X ? ButtonStyle.SUCCESS : ButtonStyle.PRIMARY, coords.getKey() + "" + coords.getValue(), currentPlayer.name()).asDisabled());
 		final ActionRow of = ActionRow.of(buttons);
 		actionRows.set(coords.getKey(), of);
 		return actionRows;
@@ -166,7 +180,7 @@ public class TicTacToeCommand extends Command {
 			final List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);
 			placeAt.remove(3);
 			if (firstWinner != FieldType.EMPTY) {
-				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + Utils.removeMarkdown((firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())) + "!").setActionRows(placeAt).queue();
+				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + (firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention()) + "!").setActionRows(placeAt).queue();
 				TicTacToeGameManager.deleteGame(game);
 				return true;
 			} else {
