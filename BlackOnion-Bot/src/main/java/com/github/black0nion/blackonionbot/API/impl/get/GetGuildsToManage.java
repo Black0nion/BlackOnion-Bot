@@ -19,7 +19,7 @@ public class GetGuildsToManage extends GetRequest {
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession session) {
 	final DiscordUser user = session.getUser();
-	final JSONObject guildsObj = new JSONObject(session.getUser());
+	final JSONObject guildsObj = new JSONObject().put("id", user.getUserId()).put("name", user.getUserName()).put("discriminator", user.getDiscriminator()).put("locale", user.getLocale()).put("mfa", user.isMfaEnabled());
 
 	final JSONArray guildsResponse = user.getGuilds();
 	final JSONArray guilds = new JSONArray();

@@ -59,15 +59,12 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 
     private static final List<Session> sessions = new ArrayList<>();
 
-    private static final LoadingCache<Session, BlackWebsocketSession> BlackWebsocketSessions = CacheBuilder
-	    .newBuilder()
-	    .expireAfterAccess(1, TimeUnit.MINUTES)
-	    .build(new CacheLoader<Session, BlackWebsocketSession>() {
-		@Override
-		public BlackWebsocketSession load(final Session key) throws Exception {
-		    return new BlackWebsocketSession(key);
-		};
-	    });
+    private static final LoadingCache<Session, BlackWebsocketSession> BlackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackWebsocketSession>() {
+	@Override
+	public BlackWebsocketSession load(final Session key) throws Exception {
+	    return new BlackWebsocketSession(key);
+	};
+    });
 
     private static final HashMap<Session, ScheduledFuture<?>> futures = new HashMap<>();
 
@@ -193,8 +190,20 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 			    return;
 			}
 			final JSONArray response = new JSONArray();
-			guild.getTextChannels().forEach(ch -> response.put(new JSONObject().put("name", ch.getName()).put("id", ch.getIdLong())));
-			reply(session, request, new JSONObject().put("channels", response));
+			final JSONObject channelsWithoutCategory = new JSONObject().put("id", -1);
+			final JSONArray chs = new JSONArray();
+			guild.getTextChannels().stream().filter(c -> c.getParent() == null).forEach(channel -> chs.put(new JSONObject().put("name", channel.getName()).put("id", channel.getId())));
+			if (!chs.isEmpty()) {
+			    response.put(channelsWithoutCategory.put("channels", chs));
+			}
+			guild.getCategories().forEach(cat -> {
+			    final JSONObject categoryInfo = new JSONObject().put("name", cat.getName()).put("id", cat.getId());
+			    final JSONArray channels = new JSONArray();
+			    cat.getTextChannels().forEach(ch -> channels.put(new JSONObject().put("name", ch.getName()).put("id", ch.getId())));
+			    response.put(categoryInfo.put("channels", channels));
+			});
+			//guild.getTextChannels().forEach(ch -> response.put(new JSONObject().put("name", ch.getName()).put("id", ch.getIdLong())));
+			reply(session, request, response);
 		    });
 		}
 	    } catch (final Exception e) {
@@ -229,7 +238,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     }
 
     /**
-     * @param session
+     * @param  session
      * @return
      */
     private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
@@ -242,7 +251,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable Object response) {
 	if (response == null) {
 	    response = new JSONObject();
-	} else if (!(response instanceof JSONObject)) {
+	} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
 	    response = new Gson().toJson(response);
 	}
 

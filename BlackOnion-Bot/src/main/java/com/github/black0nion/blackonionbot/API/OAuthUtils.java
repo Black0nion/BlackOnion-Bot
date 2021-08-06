@@ -15,7 +15,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
 import com.google.common.cache.LoadingCache;
-import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mongodb.client.model.Filters;
@@ -30,8 +29,8 @@ public class OAuthUtils {
     });
 
     /**
-     * @param code The code from Discord
-     * @return a trio with the values: AccessToken | RefreshToken | ExpiresIn
+     * @param  code The code from Discord
+     * @return      a trio with the values: AccessToken | RefreshToken | ExpiresIn
      */
     @Nullable
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {
@@ -39,18 +38,9 @@ public class OAuthUtils {
 	    LogOrigin.API.info("Getting a token from code...");
 	    Unirest.setTimeouts(0, 0);
 	    final CredentialsManager manager = Bot.getCredentialsManager();
-	    final HttpResponse<String> responseRaw = Unirest
-		    .post("https://discord.com/api/v9/oauth2/token")
-		    .header("Content-Type", "application/x-www-form-urlencoded")
-		    .field("client_id", manager.getString("client_id"))
-		    .field("client_secret", manager.getString("client_secret"))
-		    .field("grant_type", "authorization_code")
-		    .field("code", code)
-		    .field("redirect_uri", manager.getString("redirect_uri"))
-		    .asString();
+	    final HttpResponse<String> responseRaw = Unirest.post("https://discord.com/api/v9/oauth2/token").header("Content-Type", "application/x-www-form-urlencoded").field("client_id", manager.getString("client_id")).field("client_secret", manager.getString("client_secret")).field("grant_type", "authorization_code").field("code", code).field("redirect_uri", manager.getString("redirect_uri")).asString();
 	    final JSONObject response = new JSONObject(responseRaw.getBody());
-	    if (response.has("access_token") && response
-		    .has("refresh_token")) return new Trio<>(response.getString("access_token"), response.getString("refresh_token"), response.getInt("expires_in"));
+	    if (response.has("access_token") && response.has("refresh_token")) return new Trio<>(response.getString("access_token"), response.getString("refresh_token"), response.getInt("expires_in"));
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	}
@@ -90,9 +80,7 @@ public class OAuthUtils {
     private static DiscordUser loadUserFromToken(final String accessToken) {
 	final JSONObject userinfo = getUserInfoFromToken(accessToken);
 	if (userinfo == null) return null;
-	final DiscordUser discordUser = new Gson().fromJson(userinfo.toString(), DiscordUser.class);
-//	final DiscordUser discordUser = new DiscordUser(accessToken, userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo
-//		.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
+	final DiscordUser discordUser = new DiscordUser(accessToken, userinfo.getLong("id"), userinfo.getString("username"), userinfo.getString("avatar"), userinfo.getString("discriminator"), userinfo.getString("locale"), userinfo.getBoolean("mfa_enabled"));
 	LogOrigin.API.info("Loaded user " + discordUser.getFullName() + "!");
 	return discordUser;
     }
