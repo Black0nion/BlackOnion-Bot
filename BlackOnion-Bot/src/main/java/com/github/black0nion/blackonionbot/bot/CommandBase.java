@@ -152,7 +152,7 @@ public class CommandBase extends ListenerAdapter {
 
 	    if (!guild.isCommandActivated(cmd)) return;
 
-	    if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
+	    if (!member.hasPermission(requiredPermissions)) {
 		if (!cmd.isVisible(author)) return;
 		cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 		return;
