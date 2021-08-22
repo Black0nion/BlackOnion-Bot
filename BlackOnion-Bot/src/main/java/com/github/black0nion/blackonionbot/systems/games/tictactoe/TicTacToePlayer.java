@@ -2,38 +2,36 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
 import javax.annotation.Nullable;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
-
 import net.dv8tion.jda.api.entities.User;
 
 public class TicTacToePlayer {
 	public User user = null;
-	
+
 	public TicTacToePlayer() {
 	}
-	
+
 	public TicTacToePlayer(final User user) {
 		this.user = user;
 	}
-	
+
 	@Nullable
 	public User getUser() {
-		return user;
+		return this.user;
 	}
-	
+
 	public String getId() {
-		return user != null ? user.getId() : "bot";
+		return this.user != null ? this.user.getId() : "bot";
 	}
-	
+
 	public String getName() {
-		return user != null ? user.getName() : "Bot";
+		return this.user != null ? this.user.getName() : "Bot";
 	}
-	
+
 	public String getAsMention() {
-		return user != null ? user.getAsMention() : Bot.jda.getSelfUser().getAsMention();
+		return this.user != null ? this.user.getAsMention() : "Bot";
 	}
-	
+
 	public boolean isBot() {
-		return user == null;
+		return this.user == null;
 	}
 }
