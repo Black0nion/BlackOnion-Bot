@@ -100,7 +100,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.google.zxing:javase:3.4.1'
     
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.4'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.6'
     
     implementation 'io.github.classgraph:classgraph:4.8.110'
     
