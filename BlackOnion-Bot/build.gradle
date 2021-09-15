@@ -104,5 +104,5 @@ dependencies {
     
     implementation 'io.github.classgraph:classgraph:4.8.116'
     
-    implementation group: 'com.github.oshi', name: 'oshi-core', version: '5.8.0'
+    implementation group: 'com.github.oshi', name: 'oshi-core', version: '5.8.2'
 }
