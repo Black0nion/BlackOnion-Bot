@@ -8,7 +8,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
@@ -30,6 +29,7 @@ import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -118,8 +118,7 @@ public class PlayerManager {
 			final AudioTrack track = trackz.get(i);
 			builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
 		    }
-		    channel.sendMessageEmbeds(builder.build()).queue(msgg -> {
-			final BlackMessage msg = BlackMessage.from(msgg);
+		    channel.sendMessageEmbeds(builder.build()).queue(msg -> {
 			for (int i = 0; i < trackz.size(); i++) {
 			    msg.addReaction(Utils.numbersUnicode.get(i)).queue();
 			}
@@ -163,20 +162,16 @@ public class PlayerManager {
 	});
     }
 
-    private void retry(final BlackUser author, final BlackMessage msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final VoiceChannel vc) {
+    private void retry(final BlackUser author, final Message msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final VoiceChannel vc) {
 	CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class, event -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), event -> {
 	    event.getReaction().removeReaction(event.getUser()).queue();
-	    if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter(entry -> {
-		return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());
-	    }).findFirst().get().getKey()) {
+	    if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().get().getKey()) {
 		this.retry(author, msg, tracks, musicManager, manager, vc);
 		return;
 	    }
-	    final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter(entry -> {
-		return entry.getValue().equals(event.getReactionEmote().getAsCodepoints());
-	    }).findFirst().get().getKey());
+	    final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().get().getKey());
 	    musicManager.scheduler.queue(track, manager, vc);
-	}, 1, TimeUnit.MINUTES, () -> msg.editMessage(EmbedUtils.getErrorEmbed(author, msg.getBlackGuild()).addField("timeout", "tooktoolong", false).build()).queue());
+	}, 1, TimeUnit.MINUTES, () -> msg.editMessageEmbeds(EmbedUtils.getErrorEmbed(author, BlackGuild.from(msg.getGuild())).addField("timeout", "tooktoolong", false).build()).queue());
     }
 
     public static PlayerManager getInstance() {

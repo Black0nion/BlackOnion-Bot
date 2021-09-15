@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -16,7 +15,9 @@ import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
@@ -29,16 +30,16 @@ public class PermissionsCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	message.delete().queue();
 	final String mode = args[1];
 	if (Utils.equalsOneIgnoreCase(mode, "add", "remove", "list")) {
-	    final List<BlackUser> mentionedBlackUsers = message.getMentionedBlackUsers();
+	    final List<User> mentionedBlackUsers = message.getMentionedUsers();
 	    if (mentionedBlackUsers.isEmpty()) {
 		cmde.sendPleaseUse();
 		return;
 	    }
-	    final BlackUser user = mentionedBlackUsers.get(0);
+	    final BlackUser user = BlackUser.from(mentionedBlackUsers.get(0));
 	    if (mode.equalsIgnoreCase("list")) {
 		final List<CustomPermission> perms = user.getPermissions();
 		cmde.success("permissions", "permissionsof", perms.size() != 0 ? ("`[" + perms.stream().map(CustomPermission::name).collect(Collectors.joining(", ")) + "]`") : "empty", new Placeholder("user", user.getFullName()));

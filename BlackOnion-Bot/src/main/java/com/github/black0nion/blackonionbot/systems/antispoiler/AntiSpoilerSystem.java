@@ -5,7 +5,7 @@ import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoile
 import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.REPLACE;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -27,7 +27,7 @@ public class AntiSpoilerSystem {
      */
     public static boolean removeSpoilers(final CommandEvent event) {
 	final BlackGuild guild = event.getGuild();
-	final BlackMessage msg = event.getMessage();
+	final Message msg = event.getMessage();
 	final String message = msg.getContentRaw();
 	final BlackUser author = event.getUser();
 	final TextChannel channel = event.getChannel();

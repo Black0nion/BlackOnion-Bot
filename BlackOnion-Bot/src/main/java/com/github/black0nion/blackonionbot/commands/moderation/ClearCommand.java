@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -28,11 +27,11 @@ public class ClearCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
 	    final int amount = Integer.parseInt(args[1]);
 	    if (amount < 2 || amount > 100) {
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("numberofdeletedmessages"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("numberofdeletedmessages"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 		return;
 	    }
 
@@ -52,14 +51,14 @@ public class ClearCommand extends Command {
 
 		    if (messages.size() < 2 || messages.size() > 100) {
 			message.delete().queue();
-			message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("nomessagesfound"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("nomessagesfound"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		    }
 		    channel.deleteMessages(messages).queue(succ -> {
 			if (messages.size() != amount) {
-			    message.reply(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", amount - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			    message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", amount - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			} else {
-			    message.reply(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			    message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			}
 		    }, error -> {
 		    });
