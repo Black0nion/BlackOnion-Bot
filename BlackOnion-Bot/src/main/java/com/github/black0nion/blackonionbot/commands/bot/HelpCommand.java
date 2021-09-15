@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -22,6 +21,7 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.common.collect.Lists;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -35,7 +35,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
 	    message.delete().queue();
 	    if (args.length >= 2) {
@@ -91,7 +91,7 @@ public class HelpCommand extends Command {
 		}
 		buttons.add(Button.danger("close", cmde.getTranslation("close")));
 		channel.sendMessageEmbeds(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
-		    this.waitForHelpCatSelection(BlackMessage.from(msg), member, cmde);
+		    this.waitForHelpCatSelection(msg, member, cmde);
 		});
 	    }
 	} catch (final Exception ex) {
@@ -100,12 +100,12 @@ public class HelpCommand extends Command {
 		ex.printStackTrace();
 	    } else {
 		ex.printStackTrace();
-		message.reply(cmde.error().addField("What just happend?", "hau did u do that???", false).build()).queue();
+		message.replyEmbeds(cmde.error().addField("What just happend?", "hau did u do that???", false).build()).queue();
 	    }
 	}
     }
 
-    private final void waitForHelpCatSelection(final BlackMessage msg, final BlackMember author, final CommandEvent cmde) {
+    private final void waitForHelpCatSelection(final Message msg, final BlackMember author, final CommandEvent cmde) {
 	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 	    final Button button = event.getButton();
 

@@ -40,6 +40,7 @@ public class API {
     @Reloadable("api")
     public static void init() {
 	requests.clear();
+	websocketEndpoints.clear();
 	final int port = ValueManager.getInt("api_port");
 	Spark.stop();
 	Spark.awaitStop();
@@ -91,7 +92,10 @@ public class API {
 	    logInfo("IP " + ip + " tried to connect to " + req.url());
 	    if (!requests.containsKey(req.uri()) && !websocketEndpoints.contains(req.uri())) {
 	    } else {
+		// TODO: ratelimit for websockets
 		final BlackRequest request = requests.get(req.uri());
+		// null if it's a websocket endpoint
+		if (request == null) return;
 		// RATE LIMITING:
 		if (rateLimiters.containsKey(ip)) {
 		    final BlackRateLimiter limiter = rateLimiters.get(ip);
@@ -133,6 +137,13 @@ public class API {
 			body = new JSONObject(request.body());
 		    }
 
+		    for (final String parameter : req.requiredBodyParameters()) {
+			if (!body.has(parameter)) {
+			    response.status(400);
+			    return "";
+			}
+		    }
+
 		    BlackSession session = null;
 		    if (req.requiresLogin()) {
 			final String sessionId = request.headers("sessionid");
@@ -153,7 +164,6 @@ public class API {
 			    return new JSONObject().put("reason", "Not logged in.").toString();
 			}
 		    }
-
 		    return req.handle(request, response, body, headers, session);
 		} catch (final Exception e) {
 		    logInfo("Answered malformed POST request (Path: " + url + ") from: " + ip);
@@ -184,6 +194,7 @@ public class API {
 
 	final String notFoundJson = new JSONObject().put("reason", 404).toString();
 	final Route notFoundRoute = (request, response) -> {
+	    if (websocketEndpoints.contains(request.uri()) && request.headers("upgrade") != null) return null;
 	    response.header("Access-Control-Allow-Origin", "*");
 	    response.type("application/json");
 	    response.status(404);

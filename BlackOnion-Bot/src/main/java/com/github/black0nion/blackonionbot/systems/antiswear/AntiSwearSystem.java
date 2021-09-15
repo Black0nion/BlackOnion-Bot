@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
@@ -31,7 +31,7 @@ import net.dv8tion.jda.api.entities.Webhook;
 
 public class AntiSwearSystem {
 
-    public static boolean check(final BlackGuild guild, final BlackMember author, final BlackMessage message, final TextChannel channel) {
+    public static boolean check(final BlackGuild guild, final BlackMember author, final Message message, final TextChannel channel) {
 	final String messageContent = message.getContentRaw();
 	final BlackUser user = author.getBlackUser();
 	if (user.isBot()) return false;

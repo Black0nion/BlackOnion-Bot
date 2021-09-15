@@ -13,19 +13,19 @@ import com.mashape.unirest.http.Unirest;
 
 public class DiscordUser {
 
-    private final long userId;
-    private final String userName;
+    private final long id;
+    private final String username;
     private final String avatar;
     private final String discriminator;
     private final String locale;
     private final boolean mfa_enabled;
-    private final String accessToken;
+    private String accessToken;
     private JSONArray guilds = null;
 
     public DiscordUser(final String accessToken, final long userId, final String userName, final String avatar, final String discriminator, final String locale, final boolean mfa_enabled) {
 	this.accessToken = accessToken;
-	this.userId = userId;
-	this.userName = userName;
+	this.id = userId;
+	this.username = userName;
 	this.avatar = avatar;
 	this.discriminator = discriminator;
 	this.locale = locale;
@@ -35,8 +35,8 @@ public class DiscordUser {
     @Deprecated
     public DiscordUser(final long userId, final String userName, final String avatar, final String discriminator, final String locale, final boolean mfa_enabled) {
 	this.accessToken = null;
-	this.userId = userId;
-	this.userName = userName;
+	this.id = userId;
+	this.username = userName;
 	this.avatar = avatar;
 	this.discriminator = discriminator;
 	this.locale = locale;
@@ -44,11 +44,11 @@ public class DiscordUser {
     }
 
     public long getUserId() {
-	return this.userId;
+	return this.id;
     }
 
     public String getUserName() {
-	return this.userName;
+	return this.username;
     }
 
     /**
@@ -76,26 +76,21 @@ public class DiscordUser {
 
     @Override
     public String toString() {
-	return "DiscordUser [userId=" + this.userId + ", userName=" + this.userName + ", avatar=" + this.avatar + ", discriminator=" + this.discriminator + ", locale=" + this.locale + ", mfa_enabled=" + this.mfa_enabled + "]";
+	return "DiscordUser [userId=" + this.id + ", userName=" + this.username + ", avatar=" + this.avatar + ", discriminator=" + this.discriminator + ", locale=" + this.locale + ", mfa_enabled=" + this.mfa_enabled + "]";
     }
 
     public JSONObject toJsonObject() {
-	return new JSONObject().put("userid", this.userId).put("username", this.userName).put("avatar", this.avatar).put("discriminator", this.discriminator).put("locale", this.locale).put("mfa_enabled", this.mfa_enabled);
+	return new JSONObject().put("userid", this.id).put("username", this.username).put("avatar", this.avatar).put("discriminator", this.discriminator).put("locale", this.locale).put("mfa_enabled", this.mfa_enabled);
     }
 
-    private final Supplier<JSONArray> reloadSupplier = Suppliers.memoizeWithExpiration(new Supplier<JSONArray>() {
-	@Override
-	public JSONArray get() {
-	    try {
-		System.out.println("Reloading Guilds for user " + DiscordUser.this.getFullName() + "...");
-		Unirest.setTimeouts(0, 0);
-		final String body = Unirest.get("https://discord.com/api/users/@me/guilds").header("Authorization", "Bearer " + DiscordUser.this.accessToken).asString().getBody();
-		return new JSONArray(body);
-	    } catch (final Exception e) {
-		e.printStackTrace();
-		return null;
-	    }
-	};
+    private final Supplier<JSONArray> reloadSupplier = Suppliers.memoizeWithExpiration(() -> {
+	try {
+	    Unirest.setTimeouts(0, 0);
+	    final String body = Unirest.get("https://discord.com/api/users/@me/guilds").header("Authorization", "Bearer " + DiscordUser.this.accessToken).asString().getBody();
+	    return new JSONArray(body);
+	} catch (final Exception e) {
+	    return null;
+	}
     }, 10, TimeUnit.MINUTES);
 
     /**
@@ -110,5 +105,10 @@ public class DiscordUser {
 	    e.printStackTrace();
 	    return null;
 	}
+    }
+
+    public DiscordUser setToken(final String token) {
+	this.accessToken = token;
+	return this;
     }
 }

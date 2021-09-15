@@ -29,8 +29,8 @@ public class OAuthUtils {
     });
 
     /**
-     * @param code The code from Discord
-     * @return a trio with the values: AccessToken | RefreshToken | ExpiresIn
+     * @param  code The code from Discord
+     * @return      a trio with the values: AccessToken | RefreshToken | ExpiresIn
      */
     @Nullable
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {

@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
@@ -23,7 +23,7 @@ public class VirusCommand extends Command {
 //    private static final UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	cmde.reply(cmde.success().setTitle("VirusTotal", "https://www.virustotal.com/gui/home/upload").addField("virustotalfieldtitle", "virustotalinfo", false));
 //	Bot.executor.submit(() -> {
 //	    final List<Attachment> attachments = message.getAttachments();

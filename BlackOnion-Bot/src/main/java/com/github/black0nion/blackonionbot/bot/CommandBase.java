@@ -14,7 +14,6 @@ import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -39,6 +38,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.vdurmont.emoji.EmojiParser;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -103,7 +103,7 @@ public class CommandBase extends ListenerAdapter {
 
     @Override
     public void onGuildMessageUpdate(final GuildMessageUpdateEvent event) {
-	AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
+	AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getChannel());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CommandBase extends ListenerAdapter {
 	final BlackMember member = BlackMember.from(event.getMember());
 	final String prefix = guild.getPrefix();
 	final TextChannel channel = event.getChannel();
-	final BlackMessage message = BlackMessage.from(event.getMessage());
+	final Message message = event.getMessage();
 	final String msgContent = message.getContentRaw();
 	final List<Attachment> attachments = message.getAttachments();
 	final String attachmentsString = (!attachments.isEmpty() ? attachments.stream().map(Attachment::getUrl).collect(Collectors.toList()).toString() : "");
@@ -152,16 +152,16 @@ public class CommandBase extends ListenerAdapter {
 
 	    if (!guild.isCommandActivated(cmd)) return;
 
-	    if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
+	    if (!member.hasPermission(requiredPermissions)) {
 		if (!cmd.isVisible(author)) return;
 		cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 		return;
 	    } else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
 	    else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
-		message.reply(EmbedUtils.premiumRequired(author, guild)).queue();
+		message.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
 		return;
 	    } else if (cmd.getRequiredArgumentCount() + 1 > args.length) {
-		message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
+		message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargumentcount"), CommandEvent.getPleaseUse(guild, author, cmd), false).build()).queue(msg -> {
 		    final CustomPermission[] customPermission = cmd.getRequiredCustomPermissions();
 		    if (customPermission != null && customPermission.length != 0) {
 			msg.delete().queueAfter(3, TimeUnit.SECONDS);

@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -25,7 +25,7 @@ public class PollCommand extends Command {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		cmde.success("poll", String.join(" ", Utils.removeFirstArg(args)), "polltutorial", msg -> {
 			msg.addReaction("tick:822036832422068225").queue();
 			msg.addReaction("cross:822036805117018132").queue();

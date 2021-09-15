@@ -8,7 +8,6 @@ import org.bson.Document;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -17,6 +16,7 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -29,7 +29,7 @@ public class ReactionRolesSetupCommand extends Command {
     }
 
     @Override
-    public void execute(String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	args = message.getContentDisplay().split(" ");
 	final List<TextChannel> channels = message.getMentionedChannels();
 	final List<Role> roles = message.getMentionedRoles();
@@ -72,7 +72,7 @@ public class ReactionRolesSetupCommand extends Command {
 
 			if (finalArgs[1].equalsIgnoreCase("create")) {
 			    if (ReactionRoleSystem.collection.find(doc).first() != null) {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
+				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("alreadyexisting", "thisalreadyexisting", false).build()).queue();
 				return;
 			    }
 

@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -26,6 +25,7 @@ import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -40,7 +40,7 @@ public class CommandEvent {
     private final JDA jda;
     private final BlackGuild guild;
     private final TextChannel channel;
-    private final BlackMessage message;
+    private final Message message;
     private final BlackMember member;
     private final BlackUser user;
     private final BlackEmbed successEmbed;
@@ -50,14 +50,14 @@ public class CommandEvent {
 
     @Deprecated
     public CommandEvent(final Command cmd, final GuildMessageReceivedEvent e) {
-	this(cmd, e, BlackGuild.from(e.getGuild()), BlackMessage.from(e.getMessage()), BlackMember.from(e.getMember()), BlackUser.from(e.getAuthor()));
+	this(cmd, e, BlackGuild.from(e.getGuild()), e.getMessage(), BlackMember.from(e.getMember()), BlackUser.from(e.getAuthor()));
     }
 
-    public CommandEvent(final GuildMessageReceivedEvent e, final BlackGuild guild, final BlackMessage message, final BlackMember member, final BlackUser user) {
+    public CommandEvent(final GuildMessageReceivedEvent e, final BlackGuild guild, final Message message, final BlackMember member, final BlackUser user) {
 	this(null, e, guild, message, member, user);
     }
 
-    public CommandEvent(final Command cmd, final GuildMessageReceivedEvent e, final BlackGuild guild, final BlackMessage message, final BlackMember member, final BlackUser user) {
+    public CommandEvent(final Command cmd, final GuildMessageReceivedEvent e, final BlackGuild guild, final Message message, final BlackMember member, final BlackUser user) {
 	this.command = cmd;
 	this.event = e;
 	this.jda = e.getJDA();
@@ -99,7 +99,7 @@ public class CommandEvent {
 	this.success(title, name, value, null, placeholders);
     }
 
-    public void success(String title, String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+    public void success(String title, String name, String value, final Consumer<? super Message> success, final Placeholder... placeholders) {
 	title = this.language.getTranslationNonNull(title);
 	name = this.language.getTranslationNonNull(name);
 	value = this.language.getTranslationNonNull(value);
@@ -123,7 +123,7 @@ public class CommandEvent {
 	this.reply(this.success().addField(name, value, false), null);
     }
 
-    public void success(String name, String value, final Consumer<? super BlackMessage> success, final Placeholder... placeholders) {
+    public void success(String name, String value, final Consumer<? super Message> success, final Placeholder... placeholders) {
 	name = this.language.getTranslationNonNull(name);
 	value = this.language.getTranslationNonNull(value);
 	for (final Placeholder placeholder : placeholders) {
@@ -138,7 +138,7 @@ public class CommandEvent {
 	return new BlackEmbed(this.loadingEmbed);
     }
 
-    public void loading(final Consumer<? super BlackMessage> success) {
+    public void loading(final Consumer<? super Message> success) {
 	this.reply(this.loading(), success);
     }
 
@@ -146,7 +146,7 @@ public class CommandEvent {
 	this.reply(this.loading().addField(name, value, false));
     }
 
-    public void loading(final String name, final String value, final Consumer<? super BlackMessage> success) {
+    public void loading(final String name, final String value, final Consumer<? super Message> success) {
 	this.reply(this.loading().addField(name, value, false), success);
     }
 
@@ -162,7 +162,7 @@ public class CommandEvent {
 	this.reply(this.error().setTitle(title).addField(name, value, false));
     }
 
-    public void error(final String name, final String value, final Consumer<? super BlackMessage> success) {
+    public void error(final String name, final String value, final Consumer<? super Message> success) {
 	this.reply(this.error().addField(name, value, false), success);
     }
 
@@ -202,14 +202,14 @@ public class CommandEvent {
 	this.reply(builder, null, null);
     }
 
-    public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success) {
+    public void reply(final EmbedBuilder builder, final Consumer<? super Message> success) {
 	this.reply(builder, success, null);
     }
 
-    public void reply(final EmbedBuilder builder, final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
-	this.message.reply(builder.build()).queue(msg -> {
+    public void reply(final EmbedBuilder builder, final Consumer<? super Message> success, final Consumer<? super Throwable> error) {
+	this.message.replyEmbeds(builder.build()).queue(msg -> {
 	    if (success != null) {
-		success.accept(BlackMessage.from(msg));
+		success.accept(msg);
 	    }
 	}, error);
     }
@@ -218,11 +218,11 @@ public class CommandEvent {
 	this.sendPleaseUse(null, null);
     }
 
-    public void sendPleaseUse(final Consumer<? super BlackMessage> success) {
+    public void sendPleaseUse(final Consumer<? super Message> success) {
 	this.sendPleaseUse(success, null);
     }
 
-    public void sendPleaseUse(final Consumer<? super BlackMessage> success, final Consumer<? super Throwable> error) {
+    public void sendPleaseUse(final Consumer<? super Message> success, final Consumer<? super Throwable> error) {
 	this.reply(this.getWrongArgument(), success, error);
     }
 
@@ -256,7 +256,7 @@ public class CommandEvent {
 	return translation != null ? translation : this.language.getTranslationNonNull("empty");
     }
 
-    public BlackMessage getMessage() {
+    public Message getMessage() {
 	return this.message;
     }
 

@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
+import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -15,7 +15,7 @@ public class PrefixInfo {
 	
 	@SuppressWarnings("deprecation")
 	public static void handle(final CommandEvent cmde) {
-		final BlackMessage message = cmde.getMessage();
+		final Message message = cmde.getMessage();
 		final BlackUser author = cmde.getUser();
 		if (author.isBot() || message.getMentionedUsers().size() == 0) return;
 		final BlackGuild guild = cmde.getGuild();

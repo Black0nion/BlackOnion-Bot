@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
@@ -13,6 +12,8 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -23,14 +24,14 @@ public class BanCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final BlackMessage message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final List<BlackMember> mentionedMembers = message.getMentionedBlackMembers();
+    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final List<Member> mentionedMembers = message.getMentionedMembers();
 	if (mentionedMembers.size() == 0) {
-	    message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("tagornameuser"), false).build()).queue();
+	    message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("tagornameuser"), false).build()).queue();
 	    return;
 	} else {
 	    String banMessage = author.getLanguage().getTranslationNonNull("yougotbanned");
-	    final BlackMember userToBan = mentionedMembers.get(0);
+	    final BlackMember userToBan = BlackMember.from(mentionedMembers.get(0));
 
 	    if (member.canInteract(userToBan)) {
 		if (args.length >= 3) {
@@ -40,7 +41,7 @@ public class BanCommand extends Command {
 		    guild.ban(userToBan, 0).queue();
 		}
 		final String finalBanMessage = banMessage;
-		message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(cmde.getTranslation("usergotbanned"), cmde.getTranslation("message", new Placeholder("msg", banMessage)), false).build()).queue();
+		message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).setTitle("Ban").addField(cmde.getTranslation("usergotbanned"), cmde.getTranslation("message", new Placeholder("msg", banMessage)), false).build()).queue();
 		userToBan.getBlackUser().openPrivateChannel().queue(c -> {
 		    c.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban").addField(author.getLanguage().getTranslation("yougotbanned"), author.getLanguage().getTranslation("message", new Placeholder("msg", finalBanMessage)), false).build()).queue();
 		});

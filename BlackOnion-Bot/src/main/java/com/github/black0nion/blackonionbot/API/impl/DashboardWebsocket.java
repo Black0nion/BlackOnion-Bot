@@ -41,6 +41,7 @@ import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.gson.Gson;
 import com.mongodb.client.model.Filters;
 
 import net.dv8tion.jda.api.Permission;
@@ -108,7 +109,6 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		final String[] args = messageRaw.split(" ");
 		final int id = args[0].length();
 		if (args.length < 2 || !Utils.isInteger(messageRaw.substring(1, id))) {
-		    System.out.println("error");
 		    WRONG_ARGUMENTS.send(session, null);
 		    return;
 		}
@@ -121,7 +121,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		if (command.equalsIgnoreCase("updatesetting")) {
 		    Dashboard.tryUpdateValue(request, session.getUser(), code -> code.send(session, request));
 		} else if (command.equalsIgnoreCase("userinfo")) {
-		    session.send(session.getUser());
+		    reply(session, request, session.getUser());
 		} else if (command.equalsIgnoreCase("guildsettings")) {
 		    if (!(request.has("guildid") && request.has("settings"))) {
 			WRONG_ARGUMENTS.send(session, request);
@@ -190,8 +190,20 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 			    return;
 			}
 			final JSONArray response = new JSONArray();
-			guild.getTextChannels().forEach(ch -> response.put(new JSONObject().put("name", ch.getName()).put("id", ch.getIdLong())));
-			reply(session, request, new JSONObject().put("channels", response));
+			final JSONObject channelsWithoutCategory = new JSONObject().put("id", -1);
+			final JSONArray chs = new JSONArray();
+			guild.getTextChannels().stream().filter(c -> c.getParent() == null).forEach(channel -> chs.put(new JSONObject().put("name", channel.getName()).put("id", channel.getId())));
+			if (!chs.isEmpty()) {
+			    response.put(channelsWithoutCategory.put("channels", chs));
+			}
+			guild.getCategories().forEach(cat -> {
+			    final JSONObject categoryInfo = new JSONObject().put("name", cat.getName()).put("id", cat.getId());
+			    final JSONArray channels = new JSONArray();
+			    cat.getTextChannels().forEach(ch -> channels.put(new JSONObject().put("name", ch.getName()).put("id", ch.getId())));
+			    response.put(categoryInfo.put("channels", channels));
+			});
+			//guild.getTextChannels().forEach(ch -> response.put(new JSONObject().put("name", ch.getName()).put("id", ch.getIdLong())));
+			reply(session, request, response);
 		    });
 		}
 	    } catch (final Exception e) {
@@ -226,7 +238,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
     }
 
     /**
-     * @param session
+     * @param  session
      * @return
      */
     private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
@@ -236,10 +248,13 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 	}, 1, TimeUnit.MINUTES);
     }
 
-    public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable JSONObject response) {
+    public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable Object response) {
 	if (response == null) {
 	    response = new JSONObject();
+	} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
+	    response = new Gson().toJson(response);
 	}
+
 	if (request != null && request.has("id")) {
 	    session.send("a" + request.getInt("id") + " " + response);
 	} else {

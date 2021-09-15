@@ -66,7 +66,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(final AudioPlayer player, final AudioTrack track, final AudioTrackEndReason endReason) {
 	if (endReason.mayStartNext) {
 	    this.nextTrack();
-	} else if (this.queue.isEmpty()) {
+	} else if (this.queue.isEmpty() && endReason != AudioTrackEndReason.REPLACED) {
 	    this.guild.getAudioManager().closeAudioConnection();
 	}
     }
