@@ -64,6 +64,26 @@ public class Utils {
 		alphabet.add('Z');
 	}
 
+	public static String getStringWithNLength(final String text, final int length) {
+	    return new String(new char[length]).replace("\0", text);
+	}
+
+	public static int positiveOrZero(final int num) {
+	    return num <= 0 ? 0 : num;
+	}
+
+	public static float map(final float value, final float minInput, final float maxInput, final float minMapped, final float maxMapped) {
+		return (value - minInput) / (maxInput - minInput) * (maxMapped - minMapped) + minMapped;
+	}
+
+	public static String getDuration(final long time) {
+	    String result = "";
+	    if (time / 3600 != 0) {
+		result = String.format("%d:", time / 3600);
+	    }
+	    return result + String.format("%02d:%02d", (time % 3600) / 60, time % 60);
+	}
+
 	public static String removeMarkdown(final String text) {
 		return text.replace("_", "\\_").replace("*", "\\*");
 	}
