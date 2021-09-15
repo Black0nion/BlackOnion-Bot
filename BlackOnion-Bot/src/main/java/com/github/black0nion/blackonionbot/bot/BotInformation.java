@@ -36,8 +36,8 @@ public class BotInformation {
 
     public static final SimpleDateFormat datePattern = new SimpleDateFormat("dd.MM.yyy HH:mm");
 
-    public static int line_count = 0;
-    public static int file_count = 0;
+    public static int line_count = -1;
+    public static int file_count = -1;
 
     public static OperatingSystemMXBean osBean;
     public static OS os;
@@ -58,6 +58,9 @@ public class BotInformation {
     @Reloadable("botinformation")
     public static void init() {
 	Bot.executor.submit(() -> {
+	    calculateCodeLines();
+	});
+	Bot.executor.submit(() -> {
 	    try {
 		final File file = new File("version");
 		if (file.exists()) {
@@ -76,9 +79,6 @@ public class BotInformation {
 	    }
 
 	    try {
-		Bot.executor.submit(() -> {
-		    calculateCodeLines();
-		});
 
 		if (osBean == null) {
 		    osBean = ManagementFactory.getOperatingSystemMXBean();
