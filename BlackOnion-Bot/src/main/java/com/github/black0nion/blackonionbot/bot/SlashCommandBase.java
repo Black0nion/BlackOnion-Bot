@@ -11,7 +11,6 @@ import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMessage;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
@@ -92,7 +91,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
     @Override
     public void onGuildMessageUpdate(final GuildMessageUpdateEvent event) {
-	AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), BlackMessage.from(event.getMessage()), event.getChannel());
+	AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getChannel());
     }
 
     @Override
