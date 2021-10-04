@@ -10,6 +10,7 @@ import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getErrorEmbed
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getLoadingEmbed;
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmbed;
 
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -25,6 +26,7 @@ import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 /**
  * @author _SIM_ Date: 26.05.2021 Copyright 2021 BlackOnion Class Name:
@@ -191,6 +193,9 @@ public class SlashCommandExecutedEvent {
 
     public void reply(final EmbedBuilder builder) {
 	this.event.replyEmbeds(builder.build()).queue();
+    }
+   public void reply(final EmbedBuilder builder, final Consumer<InteractionHook> result) {
+	this.event.replyEmbeds(builder.build()).queue(result::accept);
     }
 
     public void replyPrivate(final EmbedBuilder builder) {

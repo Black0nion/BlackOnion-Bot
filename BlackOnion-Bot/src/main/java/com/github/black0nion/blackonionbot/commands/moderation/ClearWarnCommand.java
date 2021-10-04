@@ -8,66 +8,46 @@ import java.util.List;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 /**
  * @author _SIM_
  */
-public class ClearWarnCommand extends Command {
+public class ClearWarnCommand extends SlashCommand {
 
     public ClearWarnCommand() {
-	this.setCommand("clearwarn", "clearwarns").setSyntax("<@User> <warnid>").setRequiredArgumentCount(2).setRequiredPermissions(Permission.KICK_MEMBERS);
+	this.setData(new CommandData("clearwarn", "Clears a warn from a user")
+		.addOption(OptionType.USER, "user", "The user to clear the warn of", true)
+		.addOption(OptionType.INTEGER, "warnid", "The ID of the warn to remove"))
+	.setRequiredPermissions(Permission.KICK_MEMBERS);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final String user = args[1];
-	final BlackMember mentionedMember;
-	if (Utils.isLong(user)) {
-	    mentionedMember = BlackMember.from(guild.retrieveMemberById(user).submit().join());
-	    if (mentionedMember == null) {
-		cmde.error("usernotfound", "inputnumber");
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	try {
+	    if (e.getOptionsByType(OptionType.USER).get(0).getAsMember() == null) {
+		cmde.error("notamember", "cantclearwarnofnotmember");
 		return;
 	    }
-	} else {
-	    final List<Member> mentionedMembers = message.getMentionedMembers();
-	    if (mentionedMembers.size() != 0) {
-		if (args[1].replace("!", "").equalsIgnoreCase(mentionedMembers.get(0).getAsMention())) {
-		    mentionedMember = BlackMember.from(mentionedMembers.get(0));
-		} else {
-		    cmde.sendPleaseUse();
+	    final BlackMember mentionedMember = BlackMember.from(e.getOptionsByType(OptionType.USER).get(0).getAsMember());
+	    final long warnId = e.getOptionsByType(OptionType.INTEGER).get(0).getAsLong();
+	    final List<Warn> warns = mentionedMember.getWarns();
+	    for (final Warn warn : warns) {
+		if (warn.getDate() == warnId) {
+		    mentionedMember.deleteWarn(warn);
+		    cmde.success("entrydeleted", "warndeleted");
 		    return;
 		}
-	    } else {
-		cmde.error("nousermentioned", "tagornameuser");
-		return;
 	    }
-	}
-
-	try {
-	    if (Utils.isLong(args[2])) {
-		final long warnId = Long.parseLong(args[2]);
-		final List<Warn> warns = mentionedMember.getWarns();
-		for (final Warn warn : warns) {
-		    if (warn.getDate() == warnId) {
-			mentionedMember.deleteWarn(warn);
-			cmde.success("entrydeleted", "warndeleted");
-			return;
-		    }
-		}
-		cmde.error("notfound", "warnnotfound");
-	    } else {
-		cmde.sendPleaseUse();
-	    }
+	    cmde.error("notfound", "warnnotfound");
 	} catch (final Exception ex) {
 	    ex.printStackTrace();
 	}

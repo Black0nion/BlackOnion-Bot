@@ -7,61 +7,43 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 /**
  * @author _SIM_
  */
-public class WarnsCommand extends Command {
+public class WarnsCommand extends SlashCommand {
 
     public WarnsCommand() {
-	this.setCommand("warns").setSyntax("<@User | UserID>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.KICK_MEMBERS);
+	this.setData(new CommandData("warns", "Shows the warns for a specific user").addOption(OptionType.USER, "user", "The user to show the warns of", true)).setRequiredPermissions(Permission.KICK_MEMBERS);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final String user = args[1];
-	final BlackMember mentionedMember;
-	if (Utils.isLong(user)) {
-	    mentionedMember = BlackMember.from(guild.retrieveMemberById(user).submit().join());
-	    if (mentionedMember == null) {
-		cmde.error("usernotfound", "inputnumber");
-		return;
-	    }
-	} else {
-	    final List<Member> mentionedMembers = message.getMentionedMembers();
-	    if (mentionedMembers.size() != 0) {
-		if (args[1].replace("!", "").equalsIgnoreCase(mentionedMembers.get(0).getAsMention())) {
-		    mentionedMember = BlackMember.from(mentionedMembers.get(0));
-		} else {
-		    cmde.sendPleaseUse();
-		    return;
-		}
-	    } else {
-		cmde.error("nousermentioned", "tagornameuser");
-		return;
-	    }
-	}
-
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
-	    final List<Warn> warns = mentionedMember.getWarns();
-	    String result = "empty";
-	    if (warns.size() != 0) {
-		result = "";
-		for (final Warn warn : warns) {
-		    result += "\n`- " + BotInformation.datePattern.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason: " + warn.getReason().replace("`", "") + " (ID: " + warn.getDate() + ")`";
+	    final Member meme = e.getOptionsByType(OptionType.USER).get(0).getAsMember();
+	    if (meme != null) {
+		final List<Warn> warns = BlackMember.from(member).getWarns();
+		String result = "empty";
+		if (warns.size() != 0) {
+		    result = "";
+		    for (final Warn warn : warns) {
+			result += "\n`- " + BotInformation.datePattern.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason: " + warn.getReason().replace("`", "") + " (ID: " + warn.getDate() + ")`";
+		    }
 		}
+		cmde.success("warns", result);
+	    } else {
+		cmde.error("notamember", "canonlyseewarnsofthisserver");
 	    }
-	    cmde.success("warns", result);
 	} catch (final Exception ex) {
 	    ex.printStackTrace();
 	}

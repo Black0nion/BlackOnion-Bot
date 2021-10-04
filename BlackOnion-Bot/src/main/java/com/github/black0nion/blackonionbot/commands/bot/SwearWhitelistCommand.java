@@ -5,51 +5,50 @@ import java.util.List;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 
-public class SwearWhitelistCommand extends Command {
+public class SwearWhitelistCommand extends SlashCommand {
 
     public SwearWhitelistCommand() {
-	this.setCommand("swearwhitelist", "sw", "antiswearwhitelist", "asw").setSyntax("<add | remove> <@role | #channel | Permission Name>").setRequiredPermissions(Permission.ADMINISTRATOR);
+	final SubcommandData[] data = {
+		new SubcommandData("role", "The entry is of type role").addOption(OptionType.ROLE, "role", "The affected role", true),
+		new SubcommandData("channel", "The entry is of type channel").addOption(OptionType.CHANNEL, "channel", "The affected channel", true),
+		new SubcommandData("permission", "The entry is of type permission").addOption(OptionType.STRING, "permission", "The affected permission", true)
+	};
+	this.setData(new CommandData("swearwhitelist", "Whitelist a role, channel or permission to bypass the Swear Filter")
+		.addSubcommandGroups(new SubcommandGroupData("add", "Add something to the whitelist").addSubcommands(data),
+			new SubcommandGroupData("remove", "Remove something from the whitelist").addSubcommands(data),
+			new SubcommandGroupData("list", "List all existing entries on the whitelist")))
+	.setRequiredPermissions(Permission.ADMINISTRATOR);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (args.length >= 3 && (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove"))) {
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final String mode = e.getSubcommandGroup();
+	if (mode.equals("add") || mode.equals("remove")) {
 	    final List<String> mentionedStuff = new ArrayList<>();
-	    final List<Role> roles = message.getMentionedRoles();
-	    final List<TextChannel> channels = message.getMentionedChannels();
-	    for (int i = 2; i < args.length; i++) {
-		final String input = args[i];
-		final Role rl = roles.stream().filter(r -> r.getAsMention().equals(input)).findFirst().orElse(null);
-		final TextChannel ch = channels.stream().filter(c -> c.getAsMention().equals(input)).findFirst().orElse(null);
-		Permission perm = null;
-		try {
-		    perm = Permission.valueOf(input.toUpperCase());
-		} catch (final Exception ignored) {
-		}
-
-		if (rl != null) {
-		    mentionedStuff.add(rl.getAsMention());
-		}
-		if (ch != null) {
-		    mentionedStuff.add(ch.getAsMention());
-		}
-		if (perm != null) {
-		    mentionedStuff.add(perm.name());
-		}
+	    if (e.getOption("role") != null) {
+		mentionedStuff.add(e.getOption("role").getAsRole().getAsMention());
+	    }
+	    if (e.getOption("channel") != null) {
+		mentionedStuff.add(e.getOption("channel").getAsGuildChannel().getAsMention());
+	    }
+	    if (e.getOption("permission") != null && this.isPermission(e.getOption("permission").getAsString())) {
+		mentionedStuff.add(e.getOption("permission").getAsString().toUpperCase());
 	    }
 
-	    final boolean add = args[1].equalsIgnoreCase("add");
+	    final boolean add = mode.equals("add");
 
 	    if (mentionedStuff.size() != 0) {
 		List<String> newWhitelist = guild.getAntiSwearWhitelist();
@@ -71,5 +70,12 @@ public class SwearWhitelistCommand extends Command {
 	    final List<String> whitelist = guild.getAntiSwearWhitelist();
 	    cmde.success("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"));
 	}
+    }
+
+    private boolean isPermission(final String asString) {
+	try {
+	    Permission.valueOf(asString.toUpperCase());
+	    return true;
+	} catch (final Exception ignored) { return false; }
     }
 }

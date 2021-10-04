@@ -3,49 +3,44 @@ package com.github.black0nion.blackonionbot.commands.fun.giveaway;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 /**
  * @author _SIM_
  */
-public class EndGiveawayCommand extends Command {
+public class EndGiveawayCommand extends SlashCommand {
 
     public EndGiveawayCommand() {
-	this.setCommand("endgiveaway").setSyntax("<messageid>").setRequiredArgumentCount(1);
+	this.setData(new CommandData("endgiveaway", "Ends a giveaway early").addOption(OptionType.INTEGER, "giveawayid", "The ID of the Giveaway", true)).setRequiredPermissions(Permission.MESSAGE_MANAGE);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final String id = args[1];
-	if (Utils.isLong(id)) {
-	    final long idLong = Long.parseLong(id);
-	    final Giveaway giveaway = GiveawaySystem.getGiveaway(idLong);
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final long id = e.getOptionsByType(OptionType.STRING).get(0).getAsLong();
+	final Giveaway giveaway = GiveawaySystem.getGiveaway(id);
 
-	    if (giveaway == null || giveaway.getChannelId() != channel.getIdLong()) {
-		cmde.error("giveawaynotfound", "giveawaynotfounddesc");
-	    } else if (giveaway.getCreaterId() != author.getIdLong() && !member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
-		cmde.error("nogiveawayendrights", "mustbeadminorgiveawaycreater");
-	    } else {
-		channel.retrieveMessageById(idLong).queue(msg -> {
-		    if (msg == null) {
-			cmde.exception();
-		    } else {
-			GiveawaySystem.endGiveaway(giveaway, msg, guild);
-			cmde.success("giveawayended", "giveawaygotended");
-		    }
-		});
-	    }
+	if (giveaway == null || giveaway.getChannelId() != channel.getIdLong()) {
+	    cmde.errorPrivate("giveawaynotfound", "giveawaynotfounddesc");
+	} else if (giveaway.getCreaterId() != author.getIdLong() && !member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
+	    cmde.errorPrivate("nogiveawayendrights", "mustbeadminorgiveawaycreater");
 	} else {
-	    cmde.error("notanumber", "invalidmessageid");
+	    channel.retrieveMessageById(id).queue(msg -> {
+		if (msg == null) {
+		    cmde.exception();
+		} else {
+		    GiveawaySystem.endGiveaway(giveaway, msg, guild);
+		    cmde.successPrivate("giveawayended", "giveawaygotended");
+		}
+	    });
 	}
     }
 }

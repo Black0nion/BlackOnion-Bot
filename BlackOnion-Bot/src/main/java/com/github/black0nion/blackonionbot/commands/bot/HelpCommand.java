@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -11,8 +12,11 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -24,40 +28,63 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-public class HelpCommand extends Command {
+public class HelpCommand extends SlashCommand {
 
     public HelpCommand() {
-	this.setCommand("help").notToggleable();
+	final OptionData optionData = new OptionData(OptionType.STRING, "category", "The category to show the commands of");
+	Arrays.asList(Category.values()).forEach(l -> optionData.addChoice(l.name(), l.name().toLowerCase()));
+	this.setData(new CommandData("help", "Shows a overview of all commands")
+		.addOption(OptionType.STRING, "command", "The command to show the informations of")
+		.addOptions(optionData))
+	.notToggleable();
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
-	    message.delete().queue();
-	    if (args.length >= 2) {
+	    if (e.getOption("command") != null) {
 		// a command
+		final String cmdName = e.getOption("command").getAsString();
 		for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
 		    final Command cmd = entry.getValue();
-		    if (cmd.isVisible(author) && Arrays.asList(entry.getKey()).contains(args[1])) {
+		    if (cmd.isVisible(author) && Arrays.asList(entry.getKey()).contains(cmdName)) {
 			cmde.success("help", CommandEvent.getCommandHelp(guild, author, cmd), cmde.getTranslationOrEmpty("help" + cmd.getCommand()[0].toLowerCase()));
 			return;
 		    }
 		}
 
-		final Category category = Category.parse(args[1]);
-		if (category != null) {
-		    final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
-		    for (final Command c : CommandBase.commandsInCategory.get(category)) {
+		for (final Entry<Category, List<SlashCommand>> entry : SlashCommandBase.commandsInCategory.entrySet()) {
+		    for (final SlashCommand cmd : entry.getValue()) {
+			if (cmd.isVisible(author) && cmd.getData().getName().equalsIgnoreCase(cmdName)) {
+			    cmde.success("help", SlashCommandExecutedEvent.getCommandHelp(guild, author, cmd), cmde.getTranslationOrEmpty("help" + cmd.getData().getName().toLowerCase()));
+			    return;
+			}
+		    }
+		}
+
+		cmde.error("commandnotfound", "thecommandnotfound", new Placeholder("command", "`" + cmdName + "`"));
+	    } else if (e.getOption("category") != null) {
+		final Category category = Category.valueOf(e.getOption("category").getAsString());
+		final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
+		for (final Command c : CommandBase.commandsInCategory.get(category)) {
+		    if (c.isVisible(author)) {
 			builder.addField(CommandEvent.getCommandHelp(guild, author, c), cmde.getTranslationOrEmpty("help" + c.getCommand()[0]), false);
 		    }
-		    cmde.reply(builder);
-		} else {
-		    cmde.error("commandnotfound", "thecommandnotfound", new Placeholder("command", "`" + args[1] + "`"));
 		}
+		for (final SlashCommand c : SlashCommandBase.commandsInCategory.get(category)) {
+		    if (c.isVisible(author)) {
+			builder.addField(SlashCommandExecutedEvent.getCommandHelp(guild, author, c), cmde.getTranslationOrEmpty("help" + c.getData().getName().toLowerCase()), false);
+		    }
+		}
+		cmde.reply(builder);
 	    } else {
 		// start the help system thingy lmao
 		final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + cmde.getTranslation("modules")).setDescription(cmde.getTranslation("onlyexecutorcancontrol"));
@@ -90,7 +117,7 @@ public class HelpCommand extends Command {
 		    }
 		}
 		buttons.add(Button.danger("close", cmde.getTranslation("close")));
-		channel.sendMessageEmbeds(builder.build()).setActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).queue(msg -> {
+		e.replyEmbeds(builder.build()).addActionRows(Lists.partition(buttons, 5).stream().map(ActionRow::of).collect(Collectors.toList())).flatMap(InteractionHook::retrieveOriginal).queue(msg -> {
 		    this.waitForHelpCatSelection(msg, member, cmde);
 		});
 	    }
@@ -100,12 +127,12 @@ public class HelpCommand extends Command {
 		ex.printStackTrace();
 	    } else {
 		ex.printStackTrace();
-		message.replyEmbeds(cmde.error().addField("What just happend?", "hau did u do that???", false).build()).queue();
+		cmde.error("some error happend wtf", "how da fuq did that happen?\n" + ex.getMessage());
 	    }
 	}
     }
 
-    private final void waitForHelpCatSelection(final Message msg, final BlackMember author, final CommandEvent cmde) {
+    private final void waitForHelpCatSelection(final Message msg, final BlackMember author, final SlashCommandExecutedEvent cmde) {
 	CommandBase.waiter.waitForEvent(ButtonClickEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 	    final Button button = event.getButton();
 
@@ -167,7 +194,7 @@ public class HelpCommand extends Command {
 	    event.editMessageEmbeds(builder.build()).queue();
 	    this.waitForHelpCatSelection(msg, author, cmde);
 	}, 5, TimeUnit.MINUTES, () -> {
-	    msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getCommand()[0]))).setEmbeds().setActionRows().queue();
+	    msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", "/" + this.getData().getName()))).setEmbeds().setActionRows().queue();
 	});
     }
 }

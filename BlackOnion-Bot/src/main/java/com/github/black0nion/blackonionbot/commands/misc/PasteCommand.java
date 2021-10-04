@@ -1,55 +1,37 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class PasteCommand extends Command {
+public class PasteCommand extends SlashCommand {
 
     public PasteCommand() {
-	this.setCommand("paste", "uploadtext").setSyntax("<text (codeblock with language specification if wanted)>").setRequiredArgumentCount(1);
+	this.setData(new CommandData("paste", "Uploads a text to a pasteserver")
+		.addOption(OptionType.STRING, "text", "The text to upload", true)
+		.addOption(OptionType.STRING, "language", "The programming language the paste is in", false));
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final String bodyRaw = String.join(" ", Utils.removeFirstArg(args)).trim();
-	// broken lol
-	final Matcher m = Pattern.compile("\\s*```([a-z]+\\n)?\\s*([\\s\\S]*?)\\s*```\\s*").matcher(bodyRaw);
-	String body = null, language = null;
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final String finalLanguage = e.getOption("language") != null ? e.getOption("language").getAsString() : null;
+	final String finalBody = e.getOption("text").getAsString();
 
-	m.find();
-	try {
-	    language = m.group(1);
-	} catch (final Exception ignored) {
-	}
-
-	try {
-	    body = m.group(2);
-	} catch (final Exception ignored) {
-	    body = bodyRaw;
-	}
-
-	final String finalLanguage = language;
-	;
-	final String finalBody = body;
-
-	cmde.loading(msg -> {
+	e.replyEmbeds(cmde.loading().build()).flatMap(InteractionHook::retrieveOriginal).queue(msg -> {
 	    try {
 		Unirest.setTimeouts(0, 0);
 		final HttpRequestWithBody headers = Unirest.post("https://paste.sv-studios.net/documents").header("Content-Type", "text/plain");
@@ -66,9 +48,7 @@ public class PasteCommand extends Command {
 
 		msg.editMessageEmbeds(builder.build()).queue();
 
-		author.openPrivateChannel().queue(ch -> {
-		    ch.sendMessageEmbeds(builder.appendDescription("\n" + cmde.getTranslation("yourcode").replace("%code%", obj.getString("deleteSecret"))).build()).queue();
-		});
+		e.getHook().sendMessage(cmde.getTranslation("yourcode").replace("%code%", obj.getString("deleteSecret"))).setEphemeral(true).queue();
 	    } catch (final Exception ex) {
 		cmde.exception();
 	    }

@@ -18,6 +18,7 @@ import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
+import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.GuildType;
@@ -35,6 +36,7 @@ import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 
 import net.dv8tion.jda.api.Permission;
@@ -114,18 +116,21 @@ public class CommandBase extends ListenerAdapter {
 	if (author.isBot()) return;
 
 	final BlackGuild guild = BlackGuild.from(event.getGuild());
-	final BlackMember member = BlackMember.from(event.getMember());
 	final String prefix = guild.getPrefix();
+	final BlackMember member = BlackMember.from(event.getMember());
 	final TextChannel channel = event.getChannel();
+	final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
 	final Message message = event.getMessage();
 	final String msgContent = message.getContentRaw();
 	final List<Attachment> attachments = message.getAttachments();
 	final String attachmentsString = (!attachments.isEmpty() ? attachments.stream().map(Attachment::getUrl).collect(Collectors.toList()).toString() : "");
-	final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
+	final String log = (locked ? "[LOCKED USER] " : "") + EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
 	final String[] args = msgContent.split(" ");
 
-	Logger.log(LogMode.INFORMATION, LogOrigin.DISCORD, log);
+	Logger.log(locked ? LogMode.WARNING : LogMode.INFORMATION, LogOrigin.DISCORD, log);
 	FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
+
+	if (locked) return;
 
 	final boolean containsProfanity = AntiSwearSystem.check(guild, member, message, channel);
 

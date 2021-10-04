@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
 
+// TODO: transform to slash command
 public class ConfigCommand extends Command {
 
     public ConfigCommand() {

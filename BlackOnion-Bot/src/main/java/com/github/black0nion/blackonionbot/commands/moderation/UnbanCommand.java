@@ -1,52 +1,35 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import java.util.List;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class UnbanCommand extends Command {
+public class UnbanCommand extends SlashCommand {
 
     public UnbanCommand() {
-	this.setCommand("unban", "unyeet").setSyntax("<@User>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.BAN_MEMBERS).setRequiredBotPermissions(Permission.BAN_MEMBERS);
+	this.setData(new CommandData("unban", "Unban a User")
+		.addOption(OptionType.USER, "user", "The user to unban", true))
+	.setRequiredPermissions(Permission.BAN_MEMBERS).setRequiredBotPermissions(Permission.BAN_MEMBERS);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	final List<Member> mentionedMembers = message.getMentionedMembers();
-	if (mentionedMembers.size() != 0) {
-	    final BlackUser bannedUser = BlackUser.from(mentionedMembers.get(0));
-	    guild.retrieveBan(bannedUser).queue(ban -> {
-		cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + ban.getReason() + "**"));
-	    });
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	final User bannedUser = e.getOptionsByType(OptionType.USER).get(0).getAsUser();
+	guild.retrieveBan(bannedUser).queue(ban -> {
+	    cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "`" + (ban.getReason() != null ? ban.getReason().replace("`", "\\`") : "unknown") + "`"));
 	    guild.unban(bannedUser).queue();
-	} else {
-	    try {
-		if (!Utils.isLong(args[1])) {
-		    cmde.sendPleaseUse();
-		    return;
-		}
-
-		guild.retrieveBanById(args[1]).queue(ban -> {
-		    final String reason = ban.getReason();
-		    guild.unban(ban.getUser()).queue();
-		    cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + reason + "**"));
-		}, fail -> {
-		    cmde.error("usernotfound", "tagornameuser");
-		});
-	    } catch (final Exception ignored) {
-	    }
-	}
+	}, err -> {
+	    cmde.error("bannotfound", "usernotbanned");
+	});
     }
 }

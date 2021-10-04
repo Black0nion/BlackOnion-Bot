@@ -1,55 +1,51 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.User.UserFlag;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class UserInfoCommand extends Command {
+public class UserInfoCommand extends SlashCommand {
 
     private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public UserInfoCommand() {
-	this.setCommand("userinfo").setSyntax("[@User | UserID]");
+	this.setData(new CommandData("userinfo", "Get a info about a user").addOption(OptionType.USER, "user", "The user to the information of", false));
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final com.github.black0nion.blackonionbot.blackobjects.BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	BlackMember statsMember = null;
 	BlackUser statsUser = null;
-	if (message.getMentionedMembers().size() > 0) {
-	    statsMember = BlackMember.from(message.getMentionedMembers().get(0));
+	final List<OptionMapping> user = e.getOptionsByType(OptionType.USER);
+	if (!user.isEmpty() && user.get(0).getAsMember() != null) {
+	    statsMember = BlackMember.from(user.get(0).getAsMember());
 	    statsUser = statsMember.getBlackUser();
 	    cmde.reply(getUserInfo(cmde, statsUser, statsMember));
-	} else if (args.length >= 2) {
-	    try {
-		Long.parseLong(args[1]);
-	    } catch (final Exception ex) {
-		cmde.error("notfound", "usernotfound");
+	} else if (!user.isEmpty()) {
+	    final User idUser = user.get(0).getAsUser();
+	    guild.retrieveMember(idUser).queue(mem -> {
+		cmde.reply(getUserInfo(cmde, BlackUser.from(idUser), BlackMember.from(mem, guild)));
 		return;
-	    }
-	    e.getJDA().retrieveUserById(args[1]).queue(idUser -> {
-		guild.retrieveMember(idUser).queue(mem -> {
-		    cmde.reply(getUserInfo(cmde, BlackUser.from(idUser), BlackMember.from(mem, guild)));
-		    return;
-		}, error -> {
-		    cmde.reply(getUserInfo(cmde, BlackUser.from(idUser), null));
-		    return;
-		});
-	    }, new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, errr -> cmde.error("notfound", "usernotfound")).handle(Throwable.class, err -> cmde.exception()));
+	    }, error -> {
+		cmde.reply(getUserInfo(cmde, BlackUser.from(idUser), null));
+		return;
+	    });
 	} else {
 	    statsUser = author;
 	    statsMember = member;
@@ -58,7 +54,7 @@ public class UserInfoCommand extends Command {
 	}
     }
 
-    private static final EmbedBuilder getUserInfo(final CommandEvent cmde, final BlackUser statsUser, final BlackMember statsMember) {
+    private static final EmbedBuilder getUserInfo(final SlashCommandExecutedEvent cmde, final BlackUser statsUser, final BlackMember statsMember) {
 	final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
 
 	final BlackEmbed builder = cmde.success();

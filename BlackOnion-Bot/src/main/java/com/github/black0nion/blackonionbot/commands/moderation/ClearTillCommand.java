@@ -5,41 +5,37 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class ClearTillCommand extends Command {
+public class ClearTillCommand extends SlashCommand {
 
     public ClearTillCommand() {
-	this.setCommand("cleartill", "clearuntil").setSyntax("<MessageID>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.MESSAGE_MANAGE).setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
+	this.setData(new CommandData("cleartill", "Clears all messages until a specific one").addOption(OptionType.INTEGER, "messageid", "The ID of the message to clear until (exlusive) (max 99 messages can be deleted)", true)).setRequiredPermissions(Permission.MESSAGE_MANAGE).setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final SlashCommandExecutedEvent cmde, final SlashCommandEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
-	    if (!Utils.isLong(args[1])) {
-		cmde.sendPleaseUse();
-		return;
-	    }
-	    final long messageid = Long.parseLong(args[1]);
+	    final long messageid = e.getOptionsByType(OptionType.INTEGER).get(0).getAsLong();
 	    channel.retrieveMessageById(messageid).queue(msg -> {
 		try {
 		    channel.getHistoryAfter(msg, 100).queue(msgs -> {
 			final int msgsize = msgs.size();
-			if (msgsize == 0 || msgs.getMessageById(message.getIdLong()) == null) {
+			if (msgsize == 0 || msgsize >= 100) {
 			    cmde.error("toomanymessages", "toomanymessagesinfo", new Placeholder("msgcount", msgsize));
 			    return;
 			}
@@ -56,15 +52,14 @@ public class ClearTillCommand extends Command {
 			}
 
 			if (messages.size() < 2 || messages.size() > 100) {
-			    message.delete().queue();
-			    message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("nomessagesfound"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			    cmde.errorPrivate("wrongargument", "nomessagesfound");
 			    return;
 			}
 			channel.deleteMessages(messages).queue(succ -> {
 			    if (messages.size() != msgsize) {
-				message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", msgsize - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+				e.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", msgsize - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(InteractionHook::deleteOriginal).queue();
 			    } else {
-				message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", msgsize)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+				e.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", msgsize)), false).build()).delay(Duration.ofSeconds(5)).flatMap(InteractionHook::deleteOriginal).queue();
 			    }
 			}, error -> {
 			});
@@ -72,10 +67,10 @@ public class ClearTillCommand extends Command {
 		} catch (final Exception ex) {
 		    if (!(ex instanceof IllegalArgumentException)) {
 			ex.printStackTrace();
-			cmde.selfDestructingException();
+			cmde.privateException();
 		    } else {
 			ex.printStackTrace();
-			cmde.error("tooold", "messagestooold", newmsg -> newmsg.delete().queueAfter(5, TimeUnit.SECONDS));
+			cmde.errorPrivate("tooold", "messagestooold");
 		    }
 		    return;
 		}
