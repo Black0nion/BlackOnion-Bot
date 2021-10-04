@@ -61,11 +61,12 @@ public enum GuildType {
 	return this.getCode() >= type.getCode();
     }
 
-    public static final GuildType parse(final String input) {
-	try {
-	    return valueOf(input.toUpperCase());
-	} catch (final Exception e) {
-	    return null;
-	}
+    public static GuildType parse(final int input) {
+        try {
+            for (GuildType value : values()) {
+                if (value.getCode() == input) return value;
+            }
+        } catch (final Exception ignored) {}
+        return null;
     }
 }

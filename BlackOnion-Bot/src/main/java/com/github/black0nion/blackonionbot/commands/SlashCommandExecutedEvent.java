@@ -87,6 +87,10 @@ public class SlashCommandExecutedEvent {
 	this.reply(this.success().setTitle(title).addField(name, value, false));
     }
 
+	public void success(final String title, final String name, final String value, final Consumer<InteractionHook> msg) {
+		this.reply(this.success().setTitle(title).addField(name, value, false));
+	}
+
     public void success(final String title, final String url, final String name, final String value) {
 	this.reply(this.success().setTitle(title, url).addField(name, value, false));
     }

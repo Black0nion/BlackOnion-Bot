@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+// waiting for Discord to add files as a option
 public class QrDecodeCommand extends Command {
 
 	public QrDecodeCommand() {

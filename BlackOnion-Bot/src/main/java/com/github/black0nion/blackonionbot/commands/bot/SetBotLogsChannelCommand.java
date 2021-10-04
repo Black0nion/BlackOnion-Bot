@@ -2,27 +2,28 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandExecutedEvent;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
-
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class SetBotLogsChannelCommand extends Command {
-	
-	public SetBotLogsChannelCommand() {
-		this.setCommand("setbotlogschannel")
-			.setRequiredCustomPermissions(CustomPermission.ADMIN);
-	}
+public class SetBotLogsChannelCommand extends SlashCommand {
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		BotInformation.botLogsChannel = channel.getIdLong();
-		guild.save("botlogschannel", channel.getIdLong());
-		cmde.success("savedbotlogschannel", "thisisbotlogschannel");
-	}
+    public SetBotLogsChannelCommand() {
+        this.setData(new CommandData("setbotlogschannel", "Set the channel where the botlogs should get sent to.")).setHidden();
+    }
+
+    @Override
+    public void execute(SlashCommandExecutedEvent cmde, SlashCommandEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        BotInformation.botLogsChannel = channel.getIdLong();
+        guild.save("botlogschannel", channel.getIdLong());
+        cmde.success("savedbotlogschannel", "thisisbotlogschannel");
+    }
 }
