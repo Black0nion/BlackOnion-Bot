@@ -69,4 +69,11 @@ public enum GuildType {
         } catch (final Exception ignored) {}
         return null;
     }
+
+    public static GuildType parse(final String input) {
+        try {
+            return valueOf(input.toUpperCase());
+        } catch (Exception ignored) {}
+        return null;
+    }
 }

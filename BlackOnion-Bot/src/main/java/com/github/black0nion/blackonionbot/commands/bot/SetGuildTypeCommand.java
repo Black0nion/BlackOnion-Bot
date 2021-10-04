@@ -32,7 +32,7 @@ public class SetGuildTypeCommand extends SlashCommand {
     public SetGuildTypeCommand() {
         this.setData(new CommandData("setguildtype", "Set the type of a guild")
             .addOptions(
-                    new OptionData(OptionType.STRING, "guild", "The guild id"),
+                    new OptionData(OptionType.STRING, "guild", "The guild id", true),
                     new OptionData(OptionType.INTEGER, "type", "The new type of the guild", true)
                     .addChoices(Arrays.stream(GuildType.values())
                             .map(g -> new Command.Choice(g.name().toLowerCase(), g.getCode()))

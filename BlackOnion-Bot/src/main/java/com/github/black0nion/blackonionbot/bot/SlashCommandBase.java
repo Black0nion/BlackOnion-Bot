@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -46,6 +49,7 @@ public class SlashCommandBase extends ListenerAdapter {
     public static HashMap<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
 
     public static EventWaiter waiter;
+    public static JSONObject commandsJson;
 
     /**
      * Don't call on init!
@@ -59,6 +63,8 @@ public class SlashCommandBase extends ListenerAdapter {
 	commands.clear();
 	commandsInCategory.clear();
 	waiter = newWaiter;
+	commandsJson = new JSONObject();
+	JSONArray commands = new JSONArray();
 	final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
 	final Set<Class<? extends SlashCommand>> annotated = reflections.getSubTypesOf(SlashCommand.class);
 
@@ -69,8 +75,11 @@ public class SlashCommandBase extends ListenerAdapter {
 		final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 		newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 
+		CommandData data = newInstance.getData();
+		if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0)
+			commands.put(new JSONObject().put("name", data.getName()).put("arguments", data.getOptions()).put("permissions", newInstance.getRequiredPermissions()));
 		if (newInstance.shouldAutoRegister()) if (newInstance.getData() != null) {
-		    addCommand(newInstance);
+			addCommand(newInstance);
 		} else {
 		    System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
 		}
@@ -78,6 +87,8 @@ public class SlashCommandBase extends ListenerAdapter {
 		e.printStackTrace();
 	    }
 	}
+	commandsJson.put("commands", commands);
+	System.out.println(commandsJson);
 	// TODO: uncomment
 	// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
