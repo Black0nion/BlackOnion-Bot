@@ -31,7 +31,7 @@ public class InfluxManager {
 	    Logger.logInfo("Connected.", LogOrigin.INFLUX_DB);
 	    return true;
 	} catch (final Exception e) {
-	    Logger.logError("Couldn't connect to InfluxDB!", LogOrigin.INFLUX_DB);
+	    Logger.logError("Couldn't connect to InfluxDB! Error: " + e.getMessage(), LogOrigin.INFLUX_DB);
 	    influxDB = null;
 	    return false;
 	}
