@@ -352,6 +352,7 @@
     "cantwarnnotmember": "Es können nur Mitglieder dieses Servers gewarnt werden!",
     "cantclearwarnofnotmember": "Leider kannst du nur Warns für ein Mitglied dieses Servers entfernen.",
     "canonlyseewarnsofthisserver": "Du kannst dir nur Warns für Mitglieder dieses Servers ansehen",
+    "cantlmgtfynotmembers": "Du kannst nur Mitgliedern dieses Servers LMGTFY Links schicken!",
     "loopswitched": "Loop wurde umgeschalten!",
     "loopisnow": "Loop ist jetzt **%status%**",
     "musicpaused": "Musik pausiert",
@@ -379,5 +380,8 @@
     "permissions": "Permissions",
     "helpmenuexpired": "Dieses Hilfe-Menü ist abgelaufen. Bitte benutze `%cmd%` um ein neues zu bekommen!",
     "notwitchurl": "Keine gültige Livestream-URL angegeben!",
-    "pleasevalidtwitchurl": "Die URL muss im Format `https://twitch.tv/` oder `https://youtube.com/watch?v=` sein."
+    "pleasevalidtwitchurl": "Die URL muss im Format `https://twitch.tv/` oder `https://youtube.com/watch?v=` sein.",
+    "lmgtfy": "%user% hat [dies](%link%) für dich herausgefunden!",
+    "urlmgtfy": "Hier ist dein Link: %link%",
+    "sentlmgtfy": "Ich habe den Link versendet!"
 }
