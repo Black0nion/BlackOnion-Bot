@@ -77,7 +77,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		CommandData data = newInstance.getData();
 		if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0)
-			commands.put(new JSONObject().put("name", data.getName()).put("arguments", data.getOptions()).put("permissions", newInstance.getRequiredPermissions()));
+			commands.put(new JSONObject().put("name", data.getName()).put("description", data.getDescription()).put("arguments", data.getOptions()).put("permissions", newInstance.getRequiredPermissions()));
 		if (newInstance.shouldAutoRegister()) if (newInstance.getData() != null) {
 			addCommand(newInstance);
 		} else {

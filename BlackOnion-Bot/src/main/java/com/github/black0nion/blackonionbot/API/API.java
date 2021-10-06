@@ -124,9 +124,7 @@ public class API {
 		    response.header("Access-Control-Allow-Origin", "*");
 
 		    final HashMap<String, String> headers = new HashMap<>();
-		    request.headers().forEach(head -> {
-			headers.put(head.toLowerCase(), request.headers(head));
-		    });
+		    request.headers().forEach(head -> headers.put(head.toLowerCase(), request.headers(head)));
 		    if (!headers.keySet().containsAll(Arrays.asList(req.requiredParameters()))) {
 			response.status(400);
 			return "";
