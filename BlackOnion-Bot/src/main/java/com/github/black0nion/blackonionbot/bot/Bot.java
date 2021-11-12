@@ -276,7 +276,7 @@ public class Bot extends ListenerAdapter {
 
     @Override
     public void onReady(final ReadyEvent e) {
-	BotInformation.botId = e.getJDA().getSelfUser().getIdLong();
+	BotInformation.SELF_USER_ID = e.getJDA().getSelfUser().getIdLong();
 	Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - Bot.startTime) + "ms.");
 
 	switchingStatusCallable = () -> {
@@ -287,7 +287,7 @@ public class Bot extends ListenerAdapter {
 			jda.getPresence().setActivity(ActivityCommand.getActivity());
 			Thread.sleep(60000);
 		    }
-		    jda.getPresence().setActivity(Activity.listening(BotInformation.line_count + " lines of code in " + BotInformation.file_count + " files"));
+		    jda.getPresence().setActivity(Activity.listening(BotInformation.LINE_COUNT + " lines of code in " + BotInformation.FILE_COUNT + " files"));
 		    Thread.sleep(60000);
 		} catch (final Exception ex) {
 		    if (!(ex instanceof InterruptedException)) {

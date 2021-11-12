@@ -2,6 +2,8 @@ package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -12,8 +14,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 
 public class PrefixInfo {
-	
-	@SuppressWarnings("deprecation")
+
 	public static void handle(final CommandEvent cmde) {
 		final Message message = cmde.getMessage();
 		final BlackUser author = cmde.getUser();
@@ -23,31 +24,28 @@ public class PrefixInfo {
 		final JDA jda = cmde.getJda();
 		
 		final String msgContent = message.getContentRaw();
-		if (msgContent.replace("!", "").startsWith(cmde.getEvent().getJDA().getSelfUser().getAsMention())) {
+		if (msgContent.matches("^<@!*&*" + BotInformation.SELF_USER_ID + "+>")) {
 			final String[] args = msgContent.split(" ");
-			if (member.hasPermission(Permission.ADMINISTRATOR)) {
-				if (args.length >= 3 && args[1].equalsIgnoreCase("prefix")) {					
-					if (args[2].toCharArray().length > 10) {
-						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();
+			// @BlackOnion-Bot prefix ?
+			if (args.length >= 3) {
+				if (args[1].equalsIgnoreCase("prefix")) {
+					if (member.hasPermission(Permission.MANAGE_SERVER)) {
+						final String prefix = args[2];
+						if (prefix.length() < 10) {
+							guild.setPrefix(prefix);
+							cmde.success("prefixchanged",  "myprefixis", new Placeholder("prefix", prefix));
+							return;
+						} else {
+							cmde.error("toolong", "undertenchars");
+							return;
+						}
+					} else {
+						cmde.error("missingpermissions", "requiredpermissions", new Placeholder("permission", Utils.getPermissionString(Permission.ADMINISTRATOR)));
 						return;
 					}
-					guild.setPrefix(args[2]);
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", guild.getPrefix()), false).build()).queue();
-					return;
-				} else if (args.length >= 2 && msgContent.replace("!", "").startsWith(jda.getSelfUser().getAsMention() + "prefix")) {
-					if (args[1].toCharArray().length > 10) {
-						message.reply(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();
-						return;
-					}
-					guild.setPrefix(args[1]);
-					message.reply(EmbedUtils.getSuccessEmbed(author, guild).addField("prefixchanged", LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", guild.getPrefix()), false).build()).queue();
-					return;
 				}
-			} else {
-				message.reply(EmbedUtils.getErrorEmbed(author, guild).addField(LanguageSystem.getTranslation("missingpermissions", author, guild), LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + Utils.getPermissionString(Permission.ADMINISTRATOR), false).build()).queue();
-				return;
 			}
-			message.reply(EmbedUtils.getSuccessEmbed(author, guild).setTitle(":wave:").addField(LanguageSystem.getTranslation("myprefixis", author, guild).replace("%prefix%", guild.getPrefix()), LanguageSystem.getTranslation("changeprefix", author, guild).replace("%command%", jda.getSelfUser().getAsMention() + " prefix <prefix>"), false).build()).queue();
+			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix()), new Placeholder("command", "<@!" + BotInformation.SELF_USER_ID + "> prefix <prefix>"));
 		}
 	}
 }
