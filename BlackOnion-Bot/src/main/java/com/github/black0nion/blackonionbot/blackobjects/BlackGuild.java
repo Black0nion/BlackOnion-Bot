@@ -160,7 +160,7 @@ public class BlackGuild extends BlackObject implements Guild {
 	    this.save("name", guild.getName());
 	    this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 	    this.guildType = this.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-	    this.prefix = this.gOD(config.getString("prefix"), BotInformation.defaultPrefix);
+	    this.prefix = this.gOD(config.getString("prefix"), BotInformation.DEFAULT_PREFIX);
 	    this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
 	    this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
 	    this.joinMessage = this.gOD(config.getString("joinmessage"), this.language.getTranslationNonNull("defaultjoinmessage"));

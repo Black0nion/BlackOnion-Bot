@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import static com.github.black0nion.blackonionbot.bot.BotInformation.cpuMhz;
-import static com.github.black0nion.blackonionbot.bot.BotInformation.cpuName;
-import static com.github.black0nion.blackonionbot.bot.BotInformation.osBean;
-import static com.github.black0nion.blackonionbot.bot.BotInformation.osName;
+import static com.github.black0nion.blackonionbot.bot.BotInformation.CPU_MHZ;
+import static com.github.black0nion.blackonionbot.bot.BotInformation.CPU_NAME;
+import static com.github.black0nion.blackonionbot.bot.BotInformation.OSBEAN;
+import static com.github.black0nion.blackonionbot.bot.BotInformation.OS_NAME;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -42,12 +42,12 @@ public class StatsCommand extends Command {
 		    .setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
 		    .addField("prefix", "``" + guild.getPrefix() + "``", true)
 		    .addField("runmode", Bot.runMode.name().toUpperCase(), true)
-		    .addField("os", osName, true)
-		    .addField("cpuname", cpuName, true)
-		    .addField("cpucores", String.valueOf(osBean.getAvailableProcessors()), true)
-		    .addField("cpuspeed", cpuMhz, true)
-		    .addField("lines", String.valueOf(BotInformation.line_count), true)
-		    .addField("files", String.valueOf(BotInformation.file_count), true)
+		    .addField("os", OS_NAME, true)
+		    .addField("cpuname", CPU_NAME, true)
+		    .addField("cpucores", String.valueOf(OSBEAN.getAvailableProcessors()), true)
+		    .addField("cpuspeed", CPU_MHZ, true)
+		    .addField("lines", String.valueOf(BotInformation.LINE_COUNT), true)
+		    .addField("files", String.valueOf(BotInformation.FILE_COUNT), true)
 		    .addField("commandsexecuted", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
 		    .addField("messagessent", String.valueOf(ValueManager.getInt("messagesSent")), true)
 		    .addField("commands", String.valueOf(CommandBase.commandsArray.size()), true)
@@ -55,7 +55,7 @@ public class StatsCommand extends Command {
 		    .addField("usercount", String.valueOf(e.getJDA().getGuilds().stream().map(Guild::getMemberCount).collect(Collectors.summingInt(Integer::intValue))), true)
 		    .addField("guildcount", String.valueOf(e.getJDA().getGuildCache().size()), true)
 		    .addField("uptime", Utils.parseDate(diff), true)
-		    .addField("version", BotInformation.version, true)
+		    .addField("version", BotInformation.BOT_VERSION, true)
 		    .setThumbnail("https://image.sv-studios.net/15d06c22eb6b0b8dfbdeda94a56c878d15.png")
 		    .setTimestamp(Instant.now());
 	    cmde.reply(builder);
