@@ -1,5 +1,5 @@
 package com.github.black0nion.blackonionbot.misc;
 
 public enum OS {
-	WINDOWS, LINUX
+	WINDOWS, LINUX, MACOS, UNKNOWN;
 }

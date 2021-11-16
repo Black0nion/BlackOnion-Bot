@@ -92,9 +92,9 @@ public class AntiSwearSystem {
 
 				if (webhooks.stream().anyMatch(tempWebhook -> {
 				    if (tempWebhook == null) return false;
-				    else return (tempWebhook.getOwner().getIdLong() == BotInformation.botId);
+				    else return (tempWebhook.getOwner().getIdLong() == BotInformation.SELF_USER_ID);
 				})) {
-				    webhook = webhooks.stream().filter(tempWebhook -> (tempWebhook.getOwner().getIdLong() == BotInformation.botId)).findFirst().get();
+				    webhook = webhooks.stream().filter(tempWebhook -> (tempWebhook.getOwner().getIdLong() == BotInformation.SELF_USER_ID)).findFirst().get();
 				} else {
 				    webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSwearSystem.class.getResourceAsStream("logo.png"))).submit().join();
 				}

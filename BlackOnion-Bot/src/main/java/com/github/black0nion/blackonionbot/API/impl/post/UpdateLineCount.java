@@ -25,8 +25,8 @@ public class UpdateLineCount extends PostRequest {
 	final int newFileCount = body.getInt("file_count");
 	ValueManager.save("lines", newLineCount);
 	ValueManager.save("files", newFileCount);
-	BotInformation.line_count = newLineCount;
-	BotInformation.file_count = newFileCount;
+	BotInformation.LINE_COUNT = newLineCount;
+	BotInformation.FILE_COUNT = newFileCount;
 	API.logWarning("New file / line count! " + newLineCount + " and " + newFileCount);
 	return new JSONObject().put("line_count", newLineCount).put("file_count", newFileCount).toString();
     }

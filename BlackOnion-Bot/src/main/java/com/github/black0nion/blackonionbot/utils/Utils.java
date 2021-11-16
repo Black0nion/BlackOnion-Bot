@@ -278,4 +278,12 @@ public class Utils {
 		ROUNDED_DOUBLE_DECIMALFORMAT = new DecimalFormat("####0.00", otherSymbols);
 		ROUNDED_DOUBLE_DECIMALFORMAT.setGroupingUsed(false);
 	}
+
+	public static String arrayToString(String delimiter, StackTraceElement[] stackTrace) {
+		String result = "";
+		for (int i = 0; i < stackTrace.length; i++) {
+			result += stackTrace[i].toString() + (i == stackTrace.length - 1 ? "" : delimiter);
+		}
+		return result;
+	}
 }
