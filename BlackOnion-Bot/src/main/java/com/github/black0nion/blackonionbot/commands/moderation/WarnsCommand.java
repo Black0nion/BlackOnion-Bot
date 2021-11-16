@@ -58,7 +58,7 @@ public class WarnsCommand extends Command {
 	    if (warns.size() != 0) {
 		result = "";
 		for (final Warn warn : warns) {
-		    result += "\n`- " + BotInformation.datePattern.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason: " + warn.getReason().replace("`", "") + " (ID: " + warn.getDate() + ")`";
+		    result += "\n`- " + BotInformation.DATE_PATTERN.format(new Date(warn.getDate())) + ": `<@" + warn.getIssuer() + ">` > Reason: " + warn.getReason().replace("`", "") + " (ID: " + warn.getDate() + ")`";
 		}
 	    }
 	    cmde.success("warns", result);
