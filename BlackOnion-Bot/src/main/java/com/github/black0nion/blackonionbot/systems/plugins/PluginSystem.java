@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.BlackThread;
-import com.github.black0nion.blackonionbot.utils.Document;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -14,9 +13,11 @@ import io.github.classgraph.ScanResult;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author _SIM_

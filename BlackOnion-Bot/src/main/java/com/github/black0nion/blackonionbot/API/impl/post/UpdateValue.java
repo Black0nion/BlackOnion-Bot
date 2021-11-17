@@ -1,23 +1,18 @@
 package com.github.black0nion.blackonionbot.API.impl.post;
 
-import java.util.HashMap;
-
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.commands.bot.ConfigCommand;
-import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.bot.Bot;
-
+import com.github.black0nion.blackonionbot.commands.bot.ConfigCommand;
 import net.dv8tion.jda.api.entities.Guild;
+import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
 
+import java.util.HashMap;
+
 public class UpdateValue extends PostRequest {
 
-	@SuppressWarnings("unused")
 	@Override
 	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
 		final String newValue = headers.get("newValue");
