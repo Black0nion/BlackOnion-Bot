@@ -32,7 +32,6 @@ import com.google.common.io.Files;
 import com.mongodb.client.model.Filters;
 import com.sun.jna.platform.win32.Advapi32Util;
 
-@SuppressWarnings("UnstableApiUsage")
 public class BotInformation {
 
 	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat("dd.MM.yyy HH:mm");

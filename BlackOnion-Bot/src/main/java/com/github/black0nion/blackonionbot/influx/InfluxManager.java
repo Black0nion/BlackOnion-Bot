@@ -27,7 +27,7 @@ public class InfluxManager {
 	try {
 	    influxDB = InfluxDBClientFactory.create(databaseURL, token.toCharArray(), org, "BlackOnion-Bot");
 	    influxDB.getWriteApiBlocking().writePoint(Point.measurement("startupshutdown").addField("online", true));
-	    writeApi = influxDB.getWriteApi();
+	    writeApi = influxDB.makeWriteApi();
 	    Logger.logInfo("Connected.", LogOrigin.INFLUX_DB);
 	    return true;
 	} catch (final Exception e) {
