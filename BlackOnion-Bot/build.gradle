@@ -39,7 +39,7 @@ dependencies {
     
     implementation 'com.google.code.gson:gson:2.8.9'
     
-    implementation 'net.dv8tion:JDA:4.3.0_298'
+    implementation 'net.dv8tion:JDA:4.3.0_346'
     
     implementation 'com.jagrosh:jda-utilities:3.0.5'
     

@@ -1,15 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import java.lang.reflect.Method;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
@@ -20,12 +10,20 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+
+import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class ReloadCommand extends Command {
 
@@ -44,8 +42,6 @@ public class ReloadCommand extends Command {
 	    initReloadableMethods();
 	}
 
-	// e.getGuild().getTextChannelById(HandRaiseSystem.channelID).addReactionById(HandRaiseSystem.messageID,
-	// "k").queue();
 	if (args.length >= 2) {
 	    if (args[1].equalsIgnoreCase("list") || args[1].equalsIgnoreCase("ls")) {
 		String reloadableMethodsString = "```";
@@ -95,7 +91,8 @@ public class ReloadCommand extends Command {
     @Reloadable("reloadablemethods")
     private static void initReloadableMethods() {
 	reloadableMethods = new HashMap<>();
-	final Reflections reflections = new Reflections(Main.class.getPackage().getName(), new MethodAnnotationsScanner());
+	// todo: maybe Scanners.MethodsAnnotated.withAnnotation(Reloadable.class)
+	final Reflections reflections = new Reflections(Main.class.getPackage().getName(), Scanners.MethodsAnnotated);
 	try {
 	    reflections.getMethodsAnnotatedWith(Reloadable.class).forEach(method -> {
 		reloadableMethods.put(method.getAnnotation(Reloadable.class).value(), method);

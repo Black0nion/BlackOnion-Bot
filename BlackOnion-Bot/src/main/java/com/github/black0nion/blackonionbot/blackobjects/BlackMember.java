@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import org.jetbrains.annotations.Nullable;
 
 public class BlackMember extends BlackObject implements Member {
 
@@ -153,247 +154,279 @@ public class BlackMember extends BlackObject implements Member {
 	return configs;
     }
 
-    // built in methods
-    @Override
-    @NotNull
-    @Deprecated
-    public User getUser() {
-	return this.member.getUser();
+	@Nullable
+	@Override
+	public String getAvatarUrl() {
+		return this.member.getAvatarUrl();
+	}
+
+	@NotNull
+	@Override
+	public String getEffectiveAvatarUrl() {
+		return this.member.getEffectiveAvatarUrl();
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> ban(int delDays) {
+		return this.member.ban(delDays);
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> ban(int delDays, @Nullable String reason) {
+		return this.member.ban(delDays, reason);
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> kick() {
+		return this.member.kick();
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> kick(@Nullable String reason) {
+		return this.member.kick(reason);
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> mute(boolean mute) {
+		return this.member.mute(mute);
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> deafen(boolean deafen) {
+		return this.member.deafen(deafen);
+	}
+
+	@NotNull
+	@Override
+	public AuditableRestAction<Void> modifyNickname(@Nullable String nickname) {
+		return this.member.modifyNickname(nickname);
+	}
+
+	@Override
+	public void formatTo(Formatter formatter, int flags, int width, int precision) {
+		this.member.formatTo(formatter, flags, width, precision);
+	}
+
+	@Override
+	public boolean hasAccess(@NotNull GuildChannel channel) {
+		return this.member.hasAccess(channel);
+	}
+
+	@NotNull
+	@Override
+	public String getId() {
+		return this.member.getId();
+	}
+
+	@NotNull
+	@Override
+	public OffsetDateTime getTimeCreated() {
+		return this.member.getTimeCreated();
+	}
+
+	@NotNull
+	@Override
+	public User getUser() {
+		return this.member.getUser();
+	}
+
+	public BlackUser getBlackUser() {
+        return BlackUser.from(this.member.getUser());
     }
 
-    public BlackUser getBlackUser() {
-	return BlackUser.from(this.member);
-    }
+	@NotNull
+	@Override
+	public Guild getGuild() {
+		return this.member.getGuild();
+	}
 
-    @Override
-    @NotNull
-    @Deprecated
-    public Guild getGuild() {
-	return this.member.getGuild();
-    }
+	@NotNull
+	@Override
+	public JDA getJDA() {
+		return this.member.getJDA();
+	}
 
-    @NotNull
-    public BlackGuild getBlackGuild() {
-	return this.blackGuild;
-    }
+	@NotNull
+	@Override
+	public OffsetDateTime getTimeJoined() {
+		return this.member.getTimeJoined();
+	}
 
-    @Override
-    @NotNull
-    public EnumSet<Permission> getPermissions() {
-	return this.member.getPermissions();
-    }
+	@Override
+	public boolean hasTimeJoined() {
+		return this.member.hasTimeJoined();
+	}
 
-    @Override
-    @NotNull
-    public EnumSet<Permission> getPermissions(@NotNull final GuildChannel guildChannel) {
-	return this.member.getPermissions(guildChannel);
-    }
+	@Nullable
+	@Override
+	public OffsetDateTime getTimeBoosted() {
+		return this.member.getTimeBoosted();
+	}
 
-    @Override
-    @NotNull
-    public EnumSet<Permission> getPermissionsExplicit() {
-	return this.member.getPermissionsExplicit();
-    }
+	@Nullable
+	@Override
+	public GuildVoiceState getVoiceState() {
+		return this.member.getVoiceState();
+	}
 
-    @Override
-    @NotNull
-    public EnumSet<Permission> getPermissionsExplicit(@NotNull final GuildChannel guildChannel) {
-	return this.member.getPermissionsExplicit(guildChannel);
-    }
+	@NotNull
+	@Override
+	public List<Activity> getActivities() {
+		return this.member.getActivities();
+	}
 
-    @Override
-    public boolean hasPermission(@NotNull final Permission... permissions) {
-	return this.member.hasPermission(permissions);
-    }
+	@NotNull
+	@Override
+	public OnlineStatus getOnlineStatus() {
+		return this.member.getOnlineStatus();
+	}
 
-    @Override
-    public boolean hasPermission(@NotNull final Collection<Permission> collection) {
-	return this.member.hasPermission(collection);
-    }
+	@NotNull
+	@Override
+	public OnlineStatus getOnlineStatus(@NotNull ClientType type) {
+		return this.member.getOnlineStatus(type);
+	}
 
-    @Override
-    public boolean hasPermission(@NotNull final GuildChannel guildChannel, @NotNull final Permission... permissions) {
-	return this.member.hasPermission(guildChannel, permissions);
-    }
+	@NotNull
+	@Override
+	public EnumSet<ClientType> getActiveClients() {
+		return this.member.getActiveClients();
+	}
 
-    @Override
-    public boolean hasPermission(@NotNull final GuildChannel guildChannel, @NotNull final Collection<Permission> collection) {
-	return this.member.hasPermission(guildChannel, collection);
-    }
+	@Nullable
+	@Override
+	public String getNickname() {
+		return this.member.getNickname();
+	}
 
-    @Override
-    @NotNull
-    public JDA getJDA() {
-	return this.member.getJDA();
-    }
+	@NotNull
+	@Override
+	public String getEffectiveName() {
+		return this.member.getEffectiveName();
+	}
 
-    @Override
-    @NotNull
-    public OffsetDateTime getTimeJoined() {
-	return this.member.getTimeJoined();
-    }
+	@Nullable
+	@Override
+	public String getAvatarId() {
+		return this.member.getAvatarId();
+	}
 
-    @Override
-    public boolean hasTimeJoined() {
-	return this.member.hasTimeJoined();
-    }
+	@NotNull
+	@Override
+	public List<Role> getRoles() {
+		return this.member.getRoles();
+	}
 
-    @Override
-    public OffsetDateTime getTimeBoosted() {
-	return this.member.getTimeBoosted();
-    }
+	@Nullable
+	@Override
+	public Color getColor() {
+		return this.member.getColor();
+	}
 
-    @Override
-    public GuildVoiceState getVoiceState() {
-	return this.member.getVoiceState();
-    }
+	@Override
+	public int getColorRaw() {
+		return this.member.getColorRaw();
+	}
 
-    @Override
-    @NotNull
-    public List<Activity> getActivities() {
-	return this.member.getActivities();
-    }
+	@Override
+	public boolean canInteract(@NotNull Member member) {
+		return this.member.canInteract(member);
+	}
 
-    @Override
-    @NotNull
-    public OnlineStatus getOnlineStatus() {
-	return this.member.getOnlineStatus();
-    }
+	@Override
+	public boolean canInteract(@NotNull Role role) {
+		return this.member.canInteract(role);
+	}
 
-    @Override
-    @NotNull
-    public OnlineStatus getOnlineStatus(@NotNull final ClientType clientType) {
-	return this.member.getOnlineStatus(clientType);
-    }
+	@Override
+	public boolean canInteract(@NotNull Emote emote) {
+		return this.member.canInteract(emote);
+	}
 
-    @Override
-    @NotNull
-    public EnumSet<ClientType> getActiveClients() {
-	return this.member.getActiveClients();
-    }
+	@Override
+	public boolean isOwner() {
+		return this.member.isOwner();
+	}
 
-    @Override
-    public String getNickname() {
-	return this.member.getNickname();
-    }
+	@Override
+	public boolean isPending() {
+		return this.member.isPending();
+	}
 
-    @Override
-    @NotNull
-    public String getEffectiveName() {
-	return this.member.getEffectiveName();
-    }
+	@Nullable
+	@Override
+	public TextChannel getDefaultChannel() {
+		return this.member.getDefaultChannel();
+	}
 
-    @Override
-    @NotNull
-    public List<Role> getRoles() {
-	return this.member.getRoles();
-    }
+	@NotNull
+	@Override
+	public String getAsMention() {
+		return this.member.getAsMention();
+	}
 
-    @Override
-    public Color getColor() {
-	return this.member.getColor();
-    }
+	@NotNull
+	@Override
+	public EnumSet<Permission> getPermissions() {
+		return this.member.getPermissions();
+	}
 
-    @Override
-    public int getColorRaw() {
-	return this.member.getColorRaw();
-    }
+	@NotNull
+	@Override
+	public EnumSet<Permission> getPermissions(@NotNull GuildChannel channel) {
+		return this.member.getPermissions(channel);
+	}
 
-    @Override
-    public boolean canInteract(@NotNull final Member member) {
-	return this.member.canInteract(member);
-    }
+	@NotNull
+	@Override
+	public EnumSet<Permission> getPermissionsExplicit() {
+		return this.member.getPermissionsExplicit();
+	}
 
-    @Override
-    public boolean canInteract(@NotNull final Role role) {
-	return this.member.canInteract(role);
-    }
+	@NotNull
+	@Override
+	public EnumSet<Permission> getPermissionsExplicit(@NotNull GuildChannel channel) {
+		return this.member.getPermissionsExplicit(channel);
+	}
 
-    @Override
-    public boolean canInteract(@NotNull final Emote emote) {
-	return this.member.canInteract(emote);
-    }
+	@Override
+	public boolean hasPermission(@NotNull Permission... permissions) {
+		return this.member.hasPermission(permissions);
+	}
 
-    @Override
-    public boolean isOwner() {
-	return this.member.isOwner();
-    }
+	@Override
+	public boolean hasPermission(@NotNull Collection<Permission> permissions) {
+		return this.member.hasPermission(permissions);
+	}
 
-    @Override
-    public TextChannel getDefaultChannel() {
-	return this.member.getDefaultChannel();
-    }
+	@Override
+	public boolean hasPermission(@NotNull GuildChannel channel, @NotNull Permission... permissions) {
+		return this.member.hasPermission(channel, permissions);
+	}
 
-    @Override
-    @NotNull
-    public AuditableRestAction<Void> ban(final int delDays) {
-	return this.member.ban(delDays);
-    }
+	@Override
+	public boolean hasPermission(@NotNull GuildChannel channel, @NotNull Collection<Permission> permissions) {
+		return this.member.hasPermission(channel, permissions);
+	}
 
-    @Override
-    @NotNull
-    public AuditableRestAction<Void> ban(final int delDays, final String reason) {
-	return this.member.ban(delDays, reason);
-    }
+	@Override
+	public boolean canSync(@NotNull GuildChannel targetChannel, @NotNull GuildChannel syncSource) {
+		return this.member.canSync(targetChannel, syncSource);
+	}
 
-    @Override
-    @NotNull
-    public AuditableRestAction<Void> kick() {
-	return this.member.kick();
-    }
+	@Override
+	public boolean canSync(@NotNull GuildChannel channel) {
+		return this.member.canSync(channel);
+	}
 
-    @Override
-    @NotNull
-    public AuditableRestAction<Void> kick(final String reason) {
-	return this.member.kick(reason);
-    }
-
-    @Override
-    @NotNull
-    public AuditableRestAction<Void> modifyNickname(final String nickname) {
-	return this.member.modifyNickname(nickname);
-    }
-
-    @Override
-    @NotNull
-    public String getAsMention() {
-	return this.member.getAsMention();
-    }
-
-    @Override
-    public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
-	this.member.formatTo(formatter, flags, width, precision);
-    }
-
-    @Override
-    @NotNull
-    public String getId() {
-	return this.member.getId();
-    }
-
-    @Override
-    public long getIdLong() {
-	return this.member.getIdLong();
-    }
-
-    @Override
-    @NotNull
-    public OffsetDateTime getTimeCreated() {
-	return this.member.getTimeCreated();
-    }
-
-    @Override
-    public boolean canSync(final GuildChannel targetChannel, final GuildChannel syncSource) {
-	return this.member.canSync(targetChannel, syncSource);
-    }
-
-    @Override
-    public boolean canSync(final GuildChannel channel) {
-	return this.member.canSync(channel);
-    }
-
-    @Override
-    public boolean isPending() {
-	return this.member.isPending();
-    }
+	@Override
+	public long getIdLong() {
+		return this.member.getIdLong();
+	}
 }
