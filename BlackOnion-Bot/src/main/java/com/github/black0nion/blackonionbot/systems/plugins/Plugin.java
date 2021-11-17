@@ -10,7 +10,6 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * @author _SIM_

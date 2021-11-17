@@ -2,16 +2,12 @@ package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 
 public class PrefixInfo {
 
@@ -21,7 +17,6 @@ public class PrefixInfo {
 		if (author.isBot() || message.getMentionedUsers().size() == 0) return;
 		final BlackGuild guild = cmde.getGuild();
 		final BlackMember member = cmde.getMember();
-		final JDA jda = cmde.getJda();
 		
 		final String msgContent = message.getContentRaw();
 		if (msgContent.matches("^<@!*&*" + BotInformation.SELF_USER_ID + "+>")) {
