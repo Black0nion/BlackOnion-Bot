@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import nonapi.io.github.classgraph.utils.JarUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -285,5 +287,13 @@ public class Utils {
 			result += stackTrace[i].toString() + (i == stackTrace.length - 1 ? "" : delimiter);
 		}
 		return result;
+	}
+
+	public static String getJarName() {
+		return new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+	}
+
+	public static boolean runningFromJar() {
+		return getJarName().contains(".jar");
 	}
 }

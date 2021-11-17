@@ -41,7 +41,6 @@ import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.CatchLogs;
 import com.github.black0nion.blackonionbot.utils.CredentialsManager;
-import com.github.black0nion.blackonionbot.utils.JarUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.ValueManager;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -103,7 +102,7 @@ public class Bot extends ListenerAdapter {
 	CatchLogs.init();
 	new ValueManager();
 	DefaultValues.init();
-	isJarFile = JarUtils.runningFromJar();
+	isJarFile = Utils.runningFromJar();
 	logLevel.addAll(Arrays.asList(LogMode.values()));
 	logOrigin.addAll(Arrays.asList(LogOrigin.values()));
 	Logger.log(LogMode.INFORMATION, "Starting BlackOnion-Bot in " + runMode + " mode...");
