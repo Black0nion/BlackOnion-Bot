@@ -49,8 +49,6 @@ dependencies {
     
     implementation group: 'org.json', name: 'json', version: '20210307'
     
-    implementation 'net.java.dev.jna:jna-platform:5.10.0'
-    
     //implementation 'com.github.HypixelDev.PublicAPI:Java:2.0.0'
     
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
