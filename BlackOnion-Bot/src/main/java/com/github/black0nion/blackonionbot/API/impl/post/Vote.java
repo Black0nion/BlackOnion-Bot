@@ -28,7 +28,7 @@ public class Vote extends PostRequest {
     @Override
     public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession u) {
 	final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
-	if (!ip.equals("159.203.105.187") || !headers
+	if (!ip.equals("159.203.105.187") || !headers.containsKey("authorization") || !headers
 		.get("authorization")
 		.equals(Bot.getCredentialsManager().getString("topgg_authorization", "PEeKSqJ%Xz-7_UIVS3s!Jc4-U9NSCi2!Hz!Y_XAq9DPPt8-gAKv15pW8VtqVucI&#qZOk"))) {
 	    response.status(401);
