@@ -26,7 +26,7 @@ jobs:
         run: |
           cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot
           chmod +x ./gradlew
-          ./gradlew shadowJar -Dorg.gradle.jvmargs="-Xmx4G -Xms2G -Xshareclasses -XX:SharedCachedHardLimit=200m -Xscmx60m -XX:+IdleTuningGcOnIdle -Xquickstart -Xtune:virtualized -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
+          ./gradlew shadowJar -Dorg.gradle.jvmargs="-Xmx4G -Xms2G" -Dfile.encoding=UTF-8
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         run: |
