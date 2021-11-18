@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
         run: |
-          cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot/BlackOnion-Bot
+          cd /home/runner/work/BlackOnion-Bot/BlackOnion-Bot
           chmod +x ./gradlew
           ./gradlew shadowJar
       - name: Cleanup Gradle Cache
