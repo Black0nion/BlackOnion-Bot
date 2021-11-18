@@ -6,15 +6,10 @@
 *.class
 
 # Log file
+# logfiles
 *.log
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -26,7 +21,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-### Gradle ###
+# gradle build dirs
 .gradle
 build/
 
@@ -39,25 +34,18 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
-# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
-# gradle/wrapper/gradle-wrapper.properties
-
 ### Gradle Patch ###
 **/build/
 
-# End of https://www.toptal.com/developers/gitignore/api/java,gradle
-
-EXPORT
-POSTMAN
-.settings
-.metadata
-BlackOnion-Bot/tmp
-BlackOnion-Bot/files/*
-!BlackOnion-Bot/files/translations
-BlackOnion-Bot/.classpath
-Testbot
-Testplugin
-BlackOnion-Bot/version
-BlackOnion-Bot/plugins
-BlackOnion-Bot/.idea
-BlackOnion-Bot/out
+# temporary files like server join banners
+tmp/
+# configs, logs and other files
+files/
+# version metadata (might get added to the jar soon)
+version
+# plugins for the bot
+plugins
+# IntelliJ IDEA configs
+.idea
+# compiler output of IntelliJ
+out

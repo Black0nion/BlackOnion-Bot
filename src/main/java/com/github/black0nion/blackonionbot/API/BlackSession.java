@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.API;
 
+import com.github.black0nion.blackonionbot.API.impl.post.Login;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
@@ -28,7 +29,7 @@ public class BlackSession {
 
 	/**
 	 * The websocket will connect and then provide a session id to login to. If the
-	 * websocket connection isn't logged in, use {@link com.github.black0nion.blackonionbot.API.impl.post.Login#loginWithDiscord(String)}
+	 * websocket connection isn't logged in, use {@link Login#loginWithDiscord(String)}
 	 * <p>
 	 * Workflow:
 	 * <p>
