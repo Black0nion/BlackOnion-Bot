@@ -76,7 +76,7 @@ dependencies {
     
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.7'
     
-    implementation 'io.github.classgraph:classgraph:4.8.132'
+    implementation 'io.github.classgraph:classgraph:4.8.133'
     
     implementation group: 'com.github.oshi', name: 'oshi-core', version: '5.8.3'
 }
