@@ -22,8 +22,8 @@
 hs_err_pid*
 
 # gradle build dirs
-.gradle
-build/
+/.gradle
+/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -38,14 +38,14 @@ gradle-app.setting
 **/build/
 
 # temporary files like server join banners
-tmp/
+/tmp/
 # configs, logs and other files
-files/
+/files/
 # version metadata (might get added to the jar soon)
-version
+/version
 # plugins for the bot
-plugins
+/plugins
 # IntelliJ IDEA configs
-.idea
+/.idea
 # compiler output of IntelliJ
-out
+/out
