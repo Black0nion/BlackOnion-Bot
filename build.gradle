@@ -16,6 +16,12 @@ repositories {
 
 compileJava.options.encoding = "UTF-8"
 
+shadowJar {
+    archiveBaseName.set("BlackOnion-Bot")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+}
+
 sourceCompatibility = 17
 targetCompatibility = 17
 
