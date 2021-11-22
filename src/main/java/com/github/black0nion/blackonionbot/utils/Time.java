@@ -2,15 +2,7 @@ package com.github.black0nion.blackonionbot.utils;
 
 import java.util.concurrent.TimeUnit;
 
-public class Time {
-
-	private final TimeUnit unit;
-	private final int time;
-
-	private Time(final TimeUnit unit, final int time) {
-		this.unit = unit;
-		this.time = time;
-	}
+public record Time(TimeUnit unit, int time) {
 
 	public static Time DAYS(final int time) {
 		return new Time(TimeUnit.DAYS, time);
@@ -38,13 +30,5 @@ public class Time {
 
 	public static Time NANOSECONDS(final int time) {
 		return new Time(TimeUnit.NANOSECONDS, time);
-	}
-
-	public int getTime() {
-		return this.time;
-	}
-
-	public TimeUnit getUnit() {
-		return this.unit;
 	}
 }

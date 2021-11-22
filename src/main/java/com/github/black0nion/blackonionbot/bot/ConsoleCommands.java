@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.utils;
+package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.User;
 import spark.Spark;
 
