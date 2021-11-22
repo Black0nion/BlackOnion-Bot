@@ -164,6 +164,19 @@ public class Utils {
 		}
 	}
 
+	public static boolean isBoolean(String input) {
+		return isBoolean((Object) input);
+	}
+
+	public static boolean isBoolean(final Object input) {
+		try {
+            Boolean.parseBoolean(((String) input).trim());
+            return true;
+        } catch (final Exception ignored) {
+            return false;
+        }
+	}
+
 	/**
 	 * @return if the given Object equals to one of the other given Objects
 	 */
