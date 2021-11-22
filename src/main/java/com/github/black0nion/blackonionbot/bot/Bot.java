@@ -5,24 +5,18 @@ import java.io.PrintStream;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.annotation.Nonnull;
-
 import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.blackobjects.BlackArrayList;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.misc.LogMode;
@@ -55,7 +49,6 @@ import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import spark.Spark;
 
 public class Bot extends ListenerAdapter {
     public static RunMode runMode;
