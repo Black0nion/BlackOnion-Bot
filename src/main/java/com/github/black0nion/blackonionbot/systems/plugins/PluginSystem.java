@@ -37,7 +37,7 @@ public class PluginSystem {
 
 		final Optional<ClassInfo> optionalClassInfo = scanResult.getAllClasses().stream().filter(classInfo -> classInfo.extendsSuperclass(superclass)).findFirst();
 
-		if (!optionalClassInfo.isPresent()) {
+		if (optionalClassInfo.isEmpty()) {
 			Logger.logError("No plugin detected in file \"" + jarName + "\".", LogOrigin.PLUGINS);
 			return;
 		}
@@ -100,7 +100,6 @@ public class PluginSystem {
 						}
 						Thread.sleep(500);
 						threadGroup.interrupt();
-						threadGroup.destroy();
 					} else {
 						info.setState(PluginState.STOPPED);
 					}
