@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
@@ -18,7 +19,6 @@ import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -48,11 +48,11 @@ public class StatsCommand extends Command {
 		    .addField("cpuspeed", CPU_MHZ, true)
 		    .addField("lines", String.valueOf(BotInformation.LINE_COUNT), true)
 		    .addField("files", String.valueOf(BotInformation.FILE_COUNT), true)
-		    .addField("commandsexecuted", String.valueOf(ValueManager.getInt("commandsExecuted")), true)
-		    .addField("messagessent", String.valueOf(ValueManager.getInt("messagesSent")), true)
+		    .addField("commandsexecuted", String.valueOf(StatisticsManager.getTotalCommands()), true)
+		    .addField("messagessent", String.valueOf(StatisticsManager.getMessagesSent()), true)
 		    .addField("commands", String.valueOf(CommandBase.commandsArray.size()), true)
 		    .addField("ping", e.getJDA().getGatewayPing() + "ms", true)
-		    .addField("usercount", String.valueOf(e.getJDA().getGuilds().stream().map(Guild::getMemberCount).collect(Collectors.summingInt(Integer::intValue))), true)
+		    .addField("usercount", String.valueOf((Integer) e.getJDA().getGuilds().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum()), true)
 		    .addField("guildcount", String.valueOf(e.getJDA().getGuildCache().size()), true)
 		    .addField("uptime", Utils.parseDate(diff), true)
 		    .addField("version", BotInformation.BOT_VERSION, true)

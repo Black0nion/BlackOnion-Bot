@@ -9,7 +9,7 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.ValueManager;
+import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -41,7 +41,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		this.setRoute("dashboard");
 	}
 
-	private static final boolean LOG_HEARTBEATS = ValueManager.getBoolean("logHeartbeats");
+	private static final boolean LOG_HEARTBEATS = Config.api.LOG_HEARTBEATS;
 
 	private static final List<Session> sessions = new ArrayList<>();
 

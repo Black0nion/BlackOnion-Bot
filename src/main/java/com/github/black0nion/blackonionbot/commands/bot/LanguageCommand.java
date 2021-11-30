@@ -24,7 +24,7 @@ public class LanguageCommand extends Command {
 	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (args.length >= 2) {
 			if (LanguageSystem.getLanguageFromName(args[1].toUpperCase()) != null) {
-				final Language newLang = LanguageSystem.getLanguageFromName(args[1]);
+				final Language newLang = LanguageSystem.getLanguageFromName(args[1].toUpperCase());
 				author.setLanguage(newLang);
 				cmde.success(newLang.getTranslationNonNull("languageupdated"), newLang.getTranslationNonNull("newlanguage"), new Placeholder("newlang", newLang.getName() + " (" + newLang.getLanguageCode() + ")"));
 			} else if (args[1].equalsIgnoreCase("list"))

@@ -1,13 +1,19 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.OS;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.logging.Logger;
+import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
+import com.google.common.io.Files;
+import com.mongodb.client.model.Filters;
+import com.sun.jna.platform.win32.Advapi32Util;
+import org.bson.Document;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.ConnectException;
@@ -18,19 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bson.Document;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.misc.OS;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.utils.ValueManager;
-import com.google.common.io.Files;
-import com.mongodb.client.model.Filters;
-import com.sun.jna.platform.win32.Advapi32Util;
+import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
 
 public class BotInformation {
 
@@ -45,8 +39,6 @@ public class BotInformation {
 
 	public static String CPU_NAME = "N/A";
 	public static String CPU_MHZ = "N/A";
-
-	public static String DEFAULT_PREFIX = "*";
 
 	public static long SELF_USER_ID;
 
@@ -137,8 +129,8 @@ public class BotInformation {
 
 	public static void calculateCodeLines() {
 		if (Bot.isJarFile) {
-			LINE_COUNT = ValueManager.getInt("lines");
-			FILE_COUNT = ValueManager.getInt("files");
+			LINE_COUNT = StatisticsManager.getLineCount();
+			FILE_COUNT = StatisticsManager.getFileCount();
 		} else {
 			final File dir = new File("src/main");
 			final File[] files = dir.listFiles();
@@ -146,8 +138,8 @@ public class BotInformation {
 			FILE_COUNT = 69;
 			Bot.executor.submit(() -> {
 				showFiles(files);
-				ValueManager.save("lines", LINE_COUNT);
-				ValueManager.save("files", FILE_COUNT);
+				StatisticsManager.setLineCount(LINE_COUNT);
+				StatisticsManager.setFileCount(FILE_COUNT);
 				// Send a request to the servers to update the two counters
 				try {
 					for (final String endpoint : Files.readLines(new File("files/endpoints.txt"), StandardCharsets.UTF_8)) {
