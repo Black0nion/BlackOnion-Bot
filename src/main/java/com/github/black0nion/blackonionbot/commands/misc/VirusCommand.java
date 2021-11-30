@@ -59,7 +59,7 @@ public class VirusCommand extends Command {
 //	});
     }
 
-    public static HttpResponse<String> checkUrl(final String url) {
+    /*public static HttpResponse<String> checkUrl(final String url) {
 	try {
 	    final String key = Bot.getCredentialsManager().getString("virustotal_key");
 	    if (key == null) return null;
@@ -81,5 +81,5 @@ public class VirusCommand extends Command {
 	    e.printStackTrace();
 	}
 	return null;
-    }
+    }*/
 }

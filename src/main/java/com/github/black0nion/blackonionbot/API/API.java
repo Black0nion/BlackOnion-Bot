@@ -1,27 +1,21 @@
 package com.github.black0nion.blackonionbot.API;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.reflections.Reflections;
-
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
-import com.github.black0nion.blackonionbot.utils.ValueManager;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-
 import spark.Route;
 import spark.Spark;
+
+import java.util.*;
 
 public class API {
 
@@ -41,10 +35,10 @@ public class API {
 	public static void init() {
 		requests.clear();
 		websocketEndpoints.clear();
-		final int port = ValueManager.getInt("api_port");
+		final int port = Config.api.PORT != -1 ? Config.api.PORT : 187;
 		Spark.stop();
 		Spark.awaitStop();
-		Spark.port(port != 0 ? port : 187);
+		Spark.port(port > 0 ? port : 187);
 
 		final Reflections reflections = new Reflections(API.class.getPackage().getName());
 		// ------------------WebSockets------------------

@@ -1,16 +1,10 @@
 package com.github.black0nion.blackonionbot.API;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
-import org.json.JSONObject;
-
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.utils.CredentialsManager;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.utils.config.DashboardApplication;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
@@ -18,15 +12,22 @@ import com.google.common.cache.LoadingCache;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mongodb.client.model.Filters;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
+
+import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 public class OAuthUtils {
 
-    private static final LoadingCache<String, DiscordUser> cachedUsers = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, DiscordUser>() {
-	@Override
-	public DiscordUser load(final String token) {
-	    return loadUserFromToken(token);
-	}
-    });
+    private static final LoadingCache<String, DiscordUser> cachedUsers = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<>() {
+		@Override
+		public @NotNull DiscordUser load(@NotNull String key) throws NullPointerException {
+			DiscordUser discordUser = loadUserFromToken(key);
+			if (discordUser == null) throw new NullPointerException("DiscordUser is null");
+			return discordUser;
+		}
+	});
 
     /**
      * @param  code The code from Discord
@@ -36,9 +37,19 @@ public class OAuthUtils {
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {
 	try {
 	    LogOrigin.API.info("Getting a token from code...");
+		DashboardApplication config = Config.discord.DASHBOARD_APPLICATION;
+		if (config.CLIENT_ID == null || config.CLIENT_SECRET == null || config.REDIRECT_URI == null) {
+			LogOrigin.API.error("Discord client ID, client secret or redirect URI is null!");
+		}
 	    Unirest.setTimeouts(0, 0);
-	    final CredentialsManager manager = Bot.getCredentialsManager();
-	    final HttpResponse<String> responseRaw = Unirest.post("https://discord.com/api/v9/oauth2/token").header("Content-Type", "application/x-www-form-urlencoded").field("client_id", manager.getString("client_id")).field("client_secret", manager.getString("client_secret")).field("grant_type", "authorization_code").field("code", code).field("redirect_uri", manager.getString("redirect_uri")).asString();
+	    final HttpResponse<String> responseRaw = Unirest.post("https://discord.com/api/v9/oauth2/token")
+				.header("Content-Type", "application/x-www-form-urlencoded")
+				.field("client_id", config.CLIENT_ID)
+				.field("client_secret", config.CLIENT_SECRET)
+				.field("grant_type", "authorization_code")
+				.field("code", code)
+				.field("redirect_uri", config.REDIRECT_URI)
+			.asString();
 	    final JSONObject response = new JSONObject(responseRaw.getBody());
 	    if (response.has("access_token") && response.has("refresh_token")) return new Trio<>(response.getString("access_token"), response.getString("refresh_token"), response.getInt("expires_in"));
 	} catch (final Exception e) {

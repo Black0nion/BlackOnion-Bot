@@ -2,13 +2,13 @@ package com.github.black0nion.blackonionbot.API.impl.post;
 
 import java.util.HashMap;
 
+import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.utils.ValueManager;
 
 import spark.Request;
 import spark.Response;
@@ -23,8 +23,8 @@ public class UpdateLineCount extends PostRequest {
 	}
 	final int newLineCount = body.getInt("line_count");
 	final int newFileCount = body.getInt("file_count");
-	ValueManager.save("lines", newLineCount);
-	ValueManager.save("files", newFileCount);
+	StatisticsManager.setLineCount(newLineCount);
+	StatisticsManager.setFileCount(newFileCount);
 	BotInformation.LINE_COUNT = newLineCount;
 	BotInformation.FILE_COUNT = newFileCount;
 	API.logWarning("New file / line count! " + newLineCount + " and " + newFileCount);
