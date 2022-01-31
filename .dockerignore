@@ -1,0 +1,7 @@
+*
+
+!build.gradle
+!src/
+!gradlew
+!gradle/wrapper/gradle-wrapper.properties
+!settings.gradle
