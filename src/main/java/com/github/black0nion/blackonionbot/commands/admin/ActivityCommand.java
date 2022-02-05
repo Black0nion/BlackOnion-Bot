@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -31,7 +32,7 @@ public class ActivityCommand extends Command {
 		final String activityType = args[1].toLowerCase();
 
 		if (activityType.equalsIgnoreCase("clear")) {
-			Config.discord.ACTIVITY_TYPE = null;
+			Config.activity_type = null;
 			ConfigManager.saveConfig();
 			Bot.restartSwitchingStatus(e.getJDA());
 			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("activitycleared", "theactivitygotcleared", false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
@@ -42,9 +43,10 @@ public class ActivityCommand extends Command {
 
 		Activity.ActivityType type = parse(activityType);
 		if (type != null) {
-            e.getJDA().getPresence().setActivity(getActivity(type, status));
-			Config.discord.ACTIVITY_TYPE = type;
-			Config.discord.ACTIVITY = status;
+			Activity newActivity = getActivity(type, status);
+			e.getJDA().getPresence().setActivity(newActivity);
+			Config.activity_type = type;
+			Config.activity_name = status;
 			ConfigManager.saveConfig();
 			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 		} else {
@@ -61,7 +63,7 @@ public class ActivityCommand extends Command {
 	}
 
 	public static Activity getActivity() {
-		return getActivity(Config.discord.ACTIVITY_TYPE, Config.discord.ACTIVITY);
+		return getActivity(Config.activity_type, Config.activity_name);
 	}
 
 	public static Activity getActivity(final Activity.ActivityType status, final String activity) {

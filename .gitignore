@@ -1,3 +1,6 @@
+### General ###
+*.env
+
 ### Java ###
 # Compiled class file
 *.class

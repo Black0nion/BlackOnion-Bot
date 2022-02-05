@@ -1,58 +1,35 @@
 package com.github.black0nion.blackonionbot.utils.config;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.utils.Async;
-import com.google.gson.Gson;
-import org.json.JSONObject;
+import com.github.black0nion.blackonionbot.utils.BlackIncrementor;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.function.Consumer;
 
 public class ConfigManager {
 
-	private static final File CONFIG_FILE = new File("files", "config.json");
-	private static final Gson GSON = new Gson().newBuilder()
-			.setFieldNamingStrategy(f -> f.getName().toLowerCase())
-			.serializeNulls()
-			.registerTypeAdapterFactory(new NonNullTypeAdapterFactory())
-			.create();
+	private static final File ENV_FILE = new File("files/.env");
 
 	public static void loadConfig() throws IOException {
-		if (!CONFIG_FILE.exists() || Bot.launchArguments.contains("--reset-config") || Bot.launchArguments.contains("--generate-config") || Files.readString(CONFIG_FILE.toPath()).isEmpty()) {
-			CONFIG_FILE.getParentFile().mkdirs();
-			CONFIG_FILE.createNewFile();
-			saveConfig();
-			Logger.logWarning("Config file created - please modify it!");
-			System.exit(1);
-		}
-		try {
-			Config newConfig = GSON.fromJson(System.getenv("CONFIG") != null ? System.getenv("CONFIG") : Files.readString(CONFIG_FILE.toPath()), Config.class);
-			Config.setConfig(newConfig);
-		} catch (Exception e) {
-			Logger.logError("Failed to load config file: " + e.getMessage());
-			System.exit(1);
+		// Load .env vars from the .env file
+		if (ENV_FILE.exists()) {
+			Logger.logInfo("Loading environment variables from the .env file");
+			BlackIncrementor count = new BlackIncrementor();
+			Files.readAllLines(ENV_FILE.toPath())
+				.stream()
+				.filter(line -> !line.startsWith("#"))
+				.map(line -> line.replaceAll("\\s+=\\s+", "="))
+				.map(line -> line.split("="))
+				.peek(count::increment)
+				.forEach(split -> System.setProperty(split[0], split[1]));
+			Logger.logInfo("Loaded " + count.getCount() + " environment variables from the .env file");
+		} else {
+			Logger.logWarning("No .env file found, skipping loading environment variables");
 		}
 	}
 
-	@Async
 	public static void saveConfig() {
-		saveConfig(null);
-    }
-
-	@Async
-	public static void saveConfig(Consumer<JSONObject> onFinish) {
-		try {
-			JSONObject cnfg = new JSONObject(GSON.toJson(Config.getConfig()));
-			System.out.println(cnfg);
-			Files.writeString(CONFIG_FILE.toPath(), cnfg.toString(2));
-			if (onFinish != null) {
-				onFinish.accept(cnfg);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		throw new RuntimeException("Not implemented");
 	}
 }

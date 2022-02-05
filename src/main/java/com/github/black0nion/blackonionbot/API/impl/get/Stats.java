@@ -29,7 +29,7 @@ public class Stats extends GetRequest {
 					.put("cpu_name", BotInformation.CPU_NAME)
 					.put("cpu_cores", BotInformation.OSBEAN.getAvailableProcessors())
 					.put("cpu_speed", BotInformation.CPU_MHZ))
-			.put("prefix", Config.discord.DEFAULT_PREFIX)
+			.put("prefix", Config.prefix)
 			.put("os", BotInformation.OS_NAME).toString();
 	}
 
