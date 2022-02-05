@@ -35,7 +35,7 @@ public class API {
 	public static void init() {
 		requests.clear();
 		websocketEndpoints.clear();
-		final int port = Config.api.PORT != -1 ? Config.api.PORT : 187;
+		final int port = Config.api_port != -1 ? Config.api_port : 187;
 		Spark.stop();
 		Spark.awaitStop();
 		Spark.port(port > 0 ? port : 187);

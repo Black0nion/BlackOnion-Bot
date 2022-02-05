@@ -30,13 +30,13 @@ public class Vote extends PostRequest {
 	final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
 	if (!ip.equals("159.203.105.187") || !headers.containsKey("authorization") || !headers
 		.get("authorization")
-		.equals(Config.other.TOPGG_AUTH)) {
+		.equals(Config.topgg_auth)) {
 	    response.status(401);
 	    return "get outta here";
 	}
 
-	final Long channelid = Config.discord.VOTE_CHANNEL;
-	if (channelid != null && channelid != -1) {
+	final Long channelid = Config.vote_channel;
+	if (channelid != -1) {
 	    final TextChannel channel = Bot.jda.getTextChannelById(channelid);
 	    if (channel != null) {
 		final String userid = body.getString("user");

@@ -41,7 +41,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		this.setRoute("dashboard");
 	}
 
-	private static final boolean LOG_HEARTBEATS = Config.api.LOG_HEARTBEATS;
+	private static final boolean LOG_HEARTBEATS = Config.log_heartbeats;
 
 	private static final List<Session> sessions = new ArrayList<>();
 
@@ -241,7 +241,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		if (response == null) {
 			response = new JSONObject();
 		} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
-			response = new Gson().toJson(response);
+			response = Bot.gson.toJson(response);
 		}
 
 		if (request != null && request.has("id")) {

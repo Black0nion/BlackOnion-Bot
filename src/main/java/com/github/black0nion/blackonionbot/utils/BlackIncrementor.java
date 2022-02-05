@@ -18,6 +18,13 @@ public class BlackIncrementor {
 	count++;
     }
 
+	/**
+	 * Useful for streams
+	 */
+	public void increment(Object dummy) {
+	increment();
+	}
+
     /**
      * @return the count
      */

@@ -24,20 +24,15 @@ public abstract class BlackObject {
 	return (value != null ? value : defaultValue);
     }
 
-    @Nonnull
-    public final <T> T gOD(final T value, final T defaultValue) {
-	return (value != null ? value : defaultValue);
-    }
-
-    @Nullable
+	@Nullable
     public Document getConfig() {
 	return getCollection().find(getIdentifier()).first();
     }
 
+	/**
+	 * @return an arraylist containing all configs, empty if none present
+	 */
     @Nonnull
-    /**
-     * @return an arraylist containing all configs, empty if none present
-     */
     public List<Document> getAllConfigs() {
 	return getCollection().find().into(new ArrayList<>());
     }
