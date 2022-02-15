@@ -43,7 +43,7 @@ jobs:
         if: steps.get_version.outputs.TAG != 'latest-dev'
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
-          TAG: ${{ steps.check-tag.outputs.tag }}
+          TAG: ${{ steps.check-tag.outputs.TAG }}
         run: |
           REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           docker push ghcr.io/$REPO:$VERSION
