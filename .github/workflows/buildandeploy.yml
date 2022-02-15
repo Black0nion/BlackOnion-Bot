@@ -20,12 +20,13 @@ jobs:
           VERSION=$(echo $GITHUB_REF | cut -d / -f 3)
           echo ::set-output name=VERSION::$VERSION
           if [[ $VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
-           echo ::set-output name=TAG::latest
+            TAG="latest"
           elif [[ $VERSION =~ ^b[0-9]+.[0-9]+.[0-9]+$ ]]; then
-           echo ::set-output name=TAG::latest-beta
+            TAG="latest-beta"
           else
-           echo ::set-output name=TAG::latest-dev
+            TAG="latest-dev"
           fi
+          echo ::set-output name=TAG::$TAG
           echo "Version: $VERSION | Tag: $TAG"
       - name: Build docker image
         env:
