@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.util.Locale;
+
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 import static com.github.black0nion.blackonionbot.utils.config.Flag.NONNULL;
 
@@ -48,6 +50,7 @@ public class Config {
 	public static final int api_port = gOD(get("api_port", Integer.class), 187);
 	public static final boolean log_heartbeats = gOD(get("log_heartbeats", Boolean.class), false);
 	public static final long vote_channel = gOD(get("vote_channel", Long.class), -1L);
+	public static final BotMetadata metadata = ConfigManager.metadata;
 
 	private static <T> T get(String name, Class<T> clazz) {
 		return get(name, clazz, 0);
@@ -55,7 +58,8 @@ public class Config {
 
 	@SuppressWarnings("unchecked")
 	private static <T> T get(String name, Class<T> clazz, int flags) {
-		final String value = System.getProperty(name);
+		name = name.toUpperCase(Locale.ROOT);
+		final String value = System.getenv().containsKey(name) ? System.getenv(name) : System.getProperty(name);
 		if (value == null) {
 			if ((flags & NONNULL) != 0) {
 				throw new IllegalArgumentException("Missing required config value: " + name);

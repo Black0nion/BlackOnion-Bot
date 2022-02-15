@@ -13,6 +13,7 @@ import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
+import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.logging.EventEndpoint;
@@ -25,7 +26,9 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import marcono1234.gson.recordadapter.RecordTypeAdapterFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -61,24 +64,22 @@ public class Bot extends ListenerAdapter {
 
 	public static final Random random = new Random();
 
-	public static Future<Object> switchingStatusFuture;
-
-	public static Callable<Object> switchingStatusCallable;
-
 	public static final PrintStream out = System.out;
 	public static final PrintStream err = System.err;
 
 	public static final List<String> launchArguments = new ArrayList<>();
-	public static Gson gson = new Gson();
+	public static Gson gson = new GsonBuilder()
+			.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
+			.create();
 
 	@SuppressWarnings("resource")
 	public static void startBot(String[] args) throws IOException {
 		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
 		CatchLogs.init();
-		//ConfigManager.loadConfig();
 		ConfigManager.loadConfig();
-		//if (true) return;
+		DockerManager.init();
+		// if (true) return;
 		runMode = Config.run_mode;
 		isJarFile = Utils.runningFromJar();
 		Logger.log(LogMode.INFORMATION, "Starting BlackOnion-Bot in " + runMode + " mode...");
@@ -86,7 +87,7 @@ public class Bot extends ListenerAdapter {
 
 		MongoManager.connect(Config.mongo_connection_string, Config.mongo_timeout);
 
-		if (!Config.token.matches("[a-zA-Z0-9_-]{24}\\.[a-zA-Z0-9_-]{6}\\.[a-zA-Z0-9_-]{16}")) {
+		if (!Config.token.matches("[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}")) {
 			Logger.log(LogMode.ERROR, "Invalid token!");
 			System.exit(1);
 		}
@@ -128,32 +129,19 @@ public class Bot extends ListenerAdapter {
 		BotInformation.SELF_USER_ID = e.getJDA().getSelfUser().getIdLong();
 		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + e.getJDA().getSelfUser().getName() + "#" + e.getJDA().getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - Bot.startTime) + "ms.");
 
-		switchingStatusCallable = () -> {
-			while (true) {
-				try {
-					final Activity.ActivityType activityType = Config.activity_type;
-					if (activityType != null) {
-						jda.getPresence().setActivity(ActivityCommand.getActivity());
-						Thread.sleep(60000);
-					}
-					jda.getPresence().setActivity(Activity.listening(BotInformation.LINE_COUNT + " lines of code in " + BotInformation.FILE_COUNT + " files"));
-					Thread.sleep(60000);
-				} catch (final Exception ex) {
-					if (!(ex instanceof InterruptedException)) {
-						ex.printStackTrace();
-					}
+		scheduledExecutor.scheduleAtFixedRate(new Runnable() {
+			private boolean wasLineCount = false;
+			@Override
+			public void run() {
+				if (wasLineCount) {
+					jda.getPresence().setActivity(ActivityCommand.getActivity());
+					wasLineCount = false;
+				} else {
+					jda.getPresence().setActivity(Activity.listening(Config.metadata.lines_of_code() + " lines of code in " + Config.metadata.files() + " files"));
+					wasLineCount = true;
 				}
 			}
-		};
-
-		restartSwitchingStatus(e.getJDA());
-	}
-
-	public static void restartSwitchingStatus(final JDA jda) {
-		if (switchingStatusFuture != null) {
-			switchingStatusFuture.cancel(true);
-		}
-		switchingStatusFuture = executor.submit(switchingStatusCallable);
+		}, 0, 1, TimeUnit.MINUTES);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ dependencies {
     implementation "com.google.guava:guava:31.0.1-jre"
 
     implementation "com.google.code.gson:gson:2.8.9"
+    implementation "com.github.Marcono1234:gson-record-type-adapter-factory:v0.2.0"
 
     implementation "net.dv8tion:JDA:4.3.0_346"
 
@@ -78,6 +79,24 @@ dependencies {
 
 mainClassName = "com.github.black0nion.blackonionbot.Main"
 
+version = System.getenv("VERSION") ?: "dev"
+processResources {
+    def locAndFiles = getLoc()
+
+    filesMatching("bot.metadata.json") {
+        expand(
+            version: version,
+            lines_of_code: locAndFiles.get(0),
+            files: locAndFiles.get(1)
+        )
+    }
+}
+
+jar {
+    //noinspection GroovyAccessibility
+    archiveVersion = ""
+}
+
 /**
  * This task downloads all dependencies (and their dependencies) and puts them into the libraries folder
  */
@@ -102,4 +121,20 @@ task downloadDependencies {
         }
         logger.info("Copied dependencies into libraries folder")
     }
+}
+
+def getLoc() {
+    int linesOfCode = 0
+    int filesCount = 0
+    project.sourceSets.main.allSource.srcDirs.each { File dir ->
+        if (dir.isDirectory()) {
+            dir.eachFileRecurse { File file ->
+                if (file.isFile()) {
+                    file.eachLine(e -> linesOfCode++)
+                    filesCount++
+                }
+            }
+        }
+    }
+    return [linesOfCode, filesCount]
 }

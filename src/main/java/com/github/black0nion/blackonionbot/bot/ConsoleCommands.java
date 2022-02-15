@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -11,10 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import spark.Spark;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static com.github.black0nion.blackonionbot.bot.Bot.out;
 
@@ -152,6 +148,8 @@ public class ConsoleCommands {
 					out.println("Command not recognized. Valid Commands: [reload, shutdown, setlogorigin, setloglevel, peek]");
 				}
 			} catch (final Exception e) {
+				// docker doesn't have stdin
+				if (e instanceof NoSuchElementException) return;
 				e.printStackTrace();
 			}
 		}

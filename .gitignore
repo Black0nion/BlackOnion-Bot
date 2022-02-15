@@ -37,8 +37,6 @@ gradle-app.setting
 
 **/build/
 
-/gradle/wrapper/gradle-wrapper.jar
-
 ### IntelliJ IDEA ###
 # IntelliJ IDEA configs
 /.idea
