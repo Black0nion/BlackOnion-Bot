@@ -120,7 +120,7 @@ public class CommandBase extends ListenerAdapter {
 
 		PrefixInfo.handle(cmde);
 
-		if (!args[0].startsWith(prefix)) return;
+		if (!args[0].startsWith(prefix) && !args[0].equalsIgnoreCase(event.getJDA().getSelfUser().getAsMention())) return;
 		final String str = args[0].replace(prefix, "").toLowerCase();
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
 		if (commands.containsKey(str)) {

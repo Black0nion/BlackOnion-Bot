@@ -2,41 +2,31 @@ package com.github.black0nion.blackonionbot.mongodb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.*;
 import org.bson.Document;
 
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 public class MongoManager {
 
 	public static MongoClient client;
 
-	@SuppressWarnings("deprecation")
-	public static boolean connect(final String connectionString, int timeout) {
-		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Connecting to " + connectionString + "...");
+	public static boolean connect(final String connectionStringRaw, int timeout) {
+		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Connecting to " + connectionStringRaw + "...");
 		final long start = System.currentTimeMillis();
-		client = new MongoClient(new ServerAddress(connectionString), MongoClientOptions.builder().connectTimeout(timeout).build());
+		ConnectionString connectionString = new ConnectionString(connectionStringRaw);
+		client = MongoClients.create(connectionString);
+		client.startSession();
 		final long end = System.currentTimeMillis();
-		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to " + client.getConnectPoint() + " in " + (end - start) + " ms.");
-		try {
-			client.isLocked();
-			return true;
-		} catch (final Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to mongodb in " + (end - start) + " ms.");
+		return true;
 	}
 
 	public static void disconnect() {

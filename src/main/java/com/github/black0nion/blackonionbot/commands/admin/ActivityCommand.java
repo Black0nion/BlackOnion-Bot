@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.admin;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -12,7 +11,6 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -34,7 +32,6 @@ public class ActivityCommand extends Command {
 		if (activityType.equalsIgnoreCase("clear")) {
 			Config.activity_type = null;
 			ConfigManager.saveConfig();
-			Bot.restartSwitchingStatus(e.getJDA());
 			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("activitycleared", "theactivitygotcleared", false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
