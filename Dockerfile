@@ -1,16 +1,20 @@
-FROM gradle:7.3-jdk17-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle shadowJar downloadDependencies --no-daemon
+FROM gradle:7.4-jdk17-alpine AS build
 
-FROM eclipse-temurin:17-alpine
+WORKDIR /bot
 
-WORKDIR /root/blackonionbot
-EXPOSE 187
+COPY --chown=gradle:gradle . /bot
+WORKDIR /bot
 
-RUN mkdir /app
+RUN gradle build downloadDependencies --no-daemon
 
-COPY --from=build /home/gradle/src/build/libs/BlackOnion-Bot.jar /app/libs/bot.jar
-COPY --from=build /home/gradle/src/libraries/* /app/libs
+FROM eclipse-temurin:17-jre-alpine AS run
 
-ENTRYPOINT ["java", "-cp", "/app/libs/*", "com.github.black0nion.blackonionbot.Main"]
+WORKDIR /blackonionbot
+
+# Copy the libraries to the container
+COPY --from=build /bot/libraries/* ./
+
+# Copy the built application to the container
+COPY --from=build /bot/build/libs/BlackOnion-Bot.jar ./bot.jar
+
+ENTRYPOINT [ "java", "-cp", "*", "com.github.black0nion.blackonionbot.Main" ]

@@ -36,7 +36,7 @@ public class StatusCommand extends Command {
 			channel.sendMessageEmbeds(cmde.success().addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 			return;
 		}
-		Config.discord.STATUS = status;
+		Config.online_status = status;
 		ConfigManager.saveConfig();
 		channel.sendMessageEmbeds(cmde.success().addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
 
@@ -44,6 +44,6 @@ public class StatusCommand extends Command {
 	}
 
 	public static OnlineStatus getStatusFromConfig() {
-		return Config.discord.STATUS != null ? Config.discord.STATUS : OnlineStatus.ONLINE;
+		return Config.online_status != null ? Config.online_status : OnlineStatus.ONLINE;
 	}
 }

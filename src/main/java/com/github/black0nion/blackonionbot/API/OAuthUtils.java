@@ -3,8 +3,7 @@ package com.github.black0nion.blackonionbot.API;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.utils.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.Trio;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.utils.config.DashboardApplication;
+import static com.github.black0nion.blackonionbot.utils.config.Config.*;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
@@ -37,18 +36,17 @@ public class OAuthUtils {
     public static Trio<String, String, Integer> getTokensFromCode(final String code) {
 	try {
 	    LogOrigin.API.info("Getting a token from code...");
-		DashboardApplication config = Config.discord.DASHBOARD_APPLICATION;
-		if (config.CLIENT_ID == null || config.CLIENT_SECRET == null || config.REDIRECT_URI == null) {
+		if (discordapp_redirect_url == null || discordapp_client_secret == null || discordapp_client_id == null) {
 			LogOrigin.API.error("Discord client ID, client secret or redirect URI is null!");
 		}
 	    Unirest.setTimeouts(0, 0);
 	    final HttpResponse<String> responseRaw = Unirest.post("https://discord.com/api/v9/oauth2/token")
 				.header("Content-Type", "application/x-www-form-urlencoded")
-				.field("client_id", config.CLIENT_ID)
-				.field("client_secret", config.CLIENT_SECRET)
+				.field("client_id", discordapp_client_id)
+				.field("client_secret", discordapp_client_secret)
 				.field("grant_type", "authorization_code")
 				.field("code", code)
-				.field("redirect_uri", config.REDIRECT_URI)
+				.field("redirect_uri", discordapp_redirect_url)
 			.asString();
 	    final JSONObject response = new JSONObject(responseRaw.getBody());
 	    if (response.has("access_token") && response.has("refresh_token")) return new Trio<>(response.getString("access_token"), response.getString("refresh_token"), response.getInt("expires_in"));

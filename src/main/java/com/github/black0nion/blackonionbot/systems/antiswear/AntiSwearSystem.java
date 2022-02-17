@@ -33,7 +33,7 @@ import net.dv8tion.jda.api.entities.Webhook;
 public class AntiSwearSystem {
 
 	public static boolean check(final BlackGuild guild, final BlackMember author, final Message message, final TextChannel channel) {
-		if (Config.other.CONTENT_MODERATOR_TOKEN == null || Config.other.CONTENT_MODERATOR_TOKEN.isEmpty()) {
+		if (Config.content_moderator_token == null || Config.content_moderator_token.isEmpty()) {
 			return false;
 		}
 		final String messageContent = message.getContentRaw();
@@ -59,7 +59,7 @@ public class AntiSwearSystem {
 				return false;
 			// Message messageRaw = event.getMessage();
 			Unirest.setTimeouts(0, 0);
-			final HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True").header("Content-Type", "text/plain").header("Ocp-Apim-Subscription-Key", Config.other.CONTENT_MODERATOR_TOKEN).body(messageContent).asString();
+			final HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True").header("Content-Type", "text/plain").header("Ocp-Apim-Subscription-Key", Config.content_moderator_token).body(messageContent).asString();
 
 			final JSONObject responseJson = new JSONObject(response.getBody());
 			// check for profanity

@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.admin;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
@@ -31,9 +30,8 @@ public class ActivityCommand extends Command {
 		final String activityType = args[1].toLowerCase();
 
 		if (activityType.equalsIgnoreCase("clear")) {
-			Config.discord.ACTIVITY_TYPE = null;
+			Config.activity_type = null;
 			ConfigManager.saveConfig();
-			Bot.restartSwitchingStatus(e.getJDA());
 			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("activitycleared", "theactivitygotcleared", false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 			return;
 		}
@@ -42,9 +40,10 @@ public class ActivityCommand extends Command {
 
 		Activity.ActivityType type = parse(activityType);
 		if (type != null) {
-            e.getJDA().getPresence().setActivity(getActivity(type, status));
-			Config.discord.ACTIVITY_TYPE = type;
-			Config.discord.ACTIVITY = status;
+			Activity newActivity = getActivity(type, status);
+			e.getJDA().getPresence().setActivity(newActivity);
+			Config.activity_type = type;
+			Config.activity_name = status;
 			ConfigManager.saveConfig();
 			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("newactivity", args[1] + " " + status, false).build()).delay(Duration.ofSeconds(3)).flatMap(Message::delete).queue();
 		} else {
@@ -61,7 +60,7 @@ public class ActivityCommand extends Command {
 	}
 
 	public static Activity getActivity() {
-		return getActivity(Config.discord.ACTIVITY_TYPE, Config.discord.ACTIVITY);
+		return getActivity(Config.activity_type, Config.activity_name);
 	}
 
 	public static Activity getActivity(final Activity.ActivityType status, final String activity) {

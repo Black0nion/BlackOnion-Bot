@@ -1,17 +1,15 @@
 package com.github.black0nion.blackonionbot.API.impl.get;
 
-import java.util.HashMap;
-
-import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.API.BlackSession;
 import com.github.black0nion.blackonionbot.API.GetRequest;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-
+import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
+
+import java.util.HashMap;
 
 public class Stats extends GetRequest {
 
@@ -20,8 +18,8 @@ public class Stats extends GetRequest {
 		response.type("application/json");
 		return new JSONObject()
 			.put("code_stats", new JSONObject()
-					.put("line_count", BotInformation.LINE_COUNT)
-					.put("file_count", BotInformation.FILE_COUNT))
+					.put("line_count", Config.metadata.lines_of_code())
+					.put("file_count", Config.metadata.files()))
 			.put("message_stats", new JSONObject()
 					.put("messages_sent", StatisticsManager.getMessagesSent())
 					.put("commands_executed", StatisticsManager.getTotalCommands()))
@@ -29,7 +27,7 @@ public class Stats extends GetRequest {
 					.put("cpu_name", BotInformation.CPU_NAME)
 					.put("cpu_cores", BotInformation.OSBEAN.getAvailableProcessors())
 					.put("cpu_speed", BotInformation.CPU_MHZ))
-			.put("prefix", Config.discord.DEFAULT_PREFIX)
+			.put("prefix", Config.prefix)
 			.put("os", BotInformation.OS_NAME).toString();
 	}
 
