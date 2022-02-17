@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import net.dv8tion.jda.api.entities.*;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
@@ -138,21 +138,21 @@ public class BlackGuild extends BlackObject implements Guild {
 
 			// only to debug the configs
 			this.save("name", guild.getName());
-			this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
-			this.guildType = this.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-			this.prefix = this.gOD(config.getString("prefix"), Config.discord.DEFAULT_PREFIX);
-			this.antiSpoilerType = this.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
-			this.antiSwearType = this.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
-			this.joinMessage = this.gOD(config.getString("joinmessage"), this.language.getTranslationNonNull("defaultjoinmessage"));
-			this.joinChannel = this.gOD(config.getLong("joinchannel"), -1L);
-			this.leaveMessage = this.gOD(config.getString("leavemessage"), this.language.getTranslationNonNull("defaultleavemessage"));
-			this.leaveChannel = this.gOD(config.getLong("leavechannel"), -1L);
-			this.suggestionsChannel = this.gOD(config.getLong("suggestionschannel"), -1L);
-			this.autoRoles = this.gOD(config.getList("autoroles", Long.class), new ArrayList<>());
-			this.antiSwearWhitelist = this.gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
-			this.loop = this.gOD(config.getBoolean("loop"), false);
+			this.language = Utils.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
+			this.prefix = Utils.gOD(config.getString("prefix"), Config.prefix);
+			this.antiSpoilerType = Utils.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
+			this.antiSwearType = Utils.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
+			this.joinMessage = Utils.gOD(config.getString("joinmessage"), this.language.getTranslationNonNull("defaultjoinmessage"));
+			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
+			this.leaveMessage = Utils.gOD(config.getString("leavemessage"), this.language.getTranslationNonNull("defaultleavemessage"));
+			this.leaveChannel = Utils.gOD(config.getLong("leavechannel"), -1L);
+			this.suggestionsChannel = Utils.gOD(config.getLong("suggestionschannel"), -1L);
+			this.autoRoles = Utils.gOD(config.getList("autoroles", Long.class), new ArrayList<>());
+			this.antiSwearWhitelist = Utils.gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
+			this.loop = Utils.gOD(config.getBoolean("loop"), false);
 			this.customCommands = new HashMap<>();
-			this.gOD(this.gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> this.customCommands.put(cmd.getCommand(), cmd));
+			Utils.gOD(Utils.gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> this.customCommands.put(cmd.getCommand(), cmd));
 			final List<String> disabledCommandsString = config.getList("disabledcommands", String.class);
 			if (!(disabledCommandsString == null || disabledCommandsString.isEmpty())) {
 				this.disabledCommands = disabledCommandsString.stream().map(cmd -> CommandBase.commands.get(cmd)).collect(Collectors.toList());

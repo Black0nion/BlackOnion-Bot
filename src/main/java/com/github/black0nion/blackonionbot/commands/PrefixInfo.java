@@ -17,9 +17,9 @@ public class PrefixInfo {
 		if (author.isBot() || message.getMentionedUsers().size() == 0) return;
 		final BlackGuild guild = cmde.getGuild();
 		final BlackMember member = cmde.getMember();
-		
+
 		final String msgContent = message.getContentRaw();
-		if (msgContent.matches("^<@!*&*" + BotInformation.SELF_USER_ID + "+>")) {
+		if (msgContent.matches("<@!?" + BotInformation.SELF_USER_ID + "+>.*")) {
 			final String[] args = msgContent.split(" ");
 			// @BlackOnion-Bot prefix ?
 			if (args.length >= 3) {
@@ -29,15 +29,13 @@ public class PrefixInfo {
 						if (prefix.length() < 10) {
 							guild.setPrefix(prefix);
 							cmde.success("prefixchanged",  "myprefixis", new Placeholder("prefix", prefix));
-							return;
 						} else {
 							cmde.error("toolong", "undertenchars");
-							return;
 						}
 					} else {
 						cmde.error("missingpermissions", "requiredpermissions", new Placeholder("permission", Utils.getPermissionString(Permission.ADMINISTRATOR)));
-						return;
 					}
+					return;
 				}
 			}
 			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix()), new Placeholder("command", "<@!" + BotInformation.SELF_USER_ID + "> prefix <prefix>"));

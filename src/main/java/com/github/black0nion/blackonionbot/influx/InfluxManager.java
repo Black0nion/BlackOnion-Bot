@@ -41,11 +41,11 @@ public class InfluxManager {
 	@Reloadable("influxdb")
 	public static void init() {
 		Bot.executor.submit(() -> {
-			if (Config.influx.DATABASE_URL == null || Config.influx.TOKEN == null || Config.influx.ORG == null) {
+			if (Config.influx_database_url == null || Config.influx_token == null || Config.influx_org == null) {
 				Logger.logError("No credentials for InfluxDB.", LogOrigin.INFLUX_DB);
 				return;
 			}
-			if (!connect(Config.influx.DATABASE_URL, Config.influx.TOKEN, Config.influx.ORG)) return;
+			if (!connect(Config.influx_database_url, Config.influx_token, Config.influx_org)) return;
 
 			try {
 				Bot.jda.awaitReady();

@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -301,5 +303,10 @@ public class Utils {
 
 	public static boolean runningFromJar() {
 		return getJarName().contains(".jar");
+	}
+
+	@Nonnull
+	public static <T> T gOD(final @Nullable T value, final @Nonnull T defaultValue) {
+		return value != null ? value : defaultValue;
 	}
 }

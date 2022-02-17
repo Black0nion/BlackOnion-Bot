@@ -1,0 +1,66 @@
+name: Build & Deploy
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to Github Packages Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Get the version
+        id: get_version
+        run: |
+          VERSION=$(echo $GITHUB_REF | cut -d / -f 3)
+          echo ::set-output name=VERSION::$VERSION
+          if [[ $VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
+            TAG="latest"
+          elif [[ $VERSION =~ ^b[0-9]+.[0-9]+.[0-9]+$ ]]; then
+            TAG="latest-beta"
+          else
+            TAG="latest-dev"
+          fi
+          echo ::set-output name=TAG::$TAG
+          echo "Version: $VERSION | Tag: $TAG"
+      - name: Build docker image
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          TAG: ${{ steps.get_version.outputs.TAG }}
+        run: |
+          REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          docker build \
+            -t ghcr.io/$REPO:$VERSION \
+            -t ghcr.io/$REPO:$TAG .
+
+      - name: Push docker image
+        id: push-image
+        if: steps.get_version.outputs.TAG != 'latest-dev'
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          TAG: ${{ steps.get_version.outputs.TAG }}
+        run: |
+          REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          docker push ghcr.io/$REPO:$VERSION
+          docker push ghcr.io/$REPO:$TAG
+
+      - name: notify-server
+        if: steps.push-image.outcome == 'success'
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
+        run: |
+          answer=$(curl --location --request POST 'https://www.black-onion.com'"${API_ENDPOINT}"'' --header 't0k3n: '"${API_KEY}"'' -A "BlackOnion Action Client (yes actually a real one)" )
+          if [[ $answer == *"200-success |"* ]];
+          then
+            echo Successfully connected and started the script!
+            exit 0
+          else
+            echo Could not connect!
+            exit 1
+          fi

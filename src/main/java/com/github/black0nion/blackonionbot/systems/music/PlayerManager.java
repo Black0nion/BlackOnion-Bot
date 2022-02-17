@@ -1,17 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.music;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -28,13 +19,15 @@ import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.TrackRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerManager {
 	private static PlayerManager INSTANCE;
@@ -51,12 +44,12 @@ public class PlayerManager {
 	}
 
 	public static void init() {
-		if (Config.other.SPOTIFY_CLIENT_ID == null || Config.other.SPOTIFY_CLIENT_SECRET == null) {
+		if (Config.spotify_client_id == null || Config.spotify_client_secret == null) {
 			Logger.logWarning("Spotify client ID or secret is null, disabling Spotify integration");
 			return;
 		}
 
-		spotifyApi = new Api.Builder().clientId(Config.other.SPOTIFY_CLIENT_ID).clientSecret(Config.other.SPOTIFY_CLIENT_SECRET).build();
+		spotifyApi = new Api.Builder().clientId(Config.spotify_client_id).clientSecret(Config.spotify_client_secret).build();
 
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override

@@ -91,10 +91,10 @@ public class BlackUser extends BlackObject implements User {
 				config = new Document();
 			}
 
-			this.permissions = this.gOD(CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
+			this.permissions = Utils.gOD(CustomPermission.parse(Utils.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
 
 			if (config.getString("language") != null) {
-				this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
+				this.language = Utils.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
 			} else {
 				this.language = LanguageSystem.getDefaultLanguage();
 			}

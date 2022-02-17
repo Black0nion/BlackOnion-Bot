@@ -2,57 +2,57 @@ package com.github.black0nion.blackonionbot.utils.config;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.utils.Async;
-import com.google.gson.Gson;
-import org.json.JSONObject;
+import com.github.black0nion.blackonionbot.utils.BlackIncrementor;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
 
-	private static final File CONFIG_FILE = new File("files", "config.json");
-	private static final Gson GSON = new Gson().newBuilder()
-			.setFieldNamingStrategy(f -> f.getName().toLowerCase())
-			.serializeNulls()
-			.registerTypeAdapterFactory(new NonNullTypeAdapterFactory())
-			.create();
+	private static final File ENV_FILE = new File("files/.env");
+	static BotMetadata metadata;
 
+	private static final Pattern ENV_FILE_PATTERN = Pattern.compile("^([A-Za-z0-9_]+)=(.*)$");;
 	public static void loadConfig() throws IOException {
-		if (!CONFIG_FILE.exists() || Bot.launchArguments.contains("--reset-config") || Bot.launchArguments.contains("--generate-config") || Files.readString(CONFIG_FILE.toPath()).isEmpty()) {
-			CONFIG_FILE.getParentFile().mkdirs();
-			CONFIG_FILE.createNewFile();
-			saveConfig();
-			Logger.logWarning("Config file created - please modify it!");
-			System.exit(1);
+		// Load .env vars from the .env file
+		if (ENV_FILE.exists()) {
+			Logger.logInfo("Loading environment variables from the .env file");
+			BlackIncrementor count = new BlackIncrementor();
+			Files.readAllLines(ENV_FILE.toPath())
+				.stream()
+				.filter(line -> !line.startsWith("#"))
+				.map(ENV_FILE_PATTERN::matcher)
+				.filter(Matcher::matches)
+				.peek(count::increment)
+				.forEach(split -> System.setProperty(split.group(1), split.group(2)));
+			Logger.logInfo("Loaded " + count.getCount() + " environment variables from the .env file");
+		} else {
+			Logger.logWarning("No .env file found, skipping loading environment variables");
 		}
-		try {
-			Config newConfig = GSON.fromJson(System.getenv("CONFIG") != null ? System.getenv("CONFIG") : Files.readString(CONFIG_FILE.toPath()), Config.class);
-			Config.setConfig(newConfig);
-		} catch (Exception e) {
-			Logger.logError("Failed to load config file: " + e.getMessage());
-			System.exit(1);
+
+		// Load Metadata
+		Logger.logInfo("Loading metadata...");
+		try (InputStream in = ConfigManager.class.getResourceAsStream("/bot.metadata.json")) {
+			assert in != null;
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+				// Use resource
+				metadata = Bot.gson.fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
+				Logger.logInfo("Loaded metadata!");
+			} catch (IOException e) {
+				Logger.logError("Failed to load metadata: " + e.getMessage());
+			}
+		}
+		if (metadata == null) {
+			Logger.logError("Failed to load metadata, defaulting");
+			metadata = new BotMetadata();
 		}
 	}
 
-	@Async
 	public static void saveConfig() {
-		saveConfig(null);
-    }
-
-	@Async
-	public static void saveConfig(Consumer<JSONObject> onFinish) {
-		try {
-			JSONObject cnfg = new JSONObject(GSON.toJson(Config.getConfig()));
-			System.out.println(cnfg);
-			Files.writeString(CONFIG_FILE.toPath(), cnfg.toString(2));
-			if (onFinish != null) {
-				onFinish.accept(cnfg);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		throw new RuntimeException("Not implemented");
 	}
 }
