@@ -55,7 +55,7 @@ dependencies {
 
     implementation "com.sedmelluq:lavaplayer:1.3.77"
 
-    implementation 'com.influxdb:influxdb-client-java:4.1.0'
+    implementation 'com.influxdb:influxdb-client-java:4.2.0'
 
     // Old version because i don't know how to migrate lol
     //noinspection GradlePackageUpdate
