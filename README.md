@@ -1,15 +1,18 @@
-[![BuildAndRelease](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/updatebot.yml)    [![Build Status](https://travis-ci.com/Black0nion/BlackOnion-Bot.svg?token=BtqsLLy9uR68mjpAMTwr&branch=main)](https://travis-ci.com/Black0nion/BlackOnion-Bot)
-# Discord-Bot
+[![Build & Deploy](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml)
+# BlackOnion-Bot
 
 The official BlackOnion-Bot!
 
 Authors: mainly SIMULATAN
 
 ## How to run the Bot
+### Development
 1. Clone the repository (GitHub Desktop is helpful)
-2. Download eclipse
-3. Open the **root folder** as a eclipse **workspace**, the folder "BlackOnion-Bot" with several folders including "src" in it is the **gradle project**
-4. Import the gradle project using "Import a Project" on the left hand side of eclipse, select Gradle -> Existing Gradle Project, select the folder with "src" inside
-5. Go into the file ``Main.java``
-6. Press "Run" or Debug the Bot by pressing the F11 key
-7. stonks
+2. Download IntelliJ
+3. Open the project as a gradle project
+4. Run the `com.github.black0nion.blackonionbot.Main` class
+### Production
+There is a pre-built docker image with the name `ghcr.io/black0nion/blackonion-bot`, use the tags `latest` and `latest-beta` appropriately.
+
+## Contributions
+... are very welcome! If you have any questions, please use the GitHub Discussion tab. If you encounter any issues, please report them on the [issue tracker](https://github.com/Black0nion/BlackOnion-Bot/issues) and if you have an improvement, please submit a pull request.

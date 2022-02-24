@@ -48,7 +48,5 @@ gradle-app.setting
 /tmp/
 # configs, logs and other files
 /files/
-# version metadata (might get added to the jar soon)
-/version
 # plugins for the bot
 /plugins
