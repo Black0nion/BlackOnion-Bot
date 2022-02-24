@@ -72,7 +72,6 @@ public class Bot extends ListenerAdapter {
 			.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
 			.create();
 
-	@SuppressWarnings("resource")
 	public static void startBot(String[] args) throws IOException {
 		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
@@ -87,10 +86,6 @@ public class Bot extends ListenerAdapter {
 
 		MongoManager.connect(Config.mongo_connection_string, Config.mongo_timeout);
 
-		if (!Config.token.matches("[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}")) {
-			Logger.log(LogMode.ERROR, "Invalid token!");
-			System.exit(1);
-		}
 		final JDABuilder builder = JDABuilder.createDefault(Config.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE)).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS);
 
 		final EventWaiter waiter = new EventWaiter();
