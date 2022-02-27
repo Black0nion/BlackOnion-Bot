@@ -10,13 +10,11 @@ import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
-import com.github.black0nion.blackonionbot.systems.HandRaiseSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.logging.EventEndpoint;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
@@ -25,6 +23,9 @@ import com.github.black0nion.blackonionbot.utils.CatchLogs;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
+import com.github.ygimenez.method.Pages;
+import com.github.ygimenez.model.Paginator;
+import com.github.ygimenez.model.PaginatorBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -72,6 +73,8 @@ public class Bot extends ListenerAdapter {
 			.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
 			.create();
 
+	public static final EventWaiter waiter = new EventWaiter();
+
 	public static void startBot(String[] args) throws IOException {
 		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
@@ -82,18 +85,18 @@ public class Bot extends ListenerAdapter {
 		runMode = Config.run_mode;
 		isJarFile = Utils.runningFromJar();
 		Logger.log(LogMode.INFORMATION, "Starting BlackOnion-Bot in " + runMode + " mode...");
+		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
-		MongoManager.connect(Config.mongo_connection_string, Config.mongo_timeout);
+		MongoManager.connect(Config.mongo_connection_string);
 
 		final JDABuilder builder = JDABuilder.createDefault(Config.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE)).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS);
 
-		final EventWaiter waiter = new EventWaiter();
-
-		builder.addEventListeners(new CommandBase(), new Bot(), new ReactionRoleSystem(), new HandRaiseSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new EventEndpoint(), waiter);
+		builder.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), waiter);
 
 		LanguageSystem.init();
-		CommandBase.addCommands(waiter);
+		CommandBase.addCommands();
+		SlashCommandBase.addCommands();
 		builder.setStatus(StatusCommand.getStatusFromConfig());
 		builder.setActivity(ActivityCommand.getActivity());
 		builder.setMaxReconnectDelay(32);
@@ -103,6 +106,19 @@ public class Bot extends ListenerAdapter {
 			e.printStackTrace();
 			Logger.log(LogMode.FATAL, LogOrigin.BOT, "Failed to connect to the bot! Please make sure to have the token saved in the file \"credentials." + runMode.name() + ".json\" in the folder \"files\" with the bot's token saved under the key \"token\"!");
 			Logger.log(LogMode.ERROR, LogOrigin.BOT, "Terminating bot.");
+			System.exit(-1);
+		}
+
+		try {
+			Paginator paginator = PaginatorBuilder.createPaginator()
+				.setHandler(jda)
+				.shouldEventLock(true)
+				.setDeleteOnCancel(true)
+				.shouldRemoveOnReact(true)
+				.build();
+			Pages.activate(paginator);
+		} catch (Exception e) {
+			e.printStackTrace();
 			System.exit(-1);
 		}
 

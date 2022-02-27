@@ -2,8 +2,8 @@ package com.github.black0nion.blackonionbot.utils;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.google.common.hash.Hashing;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -65,10 +64,6 @@ public class Utils {
 	    return new String(new char[length]).replace("\0", text);
 	}
 
-	public static int positiveOrZero(final int num) {
-	    return num <= 0 ? 0 : num;
-	}
-
 	public static float map(final float value, final float minInput, final float maxInput, final float minMapped, final float maxMapped) {
 		return (value - minInput) / (maxInput - minInput) * (maxMapped - minMapped) + minMapped;
 	}
@@ -89,29 +84,14 @@ public class Utils {
 		return Arrays.copyOfRange(input, 1, input.length);
 	}
 
-	public static String round(final String decimal, final double number) {
-		final DecimalFormat df = new DecimalFormat(decimal);
-		df.setRoundingMode(RoundingMode.CEILING);
-		return df.format(number);
-	}
-
 	public static double roundToDouble(final String decimal, final double number) {
 		final DecimalFormat df = new DecimalFormat(decimal);
 		df.setRoundingMode(RoundingMode.CEILING);
-		return Double.valueOf(df.format(number).replace(",", "."));
-	}
-
-	public static boolean compareSHA256(final String hashed, final String unhashed) {
-		final String sha256hex = Hashing.sha256().hashString(unhashed, StandardCharsets.UTF_8).toString();
-		return hashed.equals(sha256hex);
-	}
-
-	public static String hashSHA256(final String input) {
-		return Hashing.sha256().hashString(input, StandardCharsets.UTF_8).toString();
+		return Double.parseDouble(df.format(number).replace(",", "."));
 	}
 
 	public static String getCountryFromCode(final String code) {
-		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream("/countrycodes.json"))).lines().collect(Collectors.joining()))).getString(code);
+		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Objects.requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining()))).getString(code);
 	}
 
 	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {
@@ -172,7 +152,8 @@ public class Utils {
 
 	public static boolean isBoolean(final Object input) {
 		try {
-            Boolean.parseBoolean(((String) input).trim());
+			//noinspection ResultOfMethodCallIgnored
+			Boolean.parseBoolean(((String) input).trim());
             return true;
         } catch (final Exception ignored) {
             return false;
@@ -182,6 +163,7 @@ public class Utils {
 	/**
 	 * @return if the given Object equals to one of the other given Objects
 	 */
+	@SuppressWarnings("unused")
 	@SafeVarargs
 	public static <T> boolean equalsOne(final T input, final T... comparison) {
 		return Arrays.asList(comparison).contains(input);
@@ -216,19 +198,13 @@ public class Utils {
 	}
 
 	/**
-	 * @param guild
-	 * @param author
-	 * @param channel
-	 * @param permissions
 	 * @return missing permissions?
 	 */
 	public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, final Permission... permissions) {
 		if (channel == null) {
-			if (!guild.getSelfMember().hasPermission(permissions)) return true;
+			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
-			if (channel != null) {
-				channel.sendMessageEmbeds(Utils.noRights(guild, author, permissions)).queue();
-			}
+			channel.sendMessageEmbeds(Utils.noRights(guild, author, permissions)).queue();
 			return true;
 		}
 		return false;
@@ -239,27 +215,19 @@ public class Utils {
 	}
 
 	public static String getPermissionString(final Permission... permissions) {
-		String output = "```";
+		StringBuilder output = new StringBuilder("```");
 		for (int i = 0; i < permissions.length; i++) {
-			output += "- " + permissions[i].getName() + (i == permissions.length - 1 ? "" : "\n");
+			output.append("- ").append(permissions[i].getName()).append(i == permissions.length - 1 ? "" : "\n");
 		}
 		return output + "```";
 	}
 
-	public static <T> T[] concatenate(final T[] a, final T[] b) {
-		final int aLen = a.length;
-		final int bLen = b.length;
-
-		@SuppressWarnings("unchecked")
-		final T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
-		System.arraycopy(a, 0, c, 0, aLen);
-		System.arraycopy(b, 0, c, aLen, bLen);
-
-		return c;
-	}
-
-	public static <T> Object[] toObjectArray(final T[] input) {
-		return Arrays.asList(input).stream().map(map -> (Object) map).toArray();
+	public static String getPermissionString(final CustomPermission... permissions) {
+		StringBuilder output = new StringBuilder("```");
+		for (int i = 0; i < permissions.length; i++) {
+			output.append("- ").append(permissions[i].name()).append(i == permissions.length - 1 ? "" : "\n");
+		}
+		return output + "```";
 	}
 
 	public static String parseDate(final long diff) {
@@ -275,8 +243,25 @@ public class Utils {
 		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 
+	public static <T> T[] concatenate(final T[] a, final T[] b) {
+		final int aLen = a.length;
+		final int bLen = b.length;
+
+		@SuppressWarnings("unchecked")
+		final T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+		System.arraycopy(a, 0, c, 0, aLen);
+		System.arraycopy(b, 0, c, aLen, bLen);
+
+		return c;
+	}
+
 	public static void printLogo() {
-		System.out.println("   ___  __         __   ____       _                  ___       __ \r\n" + "  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_\r\n" + " / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/\r\n" + "/____/_/\\_|_|\\__/_/\\_\\\\____/_//_/_/\\___/_//_/      /____/\\___/\\__/\n");
+		System.out.println("""
+			   ___  __         __   ____       _                  ___       __
+			  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_
+			 / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/
+			/____/_/\\_|_|\\__/_/\\_\\\\____/_//_/_/\\___/_//_/      /____/\\___/\\__/
+			""");
 	}
 
 	private static final DecimalFormat ROUNDED_DOUBLE_DECIMALFORMAT;
@@ -290,11 +275,11 @@ public class Utils {
 	}
 
 	public static String arrayToString(String delimiter, StackTraceElement[] stackTrace) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < stackTrace.length; i++) {
-			result += stackTrace[i].toString() + (i == stackTrace.length - 1 ? "" : delimiter);
+			result.append(stackTrace[i].toString()).append(i == stackTrace.length - 1 ? "" : delimiter);
 		}
-		return result;
+		return result.toString();
 	}
 
 	public static String getJarName() {

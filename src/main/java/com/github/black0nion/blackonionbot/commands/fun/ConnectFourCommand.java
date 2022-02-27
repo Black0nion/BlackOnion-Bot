@@ -1,14 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
@@ -16,11 +11,14 @@ import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
 
 public class ConnectFourCommand extends Command {
 
@@ -29,10 +27,11 @@ public class ConnectFourCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	if (message.getMentionedUsers().size() != 0) {
 	    final BlackUser challenged = BlackUser.from(message.getMentionedUsers().get(0));
-	    if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
+		assert challenged != null;
+		if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
 		message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
 		return;
 	    }
@@ -41,14 +40,14 @@ public class ConnectFourCommand extends Command {
 		return;
 	    }
 	    message.reply(getTranslation("c4_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
-	    CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
+	    Bot.waiter.waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
 		final BlackUser answerUser = BlackUser.from(event.getAuthor());
 		if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId())) if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 		    message.replyEmbeds(EmbedUtils.getSuccessEmbed(answerUser, guild).addField(getTranslation("challengeaccepted", answerUser, guild), getTranslation("playingagainst", answerUser, guild).replace("%challenger%", author.getName()), false).build()).queue();
 
 		    //ANGENOMMEN
 		    final ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
-		    this.rerun(game, e.getChannel(), cmde);
+		    this.rerun(game, e.getTextChannel(), cmde);
 		} else if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
 		    message.replyEmbeds(EmbedUtils.getErrorEmbed(answerUser, guild).setTitle(getTranslation("declined", answerUser, guild)).addField(getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), false).build()).queue();
 		    return;
@@ -64,7 +63,7 @@ public class ConnectFourCommand extends Command {
     }
 
     public void rerun(final ConnectFour game, final TextChannel channel, final CommandEvent cmde) {
-	CommandBase.waiter.waitForEvent(MessageReceivedEvent.class, answerEvent -> game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
+	Bot.waiter.waitForEvent(MessageReceivedEvent.class, answerEvent -> game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
 	    final String msg = answerEvent.getMessage().getContentRaw();
 	    final BlackUser author = BlackUser.from(answerEvent.getAuthor());
 	    final BlackGuild guild = BlackGuild.from(answerEvent.getGuild());

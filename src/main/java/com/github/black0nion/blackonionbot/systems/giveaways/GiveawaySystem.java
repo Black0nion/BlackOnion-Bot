@@ -44,7 +44,7 @@ public class GiveawaySystem {
     }
 
     public static void init() {
-	collection = MongoDB.botDatabase.getCollection("giveaways");
+	collection = MongoDB.DATABASE.getCollection("giveaways");
 
 	Bot.executor.submit(() -> {
 	    try {

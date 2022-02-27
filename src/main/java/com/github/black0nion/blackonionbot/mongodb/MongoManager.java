@@ -18,7 +18,7 @@ public class MongoManager {
 
 	public static MongoClient client;
 
-	public static boolean connect(final String connectionStringRaw, int timeout) {
+	public static boolean connect(final String connectionStringRaw) {
 		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Connecting to " + connectionStringRaw + "...");
 		final long start = System.currentTimeMillis();
 		ConnectionString connectionString = new ConnectionString(connectionStringRaw);

@@ -30,7 +30,9 @@ dependencies {
     implementation "com.google.code.gson:gson:2.9.0"
     implementation "com.github.Marcono1234:gson-record-type-adapter-factory:v0.2.0"
 
-    implementation "net.dv8tion:JDA:4.3.0_346"
+    implementation "net.dv8tion:JDA:5.0.0-alpha.9"
+
+    implementation "com.github.BlitzOffline:Pagination-Utils:master-SNAPSHOT"
 
     // EventWaiter
     implementation "com.github.JDA-Applications.JDA-Utilities:jda-utilities-commons:dfd5c6f599"

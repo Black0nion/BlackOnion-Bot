@@ -16,8 +16,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.Objects;
+
+@SuppressWarnings("unused")
 public class NowPlayingCommand extends Command {
 
     public NowPlayingCommand() {
@@ -25,13 +28,13 @@ public class NowPlayingCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.player.getPlayingTrack() == null) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.player.getPlayingTrack() == null) {
 	    cmde.error("queueempty", "addsomethingtoqueue");
 	    return;
 	}
 
-	final AudioTrack playingTrack = PlayerManager.getInstance().getMusicManager(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong()))).scheduler.player.getPlayingTrack();
+	final AudioTrack playingTrack = PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.player.getPlayingTrack();
 	final AudioTrackInfo info = playingTrack.getInfo();
 
 	final String totalDuration = Utils.getDuration((int) (playingTrack.getDuration() / 1000));

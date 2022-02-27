@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -34,8 +34,8 @@ public class ReloadCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (!guild.getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE)) return;
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	if (!guild.getSelfMember().hasPermission(e.getTextChannel(), Permission.MESSAGE_MANAGE)) return;
 	message.delete().queue();
 
 	if (reloadableMethods == null) {

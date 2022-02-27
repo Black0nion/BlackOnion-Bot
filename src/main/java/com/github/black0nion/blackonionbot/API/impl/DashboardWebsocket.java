@@ -168,7 +168,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 						final JSONArray response = new JSONArray();
 						final JSONObject channelsWithoutCategory = new JSONObject().put("id", -1);
 						final JSONArray chs = new JSONArray();
-						guild.getTextChannels().stream().filter(c -> c.getParent() == null).forEach(channel -> chs.put(new JSONObject().put("name", channel.getName()).put("id", channel.getId())));
+						guild.getTextChannels().stream().filter(c -> c.getParentCategory() == null).forEach(channel -> chs.put(new JSONObject().put("name", channel.getName()).put("id", channel.getId())));
 						if (!chs.isEmpty()) {
 							response.put(channelsWithoutCategory.put("channels", chs));
 						}

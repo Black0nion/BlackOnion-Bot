@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -13,7 +14,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class TicTacToe {
 	Message message;
@@ -43,7 +44,7 @@ public class TicTacToe {
 		this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		this.guild = BlackGuild.from(channel.getGuild());
 
-		this.currentPlayer = Bot.random.nextInt(1) == 0 ? FieldType.X : FieldType.O;
+		this.currentPlayer = Bot.random.nextInt(2) == 0 ? FieldType.X : FieldType.O;
 
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
@@ -51,7 +52,7 @@ public class TicTacToe {
 			}
 		}
 
-		final BlackUser currentUser = BlackUser.from(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser()));
+		final BlackUser currentUser = BlackUser.from(Objects.requireNonNull(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser())));
 
 		channel.sendMessage(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setActionRows(this.rows).queue(success -> this.message = success);
 		this.channel = channel;
@@ -80,9 +81,7 @@ public class TicTacToe {
 	}
 
 	public boolean isPlayer(final String userId) {
-		if (this.getPlayerX().getId().equals(userId) || this.getPlayerY().getId().equals(userId))
-			return true;
-		return false;
+		return this.getPlayerX().getId().equals(userId) || this.getPlayerY().getId().equals(userId);
 	}
 
 	public int getMoves() {
@@ -100,6 +99,7 @@ public class TicTacToe {
 		return null;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public boolean won(final FieldType player, final int x, final int y) {
 		final int n = TicTacToeGameManager.SIZE;
 

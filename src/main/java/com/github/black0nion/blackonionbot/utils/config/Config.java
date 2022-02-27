@@ -19,7 +19,7 @@ public class Config {
 
 	public static final String token = get("token", String.class, NonNull, matchesRegex("[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}"));
 	public static final @Nonnull String prefix = get("prefix", String.class, defaultValue("*"), matchesRegex("\\w{1,10}"));
-	public static Activity.ActivityType activity_type = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.DEFAULT));
+	public static Activity.ActivityType activity_type = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.PLAYING));
 	public static String activity_name = get("activity_name", String.class, defaultValue(prefix));
 	public static OnlineStatus online_status = get("online_status", OnlineStatus.class, defaultValue(OnlineStatus.ONLINE));
 	/**
@@ -27,17 +27,17 @@ public class Config {
 	 */
 	@SuppressWarnings("unused")
 	public static final String activity_url = get("activity_url", String.class, matchesRegex(Activity.STREAMING_URL));
-	public static final String discordapp_client_secret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("$[a-z\\d=_\\-]{32}^", Pattern.CASE_INSENSITIVE)));
+	public static final String discordapp_client_secret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("^[a-z\\d=_\\-]{32}$", Pattern.CASE_INSENSITIVE)));
 	public static final String discordapp_client_id = get("discordapp_client_id", String.class, matchesRegex("\\d{17,19}"));
 	public static final String discordapp_redirect_url = get("discordapp_redirect_url", String.class, matchesRegex("https?://.+"));
 	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
-	public static final int mongo_timeout = get("mongo_timeout", Integer.class, defaultValue(30000), range(0, 60000));
 	@Nullable
 	public static final String influx_database_url = get("influx_database_url", String.class);
 	@Nullable
 	public static final String influx_token = get("influx_token", String.class);
 	@Nullable
 	public static final String influx_org = get("influx_org", String.class);
+	public static final String openweatherapikey = get("openweathermap_api_key", String.class, matchesRegex("[a-z\\d]{32}"));
 	@Nonnull
 	public static final RunMode run_mode = get("run_mode", RunMode.class, defaultValue(RunMode.DEV));
 	@Nullable
@@ -51,7 +51,7 @@ public class Config {
 	public static final String spotify_client_secret = get("spotify_client_secret", String.class, matchesRegex("[\\w\\d]{32}"));
 	public static final int api_port = get("api_port", Integer.class, defaultValue(187), range(0, 65535));
 	public static final boolean log_heartbeats = get("log_heartbeats", Boolean.class, defaultValue(false));
-	public static final long vote_channel = get("vote_channel", Long.class, defaultValue(-1));
+	public static final long vote_channel = get("vote_channel", Long.class, defaultValue(-1L));
 	public static final BotMetadata metadata = ConfigManager.metadata;
 
 	@SuppressWarnings("SameParameterValue")
@@ -106,7 +106,7 @@ public class Config {
 	private static <T extends IFlag> T getFlag(List<IFlag> flags, @SuppressWarnings("SameParameterValue") Class<T> clazz) {
 		return flags.stream()
 			.filter(Objects::nonNull)
-			.filter(f -> f.getClass().equals(clazz))
+			.filter(f -> clazz.isAssignableFrom(f.getClass()))
 			.map(clazz::cast)
 			.findFirst()
 			.orElse(null);

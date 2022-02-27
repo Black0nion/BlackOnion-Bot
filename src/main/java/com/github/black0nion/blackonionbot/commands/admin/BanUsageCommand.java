@@ -1,50 +1,58 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import java.time.Duration;
-
-import org.bson.Document;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.mongodb.client.MongoCollection;
-
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.bson.Document;
 
-public class BanUsageCommand extends Command {
+import java.util.regex.Pattern;
 
-    public BanUsageCommand() {
-	this.setCommand("banusage", "usageban").setRequiredCustomPermissions(CustomPermission.ADMIN).setHidden().setSyntax("<u:(userid) | g:(guildid)>");
-    }
+public class BanUsageCommand extends SlashCommand {
 
-    public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("usagebans");
-
-    @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	message.delete().queue();
-	if (args.length >= 2) {
-	    final String stuffToBan = args[2];
-	    if (stuffToBan.startsWith("u:")) {
-		MongoManager.insertOne(collection, new Document().append("userid", stuffToBan.replace("u:", "")));
-	    } else if (stuffToBan.contains("g:")) {
-		MongoManager.insertOne(collection, new Document().append("guildid", stuffToBan.replace("u:", "")));
-	    } else {
-		channel.sendMessageEmbeds(cmde.success().addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-		return;
-	    }
-	    channel.sendMessageEmbeds(cmde.success().addField("bannedusage", cmde.getTranslation("cantusecommandsanymore", new Placeholder("userorguild", stuffToBan)), false).build()).queue();
-	} else {
-	    channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", "wrongargumentcount", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-	    return;
+	public BanUsageCommand() {
+		super(builder(
+			Commands.slash("banusage", "Ban a user or a guild from using commands.")
+				.addOption(OptionType.USER, "user", "The user to ban")
+				.addOption(OptionType.STRING, "guild", "The id of the guild to ban"))
+			.setHidden()
+			.setRequiredCustomPermissions(CustomPermission.BAN_USAGE));
 	}
-    }
+
+	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("usagebans");
+	private static final Pattern guildIdPattern = Pattern.compile("^\\d{17,18}$");
+
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		final User user = e.getOption("user", OptionMapping::getAsUser);
+		final String guildId = e.getOption("guild", OptionMapping::getAsString);
+		if (user == null && guildId == null) {
+			cmde.send("wrongargumentcount");
+		} else {
+			if (user != null) {
+				MongoManager.insertOne(collection, new Document("userid", user.getId()));
+				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", user.getAsTag()));
+			}
+			if (guildId != null) {
+				if (guildIdPattern.matcher(guildId).matches()) {
+					MongoManager.insertOne(collection, new Document("guildid", guildId));
+					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
+				} else {
+					cmde.send("invalidguildid");
+				}
+			}
+		}
+	}
 }

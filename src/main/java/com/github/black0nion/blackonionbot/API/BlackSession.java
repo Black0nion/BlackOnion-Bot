@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
  */
 public class BlackSession {
 
-	public static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
+	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("dashboard-sessions");
 
 	@Nullable
 	private String sessionId;

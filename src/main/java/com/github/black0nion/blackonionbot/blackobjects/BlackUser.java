@@ -38,7 +38,7 @@ public class BlackUser extends BlackObject implements User {
 
 	private final User user;
 
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.botDatabase);
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.DATABASE);
 
 	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<User, BlackUser>() {
 		@Override

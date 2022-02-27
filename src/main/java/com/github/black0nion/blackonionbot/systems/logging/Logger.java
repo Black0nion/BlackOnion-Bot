@@ -110,7 +110,7 @@ public class Logger {
 	public static void log(final LogMode mode, final String logInput) {
 		log(mode, LogOrigin.BOT, logInput);
 	}
-	
+
 	public static void printForCategory(final LogOrigin type) {
 		if (logsPerCategory.containsKey(type)) {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "LOGS IN CATEGORY: " + type.name() + "\n" + String.join("\n", logsPerCategory.get(type)));
@@ -140,7 +140,7 @@ public class Logger {
 	 * @param length
 	 */
 	public static void printAll(final int length) {
-		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + String.join("\n", logs.subList(0, (length > logs.size() ? logs.size() : length))));
+		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + String.join("\n", logs.subList(0, (Math.min(length, logs.size())))));
 	}
 
 	/**

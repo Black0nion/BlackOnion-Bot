@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
@@ -14,18 +15,17 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class JokeCommand extends Command {
-	
+
 	public JokeCommand() {
 		this.setCommand("joke", "jokes");
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		try {
-			Unirest.setTimeouts(0, 0);
+			Unirest.setTimeouts(10000, 10000);
 			final Language lang = cmde.getLanguage();
 			String langString = null;
 			if (Utils.equalsOneIgnoreCase(lang.getLanguageCode(), "de", "en", "cs", "es", "fr", "pt"))
