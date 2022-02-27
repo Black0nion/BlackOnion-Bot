@@ -7,11 +7,10 @@ import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PrefixCommand extends Command {
 
@@ -20,7 +19,7 @@ public class PrefixCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	if (args[1].toCharArray().length > 10) {
 	    cmde.error("toolong", "undertenchars");
 	    message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();

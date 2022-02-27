@@ -2,17 +2,16 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * @author _SIM_
@@ -27,7 +26,7 @@ public class SetGuildTypeCommand extends Command {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (!Utils.isLong(args[1])) {
 			cmde.error("notanumber", "inputnumber");
 		} else {

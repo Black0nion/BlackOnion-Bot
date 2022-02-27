@@ -1,17 +1,16 @@
 package com.github.black0nion.blackonionbot.commands.moderation.joinleave;
 
-import java.time.Duration;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.time.Duration;
 
 public class SetLeaveChannelCommand extends Command {
 
@@ -25,7 +24,7 @@ public class SetLeaveChannelCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	message.delete().queue();
 	if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 	    guild.setLeaveChannel(-1);

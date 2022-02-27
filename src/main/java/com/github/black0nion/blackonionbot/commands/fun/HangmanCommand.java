@@ -1,26 +1,25 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author _SIM_
@@ -42,7 +41,7 @@ public class HangmanCommand extends Command {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (ingamePlayers.contains(author.getIdLong())) {
 			cmde.error("alreadyingame", "nomultitasking");
 			return;
@@ -74,8 +73,10 @@ public class HangmanCommand extends Command {
 			return;
 		}
 
-		msg.editMessageEmbeds(builder.build()).queue(message -> {
-			CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, event -> event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)), event -> {
+		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.waiter.waitForEvent(
+			MessageReceivedEvent.class,
+			event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
+			event -> {
 				if (event.getMessage().getContentRaw().equalsIgnoreCase(solution)) {
 					msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
 					ingamePlayers.remove(cmde.getUser().getIdLong());
@@ -83,9 +84,11 @@ public class HangmanCommand extends Command {
 				}
 				alreadyGuessed.add(event.getMessage().getContentRaw().toLowerCase().charAt(0));
 				rerun(msg, cmde, solution, alreadyGuessed);
-				return;
-			}, 1, TimeUnit.MINUTES, () -> {msg.editMessageEmbeds(cmde.success().addField("timeout", "tooktoolong", false).build()).queue(); ingamePlayers.remove(cmde.getUser().getIdLong());});
-		});
+			}, 1, TimeUnit.MINUTES, () -> {
+				msg.editMessageEmbeds(cmde.success().addField("timeout", "tooktoolong", false).build()).queue();
+				ingamePlayers.remove(cmde.getUser().getIdLong());
+			}
+		));
 	}
 
 	private static String getDrawing(final int tries) {

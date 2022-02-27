@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
+import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -22,14 +23,13 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.reflections.Reflections;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class CommandBase extends ListenerAdapter {
 
@@ -39,21 +39,11 @@ public class CommandBase extends ListenerAdapter {
 
 	public static HashMap<String, Command> commands = new HashMap<>();
 
-	public static EventWaiter waiter;
-
-	/**
-	 * Don't call on init!
-	 */
 	@Reloadable("commands")
 	public static void addCommands() {
-		addCommands(waiter);
-	}
-
-	public static void addCommands(final EventWaiter newWaiter) {
 		commands.clear();
 		commandsInCategory.clear();
 		commandsArray.clear();
-		waiter = newWaiter;
 		final Reflections reflections = new Reflections(Command.class.getPackage().getName());
 		final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
 
@@ -88,24 +78,26 @@ public class CommandBase extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMessageUpdate(final GuildMessageUpdateEvent event) {
-		AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getChannel());
+	public void onMessageUpdate(final MessageUpdateEvent event) {
+		AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getTextChannel());
 	}
 
 	@Override
-	public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
+	public void onMessageReceived(final MessageReceivedEvent event) {
 		StatisticsManager.messageSent();
+		if (event.getAuthor().isBot()) return;
 		final BlackUser author = BlackUser.from(event.getAuthor());
-		if (author.isBot()) return;
+
+		assert author != null;
 
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackMember member = BlackMember.from(event.getMember());
 		final String prefix = guild.getPrefix();
-		final TextChannel channel = event.getChannel();
+		final TextChannel channel = event.getTextChannel();
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
 		final List<Attachment> attachments = message.getAttachments();
-		final String attachmentsString = (!attachments.isEmpty() ? attachments.stream().map(Attachment::getUrl).collect(Collectors.toList()).toString() : "");
+		final String attachmentsString = (!attachments.isEmpty() ? attachments.stream().map(Attachment::getUrl).toList().toString() : "");
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
 		final String[] args = msgContent.split(" ");
 
@@ -122,7 +114,7 @@ public class CommandBase extends ListenerAdapter {
 
 		if (!args[0].startsWith(prefix) && !args[0].equalsIgnoreCase(event.getJDA().getSelfUser().getAsMention())) return;
 		final String str = args[0].replace(prefix, "").toLowerCase();
-		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)) return;
+		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_MANAGE, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(str)) {
 			final Command cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);

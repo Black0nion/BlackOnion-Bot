@@ -1,8 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -11,44 +8,45 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.json.JSONObject;
 
 public class IpLocationCommand extends Command {
 
-    public IpLocationCommand() {
-	this.setCommand("iplocation", "ip").setSyntax("<public ipv4 / ipv6>").setRequiredArgumentCount(2);
-    }
-
-    private static final InetAddressValidator validator = InetAddressValidator.getInstance();
-
-    @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (!validator.isValid(args[1])) {
-	    message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notavalidip", "pleaseentervalidip", false).build()).queue();
-	    return;
+	public IpLocationCommand() {
+		this.setCommand("iplocation", "ip").setSyntax("<public ipv4 / ipv6>").setRequiredArgumentCount(2);
 	}
-	final MessageAction action = message.replyEmbeds(cmde.loading().build());
-	action.queue(msg -> {
-	    try {
-		Unirest.setTimeouts(0, 0);
-		final HttpResponse<String> response = Unirest.get("https://ipapi.co/" + args[1] + "/json/").asString();
-		final JSONObject object = new JSONObject(response.getBody());
-		if (object.has("error") && object.getBoolean("error")) if (object.getBoolean("reserved")) {
-		    cmde.error("ipnotpublic", "pleaseentervalidip");
-		    return;
-		} else {
-		    cmde.sendPleaseUse();
-		    return;
+
+	private static final InetAddressValidator validator = InetAddressValidator.getInstance();
+
+	@Override
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		if (!validator.isValid(args[1])) {
+			message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notavalidip", "pleaseentervalidip", false).build()).queue();
+			return;
 		}
-		msg.editMessageEmbeds(cmde.success().setTitle("IP Geolocation", "https://ipapi.co").addField(object.getString("city") + ", " + object.getString("region") + " (" + object.getString("region_code") + ", " + object.getString("country") + ")", object.getString("timezone"), false).build()).queue();
-	    } catch (final Exception ex) {
-		ex.printStackTrace();
-		cmde.exception();
-	    }
-	});
-    }
+		final MessageAction action = message.replyEmbeds(cmde.loading().build());
+		action.queue(msg -> {
+			try {
+				Unirest.setTimeouts(0, 0);
+				final HttpResponse<String> response = Unirest.get("https://ipapi.co/" + args[1] + "/json/").asString();
+				final JSONObject object = new JSONObject(response.getBody());
+				if (object.has("error") && object.getBoolean("error")) if (object.getBoolean("reserved")) {
+					cmde.error("ipnotpublic", "pleaseentervalidip");
+					return;
+				} else {
+					cmde.sendPleaseUse();
+					return;
+				}
+				msg.editMessageEmbeds(cmde.success().setTitle("IP Geolocation", "https://ipapi.co").addField(object.getString("city") + ", " + object.getString("region") + " (" + object.getString("region_code") + ", " + object.getString("country") + ")", object.getString("timezone"), false).build()).queue();
+			} catch (final Exception ex) {
+				ex.printStackTrace();
+				cmde.exception();
+			}
+		});
+	}
 }

@@ -1,12 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -15,20 +8,26 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ClearTillCommand extends Command {
 
     public ClearTillCommand() {
-	this.setCommand("cleartill", "clearuntil").setSyntax("<MessageID>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.MESSAGE_MANAGE).setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
+	this.setCommand("cleartill", "clearuntil").setSyntax("<MessageID>").setRequiredPermissions(Permission.MESSAGE_MANAGE).setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	try {
 	    if (!Utils.isLong(args[1])) {
 		cmde.sendPleaseUse();

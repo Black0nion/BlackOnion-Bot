@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.systems.logging;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.utils.BlackIncrementor;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.bson.Document;
 
@@ -12,13 +11,14 @@ import javax.management.AttributeList;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author _SIM_
  *
  */
+@SuppressWarnings("ALL")
+// TODO: implement
 public class StatisticsManager {
 
 	private static long commandsLastTenSeconds;
@@ -37,11 +37,6 @@ public class StatisticsManager {
 
 	public static void saveStats() {
 		InfluxManager.save("stats", new Document("cmdcount", commandsLastTenSeconds).append("messagecount", messagesSentLastTenSeconds).append("profanityfiltered", profanityFilteredLastTenSecs));
-		for (final Entry<Long, BlackIncrementor> entry : EventEndpoint.messagesPerGuild.entrySet()) {
-			final BlackIncrementor value = entry.getValue();
-			InfluxManager.save("guild_" + entry.getKey(), new Document("messages_sent", value.getCount()));
-			value.reset();
-		}
 		InfluxManager.save("guilds", new Document());
 		commandsLastTenSeconds = 0;
 		messagesSentLastTenSeconds = 0;

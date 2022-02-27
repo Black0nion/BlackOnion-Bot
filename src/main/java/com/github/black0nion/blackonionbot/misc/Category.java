@@ -1,17 +1,19 @@
 package com.github.black0nion.blackonionbot.misc;
 
-public enum Category {
-    OTHER, MODERATION, FUN, BOT, MUSIC, MISC, INFORMATION, ADMIN;
+import javax.annotation.Nullable;
 
-    /**
-     * @param string
-     * @return
-     */
-    public static final Category parse(final String input) {
-	try {
-	    return valueOf(input.toUpperCase());
-	} catch (final Exception e) {
-	    return null;
+public enum Category {
+	OTHER, MODERATION, FUN, BOT, MUSIC, MISC, INFORMATION, ADMIN;
+
+	/**
+	 * @return the Category or null
+	 */
+	@Nullable
+	public static Category parse(final String input) {
+		try {
+			return valueOf(input.toUpperCase());
+		} catch (final Exception e) {
+			return null;
+		}
 	}
-    }
 }

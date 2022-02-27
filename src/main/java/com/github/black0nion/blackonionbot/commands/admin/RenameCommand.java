@@ -1,20 +1,19 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import java.time.Duration;
-import java.util.List;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.time.Duration;
+import java.util.List;
 
 public class RenameCommand extends Command {
 
@@ -23,8 +22,8 @@ public class RenameCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember sentmember, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (Utils.handleRights(guild, author, e.getChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember sentmember, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	if (Utils.handleRights(guild, author, e.getTextChannel(), Permission.MESSAGE_MANAGE, Permission.NICKNAME_MANAGE)) return;
 	message.delete().queue();
 	final Member mem = guild.getMemberById(args[1]);
 	final List<Member> members = e.getGuild().retrieveMembersByPrefix(args[1], 99).get();

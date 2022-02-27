@@ -42,7 +42,7 @@ public class ConfigManager {
 				// Use resource
 				metadata = Bot.gson.fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
 				Logger.logInfo("Loaded metadata!");
-			} catch (IOException e) {
+			} catch (Exception e) {
 				Logger.logError("Failed to load metadata: " + e.getMessage());
 			}
 		}

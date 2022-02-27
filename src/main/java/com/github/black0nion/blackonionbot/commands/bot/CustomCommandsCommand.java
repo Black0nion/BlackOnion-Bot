@@ -1,38 +1,31 @@
-/**
- *
- */
 package com.github.black0nion.blackonionbot.commands.bot;
-
-import java.util.stream.Collectors;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-/**
- * @author _SIM_
- *
- */
+import java.util.stream.Collectors;
+
 public class CustomCommandsCommand extends Command {
 
     public CustomCommandsCommand() {
-	this.setCommand("customcommand", "cc", "ccs").setSyntax("<list | create | delete> [command (required for create and delete)]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
-
+		this.setCommand("customcommand", "cc", "ccs").setSyntax("<list | create | delete> [command (required for create and delete)]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	final String mode = args[1];
 	if (mode.equalsIgnoreCase("list")) {
 	    cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
@@ -64,9 +57,9 @@ public class CustomCommandsCommand extends Command {
 	}
     }
 
-    private final void askForDelete(final String command, final CommandEvent cmde) {
+    private void askForDelete(final String command, final CommandEvent cmde) {
 	cmde.getMessage().replyEmbeds(cmde.success().addField("areyousure", "@blaumeise was soll hier stehen?", false).build()).queue(msg -> {
-	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+	    Bot.waiter.waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 
 		if (contentRaw.equalsIgnoreCase("true")) {
@@ -79,9 +72,9 @@ public class CustomCommandsCommand extends Command {
 	});
     }
 
-    private final void askForType(final String command, final CommandEvent cmde) {
+    private void askForType(final String command, final CommandEvent cmde) {
 	cmde.getMessage().replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
-	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+	    Bot.waiter.waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 		    cmde.error("aborting", "byeeee");
@@ -99,9 +92,9 @@ public class CustomCommandsCommand extends Command {
 	});
     }
 
-    private static final void askForRaw(final String command, final CommandEvent cmde) {
+    private static void askForRaw(final String command, final CommandEvent cmde) {
 	cmde.getMessage().replyEmbeds(cmde.success().addField("messagetosend", "inputmessage", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
-	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+	    Bot.waiter.waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 		    cmde.error("aborting", "byeeee");
@@ -116,7 +109,7 @@ public class CustomCommandsCommand extends Command {
 
     private static final void askForReply(final String command, final CommandEvent cmde, final CustomCommand customCommand) {
 	cmde.getMessage().replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> {
-	    CommandBase.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+	    Bot.waiter.waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 		final String contentRaw = e.getMessage().getContentRaw();
 
 		if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {

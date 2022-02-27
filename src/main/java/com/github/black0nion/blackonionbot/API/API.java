@@ -24,7 +24,7 @@ public class API {
 
 	private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
 
-	private static final MongoCollection<Document> collection = MongoDB.botDatabase.getCollection("dashboard-sessions");
+	private static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("dashboard-sessions");
 
 	@Reloadable("ratelimits")
 	public static void clearRateLimits() {

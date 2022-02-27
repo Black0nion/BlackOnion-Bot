@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems.music;
 
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -20,10 +20,8 @@ import com.wrapper.spotify.methods.TrackRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
@@ -83,7 +81,7 @@ public class PlayerManager {
 		});
 	}
 
-	public void loadAndPlay(final BlackUser author, final TextChannel channel, String trackUrl, final AudioManager manager, final VoiceChannel vc) {
+	public void loadAndPlay(final BlackUser author, final TextChannel channel, String trackUrl, final AudioManager manager, final AudioChannel vc) {
 		final GuildMusicManager musicManager = this.getMusicManager(channel);
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
 		MusicSystem.channels.put(guild.getIdLong(), channel.getIdLong());
@@ -162,14 +160,14 @@ public class PlayerManager {
 		});
 	}
 
-	private void retry(final BlackUser author, final Message msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final VoiceChannel vc) {
-		CommandBase.waiter.waitForEvent(GuildMessageReactionAddEvent.class, event -> msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot(), event -> {
-			event.getReaction().removeReaction(event.getUser()).queue();
-			if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().get().getKey()) {
+	private void retry(final BlackUser author, final Message msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final AudioChannel vc) {
+		Bot.waiter.waitForEvent(MessageReactionAddEvent.class, event -> event.getChannelType() == ChannelType.TEXT && msg.getIdLong() == event.getMessageIdLong() && !Objects.requireNonNull(event.getUser()).isBot(), event -> {
+			event.getReaction().removeReaction(Objects.requireNonNull(event.getUser())).queue();
+			if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().orElseThrow().getKey()) {
 				this.retry(author, msg, tracks, musicManager, manager, vc);
 				return;
 			}
-			final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().get().getKey());
+			final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().orElseThrow().getKey());
 			musicManager.scheduler.queue(track, manager, vc);
 		}, 1, TimeUnit.MINUTES, () -> msg.editMessageEmbeds(EmbedUtils.getErrorEmbed(author, BlackGuild.from(msg.getGuild())).addField("timeout", "tooktoolong", false).build()).queue());
 	}

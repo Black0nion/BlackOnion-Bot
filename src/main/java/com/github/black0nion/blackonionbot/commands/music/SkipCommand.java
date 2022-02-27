@@ -15,7 +15,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SkipCommand extends Command {
 
@@ -24,10 +24,10 @@ public class SkipCommand extends Command {
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 	final GuildVoiceState state = guild.getSelfMember().getVoiceState();
 	if (state != null && state.getChannel() != null) {
-	    final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel());
+	    final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
 	    final AudioPlayer player = musicManager.audioPlayer;
 
 	    if (player.getPlayingTrack() == null) {

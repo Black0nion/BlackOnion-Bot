@@ -1,7 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.util.Map;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -10,11 +8,12 @@ import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.Map;
 
 public class GuildLanguageCommand extends Command {
 
@@ -30,7 +29,7 @@ public class GuildLanguageCommand extends Command {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (args.length >= 2) {
 			final Language newLanguage = LanguageSystem.getLanguageFromName(args[1].toUpperCase());
 			if (newLanguage != null) {
@@ -55,7 +54,7 @@ public class GuildLanguageCommand extends Command {
 			} else {
 			    language = LanguageSystem.getDefaultLanguage().getName() + " (" + LanguageSystem.getDefaultLanguage().getLanguageCode() + ")";
 			}
-			cmde.reply(cmde.success().setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + CommandEvent.getCommandHelp(guild, author, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false));
+			cmde.reply(cmde.success().setTitle("Languages").addField("Guild Language: " + language, "To change the guild language, use " + CommandEvent.getCommandHelp(guild, this) + "\nTo get a list of all valid language codes use `" + guild.getPrefix() + "language list`", false));
 		}
 	}
 }

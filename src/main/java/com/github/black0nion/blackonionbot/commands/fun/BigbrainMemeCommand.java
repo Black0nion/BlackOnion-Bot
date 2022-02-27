@@ -1,37 +1,30 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.utils.Utils;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
-
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-
 public class BigbrainMemeCommand extends Command {
-	
+
 	private static BufferedImage defaultBackGround;
-	
+
 	final static int maxWidth = 420;
-	
+
 	public BigbrainMemeCommand() {
 		this.setCommand("bigbrain")
 			.setSyntax("<smul brain text>,<medium brain text>,<big brain text>,<thicc brain text>");
@@ -45,7 +38,7 @@ public class BigbrainMemeCommand extends Command {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String[] messages = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(",");
 		if (messages.length < 4) {
 			cmde.sendPleaseUse();
@@ -53,35 +46,35 @@ public class BigbrainMemeCommand extends Command {
 		}
 		message.reply("Generating your image...").queue(m -> {
 			final @NotNull File file = generateImage(messages);
-			message.reply("bigbrian").addFile(file, "bigbrain.png").queue(msg -> {				
+			message.reply("bigbrian").addFile(file, "bigbrain.png").queue(msg -> {
 				file.delete();
 				m.delete().queue();
 			});
 		});
 	}
-	
+
 	@NotNull
 	public static File generateImage(final String[] args) {
 		try {
 			for (int i = 0; i < args.length; i++)
 				args[i] = args[i].trim();
-			
+
         	final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
-	
+
 	        final Graphics2D newGraphics = bufferedImage.createGraphics();
 	        newGraphics.setRenderingHint(
 	                RenderingHints.KEY_TEXT_ANTIALIASING,
 	                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	        newGraphics.setFont(new Font("Arial", Font.PLAIN, 40));
 	        newGraphics.setColor(Color.DARK_GRAY);
-	        
+
 	        final FontMetrics fontMetrics = newGraphics.getFontMetrics();
-	        
+
 	        final List<String> lines = new ArrayList<>();
 	        int width;
 	        String current;
 	        String[] input;
-	        
+
 	        // lil brain
 	        lines.clear();
 	        width = 0;
@@ -98,7 +91,7 @@ public class BigbrainMemeCommand extends Command {
 	        	} else current += s + " ";
 	        }
 	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 50);
-        	
+
 	        // medium brain
 	        lines.clear();
 	        width = 0;
@@ -115,8 +108,8 @@ public class BigbrainMemeCommand extends Command {
 	        	} else current += s + " ";
 	        }
 	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 275);
-        	
-	        
+
+
 	        // big brain
 	        lines.clear();
 	        width = 0;
@@ -133,7 +126,7 @@ public class BigbrainMemeCommand extends Command {
 	        	} else current += s + " ";
 	        }
 	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 520);
-	        
+
 	        // giga brain
 	        lines.clear();
 	        width = 0;
@@ -150,14 +143,14 @@ public class BigbrainMemeCommand extends Command {
 	        	} else current += s + " ";
 	        }
 	        for (int i = 0; i < lines.size(); i++) newGraphics.drawString(lines.get(i), 10, i * 50 + 750);
-	
+
 	        final File file = new File("tmp/bigbrain/" + System.currentTimeMillis() + ".png");
-	
+
 	        if (file.getParentFile() != null)
 				file.getParentFile().mkdirs();
-	
+
 	        ImageIO.write(bufferedImage, "png", file);
-	
+
 	        return file;
 		} catch (final Exception e) {
 			e.printStackTrace();

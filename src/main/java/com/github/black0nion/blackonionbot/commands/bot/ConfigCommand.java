@@ -1,15 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
@@ -26,12 +16,20 @@ import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Quadruple;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ConfigCommand extends Command {
 
@@ -73,7 +71,7 @@ public class ConfigCommand extends Command {
 	public static final HashMap<String, Quadruple<Method, ConfigGetter, Method, ConfigSetter>> both = new HashMap<>();
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final GuildMessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String mode = args[1];
 		if (mode.equalsIgnoreCase("list")) {
 			String help = "```";

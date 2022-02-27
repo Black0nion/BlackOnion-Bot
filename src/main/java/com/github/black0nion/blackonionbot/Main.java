@@ -7,10 +7,9 @@ public class Main {
 	public static void main(final String[] args) {
 		try {
 			Bot.startBot(args);
-		} catch (final Exception ex) {
-			System.err.println("UNCAUGHT ERROR:");
+		} catch (final Throwable ex) {
+			System.err.print("UNCAUGHT ERROR: ");
 			ex.printStackTrace();
 		}
 	}
-
 }
