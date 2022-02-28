@@ -68,7 +68,7 @@ dependencies {
 
     implementation "ch.qos.logback:logback-classic:1.2.10"
 
-    implementation "io.github.classgraph:classgraph:4.8.138"
+    implementation "io.github.classgraph:classgraph:4.8.141"
 }
 
 mainClassName = "com.github.black0nion.blackonionbot.Main"
