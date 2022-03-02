@@ -5,9 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlackThread extends Thread {
 
-	public BlackThread() {
-	}
-
 	public BlackThread(Runnable runnable) {
 		super(runnable);
 	}

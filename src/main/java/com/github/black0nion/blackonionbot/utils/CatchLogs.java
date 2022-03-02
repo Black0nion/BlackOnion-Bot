@@ -17,38 +17,39 @@ import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 
 public class CatchLogs extends PrintStream {
 
-    private static final PrintStream originalSystemOut = System.out;
-    private static final Pair<Caller, StackTraceElement> idk = new Pair<>(Caller.IDK, null);
+	private static final PrintStream originalSystemOut = System.out;
+	private static final Pair<Caller, StackTraceElement> idk = new Pair<>(Caller.IDK, null);
 
-    public static void disable() {
-	System.setOut(originalSystemOut);
-    }
-
-    @Reloadable("catchlogs")
-    public static void init() {
-	System.setOut(new CatchLogs(originalSystemOut));
-    }
-
-    private CatchLogs(final PrintStream original) {
-	super(original);
-    }
-
-    @Override
-    public void println(final String line) {
-	final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-	final Pair<Caller, StackTraceElement> callerPair = findCallerToLog(stack);
-	final Caller caller = callerPair.getKey();
-	if (caller == Caller.IDK) {
-	    Logger.logInfo(line);
-	} else if (caller == Caller.PLUGIN) {
-	    Logger.logInfo("[" + callerPair.getValue().getClassName() + "] " + line, LogOrigin.PLUGINS);
+	private CatchLogs(final PrintStream original) {
+		super(original);
 	}
-    }
 
-    private static Pair<Caller, StackTraceElement> findCallerToLog(final StackTraceElement[] stack) {
-	for (final StackTraceElement element : stack) {
-	    if (Plugin.isMethod(element.getMethodName()) && PluginSystem.getPluginClasses().contains(element.getClassName())) return new Pair<>(Caller.PLUGIN, element);
+	public static void disable() {
+		System.setOut(originalSystemOut);
 	}
-	return idk;
-    }
+
+	@Reloadable("catchlogs")
+	public static void init() {
+		System.setOut(new CatchLogs(originalSystemOut));
+	}
+
+	private static Pair<Caller, StackTraceElement> findCallerToLog(final StackTraceElement[] stack) {
+		for (final StackTraceElement element : stack) {
+			if (Plugin.isMethod(element.getMethodName()) && PluginSystem.getPluginClasses().contains(element.getClassName()))
+				return new Pair<>(Caller.PLUGIN, element);
+		}
+		return idk;
+	}
+
+	@Override
+	public void println(final String line) {
+		final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		final Pair<Caller, StackTraceElement> callerPair = findCallerToLog(stack);
+		final Caller caller = callerPair.getKey();
+		if (caller == Caller.IDK) {
+			Logger.logInfo(line);
+		} else if (caller == Caller.PLUGIN) {
+			Logger.logInfo("[" + callerPair.getValue().getClassName() + "] " + line, LogOrigin.PLUGINS);
+		}
+	}
 }

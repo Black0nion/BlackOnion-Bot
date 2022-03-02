@@ -8,7 +8,7 @@ import org.bson.Document;
 import org.json.JSONObject;
 
 import com.github.black0nion.blackonionbot.API.BlackSession;
-import com.github.black0nion.blackonionbot.API.OAuthUtils;
+import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
 import com.github.black0nion.blackonionbot.API.PostRequest;
 import com.github.black0nion.blackonionbot.utils.Trio;
 import com.mongodb.client.model.Filters;

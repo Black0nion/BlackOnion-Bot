@@ -37,6 +37,8 @@ dependencies {
     // EventWaiter
     implementation "com.github.JDA-Applications.JDA-Utilities:jda-utilities-commons:dfd5c6f599"
 
+    implementation 'com.github.Mokulu:discord-oauth2-api:d152a2ba71'
+
     implementation "com.sedmelluq:lavaplayer:1.3.78"
 
     implementation "com.sparkjava:spark-core:2.9.3"

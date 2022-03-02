@@ -1,9 +1,6 @@
 package com.github.black0nion.blackonionbot.misc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum CustomPermission {
@@ -34,10 +31,18 @@ public enum CustomPermission {
 		this.links.addAll(Arrays.asList(includedIn));
 	}
 
+	public static CustomPermission parse(final String input) {
+		try {
+			return valueOf(input.toUpperCase(Locale.ROOT));
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
 	public static List<CustomPermission> parse(final String... input) {
 		return Arrays.stream(input).map(perm -> {
 			try {
-				return valueOf(perm.toUpperCase());
+				return valueOf(perm.toUpperCase(Locale.ROOT));
 			} catch (final Exception ignored) {
 				return null;
 			}

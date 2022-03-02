@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -293,5 +294,14 @@ public class Utils {
 	@Nonnull
 	public static <T> T gOD(final @Nullable T value, final @Nonnull T defaultValue) {
 		return value != null ? value : defaultValue;
+	}
+
+	public static <T> List<T> add(List<T> list, T object) {
+		list.add(object);
+		return list;
+	}
+
+	public static String list(Object obj) {
+		return "- " + obj;
 	}
 }

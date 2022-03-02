@@ -141,16 +141,14 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			System.out.println("excecutdasdf");
-
 			Bot.executor.submit(() -> {
-				System.out.println("bfore set");
 				cmde.setCommand(cmd);
-				System.out.println("after set: " + cmd);
-				cmd.execute(cmde, event, member, author, guild, channel);
-				System.out.println("excteudas downe");
+				try {
+					cmd.execute(cmde, event, member, author, guild, channel);
+				} catch (Throwable t) {
+					cmde.exception(t);
+				}
 			});
-			System.out.println("set thingygsdfsdfadfs thru");
 		}
 	}
 

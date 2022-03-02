@@ -12,9 +12,9 @@ import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class LanguageCommand extends Command {
+public class UserLanguageCommand extends Command {
 
-	public LanguageCommand() {
+	public UserLanguageCommand() {
 		this.setCommand("language", "lang", "locale", "sprache")
 			.setSyntax("[language code | list]");
 	}

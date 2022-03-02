@@ -3,7 +3,8 @@ package com.github.black0nion.blackonionbot.API;
 import com.github.black0nion.blackonionbot.API.impl.post.Login;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.utils.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -41,7 +42,7 @@ public class BlackSession {
 		final Document doc = collection.find(Filters.eq("sessionid", sessionId)).first();
 		if (doc != null) {
 			this.sessionId = sessionId;
-			this.user = OAuthUtils.getUserFromToken(doc.getString("access_token"));
+			this.user = OAuthUtils.getUserWithToken(doc.getString("access_token"));
 			return true;
 		} else return false;
 	}
