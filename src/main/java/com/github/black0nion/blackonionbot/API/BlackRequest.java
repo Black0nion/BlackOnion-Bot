@@ -39,4 +39,17 @@ public abstract class BlackRequest {
     }
 
     public abstract RequestType type();
+
+	protected String exception(Throwable e) {
+		return "{\"error\":\"" + e.getMessage() + "\"}";
+	}
+
+	protected String exception(String text) {
+		return "{\"error\":\"" + text + "\"}";
+	}
+
+	protected String exception(String text, int code, Response response) {
+		response.status(code);
+		return "{\"error\":\"" + text + "\"}";
+	}
 }

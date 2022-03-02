@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "translationsschema.json",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "title": "The Two-Digit Language Code, in the Format [A-Z]{2}"
+    },
+    "name": {
+      "type": "string",
+      "title": "The name of the Language"
+    },
+    "translations": {
+      "type": "object"
+    }
+  }
+}

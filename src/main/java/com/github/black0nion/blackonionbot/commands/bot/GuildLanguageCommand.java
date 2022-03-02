@@ -3,33 +3,51 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
 import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
 import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.internal.utils.Checks;
 
 import java.util.Map;
 
-public class GuildLanguageCommand extends Command {
+public class GuildLanguageCommand extends SlashCommand {
+
+	private static final OptionData languageOption = new OptionData(OptionType.STRING, "language", "The code of the language to set", true)
+		.addChoices(LanguageSystem.getLanguages().values().stream().map(e -> new Command.Choice(e.getName(), e.getLanguageCode())).toList());
 
 	public GuildLanguageCommand() {
-		this.setCommand("guildlanguage", "guildlang", "guildlocale", "guildsprache", "serverlang", "serverlanguage", "serersprache")
-			.setRequiredPermissions(Permission.ADMINISTRATOR)
-			.setSyntax("[language code]");
+		super(builder(Commands.slash("language", "Set the language of either the guild or yourself").addSubcommands(
+			new SubcommandData("user", "Set the language of yourself").addOptions(languageOption),
+			new SubcommandData("guild", "Set the language for the guild").addOptions(languageOption)
+		)));
 	}
 
 	@Override
-	public String[] getCommand() {
-		return new String[] { "guildlanguage", "guildlang", "guildlocale", "guildsprache", "serverlang", "serverlanguage", "serversprache" };
-	}
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		String subcommand;
+		Checks.notNull(subcommand = e.getSubcommandName(), "Subcommand Name");
+		Language lang = LanguageSystem.getLanguageFromName(e.getOption("languageOption", OptionMapping::getAsString));
+		Checks.notNull(lang, "Language");
+		if (subcommand.equalsIgnoreCase("user")) {
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		} else if (subcommand.equalsIgnoreCase("guild")) {
+
+		} else throw new NotImplementedException("Subcommand");
 		if (args.length >= 2) {
 			final Language newLanguage = LanguageSystem.getLanguageFromName(args[1].toUpperCase());
 			if (newLanguage != null) {

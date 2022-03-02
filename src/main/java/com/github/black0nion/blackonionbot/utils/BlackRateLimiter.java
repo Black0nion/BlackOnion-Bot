@@ -47,6 +47,9 @@ public class BlackRateLimiter {
 		}
 	}
 
+	/**
+	 * @return How many illegal requests got tried since the last proper request
+	 */
 	public int getTooMany() {
 		return this.tooMany;
 	}

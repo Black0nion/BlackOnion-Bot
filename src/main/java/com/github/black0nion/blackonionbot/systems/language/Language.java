@@ -17,10 +17,9 @@ public class Language {
 	String languageCode;
 	HashMap<String, String> messages;
 
-	public Language(final String fileName, final String languageCode) {
+	public Language(final String fileName) {
 		try {
 			this.name = fileName;
-			this.languageCode = languageCode;
 			messages = new HashMap<>();
 			final InputStream in = getClass().getResourceAsStream("/translations/" + fileName + ".json");
 			assert in != null;

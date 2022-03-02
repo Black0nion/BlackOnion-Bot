@@ -1,19 +1,5 @@
 package com.github.black0nion.blackonionbot.blackobjects;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Formatter;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
-import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
-
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -24,15 +10,24 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class BlackUser extends BlackObject implements User {
 
@@ -40,23 +35,23 @@ public class BlackUser extends BlackObject implements User {
 
 	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.DATABASE);
 
-	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<User, BlackUser>() {
+	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
-		public BlackUser load(final User user) {
+		public @Nonnull BlackUser load(final @Nonnull User user) {
 			return new BlackUser(user);
 		}
 	});
 
-	public static BlackUser from(@NotNull final Member member) {
+	public static BlackUser from(@Nonnull final Member member) {
 		return from(member.getUser());
 	}
 
-	public static BlackUser from(@NotNull final User user) {
+	@Nonnull
+	public static BlackUser from(@Nonnull final User user) {
 		try {
 			return users.get(user);
-		} catch (final Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (ExecutionException e) {
+			throw new UncheckedExecutionException(e);
 		}
 	}
 
@@ -64,15 +59,8 @@ public class BlackUser extends BlackObject implements User {
 		return users.stream().map(BlackUser::from).collect(Collectors.toList());
 	}
 
-	@Deprecated
-	/**
-	 * Deprecated as a warning
-	 *
-	 * @param  guild
-	 * @return
-	 */
 	@Reloadable("usercache")
-	public static final void clearCache() {
+	public static void clearCache() {
 		users.invalidateAll();
 	}
 
@@ -169,11 +157,8 @@ public class BlackUser extends BlackObject implements User {
 	}
 
 	@Nonnull
-	/**
-	 * @return Full name WITH REPLACED MARKDOWN
-	 */
 	public String getFullName() {
-		return Utils.removeMarkdown(this.getName() + "#" + this.getDiscriminator());
+		return this.getName() + this.getDiscriminator();
 	}
 
 	// override methods

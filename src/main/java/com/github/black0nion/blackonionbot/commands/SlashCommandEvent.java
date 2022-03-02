@@ -140,6 +140,10 @@ public class SlashCommandEvent {
 		this.error("errorhappened", "somethingwentwrong");
 	}
 
+	public void exception(@Nullable Throwable t) {
+		this.send("errorwithmessage", new Placeholder("%msg%", t != null ? t.getClass().getTypeName() : "null"));
+	}
+
 	public void reply(final EmbedBuilder builder) {
 		this.reply(builder, null);
 	}

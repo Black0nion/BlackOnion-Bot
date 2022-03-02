@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.API.API;
 import com.github.black0nion.blackonionbot.blackobjects.BlackArrayList;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.influx.InfluxManager;
 import com.github.black0nion.blackonionbot.misc.LogMode;
@@ -95,6 +96,8 @@ public class Bot extends ListenerAdapter {
 		builder.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), waiter);
 
 		LanguageSystem.init();
+		// the constructor already needs the initialized hashmap
+		ReloadCommand.initReloadableMethods();
 		CommandBase.addCommands();
 		SlashCommandBase.addCommands();
 		builder.setStatus(StatusCommand.getStatusFromConfig());

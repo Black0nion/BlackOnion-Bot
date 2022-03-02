@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+// TODO: new config system
 public class ConfigCommand extends Command {
 
 	public ConfigCommand() {
