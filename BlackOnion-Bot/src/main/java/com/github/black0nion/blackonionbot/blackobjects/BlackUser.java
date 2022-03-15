@@ -93,11 +93,7 @@ public class BlackUser extends BlackObject implements User {
 
 	    this.permissions = this.gOD(CustomPermission.parse(this.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
 
-	    if (config.getString("language") != null) {
-		this.language = this.gOD(LanguageSystem.getLanguageFromName(config.getString("language")), LanguageSystem.defaultLocale);
-	    } else {
-		this.language = LanguageSystem.getDefaultLanguage();
-	    }
+		this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	}
@@ -107,10 +103,13 @@ public class BlackUser extends BlackObject implements User {
 	return this.language;
     }
 
-    public void setLanguage(final Language language) {
-	this.language = language;
-	this.save("language", language.getLanguageCode());
-    }
+    public void setLanguage(final @Nullable Language language) {
+		this.language = language;
+		if (language == null)
+			this.clear("language");
+		else
+			this.save("language", language.getLanguageCode());
+	}
 
     public List<CustomPermission> getPermissions() {
 	return this.permissions;
