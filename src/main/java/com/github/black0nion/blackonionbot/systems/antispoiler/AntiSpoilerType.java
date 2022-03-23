@@ -16,23 +16,25 @@ public enum AntiSpoilerType {
 	DELETE("Deletes the message, never to be seen again."),
 	REPLACE("Removes the spoilers from the message and resends the message without them."),
 	OFF;
-	
+
 	private String description;
-	
-	private AntiSpoilerType(final String description) {
+
+	AntiSpoilerType(final String description) {
 		this.description = description;
 	}
-	
-	private AntiSpoilerType() {
-		
-	}
-	
+
+	AntiSpoilerType() {}
+
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public static AntiSpoilerType parse(final String input) {
-		if (input == null || input == "") return null;
-		return valueOf(input.toUpperCase());
+		if (input == null || input.isEmpty()) return null;
+		try {
+			return valueOf(input.toUpperCase());
+		} catch (Exception ignored) {
+			return null;
+		}
 	}
 }

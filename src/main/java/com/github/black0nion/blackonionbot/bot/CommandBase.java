@@ -1,12 +1,12 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.Main;
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
+import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.misc.*;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
@@ -17,7 +17,7 @@ import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,23 +33,22 @@ import java.util.concurrent.TimeUnit;
 
 public class CommandBase extends ListenerAdapter {
 
-	public static HashMap<String[], Command> commandsArray = new HashMap<>();
+	public static final HashMap<String[], TextCommand> commandsArray = new HashMap<>();
 
-	public static HashMap<Category, List<Command>> commandsInCategory = new HashMap<>();
+	public static final HashMap<Category, List<TextCommand>> commandsInCategory = new HashMap<>();
 
-	public static HashMap<String, Command> commands = new HashMap<>();
+	public static final HashMap<String, TextCommand> commands = new HashMap<>();
 
-	@Reloadable("commands")
 	public static void addCommands() {
 		commands.clear();
 		commandsInCategory.clear();
 		commandsArray.clear();
-		final Reflections reflections = new Reflections(Command.class.getPackage().getName());
-		final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
+		final Reflections reflections = new Reflections(TextCommand.class.getPackage().getName());
+		final Set<Class<? extends TextCommand>> annotated = reflections.getSubTypesOf(TextCommand.class);
 
 		for (final Class<?> command : annotated) {
 			try {
-				final Command newInstance = (Command) command.getConstructor().newInstance();
+				final TextCommand newInstance = (TextCommand) command.getConstructor().newInstance();
 				if (newInstance.getCategory() == null) {
 					final String[] packageName = command.getPackage().getName().split("\\.");
 					final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
@@ -57,7 +56,7 @@ public class CommandBase extends ListenerAdapter {
 				}
 				newInstance.setCommand(Arrays.stream(newInstance.getCommand()).filter(Objects::nonNull).map(String::toLowerCase).toArray(String[]::new));
 
-				if (newInstance.shouldAutoRegister()) if (newInstance.getCommand() != null) {
+				if (newInstance.getCommand() != null) {
 					addCommand(newInstance);
 				} else {
 					System.err.println(newInstance.getClass().getName() + " doesn't have a command!");
@@ -68,12 +67,14 @@ public class CommandBase extends ListenerAdapter {
 		}
 
 		Bot.executor.submit(() -> {
+			//noinspection Convert2MethodRef
 			Dashboard.init();
-			// StringSelection stringSelection = new
-			// StringSelection(commandsJSON.toString());
-			// Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			// clipboard.setContents(stringSelection, null);
-			// System.out.println(commandsJSON);
+			/*
+				StringSelection stringSelection = new StringSelection(commandsJSON.toString());
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(stringSelection, null);
+				System.out.println(commandsJSON);
+			*/
 		});
 	}
 
@@ -88,8 +89,6 @@ public class CommandBase extends ListenerAdapter {
 		if (event.getAuthor().isBot()) return;
 		final BlackUser author = BlackUser.from(event.getAuthor());
 
-		assert author != null;
-
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackMember member = BlackMember.from(event.getMember());
 		final String prefix = guild.getPrefix();
@@ -101,8 +100,11 @@ public class CommandBase extends ListenerAdapter {
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
 		final String[] args = msgContent.split(" ");
 
-		Logger.log(LogMode.INFORMATION, LogOrigin.DISCORD, log);
+		boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
+		Logger.log(locked ? LogMode.WARNING : LogMode.INFORMATION, LogOrigin.DISCORD, log);
 		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
+
+		if (locked) return;
 
 		final boolean containsProfanity = AntiSwearSystem.check(guild, member, message, channel);
 
@@ -116,7 +118,7 @@ public class CommandBase extends ListenerAdapter {
 		final String str = args[0].replace(prefix, "").toLowerCase();
 		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_MANAGE, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(str)) {
-			final Command cmd = commands.get(str);
+			final TextCommand cmd = commands.get(str);
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions()))
 				return;
@@ -129,6 +131,7 @@ public class CommandBase extends ListenerAdapter {
 
 			if (!guild.isCommandActivated(cmd)) return;
 
+			assert member != null;
 			if (!member.hasPermission(requiredPermissions)) {
 				if (!cmd.isVisible(author)) return;
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
@@ -169,17 +172,17 @@ public class CommandBase extends ListenerAdapter {
 	}
 
 	@Deprecated
-	public static void addCommand(final Command c, final String... command) {
+	public static void addCommand(final TextCommand c, final String... command) {
 		for (final String s : command)
 			if (!commands.containsKey(s)) {
 				commands.put(s, c);
 			}
 	}
 
-	public static void addCommand(final Command c) {
+	public static void addCommand(final TextCommand c) {
 		if (!commandsArray.containsKey(c.getCommand())) {
 			final Category category = c.getCategory();
-			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
+			final List<TextCommand> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
 			commandsArray.put(c.getCommand(), c);

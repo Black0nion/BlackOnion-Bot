@@ -6,29 +6,23 @@ import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearTyp
 
 import java.util.List;
 
+import club.minnced.discord.webhook.WebhookClient;
 import com.github.black0nion.blackonionbot.utils.config.Config;
+import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Icon;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.Webhook;
 
 public class AntiSwearSystem {
 
@@ -84,35 +78,16 @@ public class AntiSwearSystem {
 
 						for (int i = 0; i < terms.length(); i++) {
 							final String term = terms.getJSONObject(i).getString("Term");
-							newMessage = newMessage.replaceAll("(?i)" + term, term.replaceAll(".", "*"));
+							newMessage = newMessage.replaceAll("(?i)" + term, "*".repeat(term.length()));
 						}
 
-						newMessage = Utils.removeMarkdown(newMessage);
+						newMessage = Utils.escapeMarkdown(newMessage);
 						builder.setContent(newMessage);
 						builder.setUsername(author.getEffectiveName() + "#" + user.getDiscriminator());
 						builder.setAvatarUrl(user.getEffectiveAvatarUrl());
 						channel.retrieveWebhooks().queue(webhooks -> {
 							try {
-								Webhook webhook;
-
-								if (webhooks.stream().anyMatch(tempWebhook -> {
-									if (tempWebhook == null) return false;
-									else return (tempWebhook.getOwner().getIdLong() == BotInformation.SELF_USER_ID);
-								})) {
-									webhook = webhooks.stream().filter(tempWebhook -> (tempWebhook.getOwner().getIdLong() == BotInformation.SELF_USER_ID)).findFirst().get();
-								} else {
-									webhook = channel.createWebhook("BlackOnion-Bot ContentModerator").setAvatar(Icon.from(AntiSwearSystem.class.getResourceAsStream("logo.png"))).submit().join();
-								}
-
-								final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
-								clientBuilder.setThreadFactory(job -> {
-									final Thread thread = new Thread(job);
-									thread.setName("ContentModerator");
-									thread.setDaemon(true);
-									return thread;
-								});
-
-								final WebhookClient client = clientBuilder.build();
+								WebhookClient client = Utils.makeWebhookClient(Utils.getWebhook(channel, webhooks));
 								client.send(builder.build());
 								client.close();
 							} catch (final Exception ex) {
@@ -127,7 +102,7 @@ public class AntiSwearSystem {
 				}
 				return true;
 			} else
-				throw new RuntimeException("Some error happened while contacting the Microsoft API. Response: \n" + response.getBody());
+				throw new RuntimeException("Some error happened while contacting the Microsoft api. Response: \n" + response.getBody());
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

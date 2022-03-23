@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.systems.music;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TrackScheduler extends AudioEventAdapter {
 	public final AudioPlayer player;
 	public final BlockingQueue<AudioTrack> queue;
@@ -36,13 +37,13 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	public void nextTrack() {
 		final AudioTrack poll = this.queue.poll();
-		if (this.guild.loopActivated()) {
-			this.queue.offer(poll.makeClone());
-		}
 		if (poll == null) {
 			this.guild.getAudioManager().closeAudioConnection();
 		} else {
 			this.player.startTrack(poll, false);
+			if (this.guild.loopActivated()) {
+				this.queue.offer(poll.makeClone());
+			}
 		}
 	}
 

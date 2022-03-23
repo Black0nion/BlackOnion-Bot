@@ -1,49 +1,50 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
 
-public class StatusCommand extends Command {
+public class StatusCommand extends SlashCommand {
 
 	public StatusCommand() {
-		this.setCommand("status").setSyntax("[online | invisible, offline | idle, afk | dnd, donotdisturb]").setHidden().setRequiredArgumentCount(1);
+		super(builder(Commands.slash("status", "Set the status of the bot").addOptions(
+			new OptionData(OptionType.STRING, "status", "The OnlineStatus of the bot", true)
+				.addChoices(Arrays.stream(OnlineStatus.values()).map(m -> new Command.Choice(m.name(), m.name())).toList())
+		)).setAdminGuild());
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel)
-		message.delete().queue();
-		OnlineStatus status;
-		switch (args[1].toLowerCase()) {
-			case "online" -> status = OnlineStatus.ONLINE;
-			case "invisible", "offline" -> status = OnlineStatus.OFFLINE;
-			case "idle", "afk" -> status = OnlineStatus.IDLE;
-			case "dnd", "donotdisturb" -> status = OnlineStatus.DO_NOT_DISTURB;
-			default -> status = null;
-		};
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		OnlineStatus status = Utils.parse(OnlineStatus.class, e.getOption("status", OptionMapping::getAsString));
 		if (status == null) {
-			channel.sendMessageEmbeds(cmde.success().addField("statussetfail", CommandEvent.getPleaseUse(guild, author, this), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			cmde.send("invalidrole");
 			return;
 		}
 		Config.online_status = status;
 		ConfigManager.saveConfig();
-		channel.sendMessageEmbeds(cmde.success().addField("statussetsuccess", LanguageSystem.getTranslation("newstatus", author, guild) + ": **" + status.name().toUpperCase() + "**", false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		cmde.send("newstatus", new Placeholder("status", status.name()));
 
 		e.getJDA().getPresence().setStatus(status);
 	}
 
 	public static OnlineStatus getStatusFromConfig() {
-		return Config.online_status != null ? Config.online_status : OnlineStatus.ONLINE;
+		return Optional.ofNullable(Config.online_status).orElse(OnlineStatus.ONLINE);
 	}
 }

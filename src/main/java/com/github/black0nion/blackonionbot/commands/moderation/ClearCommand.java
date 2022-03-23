@@ -1,47 +1,51 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class ClearCommand extends Command {
+public class ClearCommand extends SlashCommand {
 
 	public ClearCommand() {
-		this.setCommand("clear").setSyntax("<message count>").setRequiredPermissions(Permission.MESSAGE_MANAGE).setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
+		super(builder(Commands.slash("clear", "Clear a certain amount of messages")
+			.addOption(OptionType.INTEGER, "amount", "Amount of messages to delete", true))
+			.setRequiredPermissions(Permission.MESSAGE_MANAGE)
+			.setEphemeral(true)
+			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		try {
-			final int amount = Integer.parseInt(args[1]);
-			if (amount < 2 || amount > 100) {
-				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("numberofdeletedmessages"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
+			if (amount == null || amount < 2 || amount > 100) {
+				cmde.send("toomanymessages" );
 				return;
 			}
 
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {
-					final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2).plusSeconds(1);
+					final OffsetDateTime firstValidDate = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2).plusSeconds(1);
 					final List<Message> messages = new ArrayList<>();
-					int i = amount + 1;
+					int i = amount;
 					for (final Message m : msgs) {
-						if (!m.isPinned() && m.getTimeCreated().isAfter(now)) {
+						if (!m.isPinned() && m.getTimeCreated().isAfter(firstValidDate)) {
 							messages.add(m);
 						}
 						if (--i <= 0) {
@@ -49,32 +53,28 @@ public class ClearCommand extends Command {
 						}
 					}
 
-					if (messages.size() < 2 || messages.size() > 100) {
-						message.delete().queue();
-						message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"), cmde.getTranslation("nomessagesfound"), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-						return;
-					}
-					channel.deleteMessages(messages).queue(succ -> {
-						if (messages.size() != amount) {
-							message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", amount - messages.size())), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-						} else {
-							message.replyEmbeds(cmde.success().addField(cmde.getTranslation("messagesdeleted"), cmde.getTranslation("msgsgotdeleted", new Placeholder("msgcount", amount)), false).build()).delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-						}
-					}, error -> {
-					});
+					deleteMessages(cmde, channel, amount, messages);
 				});
 			} catch (final Exception ex) {
 				if (!(ex instanceof IllegalArgumentException)) {
 					ex.printStackTrace();
-					cmde.selfDestructingException();
+					cmde.exception(ex);
 				} else {
-					cmde.error("tooold", "messagestooold", msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+					cmde.send("messagestooold");
 				}
-				return;
 			}
 		} catch (final Exception ignored) {
 			cmde.sendPleaseUse();
 		}
-		return;
+	}
+
+	static void deleteMessages(SlashCommandEvent cmde, TextChannel channel, int amount, List<Message> messages) {
+		channel.deleteMessages(messages).queue(success -> {
+			if (messages.size() > amount) {
+				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()), new Placeholder("remaining", amount - messages.size()));
+			} else {
+				cmde.send("msgsgotdeleted", new Placeholder("msgcount", amount));
+			}
+		}, cmde::exception);
 	}
 }

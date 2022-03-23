@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -21,8 +21,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
-import static com.github.black0nion.blackonionbot.commands.SlashCommandBuilder.builder;
-
 public class ActivityCommand extends SlashCommand {
 
 	public ActivityCommand() {
@@ -37,7 +35,7 @@ public class ActivityCommand extends SlashCommand {
 						),
 					new OptionData(OptionType.STRING, "text", "The text of the activity", true)
 				), new SubcommandData("clear", "Clear the activity of the bot")))
-			.setHidden());
+			.setAdminGuild());
 	}
 
 	@Override
@@ -60,6 +58,7 @@ public class ActivityCommand extends SlashCommand {
 		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
 			Config.activity_type = null;
 			Config.activity_name = null;
+			e.getJDA().getPresence().setActivity(null);
 			ConfigManager.saveConfig();
 			cmde.send("activitycleared");
 		}

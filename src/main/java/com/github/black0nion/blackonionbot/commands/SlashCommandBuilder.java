@@ -1,16 +1,17 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class SlashCommandBuilder {
@@ -29,6 +30,12 @@ public class SlashCommandBuilder {
 	 * If true, the command will only get registered in the admins' guild.
 	 */
 	private boolean adminGuild = false;
+	private final HashMap<String, StartsWithArrayList> autoComplete = new HashMap<>();
+
+	public SlashCommandBuilder autocomplete(String command, Collection<String> values) {
+		this.autoComplete.put(command, new StartsWithArrayList(values));
+		return this;
+	}
 
 	public SlashCommandBuilder(final SlashCommandData data) {
 		this.data = Objects.requireNonNull(data);
@@ -150,6 +157,10 @@ public class SlashCommandBuilder {
 		return this.isPremium;
 	}
 
+	public SlashCommandBuilder setEphemeral() {
+		return this.setEphemeral(true);
+	}
+
 	@SuppressWarnings("UnusedReturnValue")
 	public SlashCommandBuilder setEphemeral(boolean ephemeral) {
 		this.isEphemeral = ephemeral;
@@ -158,5 +169,9 @@ public class SlashCommandBuilder {
 
 	public boolean isEphemeral() {
 		return this.isEphemeral;
+	}
+
+	public HashMap<String, StartsWithArrayList> getAutoComplete() {
+		return autoComplete;
 	}
 }

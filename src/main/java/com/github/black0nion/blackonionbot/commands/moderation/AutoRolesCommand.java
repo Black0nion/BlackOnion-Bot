@@ -3,11 +3,11 @@ package com.github.black0nion.blackonionbot.commands.moderation;
 import java.util.Arrays;
 import java.util.List;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class AutoRolesCommand extends Command {
+public class AutoRolesCommand extends TextCommand {
 
 	public AutoRolesCommand() {
 		this.setCommand("autoroles", "autorole")

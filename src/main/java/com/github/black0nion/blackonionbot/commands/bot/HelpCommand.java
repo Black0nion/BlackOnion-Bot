@@ -1,11 +1,11 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class HelpCommand extends Command {
+public class HelpCommand extends TextCommand {
 
 	public HelpCommand() {
 		this.setCommand("help").notToggleable();
@@ -36,8 +36,8 @@ public class HelpCommand extends Command {
 			message.delete().queue();
 			if (args.length >= 2) {
 				// a command
-				for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-					final Command cmd = entry.getValue();
+				for (final Map.Entry<String[], TextCommand> entry : CommandBase.commandsArray.entrySet()) {
+					final TextCommand cmd = entry.getValue();
 					if (cmd.isVisible(author) && Arrays.asList(entry.getKey()).contains(args[1])) {
 						cmde.success("help", CommandEvent.getCommandHelp(guild, cmd), cmde.getTranslationOrEmpty("help" + cmd.getCommand()[0].toLowerCase()));
 						return;
@@ -47,7 +47,7 @@ public class HelpCommand extends Command {
 				final Category category = Category.parse(args[1]);
 				if (category != null) {
 					final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
-					for (final Command c : CommandBase.commandsInCategory.get(category)) {
+					for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
 						builder.addField(CommandEvent.getCommandHelp(guild, c), cmde.getTranslationOrEmpty("help" + c.getCommand()[0]), false);
 					}
 					cmde.reply(builder);
@@ -67,11 +67,13 @@ public class HelpCommand extends Command {
 						commandsInCategory = new StringBuilder(", " + cmde.getTranslation("helpmodules"));
 					} else {
 						category = cats[i - 1];
-						for (final Command c : CommandBase.commandsInCategory.get(category)) {
-							if (c.isVisible(author)) {
-								commandsInCategory.append(", ").append(c.getCommand()[0]);
+						if (CommandBase.commandsInCategory.containsKey(category)) {
+							for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
+								if (c.isVisible(author)) {
+									commandsInCategory.append(", ").append(c.getCommand()[0]);
+								}
 							}
-						}
+						} else System.out.println("wtf:  " + category);
 					}
 					if (commandsInCategory.length() <= 2) {
 						continue;
@@ -105,7 +107,7 @@ public class HelpCommand extends Command {
 	}
 
 	private void waitForHelpCatSelection(final Message msg, final BlackMember author, final CommandEvent cmde) {
-		Bot.waiter.waitForEvent(ButtonInteractionEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
+		Bot.EVENT_WAITER.waitForEvent(ButtonInteractionEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 			final Button button = event.getButton();
 
 			final BlackGuild guild = cmde.getGuild();
@@ -124,7 +126,7 @@ public class HelpCommand extends Command {
 						commandsInCategory = new StringBuilder(", " + cmde.getTranslationOrEmpty("helpmodules"));
 					} else {
 						category = cats[i - 1];
-						for (final Command c : CommandBase.commandsInCategory.get(category)) {
+						for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
 							if (c.isVisible(user)) {
 								commandsInCategory.append(", ").append(c.getCommand()[0]);
 							}
@@ -142,7 +144,7 @@ public class HelpCommand extends Command {
 			} else {
 				final Category category = Category.valueOf(button.getId());
 				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
-				for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet())
+				for (final Map.Entry<String[], TextCommand> entry : CommandBase.commandsArray.entrySet())
 					if (entry.getValue().isVisible(user) && (entry.getValue().getCategory() == category))
 						if (entry.getValue().getProgress() == Progress.DONE) {
 							builder.addField(CommandEvent.getCommandHelp(guild, entry.getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getCommand()[0]), false);
@@ -152,8 +154,8 @@ public class HelpCommand extends Command {
 					if (pr == Progress.DONE) {
 						continue;
 					}
-					for (final Map.Entry<String[], Command> entry : CommandBase.commandsArray.entrySet()) {
-						final Command command = entry.getValue();
+					for (final Map.Entry<String[], TextCommand> entry : CommandBase.commandsArray.entrySet()) {
+						final TextCommand command = entry.getValue();
 						if (command.isVisible(user) && (command.getCategory() == category) && command.getProgress() == pr) {
 							final String commandHelp = cmde.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase());
 							if (commandHelp == null) {

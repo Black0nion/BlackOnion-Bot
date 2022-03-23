@@ -1,47 +1,43 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 public class LanguageSystem {
 
-	public static Language german;
-	public static Language english;
-	public static Language defaultLocale;
-	public static String validLanguages = "\n```";
-	static HashMap<String, Language> languages = new HashMap<>();
-	static ArrayList<Language> allLanguages = new ArrayList<>();
+	private static final HashMap<String, Language> languages = new HashMap<>();
+	private static Language defaultLocale;
+	private static String languageString;
 
 	@Reloadable("language")
 	public static void init() {
 		languages.clear();
+		AtomicBoolean hasDefault = new AtomicBoolean(false);
 		new Reflections("translations", Scanners.Resources).getResources("[A-Z][a-z]+\\.json").stream()
+			.peek(lang -> System.out.println("Loading language stored in file: " + lang))
 			.map(Language::new)
+			.peek(lang -> {
+				if (lang.isDefault()) {
+					if (hasDefault.get()) throw new RuntimeException("There can only be one default language!");
+					hasDefault.set(true);
+				}
+			})
 			.forEach(lang -> {
-				allLanguages.add(e);
-				languages.put(lang)
+				languages.put(lang.getLanguageCode(), lang);
+				if (lang.isDefault()) defaultLocale = lang;
 			});
-		english = new Language("English", "EN");
-		german = new Language("German", "DE");
-		defaultLocale = german;
-		allLanguages.add(english);
-		allLanguages.add(german);
-		languages.put("EN", english);
-		languages.put("DE", german);
-
-		for (final Map.Entry<String, Language> entry : languages.entrySet()) {
-			validLanguages += entry.getValue().getName() + " (" + entry.getKey() + ")\n";
+		if (defaultLocale == null) {
+			defaultLocale = languages.values().stream().findFirst().orElseThrow(() -> new NullPointerException("No languages found!"));
 		}
-		validLanguages += "```";
 	}
 
 	public static HashMap<String, Language> getLanguages() {
@@ -76,33 +72,14 @@ public class LanguageSystem {
 		return languages.get(name.toUpperCase());
 	}
 
-	public static String getTranslation(final String key, final BlackUser author, final BlackGuild guild) {
-		try {
-			return author.getLanguage().getTranslationNonNull(key);
-		} catch (final Exception ignored) {
-		}
-		try {
-			return guild.getLanguage().getTranslationNonNull(key);
-		} catch (final Exception ignored) {
-		}
-		try {
-			return defaultLocale.getTranslationNonNull(key);
-		} catch (final Exception ignored) {
-		}
-		return "ERROR! Key " + key + "doesn't exist in " + defaultLocale.getName() + ".json!\nPlease report this issue to the admins!";
+	public static String getTranslation(final @Nullable String key, final @Nullable BlackUser author, final @Nullable BlackGuild guild) {
+		if (author != null && author.getLanguage() != null) return author.getLanguage().getTranslation(key);
+		if (guild != null && guild.getLanguage() != null) return guild.getLanguage().getTranslation(key);
+		return defaultLocale.getTranslation(key);
 	}
 
-	/**
-	 * The replacement will also get translated!
-	 *
-	 * @param key
-	 * @param author
-	 * @param guild
-	 * @param toReplace
-	 * @param replacement
-	 * @return
-	 */
-	public static String getReplacedTranslation(final String key, final BlackUser author, final BlackGuild guild, final String toReplace, final String replacement) {
-		return getTranslation(key, author, guild).replace(toReplace, getTranslation(replacement, author, guild));
+	public static String getLanguageString() {
+		if (languageString != null) return languageString;
+		return languageString = languages.values().stream().map(Language::getFullName).map(l -> "- " + l).collect(Collectors.joining("\n"));
 	}
 }

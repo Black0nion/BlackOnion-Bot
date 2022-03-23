@@ -1,32 +1,34 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import net.dv8tion.jda.api.entities.*;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class StopCommand extends Command {
+public class StopCommand extends SlashCommand {
 
 	public StopCommand() {
-		this.setCommand("stop");
+		super("stop", "Stop the currently playing music");
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
 		if (state != null && state.getChannel() != null) {
+			//noinspection ConstantConditions - intent is enabled, so it shouldn't be null
 			final AudioChannel memberChannel = member.getVoiceState().getChannel();
 			if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
 				final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
 				musicManager.scheduler.player.stopTrack();
 				musicManager.scheduler.queue.clear();
-				e.getGuild().getAudioManager().closeAudioConnection();
+				guild.getAudioManager().closeAudioConnection();
 
 				cmde.success("musicstopped", "leftvc");
 			} else {

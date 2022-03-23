@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("unused")
 public class BlackThread extends Thread {
 
 	public BlackThread(Runnable runnable) {

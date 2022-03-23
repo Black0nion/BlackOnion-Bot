@@ -6,17 +6,10 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class TicTacToeGameManager {
-	private static List<TicTacToe> games = new ArrayList<>();
+	private static final List<TicTacToe> games = new ArrayList<>();
 
 	public static final int SIZE = 3;
 
-	/**
-	 *
-	 * @param messageID of the Game Message
-	 * @param playerX   UserID of Player X
-	 * @param playerY   UserID of Player Y
-	 * @return The new created Game
-	 */
 	public static TicTacToe createGame(final TextChannel channel, final TicTacToePlayer playerX, final TicTacToePlayer playerY) {
 		final TicTacToe newGame = new TicTacToe(channel, playerX, playerY);
 		games.add(newGame);
@@ -34,7 +27,4 @@ public class TicTacToeGameManager {
 		return false;
 	}
 
-	public static TicTacToe getGameByMessageID(final long messageID) {
-		return games.stream().filter(game -> game.getMessage().getIdLong() == messageID).findFirst().orElse(null);
-	}
 }

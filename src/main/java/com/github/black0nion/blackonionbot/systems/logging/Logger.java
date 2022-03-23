@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackLinkedList;
+import com.github.black0nion.blackonionbot.wrappers.ChainableLinkedList;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogMode;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
@@ -21,20 +21,13 @@ public class Logger {
 
 	private static final SimpleDateFormat dtf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-	private static final HashMap<LogOrigin, BlackLinkedList<String>> logsPerCategory = new HashMap<>();
-	private static final HashMap<LogMode, BlackLinkedList<String>> logsPerLevel = new HashMap<>();
+	private static final HashMap<LogOrigin, ChainableLinkedList<String>> logsPerCategory = new HashMap<>();
+	private static final HashMap<LogMode, ChainableLinkedList<String>> logsPerLevel = new HashMap<>();
 	private static final List<String> logs = new LinkedList<>();
 
 	public static void log(final LogMode mode, final LogOrigin origin, final String logInput) {
-		// StackTraceElement stackTraceElement =
-		// Thread.currentThread().getStackTrace()[Thread.currentThread().getStackTrace().length
-		// - 1];
-		// String log = dtf.format(now) + "[" +
-		// stackTraceElement.getFileName().replace(".java", "") + "." +
-		// stackTraceElement.getMethodName() + ":" + stackTraceElement.getLineNumber() +
-		// "] [" + mode.name() + "] " + logInput;
 		final String log = dtf.format(new Date()) + " [" + origin.name() + "] [" + mode.name() + "] " + logInput;
-		String consoleLog = log;
+		String consoleLog;
 		if (mode == LogMode.ERROR || mode == LogMode.FATAL) {
 			consoleLog = "\033[91m" + log + "\033[0m";
 			if (logLevel.contains(mode) && logOrigin.contains(origin)) {
@@ -55,21 +48,22 @@ public class Logger {
 		logs.add(consoleLog);
 
 		if (logsPerCategory.containsKey(origin)) {
-			logsPerCategory.put(origin, logsPerCategory.get(origin).addAndGetSelf(consoleLog));
+			logsPerCategory.get(origin).addAndGetSelf(consoleLog);
 		} else {
-			logsPerCategory.put(origin, new BlackLinkedList<String>().addAndGetSelf(consoleLog));
+			logsPerCategory.put(origin, new ChainableLinkedList<String>().addAndGetSelf(consoleLog));
 		}
 
 		if (logsPerLevel.containsKey(mode)) {
-			logsPerLevel.put(mode, logsPerLevel.get(mode).addAndGetSelf(consoleLog));
+			logsPerLevel.get(mode).addAndGetSelf(consoleLog);
 		} else {
-			logsPerLevel.put(mode, new BlackLinkedList<String>().addAndGetSelf(consoleLog));
+			logsPerLevel.put(mode, new ChainableLinkedList<String>().addAndGetSelf(consoleLog));
 		}
 
 		try {
 			final File file = new File("files/logs/log." + origin.name().toLowerCase() + "/" + origin.name().toLowerCase() + "." + mode.name().toLowerCase() + ".log");
+			// stfu intellij
+			//noinspection ResultOfMethodCallIgnored
 			file.getParentFile().mkdirs();
-			file.createNewFile();
 			Files.asCharSink(file, StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log + "\n");
 			Files.asCharSink(new File("files/logs/log"), StandardCharsets.UTF_8, FileWriteMode.APPEND).write(log + "\n");
 		} catch (final Exception e) {
@@ -101,12 +95,6 @@ public class Logger {
 		log(LogMode.ERROR, origin, logInput);
 	}
 
-	/**
-	 * Logs with LogOrigin BOT
-	 *
-	 * @param mode
-	 * @param logInput
-	 */
 	public static void log(final LogMode mode, final String logInput) {
 		log(mode, LogOrigin.BOT, logInput);
 	}
@@ -124,28 +112,20 @@ public class Logger {
 	}
 
 	/**
-	 * @param type
-	 * @param length
 	 */
 	public static void printForCategory(final LogOrigin type, final int length) {
 		if (logsPerCategory.containsKey(type)) {
-			final BlackLinkedList<String> logsInCat = logsPerCategory.get(type);
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "PEAKING: " + type.name() + "\n" + String.join("\n", logsPerCategory.get(type).subList(0, (length > logsInCat.size() ? logsInCat.size() : length))));
+			final ChainableLinkedList<String> logsInCat = logsPerCategory.get(type);
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "PEAKING: " + type.name() + "\n" + String.join("\n", logsPerCategory.get(type).subList(0, (Math.min(length, logsInCat.size())))));
 		} else {
 			System.out.println("No logs found for LogOrigin " + type.name());
 		}
 	}
 
-	/**
-	 * @param length
-	 */
 	public static void printAll(final int length) {
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + String.join("\n", logs.subList(0, (Math.min(length, logs.size())))));
 	}
 
-	/**
-	 * @param mode
-	 */
 	public static void printForLevel(final LogMode mode) {
 		if (logsPerLevel.containsKey(mode)) {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "PEAKING: " + mode.name() + "\n" + String.join("\n", logsPerLevel.get(mode)));
@@ -154,14 +134,10 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * @param mode
-	 * @param length
-	 */
 	public static void printForLevel(final LogMode mode, final int length) {
 		if (logsPerLevel.containsKey(mode)) {
-			final BlackLinkedList<String> logsInCat = logsPerLevel.get(mode);
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "PEAKING: " + mode.name() + "\n" + String.join("\n", logsInCat.subList(0, (length > logsInCat.size() ? logsInCat.size() : length))));
+			final ChainableLinkedList<String> logsInCat = logsPerLevel.get(mode);
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "PEAKING: " + mode.name() + "\n" + String.join("\n", logsInCat.subList(0, (Math.min(length, logsInCat.size())))));
 		} else {
 			System.out.println("No logs found for LogLevel " + mode.name());
 		}

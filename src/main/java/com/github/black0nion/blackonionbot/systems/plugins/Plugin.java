@@ -1,9 +1,3 @@
-/**
- * Date: 01.07.2021
- * Project: BlackOnion-Bot
- *
- * @author _SIM_
- */
 package com.github.black0nion.blackonionbot.systems.plugins;
 
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -11,9 +5,6 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-/**
- * @author _SIM_
- */
 public abstract class Plugin {
 
     private String name = this.getClass().getName();
@@ -24,18 +15,14 @@ public abstract class Plugin {
 	System.out.println("[" + this.getName() + "] Plugin disabled.");
     }
 
-	public void onDisableNow() {}
+	public void onDisableNow() {
+		System.out.println("[" + this.getName() + "] Plugin force disabling...");
+	}
 
-    /**
-     * @return the name
-     */
     public final String getName() {
 	return this.name;
     }
 
-    /**
-     * @param name the name to set
-     */
     protected final void setName(final String name) {
 	this.name = name;
     }

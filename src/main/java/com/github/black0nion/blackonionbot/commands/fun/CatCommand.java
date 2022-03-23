@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.mashape.unirest.http.HttpResponse;
@@ -15,16 +15,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CatCommand extends Command {
+public class CatCommand extends TextCommand {
 
 	public CatCommand() {
 		this.setCommand("cat", "cato")
 			.setSyntax("[cat breed]");
-	}
-
-	@Override
-	public String[] getCommand() {
-		return new String[] { "cat", "cato" };
 	}
 
 	@Override
@@ -33,8 +28,8 @@ public class CatCommand extends Command {
 		try {
 			Unirest.setTimeouts(0, 0);
 			final HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/images/search" + (breed != null ? "?breed_ids=" + breed : ""))
-			  .header("Content-Type", "application/json")
-			  .asString();
+				.header("Content-Type", "application/json")
+				.asString();
 			if (response.getBody().equalsIgnoreCase("[]")) {
 				// cat breed not found
 				cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", guild.getPrefix() + CommandBase.commands.get("catbreeds").getCommand()[0]));

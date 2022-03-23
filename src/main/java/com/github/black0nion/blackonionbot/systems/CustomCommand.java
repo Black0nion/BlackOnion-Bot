@@ -3,8 +3,8 @@
  */
 package com.github.black0nion.blackonionbot.systems;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.User;
@@ -21,7 +21,7 @@ public class CustomCommand {
 
 	private final BlackGuild guild;
 	private String command;
-	private BlackEmbed embed;
+	private TranslatedEmbed embed;
 	private String answer;
 	private boolean reply;
 
@@ -31,7 +31,8 @@ public class CustomCommand {
 		this.answer = answer;
 	}
 
-	public CustomCommand(final BlackGuild guild, final String command, final BlackEmbed answer) {
+	@SuppressWarnings("unused")
+	public CustomCommand(final BlackGuild guild, final String command, final TranslatedEmbed answer) {
 		this.guild = guild;
 		this.command = command.toLowerCase();
 		this.embed = answer;
@@ -47,7 +48,7 @@ public class CustomCommand {
 
 		if (doc.containsKey("embed")) {
 			final Document embedDoc = doc.get("embed", new Document());
-			final BlackEmbed embed = new BlackEmbed();
+			final TranslatedEmbed embed = new TranslatedEmbed();
 			if (embedDoc.containsKey("title")) {
 				if (embedDoc.containsKey("url")) {
 					embed.setTitle(embedDoc.getString("title"), embedDoc.getString("url"));
@@ -61,7 +62,7 @@ public class CustomCommand {
 				}
 			}
 			if (embedDoc.containsKey("color")) {
-				final int integer = embedDoc.getInteger("color", EmbedUtils.blackOnionColor.getRGB());
+				final int integer = embedDoc.getInteger("color", EmbedUtils.BLACK_ONION_COLOR.getRGB());
 				embed.setColor(new Color(integer));
 			}
 			this.embed = embed;
@@ -90,13 +91,6 @@ public class CustomCommand {
 	 */
 	public BlackGuild getGuild() {
 		return this.guild;
-	}
-
-	/**
-	 * @param command the command to set
-	 */
-	public void setCommand(final String command) {
-		this.command = command;
 	}
 
 	public void handle(final MessageReceivedEvent event) {

@@ -1,6 +1,5 @@
-package com.github.black0nion.blackonionbot.API;
+package com.github.black0nion.blackonionbot.api;
 
-import com.github.black0nion.blackonionbot.API.impl.post.Login;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
@@ -10,12 +9,9 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
 import javax.annotation.Nullable;
+import java.util.InputMismatchException;
+import java.util.concurrent.ExecutionException;
 
-/**
- * Wrapper class for websocket sessions.
- *
- * @author _SIM_
- */
 public class BlackSession {
 
 	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("dashboard-sessions");
@@ -24,42 +20,45 @@ public class BlackSession {
 	private String sessionId;
 	private DiscordUser user;
 
-	public BlackSession(final String sessionId) throws IllegalArgumentException {
-		if (!this.loginToSession(sessionId)) throw new IllegalArgumentException("Invalid session id");
+	public BlackSession(final String sessionId) throws ExecutionException, InputMismatchException {
+		this.loginToSession(sessionId);
 	}
 
 	/**
 	 * The websocket will connect and then provide a session id to login to. If the
-	 * websocket connection isn't logged in, use {@link Login#loginWithDiscord(String)}
+	 * websocket connection isn't logged in, use {@link OAuthUtils#loginWithDiscord(String)}
 	 * <p>
 	 * Workflow:
 	 * <p>
-	 * - client gets a session id using {@link com.github.black0nion.blackonionbot.API.impl.post.Login#loginWithDiscord(String)}
-	 * - client links the session id to the websocket using this method
-	 *
+	 * - client gets a session id using {@link OAuthUtils#loginWithDiscord(String)}
+	 * - client saves the session id
+	 * - client uses this session id to authorize in the future
 	 */
-	public boolean loginToSession(final String sessionId) {
+	public void loginToSession(final String sessionId) throws ExecutionException, InputMismatchException, NullPointerException {
 		final Document doc = collection.find(Filters.eq("sessionid", sessionId)).first();
 		if (doc != null) {
 			this.sessionId = sessionId;
-			this.user = OAuthUtils.getUserWithToken(doc.getString("access_token"));
-			return true;
-		} else return false;
+			this.user = OAuthUtils.getUserWithToken(doc.getString("access_token"), doc.getString("refresh_token"));
+		} else throw new NullPointerException("Session id not found");
 	}
 
+	private static final int TARGET_STRING_LENGTH = 69;
+	private static final int LEFT_LIMIT_1 = 'A';
+	private static final int LEFT_LIMIT_2 = 'a';
+	private static final int LEFT_LIMIT_3 = '0';
+	private static final int RIGHT_LIMIT_1 = 'Z';
+	private static final int RIGHT_LIMIT_2 = 'z';
+	private static final int RIGHT_LIMIT_3 = '9';
 	public static String generateSessionId() {
-		final int leftLimit1 = 65; // letter 'A'
-		final int rightLimit1 = 90; // letter 'B'
-		final int leftLimit2 = 97; // letter 'a'
-		final int rightLimit2 = 122; // letter 'z'
-		final int leftLimit3 = 48; // 0
-		final int rightLimit3 = 57; // 9
+		final String generatedId = Bot.RANDOM.ints(LEFT_LIMIT_3, RIGHT_LIMIT_2 + 1)
+			.filter(i ->  ((i <= RIGHT_LIMIT_1 && i >= LEFT_LIMIT_1)
+						|| (i <= RIGHT_LIMIT_2 && i >= LEFT_LIMIT_2)
+						|| (i <= RIGHT_LIMIT_3 && i >= LEFT_LIMIT_3)))
+			.limit(TARGET_STRING_LENGTH + 2)
+			.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+			.toString();
 
-		final int targetStringLength = 69;
-
-		final String generatedId = Bot.random.ints(leftLimit3, rightLimit2 + 1).filter(i -> ((i <= rightLimit1 && i >= leftLimit1) || (i <= rightLimit2 && i >= leftLimit2) || (i <= rightLimit3 && i >= leftLimit3))).limit(targetStringLength + 2).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
-
-		// check if the database contains a entry for this session id, very unlikely
+		// check if the database contains an entry for this session id, very unlikely
 		if (collection.find(Filters.eq("sessionid", generatedId)).first() != null) return generateSessionId();
 
 		return generatedId;
@@ -69,7 +68,7 @@ public class BlackSession {
 		return this.user;
 	}
 
-	public final String getSessionId() {
+	public final @Nullable String getSessionId() {
 		return this.sessionId;
 	}
 }

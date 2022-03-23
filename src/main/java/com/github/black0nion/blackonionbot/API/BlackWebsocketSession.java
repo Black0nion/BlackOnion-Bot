@@ -1,10 +1,9 @@
-/**
- *
- */
-package com.github.black0nion.blackonionbot.API;
+package com.github.black0nion.blackonionbot.api;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.InputMismatchException;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jetty.websocket.api.CloseStatus;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
@@ -17,18 +16,15 @@ import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 
-/**
- * @author _SIM_
- *
- */
 public class BlackWebsocketSession extends BlackSession implements org.eclipse.jetty.websocket.api.Session {
 
-	public BlackWebsocketSession(final Session sessionRaw) throws IllegalArgumentException {
+	public BlackWebsocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {
 		super(sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol"));
 		this.session = sessionRaw;
 	}
 
 	private final Session session;
+
 	@SuppressWarnings("unused")
 	private int heartbeats;
 
@@ -128,5 +124,10 @@ public class BlackWebsocketSession extends BlackSession implements org.eclipse.j
 
 	public void heartbeat() {
 		this.heartbeats++;
+	}
+
+	public void heartbeat(final String id) {
+		this.heartbeat();
+		this.send("heartbeat" + id);
 	}
 }

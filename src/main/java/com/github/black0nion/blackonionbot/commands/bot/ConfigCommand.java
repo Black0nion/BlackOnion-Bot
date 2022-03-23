@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetResponse;
@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 // TODO: new config system
-public class ConfigCommand extends Command {
+public class ConfigCommand extends TextCommand {
 
 	public ConfigCommand() {
 		getters.clear();
@@ -126,7 +126,7 @@ public class ConfigCommand extends Command {
 				cmde.error("bruh", "unknownkey");
 				return;
 			}
-			@Nonnull final Pair<Method, ConfigSetter> finalSetter = onlySetter != null ? onlySetter : new Pair<Method, ConfigSetter>(bothGetterAndSetter.getThird(), bothGetterAndSetter.getFourth());
+			@Nonnull final Pair<Method, ConfigSetter> finalSetter = onlySetter != null ? onlySetter : new Pair<>(bothGetterAndSetter.getThird(), bothGetterAndSetter.getFourth());
 			if (!finalSetter.getValue().nullable()) {
 				cmde.error("notclearable", "thisnotclearable");
 				return;
@@ -136,7 +136,6 @@ public class ConfigCommand extends Command {
 			if (mode.equalsIgnoreCase("set")) {
 				final ConfigSetResponse saveValue = saveValue(guild, method, finalSetter, response -> {
 					cmde.success("valueset", "valuesetto %newvalue%", new Placeholder("newvalue", arrayToString(response)));
-					return;
 				}, (Object[]) Utils.subArray(args, 3));
 				if (saveValue != ConfigSetResponse.SUCCESS) {
 					cmde.error("error", "code: %code%", new Placeholder("code", saveValue.name()));
@@ -164,7 +163,7 @@ public class ConfigCommand extends Command {
 		}
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings("RedundantCast")
 	private static ConfigSetResponse saveValue(final Object objectToInvokeMethodIn, final Method method, final Pair<Method, ConfigSetter> pair, final Consumer<Object[]> response, final Object... args) {
 		try {
 			final Parameter[] parameters = method.getParameters();
@@ -194,11 +193,8 @@ public class ConfigCommand extends Command {
 					parsed[i] = Dashboard.parseInt(args[i]);
 				} else if (parameterType.isEnum()) {
 					final Method parse = parameterType.getDeclaredMethod("parse", String.class);
-					if (parse != null) {
-						parsed[i] = parse.invoke(parameterType, (String) args[i]);
-					} else {
-						parsed[i] = Enum.valueOf((Class<? extends Enum>) parameterType, (String) args[i]);
-					}
+					//noinspection JavaReflectionInvocation
+					parsed[i] = parse.invoke(parameterType, args[i]);
 				} else if (parameterType.isArray()) {
 					hasArray = true;
 					final Class<?> clazz = parameterType.getComponentType();
@@ -218,9 +214,7 @@ public class ConfigCommand extends Command {
 						parsed[i] = Dashboard.parseIntegerPrimitive(i, args);
 					} else if (clazz == Object.class) {
 						final Object[] obj = new Object[args.length - i];
-						for (int j = i; j < args.length; j++) {
-							obj[j - i] = args[j];
-						}
+						System.arraycopy(args, i, obj, 0, args.length - i);
 						parsed[i] = obj;
 					} else {
 						Logger.logError("No array casting way provided for " + clazz, LogOrigin.DASHBOARD);

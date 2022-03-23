@@ -18,11 +18,11 @@ import net.dv8tion.jda.api.Permission;
  * @author _SIM_
  */
 public @interface ConfigSetter {
-    public String key();
+    String key();
 
-    public String[] argumentsDescription();
+    String[] argumentsDescription();
 
-    public Permission[] requiredPermissions() default {};
+    Permission[] requiredPermissions() default {};
 
-    public boolean nullable() default false;
+    boolean nullable() default false;
 }
