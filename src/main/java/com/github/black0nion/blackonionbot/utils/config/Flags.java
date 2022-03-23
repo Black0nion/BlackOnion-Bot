@@ -10,30 +10,20 @@ public class Flags {
 		}
 	};
 
-	public static abstract class MatchesRegex implements IFlag {
-		abstract Pattern regex();
+	public interface MatchesRegex extends IFlag {
+		Pattern regex();
 	}
 	public static MatchesRegex matchesRegex(String regex) {
-		return new MatchesRegex() {
-			@Override
-			public Pattern regex() {
-				return Pattern.compile(regex);
-			}
-		};
+		return () -> Pattern.compile(regex);
 	}
 
 	public static MatchesRegex matchesRegex(Pattern regex) {
-		return new MatchesRegex() {
-			@Override
-			public Pattern regex() {
-				return regex;
-			}
-		};
+		return () -> regex;
 	}
 
-	public static abstract class Range implements IFlag {
-		abstract double min();
-		abstract double max();
+	public interface Range extends IFlag {
+		double min();
+		double max();
 	}
 
 	public static Range range(double min, double max) {
@@ -49,15 +39,10 @@ public class Flags {
 		};
 	}
 
-	public static abstract class Default<T> implements IFlag {
-		abstract T defaultValue();
+	public interface Default<T> extends IFlag {
+		T defaultValue();
 	}
 	public static <T> Default<T> defaultValue(T defaultValue) {
-		return new Default<>() {
-			@Override
-			public T defaultValue() {
-				return defaultValue;
-			}
-		};
+		return () -> defaultValue;
 	}
 }

@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.moderation.joinleave;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import net.dv8tion.jda.api.Permission;
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.time.Duration;
 
-public class SetWelcomeChannelCommand extends Command {
+public class SetWelcomeChannelCommand extends TextCommand {
 
     public SetWelcomeChannelCommand() {
 	this.setCommand("setwelcomechannel", "setwelcomechat").setSyntax("[clear / off]").setRequiredBotPermissions(Permission.MESSAGE_MANAGE).setRequiredPermissions(Permission.MANAGE_SERVER);

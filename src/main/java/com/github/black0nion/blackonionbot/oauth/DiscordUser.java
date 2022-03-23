@@ -12,14 +12,12 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 import static com.github.black0nion.blackonionbot.oauth.OAuthUtils.OAUTH_HANDLER;
 
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class DiscordUser {
 
-	private static final Pattern TOKEN_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 	private static final int EXPIRATION_TIME = 604800; // 7 days
 
 	private String accessToken;
@@ -28,10 +26,10 @@ public class DiscordUser {
 	private DiscordAPI api;
 	private User user;
 
-	public DiscordUser(String accessToken, String refreshToken, DiscordAPI api) throws Exception {
+	public DiscordUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
 		if (accessToken == null || api == null) {
-			throw new Exception("Invalid parameters!");
-		} else if (!TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !TOKEN_PATTERN.matcher(refreshToken).matches())) {
+			throw new IllegalArgumentException("Invalid parameters!");
+		} else if (!OAuthUtils.TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !OAuthUtils.TOKEN_PATTERN.matcher(refreshToken).matches())) {
 			throw new IllegalArgumentException("Invalid tokens!");
 		}
 		this.accessToken = accessToken;

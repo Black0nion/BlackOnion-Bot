@@ -1,14 +1,20 @@
 package com.github.black0nion.blackonionbot.utils;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -18,12 +24,14 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -77,8 +85,10 @@ public class Utils {
 	    return result + String.format("%02d:%02d", (time % 3600) / 60, time % 60);
 	}
 
-	public static String removeMarkdown(final String text) {
-		return text.replace("_", "\\_").replace("*", "\\*");
+	public static String escapeMarkdown(final String text) {
+		return text
+          .replace("\\(\\*|_|`|~|\\)", "$1")
+          .replace("(\\*|_|`|~|\\)", "\\$1");
 	}
 
 	public static String[] removeFirstArg(final String[] input) {
@@ -112,6 +122,7 @@ public class Utils {
 	}
 
 	public static boolean isLong(final String input) {
+		if (input == null) return false;
 		try {
 			Long.parseLong(input.trim());
 			return true;
@@ -303,5 +314,60 @@ public class Utils {
 
 	public static String list(Object obj) {
 		return "- " + obj;
+	}
+
+	public static <T extends Enum<T>> T parse(Class<T> clazz, String value) {
+		for (T val : clazz.getEnumConstants()) {
+			if (val.name().equalsIgnoreCase(value)) {
+				return val;
+			}
+		}
+		return null;
+	}
+
+	public static <T> T getOrReplaceMessage(Callable<T> msg, String replacedMessage) {
+		try {
+			return msg.call();
+		} catch (Exception e) {
+			throw new RuntimeException(replacedMessage, e);
+		}
+	}
+
+	public static WebhookClient makeWebhookClient(Webhook webhook) {
+		final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
+		clientBuilder.setThreadFactory(job -> {
+			final Thread thread = new Thread(job);
+			thread.setName("ContentModerator");
+			thread.setDaemon(true);
+			return thread;
+		});
+
+		return clientBuilder.build();
+	}
+
+	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) throws IOException {
+		return webhooks.stream()
+			.filter(Objects::nonNull)
+			.filter(webhook1 -> webhook1.getOwner() != null)
+			.filter(webhook1 -> webhook1.getName().equals("BlackOnion-Bot ContentModerator") && webhook1.getOwner().getIdLong() == BotInformation.SELF_USER_ID)
+			.findFirst()
+			.orElse(channel
+				.createWebhook("BlackOnion-Bot ContentModerator")
+				.setAvatar(Icon.from(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("/logo.png"))))
+				.submit()
+				.join());
+	}
+
+	public static JSONArray optionsToJson(List<OptionData> options) {
+		final JSONArray jsonArray = new JSONArray();
+		for (OptionData option : options) {
+			jsonArray.put(new JSONObject()
+				.put("name", option.getName())
+				.put("description", option.getDescription())
+				.put("type", option.getType().name())
+				.put("required", option.isRequired())
+			);
+		}
+		return jsonArray;
 	}
 }

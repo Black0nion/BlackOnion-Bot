@@ -1,14 +1,17 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -31,10 +34,10 @@ public class SlashCommandEvent {
 	private final TextChannel channel;
 	private final BlackMember member;
 	private final BlackUser user;
-	private final BlackEmbed successEmbed;
-	private final BlackEmbed loadingEmbed;
-	private final BlackEmbed errorEmbed;
-	private final Language language;
+	private final TranslatedEmbed successEmbed;
+	private final TranslatedEmbed loadingEmbed;
+	private final TranslatedEmbed errorEmbed;
+	private Language language;
 
 	public SlashCommandEvent(final SlashCommandInteractionEvent e, final BlackGuild guild, final BlackMember member, final BlackUser user) {
 		this(null, e, guild, member, user);
@@ -61,9 +64,14 @@ public class SlashCommandEvent {
 		return this.language;
 	}
 
+	// useful in the LanguageCommand
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+
 	//region Embeds
-	public BlackEmbed success() {
-		return new BlackEmbed(this.successEmbed);
+	public TranslatedEmbed success() {
+		return new TranslatedEmbed(this.successEmbed);
 	}
 
 	public void success(final String name, final String value) {
@@ -101,12 +109,12 @@ public class SlashCommandEvent {
 		this.reply(this.success().setTitle(title).addField(name, value, false));
 	}
 
-	public BlackEmbed loading() {
-		return new BlackEmbed(this.loadingEmbed);
+	public TranslatedEmbed loading() {
+		return new TranslatedEmbed(this.loadingEmbed);
 	}
 
-	public BlackEmbed error() {
-		return new BlackEmbed(this.errorEmbed);
+	public TranslatedEmbed error() {
+		return new TranslatedEmbed(this.errorEmbed);
 	}
 
 	public void error(final String name, final String value) {
@@ -141,7 +149,8 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		this.send("errorwithmessage", new Placeholder("%msg%", t != null ? t.getClass().getTypeName() : "null"));
+		if (t != null) t.printStackTrace();
+		this.send("errorwithmessage", new Placeholder("msg", t != null ? t.getClass().getSimpleName() + ": " + t.getMessage() : "null"));
 	}
 
 	public void reply(final EmbedBuilder builder) {
@@ -162,7 +171,7 @@ public class SlashCommandEvent {
 
 	public void reply(final MessageEmbed embed, boolean ephemeral, final Consumer<InteractionHook> result) {
 		try {
-			this.event.replyEmbeds(embed).setEphemeral(true).queue(result);
+			this.event.replyEmbeds(embed).setEphemeral(ephemeral).queue(result);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -186,11 +195,11 @@ public class SlashCommandEvent {
 	}
 
 	public void send(final String message, final Consumer<InteractionHook> result, final Placeholder... placeholders) {
-		this.event.reply(getTranslation(message, placeholders)).queue(result);
+		this.event.reply(getTranslation(message, placeholders)).setEphemeral(this.command.isEphemeral()).queue(result);
 	}
 
 	public void send(final Message message, final Consumer<InteractionHook> result) {
-		this.event.reply(message).queue(result, System.err::println);
+		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, System.err::println);
 	}
 
 	private String getPleaseUse() {
@@ -218,6 +227,15 @@ public class SlashCommandEvent {
 		return translation != null ? translation : this.language.getTranslationNonNull("empty");
 	}
 
+
+	public void handlePerms(Permission... permissions) {
+		if (!this.member.hasPermission(permissions)) {
+			this.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(permissions)));
+			throw new DummyException();
+		}
+	}
+
+	//region Getters / Setters
 	public TextChannel getChannel() {
 		return this.channel;
 	}
@@ -250,4 +268,5 @@ public class SlashCommandEvent {
 	public void setCommand(final SlashCommand cmd) {
 		this.command = cmd;
 	}
+	//endregion
 }

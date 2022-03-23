@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.mashape.unirest.http.HttpResponse;
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.json.JSONObject;
 
-public class IpLocationCommand extends Command {
+public class IpLocationCommand extends TextCommand {
 
 	public IpLocationCommand() {
 		this.setCommand("iplocation", "ip").setSyntax("<public ipv4 / ipv6>").setRequiredArgumentCount(2);

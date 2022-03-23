@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackEmbed;
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -21,7 +21,7 @@ import static com.github.black0nion.blackonionbot.utils.EmbedUtils.*;
 
 public class CommandEvent {
 
-	private Command command;
+	private TextCommand command;
 	private final MessageReceivedEvent event;
 	private final JDA jda;
 	private final BlackGuild guild;
@@ -29,13 +29,13 @@ public class CommandEvent {
 	private final Message message;
 	private final BlackMember member;
 	private final BlackUser user;
-	private final BlackEmbed successEmbed;
-	private final BlackEmbed loadingEmbed;
-	private final BlackEmbed errorEmbed;
+	private final TranslatedEmbed successEmbed;
+	private final TranslatedEmbed loadingEmbed;
+	private final TranslatedEmbed errorEmbed;
 	private final Language language;
 
 	@Deprecated
-	public CommandEvent(final Command cmd, final MessageReceivedEvent e) {
+	public CommandEvent(final TextCommand cmd, final MessageReceivedEvent e) {
 		this(cmd, e, BlackGuild.from(e.getGuild()), e.getMessage(), BlackMember.from(e.getMember()), BlackUser.from(e.getAuthor()));
 	}
 
@@ -43,7 +43,7 @@ public class CommandEvent {
 		this(null, e, guild, message, member, user);
 	}
 
-	public CommandEvent(final Command cmd, final MessageReceivedEvent e, final BlackGuild guild, final Message message, final BlackMember member, final BlackUser user) {
+	public CommandEvent(final TextCommand cmd, final MessageReceivedEvent e, final BlackGuild guild, final Message message, final BlackMember member, final BlackUser user) {
 		this.command = cmd;
 		this.event = e;
 		this.jda = e.getJDA();
@@ -65,8 +65,8 @@ public class CommandEvent {
 		return this.language;
 	}
 
-	public BlackEmbed success() {
-		return new BlackEmbed(this.successEmbed);
+	public TranslatedEmbed success() {
+		return new TranslatedEmbed(this.successEmbed);
 	}
 
 	public void success(final String name, final String value) {
@@ -109,27 +109,16 @@ public class CommandEvent {
 		this.reply(this.success().addField(name, value, false), null);
 	}
 
-	public void success(String name, String value, final Consumer<? super Message> success, final Placeholder... placeholders) {
-		name = this.language.getTranslationNonNull(name);
-		value = this.language.getTranslationNonNull(value);
-		for (final Placeholder placeholder : placeholders) {
-			name = placeholder.process(name);
-			value = placeholder.process(value);
-		}
-
-		this.reply(this.success().addField(name, value, false), success);
-	}
-
-	public BlackEmbed loading() {
-		return new BlackEmbed(this.loadingEmbed);
+	public TranslatedEmbed loading() {
+		return new TranslatedEmbed(this.loadingEmbed);
 	}
 
 	public void loading(final Consumer<? super Message> success) {
 		this.reply(this.loading(), success);
 	}
 
-	public BlackEmbed error() {
-		return new BlackEmbed(this.errorEmbed);
+	public TranslatedEmbed error() {
+		return new TranslatedEmbed(this.errorEmbed);
 	}
 
 	public void error(final String name, final String value) {
@@ -196,19 +185,15 @@ public class CommandEvent {
 		this.sendPleaseUse(null, null);
 	}
 
-	public void sendPleaseUse(final Consumer<? super Message> success) {
-		this.sendPleaseUse(success, null);
-	}
-
 	public void sendPleaseUse(final Consumer<? super Message> success, final Consumer<? super Throwable> error) {
 		this.reply(this.getWrongArgument(), success, error);
 	}
 
-	public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final Command command) {
+	public static String getPleaseUse(final BlackGuild guild, final BlackUser author, final TextCommand command) {
 		return LanguageSystem.getTranslation("pleaseuse", author, guild).replace("%command%", getCommandHelp(guild, command));
 	}
 
-	public static String getCommandHelp(final BlackGuild guild, final Command command) {
+	public static String getCommandHelp(final BlackGuild guild, final TextCommand command) {
 		final String syntax = command.getSyntax();
 		return guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "");
 	}
@@ -242,7 +227,7 @@ public class CommandEvent {
 		return this.channel;
 	}
 
-	public Command getCommand() {
+	public TextCommand getCommand() {
 		return this.command;
 	}
 
@@ -258,16 +243,11 @@ public class CommandEvent {
 		return this.member;
 	}
 
-	@Nullable
-	public MessageReceivedEvent getEvent() {
-		return this.event;
-	}
-
 	public JDA getJda() {
 		return this.jda;
 	}
 
-	public void setCommand(final Command cmd) {
+	public void setCommand(final TextCommand cmd) {
 		this.command = cmd;
 	}
 }

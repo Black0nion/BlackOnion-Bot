@@ -1,43 +1,64 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import net.dv8tion.jda.internal.utils.Checks;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Language {
 
-	String name;
-	String languageCode;
-	HashMap<String, String> messages;
+	private final String languageCode;
+	private final String name;
+	private final boolean isDefault;
+	private final HashMap<String, String> messages;
 
 	public Language(final String fileName) {
+		this(
+			new JSONObject(
+				new BufferedReader(
+					new InputStreamReader(
+						Objects.requireNonNull(
+							Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName)
+						)
+					)
+				)
+				.lines()
+				.collect(Collectors.joining())
+			)
+		);
+	}
+
+	public Language(final JSONObject translations) {
 		try {
-			this.name = fileName;
 			messages = new HashMap<>();
-			final InputStream in = getClass().getResourceAsStream("/translations/" + fileName + ".json");
-			assert in != null;
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			final JSONObject translations = new JSONObject(String.join("\n", reader.lines().collect(Collectors.joining())));
+			JSONObject metadata = translations.getJSONObject("metadata");
+			this.name = metadata.getString("name");
+			Checks.matches(this.name, Pattern.compile("[A-Z][a-z]+"), "Language name");
+			this.languageCode = metadata.getString("code");
+			Checks.matches(this.languageCode, Pattern.compile("[A-Z]{2}"), "Language code");
+			this.isDefault = metadata.has("default") && metadata.getBoolean("default");
 
 			if (translations.isEmpty()) {
-				System.out.println("fileName" + ".json is empty!");
-				return;
+				throw new NullPointerException("Translation file is empty");
 			}
 
 			for (final String key : translations.keySet()) {
 				if (!key.toLowerCase().equals(key))
-					System.out.println(key + " is not entirely in lower case! Please correct in " + fileName + ".json!");
+					System.out.println(key + " is not entirely in lower case! Please correct in " + this.languageCode + "!");
+				if (key.equalsIgnoreCase("metadata")) continue;
 				messages.put(key.toLowerCase(), translations.getString(key));
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -47,6 +68,14 @@ public class Language {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public String getFullName() {
+		return name + " (" + languageCode + ")";
 	}
 
 	@Nonnull
@@ -80,6 +109,6 @@ public class Language {
 
 	@Override
 	public String toString() {
-		return name + " (" + languageCode + ")";
+		return getFullName();
 	}
 }

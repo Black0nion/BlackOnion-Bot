@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][a-z]+$"
+        }
+      },
+      "required": [
+        "code",
+        "name"
+      ]
+    }
+  },
+  "required": [
+    "metadata"
+  ],
+  "title": "BlackOnion-Bot Translations"
+}

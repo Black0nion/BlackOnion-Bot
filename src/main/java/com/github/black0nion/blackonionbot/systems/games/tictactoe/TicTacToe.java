@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -44,7 +44,7 @@ public class TicTacToe {
 		this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		this.guild = BlackGuild.from(channel.getGuild());
 
-		this.currentPlayer = Bot.random.nextInt(2) == 0 ? FieldType.X : FieldType.O;
+		this.currentPlayer = Bot.RANDOM.nextInt(2) == 0 ? FieldType.X : FieldType.O;
 
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {

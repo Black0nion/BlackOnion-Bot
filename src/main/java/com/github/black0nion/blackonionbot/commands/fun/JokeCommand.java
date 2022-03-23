@@ -3,11 +3,11 @@ package com.github.black0nion.blackonionbot.commands.fun;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -16,7 +16,7 @@ import com.mashape.unirest.http.Unirest;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class JokeCommand extends Command {
+public class JokeCommand extends TextCommand {
 
 	public JokeCommand() {
 		this.setCommand("joke", "jokes");

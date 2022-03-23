@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-public class WeatherCommand extends Command {
+public class WeatherCommand extends TextCommand {
 
 	public WeatherCommand() {
 		this.setCommand("weather").setSyntax("<City Name>").setRequiredArgumentCount(1);
@@ -40,7 +40,7 @@ public class WeatherCommand extends Command {
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 			final JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			cmde.reply(cmde.success().setThumbnail("http://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png").setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org").addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true).addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true).addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true).addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true).addField("sunrise", sdf.format(sunrise), false).addField("sunset", sdf.format(sunset), false));
+			cmde.reply(cmde.success().setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png").setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org").addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true).addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true).addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true).addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true).addField("sunrise", sdf.format(sunrise), false).addField("sunset", sdf.format(sunset), false));
 		} catch (final IOException ex) {
 			cmde.error("unknowncity", query);
 		}

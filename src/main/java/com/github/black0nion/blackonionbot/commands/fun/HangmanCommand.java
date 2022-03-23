@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author _SIM_
  */
-public class HangmanCommand extends Command {
+public class HangmanCommand extends TextCommand {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 
@@ -48,11 +48,10 @@ public class HangmanCommand extends Command {
 		}
 
 		final List<String> wordsInThisLang = hangmanWords.get(cmde.getLanguage());
-		final String solution = wordsInThisLang.get(Bot.random.nextInt(wordsInThisLang.size()));
+		final String solution = wordsInThisLang.get(Bot.RANDOM.nextInt(wordsInThisLang.size()));
 		cmde.reply(cmde.success().setTitle("hangman"), msg -> {
 			ingamePlayers.add(author.getIdLong());
 			rerun(msg, cmde, solution, new ArrayList<>());
-			return;
 		});
 	}
 
@@ -73,7 +72,7 @@ public class HangmanCommand extends Command {
 			return;
 		}
 
-		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.waiter.waitForEvent(
+		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.EVENT_WAITER.waitForEvent(
 			MessageReceivedEvent.class,
 			event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
 			event -> {
@@ -118,22 +117,22 @@ public class HangmanCommand extends Command {
 	}
 
 	private static String getSpacesString(final String solution, final List<Character> tries) {
-		String s = "Word: ";
+		StringBuilder s = new StringBuilder("Word: ");
 
 		for (final Character c : solution.toCharArray()) if (tries.contains(c)) {
-			s += String.valueOf(c) + " ";
+			s.append(c).append(" ");
 		} else {
-			s += "_ ";
+			s.append("_ ");
 		}
-		return s;
+		return s.toString();
 	}
 
 	private static String getFailedAttempts(final String solution, final List<Character> tries) {
-		String failedAttempts = "";
+		StringBuilder failedAttempts = new StringBuilder();
 		for (final Character c : tries) if (!solution.contains(String.valueOf(c))) {
-			failedAttempts += ", " + c;
+			failedAttempts.append(", ").append(c);
 		}
-		return failedAttempts.equalsIgnoreCase("") ? "" : failedAttempts.substring(1);
+		return failedAttempts.toString().equalsIgnoreCase("") ? "" : failedAttempts.substring(1);
 	}
 
 	private static boolean won(final String solution, final List<Character> tries) {

@@ -3,11 +3,11 @@
  */
 package com.github.black0nion.blackonionbot.commands.music;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
@@ -20,8 +20,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Objects;
 
-@SuppressWarnings("unused")
-public class NowPlayingCommand extends Command {
+public class NowPlayingCommand extends TextCommand {
 
     public NowPlayingCommand() {
 	this.setCommand("nowplaying");
@@ -47,6 +46,6 @@ public class NowPlayingCommand extends Command {
 	final String durationInfo = info.isStream ? ":red_circle: LIVE" : "```00:00 " +
 		"(" + position.toString().replace("D", "•") + ") " + totalDuration + "\n" +
 		Utils.getStringWithNLength(" ", index + 7 - currentDuration.length() / 2) + currentDuration + "\n```";
-	cmde.reply(cmde.success().setTitle("Now Playing").setDescription(Utils.removeMarkdown(info.author + " - " + info.title) + "\n" + durationInfo + (!info.isStream ? "\nSong will end <t:" + (System.currentTimeMillis() + playingTrack.getDuration()) / 1000 + ":R>" : "")));
+	cmde.reply(cmde.success().setTitle("Now Playing").setDescription(Utils.escapeMarkdown(info.author + " - " + info.title) + "\n" + durationInfo + (!info.isStream ? "\nSong will end <t:" + (System.currentTimeMillis() + playingTrack.getDuration()) / 1000 + ":R>" : "")));
     }
 }

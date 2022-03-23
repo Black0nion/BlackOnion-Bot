@@ -1,51 +1,66 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
-import com.github.black0nion.blackonionbot.misc.*;
+import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.LogMode;
+import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.FileUtils;
-import com.github.black0nion.blackonionbot.utils.Pair;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.*;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class SlashCommandBase extends ListenerAdapter {
 
-	public static HashMap<Category, List<SlashCommand>> commandsInCategory = new HashMap<>();
+	public static final HashMap<Category, List<SlashCommand>> commandsInCategory = new HashMap<>();
 
-	public static HashMap<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
+	public static final HashMap<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
+
+	public static final HashMap<Class<? extends SlashCommand>, SlashCommand> commandInstances = new HashMap<>();
 
 	public static JSONObject commandsJson;
 
-	@Reloadable("commands")
+	private static final ExecutorService commandPool = Executors.newCachedThreadPool();
+
 	public static void addCommands() {
 		commands.clear();
 		commandsInCategory.clear();
+		autoCompletes.clear();
 		commandsJson = new JSONObject();
-		JSONArray commands = new JSONArray();
+		final JSONArray commands = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
 		final Set<Class<? extends SlashCommand>> annotated = reflections.getSubTypesOf(SlashCommand.class);
 
@@ -57,38 +72,104 @@ public class SlashCommandBase extends ListenerAdapter {
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 
 				SlashCommandData data = newInstance.getData();
-				if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0)
-					commands.put(new JSONObject().put("name", data.getName()).put("description", data.getDescription()).put("arguments", data.getOptions()).put("permissions", newInstance.getRequiredPermissions()));
-				if (newInstance.shouldAutoRegister()) {
-					if (newInstance.getData() != null) addCommand(newInstance);
-					// should be covered by the builder
-					else throw new RuntimeException("Command " + command.getName() + " has no data!");
+				if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
+					final JSONObject commandJSON = new JSONObject()
+						.put("name", data.getName())
+						.put("description", data.getDescription())
+						.put("permissions", newInstance.getRequiredPermissions())
+						.put("options", Utils.optionsToJson(data.getOptions()));
+
+					JSONArray groupJson = new JSONArray();
+					for (SubcommandGroupData subcommandGroupData : data.getSubcommandGroups()) {
+						final JSONObject subcommandGroupJson = new JSONObject()
+							.put("name", subcommandGroupData.getName())
+							.put("description", subcommandGroupData.getDescription());
+
+						final JSONArray subcommandJson = new JSONArray();
+						for (SubcommandData subcommandData : subcommandGroupData.getSubcommands()) {
+							JSONObject subcommandObjJson = new JSONObject()
+								.put("name", subcommandData.getName())
+								.put("description", subcommandData.getDescription());
+							subcommandObjJson.put("options", Utils.optionsToJson(subcommandData.getOptions()));
+							subcommandJson.put(subcommandObjJson);
+						}
+						subcommandGroupJson.put("subcommands", subcommandJson);
+						groupJson.put(subcommandGroupJson);
+					}
+					commandJSON.put("subcommand_groups", groupJson);
+
+					JSONObject subcommandJson = new JSONObject();
+					for (SubcommandData subcommandData : data.getSubcommands()) {
+						subcommandJson.put(subcommandData.getName(), new JSONObject()
+							.put("name", subcommandData.getName())
+							.put("description", subcommandData.getDescription())
+							.put("options", Utils.optionsToJson(subcommandData.getOptions())));
+					}
+					commandJSON.put("subcommands", subcommandJson);
+
+					commands.put(commandJSON);
 				}
-			} catch (final Exception e) {
+
+				if (newInstance.getData() != null) addCommand(newInstance);
+					// should be covered by the builder
+				else throw new RuntimeException("Command " + command.getName() + " has no data!");
+			} catch (Exception e) {
 				e.printStackTrace();
+				// 10/10 error handling
+				System.exit(-1);
 			}
 		}
 		commandsJson.put("commands", commands);
-		System.out.println(commandsJson);
-		// TODO: remove (debug)
+		Logger.logInfo("Generated Commands JSON: " + commands);
 		// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
-		// StringSelection stringSelection = new
-		// StringSelection(commandsJSON.toString());
-		// Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		// clipboard.setContents(stringSelection, null);
-		// System.out.println(commandsJSON);
+		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
+
 		Bot.executor.submit(Dashboard::init);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends SlashCommand> T getCommand(Class<T> clazz) {
+		return (T) commandInstances.get(clazz);
+	}
+
+	private static final HashMap<String, HashMap<String, StartsWithArrayList>> autoCompletes = new HashMap<>();
+
+	public static HashMap<String, StartsWithArrayList> getAutoComplete(SlashCommand cmd) {
+		return autoCompletes.get(cmd.getData().getName());
+	}
+
+	public static void addAutocomplete(HashMap<String, StartsWithArrayList> autoComplete, SlashCommand slashCommand) {
+		autoCompletes.put(slashCommand.getData().getName(), autoComplete);
+	}
+
+	public static void updateCommandsDev(JDA jda) {
+		if (Config.dev_guild != -1) {
+			Objects.requireNonNull(jda.getGuildById(Config.dev_guild))
+				.updateCommands()
+				.addCommands(commands.values().stream()
+					.map(Pair::getValue)
+					.map(SlashCommand::getData)
+					.toList())
+				.queue();
+		}
+	}
+
+	@Override
+	public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
+		String name = event.getName();
+		if (autoCompletes.containsKey(name)) {
+			HashMap<String, StartsWithArrayList> autoComplete = autoCompletes.get(name);
+			if (autoComplete.containsKey(event.getFocusedOption().getName())) {
+				List<String> options = autoComplete.get(event.getFocusedOption().getName()).getElementsStartingWith(event.getFocusedOption().getValue(), true);
+				event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).toList()).queue();
+			}
+		}
 	}
 
 	@Override
 	public void onMessageUpdate(final MessageUpdateEvent event) {
 		if (event.getChannelType() == ChannelType.TEXT) {
-			// TODO: LMAO remove dis pls
-			if (event.getMessage().getContentRaw().startsWith("register")) {
-				event.getGuild().updateCommands().addCommands(SlashCommandBase.commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).toList()).queue();
-				System.out.println("Updated! :D");
-			}
 			AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getTextChannel());
 		}
 	}
@@ -102,7 +183,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackMember member = BlackMember.from(event.getMember());
 
-		assert author != null && guild != null && member != null;
+		assert guild != null && member != null;
 
 		final TextChannel channel = event.getTextChannel();
 		final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
@@ -112,13 +193,23 @@ public class SlashCommandBase extends ListenerAdapter {
 		Logger.log(locked ? LogMode.WARNING : LogMode.INFORMATION, LogOrigin.DISCORD, log);
 		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 
-		if (locked) return;
+		if (locked) {
+			// haha funni
+			event.reply("https://tenor.com/view/you-got-banned-banned-banned-message-mickey-mouse-club-gif-17668002").queue();
+			return;
+		}
 
 		final SlashCommandEvent cmde = new SlashCommandEvent(event, guild, member, author);
 
 		if (Utils.handleRights(guild, author, channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
 			final SlashCommand cmd = commands.get(event.getName()).getValue();
+			cmde.setCommand(cmd);
+			final boolean disabled = !guild.isCommandActivated(cmd);
+			if (disabled) {
+				cmde.send("commanddisabled", new Placeholder("cmd", "/" + cmd.getName()));
+				return;
+			}
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
 				cmde.error("missingpermissions", cmde.getTranslation("requiredcustompermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredCustomPermissions()));
@@ -132,7 +223,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
-				if (!cmd.isVisible(author)) return;
+				if (cmd.isHidden(author)) return;
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
@@ -141,26 +232,27 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			Bot.executor.submit(() -> {
-				cmde.setCommand(cmd);
+			commandPool.submit(() -> {
 				try {
 					cmd.execute(cmde, event, member, author, guild, channel);
 				} catch (Throwable t) {
-					cmde.exception(t);
+					if (!(t instanceof DummyException))
+						cmde.exception(t);
 				}
 			});
 		}
 	}
 
 	public static void addCommand(final SlashCommand c) {
+		assert c != null;
 		final String commandName = c.getData().getName();
 		if (!commands.containsKey(commandName)) {
 			final Category category = c.getCategory();
-			final List<SlashCommand> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElse(new ArrayList<>());
+			final List<SlashCommand> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
-
 			commands.put(commandName, new Pair<>(null, c));
+			commandInstances.put(c.getClass(), c);
 		}
 	}
 }

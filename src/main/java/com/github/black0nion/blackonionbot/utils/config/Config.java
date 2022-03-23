@@ -52,6 +52,7 @@ public class Config {
 	public static final int api_port = get("api_port", Integer.class, defaultValue(187), range(0, 65535));
 	public static final boolean log_heartbeats = get("log_heartbeats", Boolean.class, defaultValue(false));
 	public static final long vote_channel = get("vote_channel", Long.class, defaultValue(-1L));
+	public static final long dev_guild = get("dev_guild", Long.class, defaultValue(-1L));
 	public static final BotMetadata metadata = ConfigManager.metadata;
 
 	@SuppressWarnings("SameParameterValue")
@@ -60,7 +61,7 @@ public class Config {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T get(String name, Class<T> clazz, IFlag... flagsArr) {
+	static <T> T get(String name, Class<T> clazz, IFlag... flagsArr) {
 		name = name.toUpperCase(Locale.ROOT);
 		final String value = System.getenv().containsKey(name) ? System.getenv(name) : System.getProperty(name);
 		List<IFlag> flags = List.of(flagsArr);

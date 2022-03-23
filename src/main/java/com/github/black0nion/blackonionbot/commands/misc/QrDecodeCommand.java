@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.google.zxing.BinaryBitmap;
@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-public class QrDecodeCommand extends Command {
+public class QrDecodeCommand extends TextCommand {
 
 	private static final MultiFormatReader multiFormatReader = new MultiFormatReader();
 

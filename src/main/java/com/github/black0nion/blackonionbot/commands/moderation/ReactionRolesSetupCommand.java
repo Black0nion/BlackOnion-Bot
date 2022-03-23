@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ReactionRolesSetupCommand extends Command {
+public class ReactionRolesSetupCommand extends TextCommand {
 
 	public ReactionRolesSetupCommand() {
 		this.setCommand("reactionrole", "rr").setSyntax("<create | remove / delete> <#channel> <message id> <emote> <role to give>").setRequiredArgumentCount(5).setRequiredPermissions(Permission.MANAGE_ROLES).setRequiredBotPermissions(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION);
@@ -50,7 +50,7 @@ public class ReactionRolesSetupCommand extends Command {
 				tc.retrieveMessageById(messageID).queue(success -> {
 					final String emoteName = finalArgs[4];
 					guild.retrieveEmotes().queue(emoteList -> {
-						String emote = null;
+						String emote;
 
 						emoteList = emoteList.stream().filter(entry -> entry.getName().equals(emoteName.replace(":", ""))).collect(Collectors.toList());
 
@@ -59,10 +59,7 @@ public class ReactionRolesSetupCommand extends Command {
 							emote = emoteList.get(0).getAsMention();
 						} else {
 							emote = emoteName;
-							tc.addReactionById(messageID, emote).queue(null, fail -> {
-								cmde.error("wrongargument", "emotenotfound");
-								return;
-							});
+							tc.addReactionById(messageID, emote).queue(null, fail -> cmde.error("wrongargument", "emotenotfound"));
 						}
 
 						final Document doc = new Document().append("guildid", e.getGuild().getIdLong()).append("channelid", tc.getIdLong()).append("messageid", messageID).append("emote", emote).append("roleid", role.getIdLong());
@@ -76,39 +73,27 @@ public class ReactionRolesSetupCommand extends Command {
 							ReactionRoleSystem.collection.insertOne(doc);
 
 							cmde.success("reactionrolecreated", "reactionrolecreatedinfo", new Placeholder("emote", emote), new Placeholder("role", role.getAsMention()));
-							return;
 						} else if (finalArgs[1].equalsIgnoreCase("remove") || finalArgs[1].equalsIgnoreCase("delete")) {
 							if (ReactionRoleSystem.collection.find(doc).first() != null) {
 								ReactionRoleSystem.collection.deleteOne(doc);
 
 								final String finalEmote = emote;
-								tc.retrieveMessageById(messageID).queue(msg -> {
-									guild.retrieveEmoteById(finalEmote.split(":")[2].replace(">", "")).queue(customEmote -> {
-										if (customEmote != null) {
-											msg.clearReactions(customEmote).queue();
-										} else {
-											msg.clearReactions(finalEmote).queue();
-										}
-										cmde.success("entrydeleted", "reactionroledeleted");
-									});
-								});
-								return;
+								tc.retrieveMessageById(messageID).queue(msg -> guild.retrieveEmoteById(finalEmote.split(":")[2].replace(">", "")).queue(customEmote -> {
+									if (customEmote != null) {
+										msg.clearReactions(customEmote).queue();
+									} else {
+										msg.clearReactions(finalEmote).queue();
+									}
+									cmde.success("entrydeleted", "reactionroledeleted");
+								}));
 							} else {
 								cmde.error("errorhappened", "thisnotfound");
-								return;
 							}
 						} else {
 							cmde.sendPleaseUse();
-							return;
 						}
-					}, fail -> {
-						cmde.exception();
-						return;
-					});
-				}, fail -> {
-					cmde.error("messagenotfound", "messagecouldntbefound");
-					return;
-				});
+					}, fail -> cmde.exception());
+				}, fail -> cmde.error("messagenotfound", "messagecouldntbefound"));
 			} catch (final NumberFormatException ex) {
 				cmde.sendPleaseUse();
 			}

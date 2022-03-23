@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class CatBreedsCommand extends Command {
+public class CatBreedsCommand extends TextCommand {
 
 	public CatBreedsCommand() {
 		this.setCommand("catbreeds", "catexamples");
@@ -66,7 +66,7 @@ public class CatBreedsCommand extends Command {
 	}
 
 	private static void waitForPageSwitch(final CommandEvent cmde, final Message msg, final BlackUser user, final HashMap<Integer, HashMap<String, String>> pages) {
-		Bot.waiter.waitForEvent(MessageReactionAddEvent.class,
+		Bot.EVENT_WAITER.waitForEvent(MessageReactionAddEvent.class,
 			event -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
 			event -> {
 				event.getReaction().removeReaction(Objects.requireNonNull(event.getUser())).queue();

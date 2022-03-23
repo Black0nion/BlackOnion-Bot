@@ -39,16 +39,6 @@ public enum CustomPermission {
 		}
 	}
 
-	public static List<CustomPermission> parse(final String... input) {
-		return Arrays.stream(input).map(perm -> {
-			try {
-				return valueOf(perm.toUpperCase(Locale.ROOT));
-			} catch (final Exception ignored) {
-				return null;
-			}
-		}).filter(Objects::nonNull).collect(Collectors.toList());
-	}
-
 	public static List<CustomPermission> parse(final List<String> input) {
 		return input.stream().map(perm -> {
 			try {

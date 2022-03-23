@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -12,14 +12,13 @@ import com.github.ygimenez.model.Page;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unused")
 public class GuildListCommand extends SlashCommand {
 
 	public GuildListCommand() {
@@ -36,11 +35,14 @@ public class GuildListCommand extends SlashCommand {
 		boolean found = false;
 		for (Guild guild : e.getJDA().getGuilds()) {
 			found = true;
-			@Nullable Member owner = guild.getOwner();
-			String text = "- " + Utils.removeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
+			@Nullable BlackUser owner = Optional.ofNullable(guild.getOwner())
+				.map(Member::getUser)
+				.map(BlackUser::from)
+				.orElse(null);
+			String text = "- " + Utils.escapeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
 			try {
 				if (currentEmbed.getDescriptionBuilder().length() + text.length() + 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH) throw new Exception();
-				currentEmbed.appendDescription("\n" + text);
+				currentEmbed.appendDescription("\n" + text + " (Owner: " + (owner == null ? cmde.getTranslation("empty") : owner.getEscapedEffectiveName()) + ")");
 			} catch (Exception ignored) {
 				pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
 				currentEmbed = new EmbedBuilder(baseEmbed);

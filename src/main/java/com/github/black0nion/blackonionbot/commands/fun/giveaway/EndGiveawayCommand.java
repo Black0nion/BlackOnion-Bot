@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.fun.giveaway;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 /**
  * @author _SIM_
  */
-public class EndGiveawayCommand extends Command {
+public class EndGiveawayCommand extends TextCommand {
 
     public EndGiveawayCommand() {
 	this.setCommand("endgiveaway").setSyntax("<messageid>").setRequiredArgumentCount(1);
@@ -29,9 +29,9 @@ public class EndGiveawayCommand extends Command {
 	    final long idLong = Long.parseLong(id);
 	    final Giveaway giveaway = GiveawaySystem.getGiveaway(idLong);
 
-	    if (giveaway == null || giveaway.getChannelId() != channel.getIdLong()) {
+	    if (giveaway == null || giveaway.channelId() != channel.getIdLong()) {
 		cmde.error("giveawaynotfound", "giveawaynotfounddesc");
-	    } else if (giveaway.getCreaterId() != author.getIdLong() && !member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
+	    } else if (giveaway.createrId() != author.getIdLong() && !member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
 		cmde.error("nogiveawayendrights", "mustbeadminorgiveawaycreater");
 	    } else {
 		channel.retrieveMessageById(idLong).queue(msg -> {

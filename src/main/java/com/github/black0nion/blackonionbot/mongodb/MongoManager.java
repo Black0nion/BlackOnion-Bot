@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.mongodb;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.ConnectionString;
@@ -18,15 +17,14 @@ public class MongoManager {
 
 	public static MongoClient client;
 
-	public static boolean connect(final String connectionStringRaw) {
+	public static void connect(final String connectionStringRaw) {
 		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Connecting to " + connectionStringRaw + "...");
 		final long start = System.currentTimeMillis();
 		ConnectionString connectionString = new ConnectionString(connectionStringRaw);
 		client = MongoClients.create(connectionString);
 		client.startSession();
 		final long end = System.currentTimeMillis();
-		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to mongodb in " + (end - start) + " ms.");
-		return true;
+		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to MongoDB in " + (end - start) + " ms.");
 	}
 
 	public static void disconnect() {

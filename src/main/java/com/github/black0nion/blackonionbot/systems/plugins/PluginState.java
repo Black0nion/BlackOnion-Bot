@@ -1,6 +1,9 @@
 package com.github.black0nion.blackonionbot.systems.plugins;
 
 public enum PluginState {
+	/**
+	 * The plugin didn't start yet
+	 */
 	NOT_STARTED_YET,
 	/**
 	 * The plugin is loaded and ready to be used
@@ -25,5 +28,5 @@ public enum PluginState {
 	/**
 	 * The plugin got forcefully shut down
 	 */
-	TERMINATED;
+	TERMINATED
 }

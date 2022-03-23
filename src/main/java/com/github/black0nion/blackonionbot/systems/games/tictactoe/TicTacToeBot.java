@@ -47,11 +47,11 @@ public class TicTacToeBot {
 		int aiCount = 0;
 		int humanCount = 0;
 
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[i][j] == ai) {
+		for (FieldType[] fieldTypes : board) {
+			for (FieldType fieldType : fieldTypes) {
+				if (fieldType == ai) {
 					aiCount++;
-				} else if (board[i][j] == human) {
+				} else if (fieldType == human) {
 					humanCount++;
 				}
 			}

@@ -38,8 +38,6 @@ gradle-app.setting
 **/build/
 
 ### IntelliJ IDEA ###
-# IntelliJ IDEA configs
-/.idea
 # compiler output of IntelliJ
 /out
 

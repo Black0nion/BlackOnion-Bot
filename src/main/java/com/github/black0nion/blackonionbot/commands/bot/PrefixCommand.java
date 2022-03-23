@@ -1,31 +1,44 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class PrefixCommand extends Command {
+import java.util.regex.Pattern;
 
-    public PrefixCommand() {
-	this.setCommand("prefix", "changeprefix", "setprefix").setSyntax("<new prefix, no spaces, less than 10 characters>").setRequiredPermissions(Permission.ADMINISTRATOR).setRequiredArgumentCount(1);
-    }
+public class PrefixCommand extends SlashCommand {
 
-    @Override
-    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-	if (args[1].toCharArray().length > 10) {
-	    cmde.error("toolong", "undertenchars");
-	    message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("toolong", "undertenchars", false).build()).queue();
-	    return;
+	private static final Pattern PREFIX_PATTERN = Pattern.compile("^[a-zA-Z?:()/&%$§!*;.,-_+#'~|><°^={}\\[\\]´`]{1,10}$");
+
+	public PrefixCommand() {
+		super(builder(Commands.slash("prefix", "Change the prefix of the bot for this guild")
+			.addOption(OptionType.STRING, "prefix", "The prefix to set"))
+			.notToggleable()
+			.setRequiredPermissions(Permission.MANAGE_SERVER));
 	}
-	guild.setPrefix(args[1]);
-	cmde.success("prefixchanged", "myprefixis", new Placeholder("prefix", guild.getPrefix()));
-    }
+
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		String prefix = e.getOption("prefix", OptionMapping::getAsString);
+		if (prefix == null) {
+			cmde.send("myprefixis", new Placeholder("prefix", Utils.escapeMarkdown(guild.getPrefix())));
+		} else {
+			if (PREFIX_PATTERN.matcher(prefix).matches()) {
+				guild.setPrefix(prefix);
+				cmde.send("prefixchanged", new Placeholder("prefix", Utils.escapeMarkdown(prefix)));
+			} else {
+				cmde.send("prefixinvalid", new Placeholder("format", PREFIX_PATTERN.pattern().replaceAll("[_*~`]", "\\$0")));
+			}
+		}
+	}
 }

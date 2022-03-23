@@ -1,9 +1,9 @@
-package com.github.black0nion.blackonionbot.API.impl;
+package com.github.black0nion.blackonionbot.api.impl;
 
-import com.github.black0nion.blackonionbot.API.BlackSession;
-import com.github.black0nion.blackonionbot.API.BlackWebsocketSession;
-import com.github.black0nion.blackonionbot.API.WebSocketEndpoint;
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
+import com.github.black0nion.blackonionbot.api.BlackSession;
+import com.github.black0nion.blackonionbot.api.BlackWebsocketSession;
+import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -13,7 +13,6 @@ import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.gson.Gson;
 import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.Permission;
 import org.bson.Document;
@@ -29,25 +28,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.*;
 
 @WebSocket
-public class DashboardWebsocket extends WebSocketEndpoint {
+public class DashboardWebsocket implements IWebSocketEndpoint {
 
-	public DashboardWebsocket() {
-		this.setRoute("dashboard");
+	@Override
+	public String getRoute() {
+		return "dashboard";
 	}
 
 	private static final boolean LOG_HEARTBEATS = Config.log_heartbeats;
 
+	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private static final List<Session> sessions = new ArrayList<>();
 
-	private static final LoadingCache<Session, BlackWebsocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<Session, BlackWebsocketSession>() {
+	private static final LoadingCache<Session, BlackWebsocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
-		public BlackWebsocketSession load(final @NotNull Session key) throws IllegalArgumentException {
+		public @NotNull BlackWebsocketSession load(final @NotNull Session key) throws IllegalArgumentException, ExecutionException {
 			return new BlackWebsocketSession(key);
 		}
 	});
@@ -125,7 +127,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 					} catch (final Exception e) {
 						return;
 					}
-					guild.retrieveMemberById(session.getUser().getUserId()).queue(member -> {
+					guild.retrieveMemberById(session.getUser().getUser().getId()).queue(member -> {
 						if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
 							UNAUTHORIZED.send(session, request);
 							return;
@@ -160,7 +162,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 					} catch (final Exception e) {
 						return;
 					}
-					guild.retrieveMemberById(session.getUser().getUserId()).queue(member -> {
+					guild.retrieveMemberById(session.getUser().getUser().getId()).queue(member -> {
 						if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
 							UNAUTHORIZED.send(session, request);
 							return;
@@ -192,11 +194,10 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		} else if (messageRaw.startsWith("heartbeat")) {
 			futures.get(sessionUnchecked).cancel(true);
 			futures.put(sessionUnchecked, this.scheduleTimeout(session));
+			session.heartbeat(messageRaw.substring(9));
 			if (LOG_HEARTBEATS) {
 				Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Heartbeat.", LogOrigin.DASHBOARD);
 			}
-			final String id = messageRaw.substring(9);
-			session.send("heartbeat" + id);
 		} else {
 			reply(session, null, INVALID_TYPE.getJson());
 		}
@@ -241,7 +242,7 @@ public class DashboardWebsocket extends WebSocketEndpoint {
 		if (response == null) {
 			response = new JSONObject();
 		} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
-			response = Bot.gson.toJson(response);
+			response = Bot.GSON.toJson(response);
 		}
 
 		if (request != null && request.has("id")) {

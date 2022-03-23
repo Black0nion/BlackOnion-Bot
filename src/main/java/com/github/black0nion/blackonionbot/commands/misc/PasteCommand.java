@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PasteCommand extends Command {
+public class PasteCommand extends TextCommand {
 
 	public PasteCommand() {
 		this.setCommand("paste", "uploadtext").setSyntax("<text (codeblock with language specification if wanted)>").setRequiredArgumentCount(1);
@@ -29,21 +29,20 @@ public class PasteCommand extends Command {
 		final String bodyRaw = String.join(" ", Utils.removeFirstArg(args)).trim();
 		// broken lol
 		final Matcher m = Pattern.compile("\\s*```([a-z]+\\n)?\\s*([\\s\\S]*?)\\s*```\\s*").matcher(bodyRaw);
-		String body, language = null;
+		String body = null, language = null;
 
-		m.find();
-		try {
-			language = m.group(1);
-		} catch (final Exception ignored) {}
+		if (m.find()) {
+			try {
+				language = m.group(1);
+			} catch (final Exception ignored) {}
 
-		try {
-			body = m.group(2);
-		} catch (final Exception ignored) {
-			body = bodyRaw;
+			try {
+				body = m.group(2);
+			} catch (final Exception ignored) {}
 		}
 
 		final String finalLanguage = language;
-		final String finalBody = body;
+		final String finalBody = body != null ? body : bodyRaw;
 
 		cmde.loading(msg -> {
 			try {

@@ -1,8 +1,9 @@
-package com.github.black0nion.blackonionbot.API.impl.get;
+package com.github.black0nion.blackonionbot.api.impl.get;
 
-import com.github.black0nion.blackonionbot.API.BlackSession;
-import com.github.black0nion.blackonionbot.API.GetRequest;
+import com.github.black0nion.blackonionbot.api.BlackSession;
+import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import org.json.JSONObject;
@@ -11,10 +12,10 @@ import spark.Response;
 
 import java.util.HashMap;
 
-public class Stats extends GetRequest {
+public class Stats implements IGetRoute {
 
 	@Override
-	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession user) {
+	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession session, DiscordUser user) {
 		response.type("application/json");
 		return new JSONObject()
 			.put("code_stats", new JSONObject()

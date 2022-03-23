@@ -1,11 +1,14 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
+import com.google.common.collect.Maps;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,23 +17,30 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Optional;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
 @SuppressWarnings("unused")
-public abstract class SlashCommand {
+public abstract class SlashCommand extends GenericCommand {
 
-	final SlashCommandData data;
-	Category category;
-	final Progress progress;
-	final Permission[] requiredPermissions;
-	final Permission[] requiredBotPermissions;
-	final CustomPermission[] requiredCustomPermissions;
-	final boolean isToggleable;
-	final boolean shouldAutoRegister;
-	final boolean isPremium;
-	final boolean isEphemeral;
-	final boolean isAdminGuild;
+	private final SlashCommandData data;
+	private Category category;
+	private final Progress progress;
+	private final Permission[] requiredPermissions;
+	private final Permission[] requiredBotPermissions;
+	private final CustomPermission[] requiredCustomPermissions;
+	private final boolean isToggleable;
+	private final boolean shouldAutoRegister;
+	private final boolean isPremium;
+	private final boolean isEphemeral;
+	private final boolean isAdminGuild;
+
+	public SlashCommand(String name, String description) {
+		this(builder(Commands.slash(name, description)));
+	}
 
 	public SlashCommand(SlashCommandBuilder builder) {
 		this.data = builder.getData();
@@ -44,9 +54,23 @@ public abstract class SlashCommand {
 		this.isPremium = builder.isPremium();
 		this.isEphemeral = builder.isEphemeral();
 		this.isAdminGuild = builder.isAdminGuild();
+		if (!builder.getAutoComplete().isEmpty()) {
+			SlashCommandBase.addAutocomplete(builder.getAutoComplete(), this);
+		}
 	}
 
 	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
+
+	protected void updateAutoComplete(String option, Collection<String> values) {
+		HashMap<String, StartsWithArrayList> prevAutocomplete = Optional.ofNullable(SlashCommandBase.getAutoComplete(this)).orElseGet(HashMap::new);
+		prevAutocomplete.put(option, new StartsWithArrayList(values));
+		SlashCommandBase.addAutocomplete(prevAutocomplete, this);
+	}
+
+	@Override
+	public String getName() {
+		return data.getName();
+	}
 
 	//region Getters
 	public SlashCommandData getData() {
@@ -77,6 +101,7 @@ public abstract class SlashCommand {
 		return requiredCustomPermissions;
 	}
 
+	@Override
 	public boolean isToggleable() {
 		return isToggleable;
 	}
@@ -98,8 +123,8 @@ public abstract class SlashCommand {
 	}
 	//endregion
 
-	public boolean isVisible(final BlackUser user) {
-		return user.hasPermission(this.requiredCustomPermissions);
+	public boolean isHidden(final BlackUser user) {
+		return !user.hasPermission(this.requiredCustomPermissions);
 	}
 
 	@Nonnull

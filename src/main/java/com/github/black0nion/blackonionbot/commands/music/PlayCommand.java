@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
-import com.github.black0nion.blackonionbot.blackobjects.BlackGuild;
-import com.github.black0nion.blackonionbot.blackobjects.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.*;
-import com.github.black0nion.blackonionbot.blackobjects.BlackUser;
-import com.github.black0nion.blackonionbot.commands.Command;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-public class PlayCommand extends Command {
+public class PlayCommand extends TextCommand {
 
 	public PlayCommand() {
 		this.setCommand("play")
@@ -26,7 +26,7 @@ public class PlayCommand extends Command {
 		final GuildVoiceState state = member.getVoiceState();
 		if (state != null && state.getChannel() != null) {
 			final StringBuilder builder = new StringBuilder();
-			for (int i = 1; i < args.length; i++) builder.append(args[i] + " ");
+			for (int i = 1; i < args.length; i++) builder.append(args[i]).append(" ");
 
 			String url = builder.toString().trim();
 			if (!url.startsWith("http"))
