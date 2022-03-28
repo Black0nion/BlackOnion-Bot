@@ -1,0 +1,164 @@
+package com.github.black0nion.blackonionbot.stats;
+
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.config.BotMetadata;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
+
+public class StatisticsManager extends ListenerAdapter {
+
+	public static final long STARTUP_TIME = System.currentTimeMillis();
+	private static final String NAMESPACE = "blackonionbot";
+
+	static {
+		final BotMetadata metadata = Config.metadata;
+		Gauge.build()
+			.name("info")
+			.help("Build information")
+			.namespace(NAMESPACE)
+			.labelNames("run_mode", "version", "lines_of_code", "files")
+			.register()
+			.labels(
+				Config.run_mode.name(),
+				metadata.version(),
+				String.valueOf(metadata.lines_of_code()),
+				String.valueOf(metadata.files()))
+			.set(1);
+	}
+
+	public static final Gauge UPTIME = Gauge.build()
+		.name("uptime")
+		.help("How long the bot has been running")
+		.unit("seconds")
+		.namespace(NAMESPACE)
+		.register();
+
+	public static final Counter COMMANDS_EXECUTED = Counter.build()
+		.name("commands_executed")
+		.help("Total number of commands executed")
+		.namespace(NAMESPACE)
+		.labelNames("type", "command", "guild_id", "guild", "channel_id", "channel")
+		.register();
+
+	public static final Counter MESSAGES_SENT = Counter.build()
+		.name("messages_sent")
+		.help("Total number of messages sent")
+		.namespace(NAMESPACE)
+		.labelNames("guild_id", "guild", "channel_id", "channel")
+		.register();
+
+	public static final Counter PROFANITY_FILTERED = Counter.build()
+		.name("profanity_filtered")
+		.help("Total number of profanity filtered")
+		.namespace(NAMESPACE)
+		.labelNames("guild_id", "guild", "channel_id", "channel")
+		.register();
+
+	public static final Gauge RAM_LOAD = Gauge.build()
+		.name("ram_load")
+		.help("Total amount of RAM used")
+		.namespace(NAMESPACE)
+		.labelNames("max_ram")
+		.unit("bytes")
+		.register();
+
+	public static final Gauge CPU_LOAD = Gauge.build()
+		.name("cpu_load")
+		.help("Total amount of CPU used")
+		.namespace(NAMESPACE)
+		.unit("ratio")
+		.register();
+
+	public static final Counter EVENTS = Counter.build()
+		.name("events")
+		.help("Events received")
+		.namespace(NAMESPACE)
+		.labelNames("type", "guild_id", "guild")
+		.register();
+
+	public static final Gauge GUILD_COUNT = Gauge.build()
+		.name("guild_count")
+		.help("Total number of guilds")
+		.namespace(NAMESPACE)
+		.register();
+
+	public static final Gauge USER_COUNT = Gauge.build()
+		.name("user_count")
+		.help("Total number of users")
+		.namespace(NAMESPACE)
+		.register();
+
+	public static double getProcessRamLoad() {
+		final Runtime runtime = Runtime.getRuntime();
+		return runtime.totalMemory() - runtime.freeMemory();
+	}
+
+	public static double getProcessMaxRamLoad() {
+		final Runtime runtime = Runtime.getRuntime();
+		return runtime.maxMemory();
+	}
+
+	private static int guildCount = -1;
+
+	static int reloadGuildCount() {
+		return guildCount = (int) Bot.jda.getGuildCache().size();
+	}
+
+	public static int getGuildCount() {
+		return guildCount;
+	}
+
+	private static long userCount = -1;
+
+	static long reloadUserCount() {
+		return userCount = Bot.jda.getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+	}
+
+	public static long getUserCount() {
+		return userCount;
+	}
+
+	public static double getProcessCpuLoad() {
+		try {
+			final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			final ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			final AttributeList list = mbs.getAttributes(name, new String[]{"ProcessCpuLoad"});
+
+			if (list.isEmpty()) return Double.NaN;
+
+			final Attribute att = (Attribute) list.get(0);
+			final Double value = (Double) att.getValue();
+
+			// usually takes a couple of seconds before we get real values
+			if (value == -1.0) return Double.NaN;
+			// returns a percentage value with 1 decimal point precision
+			return Utils.roundToDouble("#0.000", value);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		return Double.NaN;
+	}
+
+	@Override
+	public void onGenericEvent(@NotNull GenericEvent event) {
+		String guildId = "none", guildName = "none";
+		if (event instanceof GenericGuildEvent guildEvent) {
+			guildId = guildEvent.getGuild().getId();
+			guildName = guildEvent.getGuild().getName();
+		}
+		EVENTS.labels(event.getClass().getSimpleName(), guildId, guildName).inc();
+	}
+}

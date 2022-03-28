@@ -25,7 +25,6 @@ import com.github.black0nion.blackonionbot.misc.DrawType;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -37,12 +36,15 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("all")
 // TODO: improve
 public class JoinLeaveSystem extends ListenerAdapter {
 
 	private static BufferedImage defaultBackGround;
+	private static final Logger logger = LoggerFactory.getLogger(JoinLeaveSystem.class);
 
 	public JoinLeaveSystem() {
 		try {
@@ -98,7 +100,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			guild.retrieveOwner().queue(user -> {
 				final BlackUser author = BlackUser.from(user.getUser());
 
-				Logger.logInfo("I got added to the guild " + guild.getName() + "(G:" + guild.getId() + ") with owner " + author.getName() + "(U:" + author.getId() + ")");
+				logger.info("I got added to the guild {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
 
 				try {
 					final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
@@ -110,7 +112,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
-					Logger.logError(guild.getName() + "(G:" + guild.getId() + ") is not a beta guild!");
+					logger.error("{} (G: {}) added me but is not a beta guild!", guild.getName(), guild.getId());
 					return;
 				}
 
@@ -124,7 +126,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildLeave(final GuildLeaveEvent event) {
 		Bot.executor.submit(() -> {
 			final Guild guild = event.getGuild();
-			Logger.logInfo("I got removed from the guild " + guild.getName() + "(G:" + guild.getId() + ")");
+			logger.info("I got removed from the guild {} (G: {})", guild.getName(), guild.getId());
 
 			try {
 				final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);

@@ -4,7 +4,6 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
@@ -23,6 +22,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +43,7 @@ public class PlayerManager {
 
 	public static void init() {
 		if (Config.spotify_client_id == null || Config.spotify_client_secret == null) {
-			Logger.logWarning("Spotify client ID or secret is null, disabling Spotify integration");
+			LoggerFactory.getLogger(PlayerManager.class).warn("Spotify client ID or secret is null, disabling Spotify integration");
 			return;
 		}
 

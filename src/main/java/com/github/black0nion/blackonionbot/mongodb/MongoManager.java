@@ -8,23 +8,24 @@ import com.mongodb.ConnectionString;
 import com.mongodb.client.*;
 import org.bson.Document;
 
-import com.github.black0nion.blackonionbot.misc.LogMode;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.mongodb.client.model.Filters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MongoManager {
 
 	public static MongoClient client;
 
+	private static final Logger logger = LoggerFactory.getLogger(MongoManager.class);
+
 	public static void connect(final String connectionStringRaw) {
-		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Connecting to " + connectionStringRaw + "...");
+		logger.info("Connecting to {}...", connectionStringRaw);
 		final long start = System.currentTimeMillis();
 		ConnectionString connectionString = new ConnectionString(connectionStringRaw);
 		client = MongoClients.create(connectionString);
 		client.startSession();
 		final long end = System.currentTimeMillis();
-		Logger.log(LogMode.INFORMATION, LogOrigin.MONGODB, "Successfully connected to MongoDB in " + (end - start) + " ms.");
+		logger.info("Connected to MongoDB in {}ms", end - start);
 	}
 
 	public static void disconnect() {

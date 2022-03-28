@@ -1,14 +1,13 @@
 package com.github.black0nion.blackonionbot.systems.plugins;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.BlackThread;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -28,6 +27,8 @@ public class PluginSystem {
 	private static final List<String> pluginNames = new ArrayList<>();
 	private static final List<String> pluginClasses = new ArrayList<>();
 
+	private static final Logger logger = LoggerFactory.getLogger(PluginSystem.class);
+
 	private static void loadPlugin(final File jarFile) {
 		System.out.println("Loading " + jarFile);
 		final String jarName = jarFile.getName();
@@ -38,7 +39,7 @@ public class PluginSystem {
 		final Optional<ClassInfo> optionalClassInfo = scanResult.getAllClasses().stream().filter(classInfo -> classInfo.extendsSuperclass(superclass)).findFirst();
 
 		if (optionalClassInfo.isEmpty()) {
-			Logger.logError("No plugin detected in file \"" + jarName + "\".", LogOrigin.PLUGINS);
+			logger.error("No plugin detected in file \"{}\".", jarName);
 			return;
 		}
 
@@ -48,7 +49,7 @@ public class PluginSystem {
 			final Plugin plugin = (Plugin) Class.forName(classInfo.getName(), true, new URLClassLoader(new URL[]{jarFile.toURI().toURL()})).getDeclaredConstructor().newInstance();
 			final String pluginName = plugin.getName();
 
-			Logger.logInfo("Loading Plugin \"" + pluginName + "\" stored in file \"" + jarName + "\"...", LogOrigin.PLUGINS);
+			logger.info("Loading Plugin \"{}\" stored in file \"{}\"", pluginName, jarName);
 
 			ThreadGroup threadGroup = new ThreadGroup("[PLUGIN THREADS] " + pluginName);
 			PluginInformation information = new PluginInformation(plugin, new BlackThread(threadGroup, () -> {
@@ -60,9 +61,9 @@ public class PluginSystem {
 				} catch(Exception e) {
 					e.printStackTrace();
 					plugins.get(plugin).setState(PluginState.ERRORED);
-					Logger.logInfo("Plugin " + pluginName + " errored!", LogOrigin.PLUGINS);
-				} finally{
-					Logger.logInfo("Plugin " + pluginName + " stopped by itself.", LogOrigin.PLUGINS);
+					logger.info("Plugin {} crashed!", pluginName);
+				} finally {
+					logger.info("Plugin {} terminated.", pluginName);
 				}
 			}, "[PLUGIN LOADER] " + pluginName).startThread(), threadGroup);
 			information.setState(PluginState.RUNNING);
@@ -70,10 +71,10 @@ public class PluginSystem {
 			pluginClasses.add(classInfo.getName());
 
 			plugins.put(plugin, information);
-			Logger.logInfo("The Plugin \"" + pluginName + "\" stored in file \"" + jarName + "\" got loaded successfully!", LogOrigin.PLUGINS);
+			logger.info("The Plugin \"{}\" stored in file \"{}\" got loaded successfully!", pluginName, jarName);
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Logger.logError("Plugin " + jarName + " couldn't get loaded! Stack Trace: " + e.getMessage() + "\n" + Utils.arrayToString("\n", e.getStackTrace()), LogOrigin.PLUGINS);
+			logger.error("Plugin " + jarName + " could not be loaded!", e);
 		}
 	}
 
@@ -129,10 +130,10 @@ public class PluginSystem {
 			final File[] files = folder.listFiles();
 			disablePlugins();
 			if (files == null || files.length == 0) {
-				Logger.logInfo("No plugins found.", LogOrigin.PLUGINS);
+				logger.info("No plugins found.");
 				return;
 			}
-			Logger.logInfo("Loading plugins...");
+			logger.info("Loading plugins...");
 			for (final File file : files) {
 				if (!file.isDirectory() && file.getName().endsWith(".jar")) {
 					loadPlugin(file);
@@ -144,9 +145,6 @@ public class PluginSystem {
 		});
 	}
 
-	/**
-	 * @return the pluginnames
-	 */
 	public static List<String> getPluginNames() {
 		return pluginNames;
 	}

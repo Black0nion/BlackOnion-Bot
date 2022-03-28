@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import org.json.JSONObject;
 import spark.Request;
@@ -21,13 +21,14 @@ public class Stats implements IGetRoute {
 			.put("code_stats", new JSONObject()
 					.put("line_count", Config.metadata.lines_of_code())
 					.put("file_count", Config.metadata.files()))
-			.put("message_stats", new JSONObject()
-					.put("messages_sent", StatisticsManager.getMessagesSent())
-					.put("commands_executed", StatisticsManager.getTotalCommands()))
+			.put("messages_sent", StatisticsManager.MESSAGES_SENT.get())
+			.put("commands_executed", StatisticsManager.COMMANDS_EXECUTED.get())
 			.put("cpu", new JSONObject()
 					.put("cpu_name", BotInformation.CPU_NAME)
 					.put("cpu_cores", BotInformation.OSBEAN.getAvailableProcessors())
 					.put("cpu_speed", BotInformation.CPU_MHZ))
+			.put("guilds", StatisticsManager.getGuildCount())
+			.put("users", StatisticsManager.getUserCount())
 			.put("prefix", Config.prefix)
 			.put("os", BotInformation.OS_NAME).toString();
 	}

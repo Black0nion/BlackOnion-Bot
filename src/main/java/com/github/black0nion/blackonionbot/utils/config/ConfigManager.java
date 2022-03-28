@@ -1,9 +1,10 @@
 package com.github.black0nion.blackonionbot.utils.config;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.Incrementer;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,10 +20,12 @@ public class ConfigManager {
 
 	private static final Pattern ENV_FILE_PATTERN = Pattern.compile("^(\\w+)=(.*)$");
 
+	private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
+
 	public static void loadConfig() throws IOException {
 		// Load .env vars from the .env file
 		if (ENV_FILE.exists()) {
-			Logger.logInfo("Loading environment variables from the .env file");
+			logger.info("Loading environment variables from the .env file...");
 			Incrementer count = new Incrementer();
 			Files.readAllLines(ENV_FILE.toPath())
 				.stream()
@@ -31,25 +34,25 @@ public class ConfigManager {
 				.filter(Matcher::matches)
 				.peek(count::increment)
 				.forEach(split -> set(split.group(1), split.group(2)));
-			Logger.logInfo("Loaded " + count.getCount() + " environment variables from the .env file");
+			logger.info("Loaded " + count.getCount() + " environment variables from the .env file");
 		} else {
-			Logger.logWarning("No .env file found, skipping loading environment variables");
+			logger.info("No .env file found, skipping loading environment variables");
 		}
 
 		// Load Metadata
-		Logger.logInfo("Loading metadata...");
+		logger.info("Loading metadata...");
 		try (InputStream in = ConfigManager.class.getResourceAsStream("/bot.metadata.json")) {
 			assert in != null;
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 				// Use resource
 				metadata = Bot.GSON.fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
-				Logger.logInfo("Loaded metadata!");
+				logger.info("Loaded metadata!");
 			} catch (Exception e) {
-				Logger.logError("Failed to load metadata: " + e.getMessage());
+				logger.error("Failed to load metadata", e);
 			}
 		}
 		if (metadata == null) {
-			Logger.logError("Failed to load metadata, defaulting");
+			logger.error("Failed to load metadata, defaulting");
 			metadata = new BotMetadata();
 		}
 	}
