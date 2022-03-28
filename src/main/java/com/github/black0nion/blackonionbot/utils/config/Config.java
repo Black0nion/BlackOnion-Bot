@@ -50,9 +50,9 @@ public class Config {
 	@Nullable
 	public static final String spotify_client_secret = get("spotify_client_secret", String.class, matchesRegex("[\\w\\d]{32}"));
 	public static final int api_port = get("api_port", Integer.class, defaultValue(187), range(0, 65535));
-	public static final boolean log_heartbeats = get("log_heartbeats", Boolean.class, defaultValue(false));
 	public static final long vote_channel = get("vote_channel", Long.class, defaultValue(-1L));
 	public static final long dev_guild = get("dev_guild", Long.class, defaultValue(-1L));
+	public static final int prometheus_port = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
 	public static final BotMetadata metadata = ConfigManager.metadata;
 
 	@SuppressWarnings("SameParameterValue")

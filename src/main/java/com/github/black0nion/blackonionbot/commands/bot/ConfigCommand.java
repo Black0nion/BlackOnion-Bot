@@ -1,26 +1,25 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetResponse;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Quadruple;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -99,7 +98,7 @@ public class ConfigCommand extends TextCommand {
 				cmde.error("bruh", "unknownkey");
 				return;
 			}
-			@Nonnull final Pair<Method, ConfigGetter> finalGetter = onlyGetter != null ? onlyGetter : new Pair<Method, ConfigGetter>(bothGetterAndSetter.getFirst(), bothGetterAndSetter.getSecond());
+			@Nonnull final Pair<Method, ConfigGetter> finalGetter = onlyGetter != null ? onlyGetter : new Pair<>(bothGetterAndSetter.getFirst(), bothGetterAndSetter.getSecond());
 			try {
 				final Object invoke = finalGetter.getKey().invoke(guild);
 				String result = "";
@@ -134,9 +133,8 @@ public class ConfigCommand extends TextCommand {
 			final Method method = finalSetter.getKey();
 			final Parameter[] parameters = method.getParameters();
 			if (mode.equalsIgnoreCase("set")) {
-				final ConfigSetResponse saveValue = saveValue(guild, method, finalSetter, response -> {
-					cmde.success("valueset", "valuesetto %newvalue%", new Placeholder("newvalue", arrayToString(response)));
-				}, (Object[]) Utils.subArray(args, 3));
+				final ConfigSetResponse saveValue = saveValue(guild, method, response -> cmde.success("valueset", "valuesetto %newvalue%", new Placeholder("newvalue", arrayToString(response))), (Object[]) Utils.subArray(args, 3));
+
 				if (saveValue != ConfigSetResponse.SUCCESS) {
 					cmde.error("error", "code: %code%", new Placeholder("code", saveValue.name()));
 				}
@@ -164,7 +162,7 @@ public class ConfigCommand extends TextCommand {
 	}
 
 	@SuppressWarnings("RedundantCast")
-	private static ConfigSetResponse saveValue(final Object objectToInvokeMethodIn, final Method method, final Pair<Method, ConfigSetter> pair, final Consumer<Object[]> response, final Object... args) {
+	private static ConfigSetResponse saveValue(final Object objectToInvokeMethodIn, final Method method, final Consumer<Object[]> response, final Object... args) {
 		try {
 			final Parameter[] parameters = method.getParameters();
 			final Object[] parsed = new Object[parameters.length];
@@ -217,7 +215,7 @@ public class ConfigCommand extends TextCommand {
 						System.arraycopy(args, i, obj, 0, args.length - i);
 						parsed[i] = obj;
 					} else {
-						Logger.logError("No array casting way provided for " + clazz, LogOrigin.DASHBOARD);
+						LoggerFactory.getLogger(ConfigCommand.class).error("No array casting way provided for " + clazz);
 					}
 					break;
 				} else {

@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
@@ -60,11 +60,12 @@ public class AntiSwearSystem {
 			if (responseJson.has("Terms")) {
 				// this will happen if it doesn't contain any profanity
 				if (!(responseJson.get("Terms") instanceof JSONArray)) return false;
-				StatisticsManager.profanityFiltered();
+
+				StatisticsManager.PROFANITY_FILTERED.labels(guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
+
 				try {
 					message.delete().queue();
 
-					// if shit fuck it here
 					if (type == DELETE) return true;
 
 					if (type == REPLACE) {

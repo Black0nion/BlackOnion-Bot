@@ -35,6 +35,7 @@ public class GuildListCommand extends SlashCommand {
 		boolean found = false;
 		for (Guild guild : e.getJDA().getGuilds()) {
 			found = true;
+			System.out.println(guild.getOwner());
 			@Nullable BlackUser owner = Optional.ofNullable(guild.getOwner())
 				.map(Member::getUser)
 				.map(BlackUser::from)

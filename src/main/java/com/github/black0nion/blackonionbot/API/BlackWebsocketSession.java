@@ -1,20 +1,13 @@
 package com.github.black0nion.blackonionbot.api;
 
+import org.eclipse.jetty.websocket.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
-
-import org.eclipse.jetty.websocket.api.CloseStatus;
-import org.eclipse.jetty.websocket.api.RemoteEndpoint;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.SuspendToken;
-import org.eclipse.jetty.websocket.api.UpgradeRequest;
-import org.eclipse.jetty.websocket.api.UpgradeResponse;
-import org.eclipse.jetty.websocket.api.WebSocketPolicy;
-
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 
 public class BlackWebsocketSession extends BlackSession implements org.eclipse.jetty.websocket.api.Session {
 
@@ -38,15 +31,17 @@ public class BlackWebsocketSession extends BlackSession implements org.eclipse.j
 		this.session.close(closeStatus);
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger("Websocket Session");
+
 	@Override
 	public void close(final int statusCode, final String reason) {
-		Logger.logInfo("IP " + this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " got yeeted out.", LogOrigin.DASHBOARD);
+		logger.info("IP {} will get closed with code {} and reason {}", this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), statusCode, reason);
 		this.session.close(statusCode, reason);
 	}
 
 	@Override
 	public void disconnect() throws IOException {
-		Logger.logInfo("IP " + this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " got yeeted out.", LogOrigin.DASHBOARD);
+		logger.info("IP {} disconnected", this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress());
 		this.session.disconnect();
 	}
 
@@ -129,5 +124,9 @@ public class BlackWebsocketSession extends BlackSession implements org.eclipse.j
 	public void heartbeat(final String id) {
 		this.heartbeat();
 		this.send("heartbeat" + id);
+	}
+
+	public String getIp() {
+		return this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress();
 	}
 }

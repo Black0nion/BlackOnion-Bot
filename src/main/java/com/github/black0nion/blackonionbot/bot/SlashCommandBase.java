@@ -4,14 +4,10 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.LogMode;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
+import com.github.black0nion.blackonionbot.misc.*;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
@@ -37,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -54,6 +52,8 @@ public class SlashCommandBase extends ListenerAdapter {
 	public static JSONObject commandsJson;
 
 	private static final ExecutorService commandPool = Executors.newCachedThreadPool();
+
+	private static final Logger logger = LoggerFactory.getLogger(SlashCommandBase.class);
 
 	public static void addCommands() {
 		commands.clear();
@@ -120,7 +120,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			}
 		}
 		commandsJson.put("commands", commands);
-		Logger.logInfo("Generated Commands JSON: " + commands);
+		logger.info("Generated Commands JSON: " + commands);
 		// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
@@ -176,7 +176,6 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommandInteraction(final SlashCommandInteractionEvent event) {
-		StatisticsManager.commandExecuted();
 		if (event.getUser().isBot()) return;
 
 		final BlackUser author = BlackUser.from(event.getUser());
@@ -186,12 +185,15 @@ public class SlashCommandBase extends ListenerAdapter {
 		assert guild != null && member != null;
 
 		final TextChannel channel = event.getTextChannel();
+
 		final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
-		// TODO: remove personal information & only log on exception
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
-		Logger.log(locked ? LogMode.WARNING : LogMode.INFORMATION, LogOrigin.DISCORD, log);
-		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
+		if (Config.run_mode == RunMode.DEV) {
+			if (locked) logger.warn(log);
+			else logger.info(log);
+			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
+		}
 
 		if (locked) {
 			// haha funni
@@ -216,7 +218,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			StatisticsManager.commandExecuted();
+			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getCommandPath(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};

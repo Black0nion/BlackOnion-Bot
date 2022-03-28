@@ -4,22 +4,20 @@ import com.github.black0nion.blackonionbot.api.API;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
-import com.github.black0nion.blackonionbot.influx.InfluxManager;
-import com.github.black0nion.blackonionbot.misc.LogMode;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.stats.Prometheus;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
+import com.github.black0nion.blackonionbot.stats.StatsJob;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
-import com.github.black0nion.blackonionbot.utils.CatchLogs;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
@@ -42,14 +40,17 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Bot extends ListenerAdapter {
 
@@ -58,12 +59,7 @@ public class Bot extends ListenerAdapter {
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
 	public static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 
-	public static final long STARTUP_TIME = System.currentTimeMillis();
-
 	public static final Random RANDOM = new Random();
-
-	public static final PrintStream out = System.out;
-	public static final PrintStream err = System.err;
 
 	public static final List<String> launchArguments = new ArrayList<>();
 	public static final Gson GSON = new GsonBuilder()
@@ -72,13 +68,16 @@ public class Bot extends ListenerAdapter {
 
 	public static final EventWaiter EVENT_WAITER = new EventWaiter();
 
+	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
+
 	public static void startBot(String[] args) throws IOException {
 		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
-		CatchLogs.init();
+		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 		ConfigManager.loadConfig();
+		LoggerFactory.getLogger(Bot.class).debug("Weep Woop debug message...");
 		DockerManager.init();
-		Logger.log(LogMode.INFORMATION, "Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
+		logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
@@ -90,7 +89,7 @@ public class Bot extends ListenerAdapter {
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), EVENT_WAITER);
+			.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), EVENT_WAITER);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
@@ -99,12 +98,13 @@ public class Bot extends ListenerAdapter {
 		SlashCommandBase.addCommands();
 		builder.setStatus(StatusCommand.getStatusFromConfig());
 		builder.setActivity(ActivityCommand.getActivity());
+
 		try {
 			jda = builder.build();
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Logger.log(LogMode.FATAL, LogOrigin.BOT, "Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
-			Logger.log(LogMode.ERROR, LogOrigin.BOT, "Terminating bot.");
+			logger.error("Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
+			logger.error("Terminating bot.");
 			System.exit(-1);
 		}
 
@@ -122,16 +122,18 @@ public class Bot extends ListenerAdapter {
 		}
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
-		runnables.addAndGetSelf(InfluxManager::init)
-				.addAndGetSelf(BotInformation::init)
+		runnables.addAndGetSelf(BotInformation::init)
 				.addAndGetSelf(GiveawaySystem::init)
 				.addAndGetSelf(PlayerManager::init)
 				.addAndGetSelf(Newssystem::init)
 				.addAndGetSelf(API::init)
 				.addAndGetSelf(PluginSystem::loadPlugins)
-				.addAndGetSelf(ConsoleCommands::run);
+				.addAndGetSelf(ConsoleCommands::run)
+				.addAndGetSelf(Prometheus::init);
 		ExecutorService asyncStartup = Executors.newFixedThreadPool(runnables.size());
 		runnables.forEach(asyncStartup::submit);
+
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, 15, TimeUnit.SECONDS);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(MongoManager::disconnect));
 	}
@@ -140,7 +142,7 @@ public class Bot extends ListenerAdapter {
 	public void onReady(final ReadyEvent e) {
 		final JDA jda = e.getJDA();
 		BotInformation.SELF_USER_ID = jda.getSelfUser().getIdLong();
-		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - Bot.STARTUP_TIME) + "ms.");
+		logger.info("Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity());
 
@@ -156,11 +158,11 @@ public class Bot extends ListenerAdapter {
 	@Override
 	public void onDisconnect(final DisconnectEvent event) {
 		final CloseCode closeCode = event.getCloseCode();
-		Logger.log(LogMode.FATAL, LogOrigin.BOT, "Disconnected from Discord! Code: " + (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
+		logger.error("Disconnected from Discord! Code: " + (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
 	}
 
 	@Override
 	public void onReconnected(final @NotNull ReconnectedEvent event) {
-		Logger.log(LogMode.INFORMATION, LogOrigin.BOT, "Reconnected to Discord.");
+		logger.info("Reconnected to Discord.");
 	}
 }

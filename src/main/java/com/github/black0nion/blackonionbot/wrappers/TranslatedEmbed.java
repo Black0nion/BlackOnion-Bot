@@ -64,6 +64,11 @@ public class TranslatedEmbed extends EmbedBuilder {
 	}
 
 	@Nonnull
+	public TranslatedEmbed addField(final String name, final Object value, boolean inline) {
+		return this.addField(name, String.valueOf(value), inline);
+	}
+
+	@Nonnull
 	public TranslatedEmbed addField(final String name, final String value) {
 		return this.addField(name, value, false);
 	}

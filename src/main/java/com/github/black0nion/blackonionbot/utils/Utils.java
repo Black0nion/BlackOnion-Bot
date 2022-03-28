@@ -23,7 +23,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
@@ -284,22 +283,6 @@ public class Utils {
 		otherSymbols.setGroupingSeparator(',');
 		ROUNDED_DOUBLE_DECIMALFORMAT = new DecimalFormat("####0.00", otherSymbols);
 		ROUNDED_DOUBLE_DECIMALFORMAT.setGroupingUsed(false);
-	}
-
-	public static String arrayToString(String delimiter, StackTraceElement[] stackTrace) {
-		StringBuilder result = new StringBuilder();
-		for (int i = 0; i < stackTrace.length; i++) {
-			result.append(stackTrace[i].toString()).append(i == stackTrace.length - 1 ? "" : delimiter);
-		}
-		return result.toString();
-	}
-
-	public static String getJarName() {
-		return new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-	}
-
-	public static boolean runningFromJar() {
-		return getJarName().contains(".jar");
 	}
 
 	@Nonnull

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -149,7 +150,7 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null) t.printStackTrace();
+		if (t != null) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
 		this.send("errorwithmessage", new Placeholder("msg", t != null ? t.getClass().getSimpleName() + ": " + t.getMessage() : "null"));
 	}
 

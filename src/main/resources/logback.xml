@@ -1,12 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <conversionRule conversionWord="highlight" converterClass="com.github.black0nion.blackonionbot.systems.logging.ColorConversion" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
         <encoder>
-            <pattern>%d{yyyy/mm/dd HH:mm:ss} %-6level %msg%n</pattern>
+            <pattern>%cyan(%d{yyyy/mm/dd HH:mm:ss}) %green({%thread}) [%highlight(%level)] %magenta(%replace(%logger){'.*\.blackonionbot\.', ''}): %highlight(%msg) %n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <root level="WARN">
-        <appender-ref ref="STDOUT" />
+    <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>files/logs/all.log</file>
+        <encoder>
+            <pattern>%d{yyyy/mm/dd HH:mm:ss} {%thread} [%level] %logger: %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>files/logs/archive/%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern>
+            <!-- Keep logs for 4 weeks -->
+            <maxHistory>4</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="com.github.black0nion.blackonionbot" level="${LOG_LEVEL:-INFO}" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
+    </logger>
+
+    <root level="warn">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </root>
 </configuration>

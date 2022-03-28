@@ -1,22 +1,25 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.PrefixInfo;
+import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
-import com.github.black0nion.blackonionbot.misc.*;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.RunMode;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.systems.logging.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.Permission;
@@ -27,6 +30,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +43,8 @@ public class CommandBase extends ListenerAdapter {
 	public static final HashMap<Category, List<TextCommand>> commandsInCategory = new HashMap<>();
 
 	public static final HashMap<String, TextCommand> commands = new HashMap<>();
+
+	private static final Logger logger = LoggerFactory.getLogger(CommandBase.class);
 
 	public static void addCommands() {
 		commands.clear();
@@ -85,7 +92,6 @@ public class CommandBase extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(final MessageReceivedEvent event) {
-		StatisticsManager.messageSent();
 		if (event.getAuthor().isBot()) return;
 		final BlackUser author = BlackUser.from(event.getAuthor());
 
@@ -93,6 +99,7 @@ public class CommandBase extends ListenerAdapter {
 		final BlackMember member = BlackMember.from(event.getMember());
 		final String prefix = guild.getPrefix();
 		final TextChannel channel = event.getTextChannel();
+		StatisticsManager.MESSAGES_SENT.labels(guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
 		final List<Attachment> attachments = message.getAttachments();
@@ -101,8 +108,11 @@ public class CommandBase extends ListenerAdapter {
 		final String[] args = msgContent.split(" ");
 
 		boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
-		Logger.log(locked ? LogMode.WARNING : LogMode.INFORMATION, LogOrigin.DISCORD, log);
-		FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
+		if (Config.run_mode == RunMode.DEV) {
+			if (locked) logger.warn(log);
+			else logger.info(log);
+			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + message.getId() + ")" + msgContent.replace("\n", "\\n") + attachmentsString);
+		}
 
 		if (locked) return;
 
@@ -123,7 +133,7 @@ public class CommandBase extends ListenerAdapter {
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions()))
 				return;
 
-			StatisticsManager.commandExecuted();
+			StatisticsManager.COMMANDS_EXECUTED.labels("text", cmd.getName(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[]{};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[]{};

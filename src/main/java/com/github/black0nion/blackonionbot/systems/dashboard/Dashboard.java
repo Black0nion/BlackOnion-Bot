@@ -1,5 +1,16 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
+import org.json.JSONObject;
+import org.reflections.Reflections;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -7,20 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import org.json.JSONObject;
-import org.reflections.Reflections;
-
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import com.github.black0nion.blackonionbot.utils.Utils;
-
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class Dashboard {
 
@@ -142,7 +139,7 @@ public class Dashboard {
 						System.arraycopy(args, i, obj, 0, args.length - i);
 						parsed[i] = obj;
 					} else {
-						Logger.logError("No array casting way provided for " + clazz, LogOrigin.DASHBOARD);
+						LoggerFactory.getLogger(Dashboard.class).error("No array casting way provided for " + clazz);
 					}
 					break;
 				} else {

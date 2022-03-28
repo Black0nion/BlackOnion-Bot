@@ -3,13 +3,10 @@ package com.github.black0nion.blackonionbot.api.impl;
 import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.BlackWebsocketSession;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
-import com.github.black0nion.blackonionbot.systems.logging.Logger;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -22,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -42,8 +41,6 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		return "dashboard";
 	}
 
-	private static final boolean LOG_HEARTBEATS = Config.log_heartbeats;
-
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private static final List<Session> sessions = new ArrayList<>();
 
@@ -55,6 +52,8 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	});
 
 	private static final HashMap<Session, ScheduledFuture<?>> futures = new HashMap<>();
+
+	private static final Logger logger = LoggerFactory.getLogger(DashboardWebsocket.class);
 
 	@OnWebSocketConnect
 	public void connected(final Session sessionRaw) {
@@ -83,7 +82,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 			LOGGED_IN.send(session, null);
 			sessions.add(session);
 			futures.put(sessionRaw, this.scheduleTimeout(session));
-			Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Connected to Dashboard Websocket.", LogOrigin.DASHBOARD);
+			logger.info("IP {} connected to dashboard websocket", session.getIp());
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -97,7 +96,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	@OnWebSocketMessage
 	public void message(final Session sessionUnchecked, final String messageRaw) {
 		final BlackWebsocketSession session = blackWebsocketSessions.getUnchecked(sessionUnchecked);
-		Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Received: " + messageRaw.replace("\n", "\\n"), LogOrigin.DASHBOARD);
+		logger.info("IP {}: received {}", session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), messageRaw.replace("\n", "\\n"));
 		if (messageRaw.charAt(0) == 'r') {
 			try {
 				final String[] args = messageRaw.split(" ");
@@ -195,9 +194,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 			futures.get(sessionUnchecked).cancel(true);
 			futures.put(sessionUnchecked, this.scheduleTimeout(session));
 			session.heartbeat(messageRaw.substring(9));
-			if (LOG_HEARTBEATS) {
-				Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Heartbeat.", LogOrigin.DASHBOARD);
-			}
+			logger.debug("IP {} sent heartbeat", session.getIp());
 		} else {
 			reply(session, null, INVALID_TYPE.getJson());
 		}
@@ -233,8 +230,8 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
 		return Bot.scheduledExecutor.schedule(() -> {
-			Logger.logInfo("IP " + session.getRemote().getInetSocketAddress().getAddress().getHostAddress() + " Timed Out.", LogOrigin.DASHBOARD);
-			session.close(4408, "Mach dich aus meiner Leitung raus, du Birne!");
+			logger.info("IP {} timed out.", session.getIp());
+			session.close(4408, "Timed out.");
 		}, 1, TimeUnit.MINUTES);
 	}
 

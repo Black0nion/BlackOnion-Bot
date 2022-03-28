@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.api;
 import com.beust.jcommander.internal.Lists;
 import com.github.black0nion.blackonionbot.api.routes.IRoute;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
-import com.github.black0nion.blackonionbot.misc.LogOrigin;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
@@ -15,6 +14,8 @@ import org.bson.conversions.Bson;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Response;
 import spark.Route;
 import spark.Spark;
@@ -84,14 +85,14 @@ public class API {
 		Spark.internalServerError((request, response) -> {
 			response.header("Access-Control-Allow-Origin", "*");
 			response.type("application/json");
-			logError("Some internal server error happened! URL: " + request.url());
+			logger.error("Some internal server error happened! URL: " + request.url());
 			return exception("Internal server error", 500, response);
 		});
 
 		final String ratelimited = new JSONObject().put("error", "ratelimited").toString();
 		Spark.before((req, res) -> {
 			final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
-			logInfo("IP " + ip + " tried to connect to " + req.url());
+			logger.info("IP {} > {} AS {}", ip, req.url(), req.requestMethod());
 			if (!(!requests.containsKey(req.uri()) && !websocketEndpoints.contains(req.uri()))) {
 				// TODO: ratelimit for websockets
 				final IRoute request = requests.get(req.uri());
@@ -100,7 +101,7 @@ public class API {
 				if (rateLimiters.containsKey(ip)) {
 					final BlackRateLimiter limiter = rateLimiters.get(ip);
 					if (!limiter.tryAcquire()) {
-						logWarning(ip + " got ratelimited! Sent " + limiter.getTooMany() + " too many requests!");
+						logger.info("IP {} got ratelimited! Sent {} requests over the limit", ip, limiter.getTooMany());
 						res.status(429);
 						Spark.halt(ratelimited);
 					}
@@ -112,7 +113,7 @@ public class API {
 
 		for (final IRoute req : requests.values()) {
 			if (req.url() == null) {
-				logError("Path is null: " + req.getClass().getName());
+				logger.error("Path is null: {}", req.getClass().getName());
 				continue;
 			}
 
@@ -165,10 +166,10 @@ public class API {
 									if (e instanceof InputMismatchException) {
 										return exception("Session is invalid!", 401, response);
 									} else if (e instanceof NullPointerException) {
-										logError("Session ID is null, shouldn't happen because of the filter before!");
+										logger.error("Session ID is null, shouldn't happen because of the filter before!");
 										return exception(e, response);
 									} else {
-										logError("Unknown exception: " + e.getMessage());
+										logger.error("Unknown exception: " + e.getMessage());
 										return exception(e, response);
 									}
 								}
@@ -189,8 +190,7 @@ public class API {
 					if (e instanceof JSONException) {
 						return exception("Invalid JSON!", 400, response);
 					} else {
-						logInfo("Error in api happened! Path: " + url + " from: " + ip);
-						e.printStackTrace();
+						logger.error("API Error happened! Path " + url + " - from IP " + ip, e);
 						return exception("Internal server error!", 500, response);
 					}
 				}
@@ -206,7 +206,7 @@ public class API {
 				case TRACE -> Spark.trace(url, route);
 				case CONNECT -> Spark.connect(url, route);
 				case OPTIONS -> Spark.options(url, route);
-				default -> logError("Unknown type: " + req.type());
+				default -> logger.error("Unknown type: " + req.type());
 			}
 		}
 
@@ -219,18 +219,6 @@ public class API {
 		Spark.notFound(notFoundRoute);
 		Spark.get("*", notFoundRoute);
 		Spark.post("*", notFoundRoute);
-	}
-
-	public static void logInfo(final String logInput) {
-		LogOrigin.API.info(logInput);
-	}
-
-	public static void logWarning(final String logInput) {
-		LogOrigin.API.warn(logInput);
-	}
-
-	public static void logError(final String logInput) {
-		LogOrigin.API.error(logInput);
 	}
 
 	public static String exception(Throwable e) {
@@ -258,4 +246,6 @@ public class API {
 		response.type("application/json");
 		return "{\"error\":\"" + text + "\"}";
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(API.class);
 }
