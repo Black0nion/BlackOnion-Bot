@@ -39,7 +39,7 @@ dependencies {
 
     implementation "com.sparkjava:spark-core:2.9.3"
 
-    implementation "org.json:json:20211205"
+    implementation "org.json:json:20220320"
 
     implementation "net.java.dev.jna:jna-platform:5.10.0"
 
