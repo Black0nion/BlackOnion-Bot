@@ -103,9 +103,9 @@ processResources {
 
     filesMatching("bot.metadata.json") {
         expand(
-            version: version,
-            lines_of_code: locAndFiles.get(0),
-            files: locAndFiles.get(1)
+                version: version,
+                lines_of_code: locAndFiles.get(0),
+                files: locAndFiles.get(1)
         )
     }
 }
