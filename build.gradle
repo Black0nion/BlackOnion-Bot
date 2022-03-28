@@ -61,7 +61,7 @@ dependencies {
 
     // Old version because i don't know how to migrate lol
     //noinspection GradlePackageUpdate
-    implementation "se.michaelthelin.spotify:spotify-web-api-java:1.5.0"
+    implementation "se.michaelthelin.spotify:spotify-web-api-java:7.0.0"
 
     implementation "com.vdurmont:emoji-java:5.1.1"
 
