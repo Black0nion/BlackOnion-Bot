@@ -36,7 +36,7 @@ dependencies {
 
     implementation "net.dv8tion:JDA:5.0.0-alpha.9"
     implementation "com.github.BlitzOffline:Pagination-Utils:master-SNAPSHOT"
-    implementation "com.github.JDA-Applications.JDA-Utilities:jda-utilities-commons:dfd5c6f599"
+    implementation "com.github.JDA-Applications.JDA-Utilities:jda-utilities-commons:2.1"
 
     implementation "com.github.Mokulu:discord-oauth2-api:1.0.2"
 
