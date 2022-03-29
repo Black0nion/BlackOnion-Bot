@@ -67,7 +67,7 @@ public class StatisticsManager extends ListenerAdapter {
 		.labelNames("guild_id", "guild", "channel_id", "channel")
 		.register();
 
-	public static final Gauge RAM_LOAD = Gauge.build()
+	static final Gauge RAM_LOAD = Gauge.build()
 		.name("ram_load")
 		.help("Total amount of RAM used")
 		.namespace(NAMESPACE)
@@ -75,29 +75,35 @@ public class StatisticsManager extends ListenerAdapter {
 		.unit("bytes")
 		.register();
 
-	public static final Gauge CPU_LOAD = Gauge.build()
+	static final Gauge CPU_LOAD = Gauge.build()
 		.name("cpu_load")
 		.help("Total amount of CPU used")
 		.namespace(NAMESPACE)
 		.unit("ratio")
 		.register();
 
-	public static final Counter EVENTS = Counter.build()
+	private static final Counter EVENTS = Counter.build()
 		.name("events")
 		.help("Events received")
 		.namespace(NAMESPACE)
 		.labelNames("type", "guild_id", "guild")
 		.register();
 
-	public static final Gauge GUILD_COUNT = Gauge.build()
+	static final Gauge GUILD_COUNT = Gauge.build()
 		.name("guild_count")
 		.help("Total number of guilds")
 		.namespace(NAMESPACE)
 		.register();
 
-	public static final Gauge USER_COUNT = Gauge.build()
+	static final Gauge USER_COUNT = Gauge.build()
 		.name("user_count")
 		.help("Total number of users")
+		.namespace(NAMESPACE)
+		.register();
+
+	static final Gauge PING = Gauge.build()
+		.name("ping")
+		.help("The gateway ping of the bot")
 		.namespace(NAMESPACE)
 		.register();
 
@@ -114,7 +120,7 @@ public class StatisticsManager extends ListenerAdapter {
 	private static int guildCount = -1;
 
 	static int reloadGuildCount() {
-		return guildCount = (int) Bot.jda.getGuildCache().size();
+		return guildCount = (int) Bot.getInstance().getJda().getGuildCache().size();
 	}
 
 	public static int getGuildCount() {
@@ -124,11 +130,15 @@ public class StatisticsManager extends ListenerAdapter {
 	private static long userCount = -1;
 
 	static long reloadUserCount() {
-		return userCount = Bot.jda.getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		return userCount = Bot.getInstance().getJda().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
 	}
 
 	public static long getUserCount() {
 		return userCount;
+	}
+
+	public static double getGatewayPing() {
+		return PING.get();
 	}
 
 	public static double getProcessCpuLoad() {

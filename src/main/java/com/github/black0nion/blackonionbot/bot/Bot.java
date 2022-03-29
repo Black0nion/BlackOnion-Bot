@@ -46,36 +46,71 @@ import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
 
-	public static JDA jda;
-
-	public static final ExecutorService executor = Executors.newCachedThreadPool();
-	public static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-
-	public static final Random RANDOM = new Random();
-
 	public static final List<String> launchArguments = new ArrayList<>();
-	public static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
-			.create();
 
-	public static final EventWaiter EVENT_WAITER = new EventWaiter();
+	private static Bot instance;
 
-	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
+	public static Bot getInstance() {
+		return instance;
+	}
+	private JDA jda;
 
-	public static void startBot(String[] args) throws IOException {
+	public JDA getJda() {
+		return jda;
+	}
+
+	private final Logger logger = LoggerFactory.getLogger(Bot.class);
+	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+	private final Gson gson = new GsonBuilder()
+		.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
+		.create();
+	private final EventWaiter eventWaiter = new EventWaiter();
+	private final HttpClient httpClient = HttpClient.newBuilder()
+		.executor(Executors.newCachedThreadPool(new ThreadFactory() {
+			private final ThreadGroup group = new ThreadGroup("HttpClient");
+			@Override
+			public Thread newThread(@NotNull Runnable r) {
+				return new Thread(group, r);
+			}
+		}))
+		.followRedirects(HttpClient.Redirect.ALWAYS)
+		.build();
+
+	//region Getters
+	public ExecutorService getExecutor() {
+		return executor;
+	}
+
+	public ScheduledExecutorService getScheduledExecutor() {
+		return scheduledExecutor;
+	}
+
+	public Gson getGson() {
+		return gson;
+	}
+
+	public EventWaiter getEventWaiter() {
+		return eventWaiter;
+	}
+
+	public HttpClient getHttpClient() {
+		return httpClient;
+	}
+	//endregion
+
+	public Bot(String[] args) throws IOException {
+		instance = this;
 		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 		ConfigManager.loadConfig();
-		LoggerFactory.getLogger(Bot.class).debug("Weep Woop debug message...");
 		DockerManager.init();
 		logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
 		//noinspection ResultOfMethodCallIgnored
@@ -89,7 +124,7 @@ public class Bot extends ListenerAdapter {
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(new CommandBase(), new SlashCommandBase(), new Bot(), new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), EVENT_WAITER);
+			.addEventListeners(new CommandBase(), new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
@@ -100,12 +135,13 @@ public class Bot extends ListenerAdapter {
 		builder.setActivity(ActivityCommand.getActivity());
 
 		try {
-			jda = builder.build();
+			this.jda = builder.build();
 		} catch (final Exception e) {
 			e.printStackTrace();
 			logger.error("Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
 			logger.error("Terminating bot.");
 			System.exit(-1);
+			return;
 		}
 
 		try {

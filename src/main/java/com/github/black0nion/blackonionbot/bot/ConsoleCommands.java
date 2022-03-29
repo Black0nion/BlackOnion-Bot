@@ -28,14 +28,14 @@ public class ConsoleCommands {
 				} else if (input.equalsIgnoreCase("guildlist")) {
 					// parse boolean in args[1]
 					boolean loadUser = args.length > 1 && Utils.isBoolean(args[1]) && Boolean.parseBoolean(args[1]);
-					logger.info("Guilds: " + Bot.jda.getGuilds().stream().map(g -> {
+					logger.info("Guilds: " + Bot.getInstance().getJda().getGuilds().stream().map(g -> {
 						User user = null;
 						if (loadUser) user = g.retrieveOwner().submit().join().getUser();
 						return g.getName() + "(" + g.getId() + ")" + (user != null ? " | " + user.getAsTag() + "(" + user.getId() + ")" : "");
 					}));
 				} else if (input.equalsIgnoreCase("shutdown")) {
 					logger.warn("Shutting down...");
-					Bot.jda.shutdown();
+					Bot.getInstance().getJda().shutdown();
 					Spark.stop();
 					PluginSystem.disablePlugins();
 					Spark.awaitStop();

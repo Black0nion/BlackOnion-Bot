@@ -20,7 +20,7 @@ public class Newssystem {
 	private static final Logger logger = LoggerFactory.getLogger(Newssystem.class);
 	public static void init() {
 		reload();
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			//noinspection InfiniteLoopStatement
 			while (true) {
 				// will block until a change is detected
@@ -33,7 +33,7 @@ public class Newssystem {
 
 	@Reloadable("newssystem")
 	public static void reload() {
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			posts.clear();
 			final List<Document> postsRaw = collection.find().into(new ArrayList<>());
 			postsRaw.forEach(document -> posts.add(new Newspost(document.getString("title"), document.getString("content").replace("#", ""), document.getDate("date"))));

@@ -1,41 +1,37 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.json.JSONObject;
-
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import net.dv8tion.jda.api.entities.Message;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.json.JSONObject;
 
-public class JokeCommand extends TextCommand {
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class JokeCommand extends SlashCommand {
 
 	public JokeCommand() {
-		this.setCommand("joke", "jokes");
+		super("joke", "Sends a random joke");
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		try {
-			Unirest.setTimeouts(10000, 10000);
-			final Language lang = cmde.getLanguage();
-			String langString = null;
-			if (Utils.equalsOneIgnoreCase(lang.getLanguageCode(), "de", "en", "cs", "es", "fr", "pt"))
-				langString = "&lang=" + lang.getLanguageCode().toLowerCase();
-			final HttpResponse<String> response = Unirest.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langString != null ? langString : "")).asString();
-			final JSONObject object = new JSONObject(response.getBody());
-			cmde.success("Joke", "https://jokeapi.dev", object.getString("setup"), object.getString("delivery"));
-		} catch (final Exception ex) {
-			cmde.exception();
-			ex.printStackTrace();
-		}
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		final Language lang = cmde.getLanguage();
+		String langParam = null;
+		if (Utils.equalsOneIgnoreCase(lang.getLanguageCode(), "de", "en", "cs", "es", "fr", "pt"))
+			langParam = "&lang=" + lang.getLanguageCode().toLowerCase();
+		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langParam != null ?  langParam : ""))).build(), HttpResponse.BodyHandlers.ofString())
+			.thenApply(HttpResponse::body).thenAccept(response -> {
+				final JSONObject object = new JSONObject(response);
+				cmde.success("Joke", "https://jokeapi.dev", object.getString("setup"), object.getString("delivery"));
+			});
 	}
 }

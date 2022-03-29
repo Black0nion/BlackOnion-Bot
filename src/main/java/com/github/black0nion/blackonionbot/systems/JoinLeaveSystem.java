@@ -93,7 +93,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	 */
 	@Override
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
 			final String prefix = guild.getPrefix();
 
@@ -124,7 +124,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 	@Override
 	public void onGuildLeave(final GuildLeaveEvent event) {
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			final Guild guild = event.getGuild();
 			logger.info("I got removed from the guild {} (G: {})", guild.getName(), guild.getId());
 

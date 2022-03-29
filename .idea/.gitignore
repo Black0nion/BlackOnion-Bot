@@ -1,0 +1,6 @@
+*
+
+!.gitignore
+!JsonSchemas.xml
+!encodings.xml
+!inspectionProfiles**/**

@@ -1,88 +1,70 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
+import com.github.ygimenez.method.Pages;
+import com.github.ygimenez.model.InteractPage;
+import com.github.ygimenez.model.Page;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class CatBreedsCommand extends TextCommand {
+public class CatBreedsCommand extends SlashCommand {
 
 	public CatBreedsCommand() {
-		this.setCommand("catbreeds", "catexamples");
+		super("catbreeds", "Shows you a list of avaliable cat breeds");
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		try {
-			Unirest.setTimeouts(0, 0);
-			final HttpResponse<String> response = Unirest.get("https://api.thecatapi.com/v1/breeds")
-			  .header("Content-Type", "application/json")
-			  .asString();
-			final JSONArray responseAsJSONArray = new JSONArray(response.getBody());
-			final HashMap<Integer, HashMap<String, String>> pages = new HashMap<>();
+			HttpRequest request = HttpRequest.newBuilder(URI.create("https://api.thecatapi.com/v1/breeds"))
+				.GET()
+				.header("Content-Type", "application/json")
+				.timeout(Duration.ofSeconds(2))
+				.build();
+			final JSONArray responseAsJSONArray = new JSONArray(Bot.getInstance().getHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body());
 
-			final int pageCount = (int) Math.ceil(responseAsJSONArray.length() / 10D);
-			for (int i = 0; i < pageCount; i++) {
-				final HashMap<String, String> entrysOnThisPage = new HashMap<>();
-				for (int j = i * 10; j < (i+1) * 10; j++) {
-					if (j >= responseAsJSONArray.length()) {
-					    break;
-					}
-					final JSONObject jsonObjectForThisPage = responseAsJSONArray.getJSONObject(j);
-					entrysOnThisPage.put(jsonObjectForThisPage.getString("name"), jsonObjectForThisPage.getString("id"));
+			final EmbedBuilder baseEmbed = cmde.success().setTitle("Cato :3");
+			EmbedBuilder currentEmbed = new EmbedBuilder(baseEmbed);
+
+			final List<Page> pages = new ArrayList<>();
+			boolean found = false;
+			for (int i = 1; i <= responseAsJSONArray.length(); i++) {
+				found = true;
+				final JSONObject jsonObjectForThisPage = responseAsJSONArray.getJSONObject(i - 1);
+				currentEmbed.addField(jsonObjectForThisPage.getString("name"), jsonObjectForThisPage.getString("id"), false);
+				if (i % 10 == 0) {
+					pages.add(new InteractPage(currentEmbed.build()));
+					currentEmbed = new EmbedBuilder(baseEmbed);
 				}
-				pages.put(i, entrysOnThisPage);
 			}
-
-			final EmbedBuilder builder = cmde.success().setTitle("Cato :3");
-			pages.get(0).forEach((name, value) -> builder.addField(name, value, false));
-
-			cmde.reply(builder, msg -> {
-				for (int i = 0; i < pages.size(); i++) {
-				    msg.addReaction(Utils.numbersUnicode.get(i)).queue();
-				}
-				waitForPageSwitch(cmde, msg, author, pages);
-			});
+			if (currentEmbed.getFields().size() > 0) {
+				pages.add(new InteractPage(currentEmbed.build()));
+			}
+			if (!found) {
+				throw new DummyException("No breeds found");
+			} else {
+				cmde.reply((MessageEmbed) pages.get(0).getContent(), success -> success.retrieveOriginal().queue(message -> Pages.paginate(message, pages, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong())));
+			}
 		} catch (final Exception ex) {
-			ex.printStackTrace();
-			cmde.exception();
+			cmde.exception(ex);
 		}
-	}
-
-	private static void waitForPageSwitch(final CommandEvent cmde, final Message msg, final BlackUser user, final HashMap<Integer, HashMap<String, String>> pages) {
-		Bot.EVENT_WAITER.waitForEvent(MessageReactionAddEvent.class,
-			event -> event.getUserIdLong() == user.getIdLong() && event.getMessageIdLong() == msg.getIdLong(),
-			event -> {
-				event.getReaction().removeReaction(Objects.requireNonNull(event.getUser())).queue();
-				final Integer emojiReactionNum = Utils.numbersUnicode.entrySet().stream().filter((entry) -> entry.getValue().equals(event.getReactionEmote().getAsCodepoints())).findFirst().orElseThrow().getKey();
-
-				if (!event.getReactionEmote().isEmoji() || !Utils.numbersUnicode.containsValue(event.getReactionEmote().getAsCodepoints()) || pages.size() < emojiReactionNum) {
-					waitForPageSwitch(cmde, msg, user, pages);
-				}
-
-				// all fine, we can switch page
-				final EmbedBuilder builder = cmde.success().setTitle("Cato :3");
-				pages.get(emojiReactionNum).forEach((name, value) -> builder.addField(name, value, false));
-
-				msg.editMessageEmbeds(builder.build()).queue();
-				waitForPageSwitch(cmde, msg, user, pages);
-			},
-	1, TimeUnit.MINUTES, () -> msg.delete().queue());
 	}
 }

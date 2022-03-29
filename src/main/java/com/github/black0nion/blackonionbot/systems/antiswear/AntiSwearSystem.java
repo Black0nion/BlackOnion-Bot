@@ -4,9 +4,13 @@ import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearTyp
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
 import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REPLACE;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 import club.minnced.discord.webhook.WebhookClient;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
@@ -18,8 +22,6 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -52,10 +54,14 @@ public class AntiSwearSystem {
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention()))))
 				return false;
 			// Message messageRaw = event.getMessage();
-			Unirest.setTimeouts(0, 0);
-			final HttpResponse<String> response = Unirest.post("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True").header("Content-Type", "text/plain").header("Ocp-Apim-Subscription-Key", Config.content_moderator_token).body(messageContent).asString();
+			HttpResponse<String> response = Bot.getInstance().getHttpClient().send(HttpRequest.newBuilder(URI.create("https://westeurope.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessText/Screen?autocorrect=false&classify=True"))
+				.POST(HttpRequest.BodyPublishers.ofString(messageContent))
+				.header("Content-Type", "text/plain")
+				.header("Ocp-Apim-Subscription-Key", Config.content_moderator_token)
+				.build(), HttpResponse.BodyHandlers.ofString());
 
-			final JSONObject responseJson = new JSONObject(response.getBody());
+			String responseBody = response.body();
+			final JSONObject responseJson = new JSONObject(responseBody);
 			// check for profanity
 			if (responseJson.has("Terms")) {
 				// this will happen if it doesn't contain any profanity
@@ -103,7 +109,7 @@ public class AntiSwearSystem {
 				}
 				return true;
 			} else
-				throw new RuntimeException("Some error happened while contacting the Microsoft api. Response: \n" + response.getBody());
+				throw new RuntimeException("Some error happened while contacting the Microsoft api. Response: \n" + responseBody);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

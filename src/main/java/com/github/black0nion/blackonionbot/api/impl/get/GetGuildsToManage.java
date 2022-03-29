@@ -34,7 +34,7 @@ public class GetGuildsToManage implements IGetRoute {
 
 			guildsResponse.forEach(oauthGuild -> {
 				final JSONObject guildAsJson = new JSONObject();
-				final Guild guild = Bot.jda.getGuildById(oauthGuild.getId());
+				final Guild guild = Bot.getInstance().getJda().getGuildById(oauthGuild.getId());
 				final long permissions = oauthGuild.getPermissions();
 				if ((permissions & (1 << 3 | 1 << 5)) != 0) {
 					guildAsJson.put("bot_in_guild", guild != null);

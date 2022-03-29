@@ -51,7 +51,6 @@ public class GuildListCommand extends SlashCommand {
 			}
 		}
 		pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
-		pages.add(new InteractPage(cmde.success().setTitle("Guilds").setDescription("No guilds found.").build()));
 		// TODO: Fix
 		if (!found)
 			cmde.send("noguildsfound");

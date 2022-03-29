@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ConnectFour {
 	long messageID;
@@ -23,7 +24,7 @@ public class ConnectFour {
 
 		this.field = new FieldType[ConnectFourGameManager.HEIGHT][ConnectFourGameManager.WIDTH];
 
-		this.currentUser = Bot.RANDOM.nextInt(2) == 0 ? FieldType.X : FieldType.O;
+		this.currentUser = ThreadLocalRandom.current().nextInt(2) == 0 ? FieldType.X : FieldType.O;
 
 		for (int x = 0; x < ConnectFourGameManager.WIDTH; x++) {
 			for (int y = 0; y < ConnectFourGameManager.HEIGHT; y++) {

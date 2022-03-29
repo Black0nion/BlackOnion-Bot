@@ -1,20 +1,21 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,16 +47,17 @@ public class PasteCommand extends TextCommand {
 
 		cmde.loading(msg -> {
 			try {
-				Unirest.setTimeouts(0, 0);
-				final HttpRequestWithBody headers = Unirest.post("https://paste.sv-studios.net/documents").header("Content-Type", "text/plain");
+				HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create("https://paste.sv-studios.net/documents"))
+					.POST(HttpRequest.BodyPublishers.ofString(finalBody))
+					.header("Content-Type", "text/plain");
 
 				if (finalLanguage != null) {
-					headers.header("language", finalLanguage);
+					requestBuilder.setHeader("language", finalLanguage);
 				}
 
-				final HttpResponse<String> response = headers.body(finalBody).asString();
+				final HttpResponse<String> response = Bot.getInstance().getHttpClient().send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
-				final JSONObject obj = new JSONObject(response.getBody());
+				final JSONObject obj = new JSONObject(response.body());
 
 				final EmbedBuilder builder = cmde.success().setTitle("pastecreated", "https://paste.sv-studios.net/" + obj.getString("key")).setDescription("```" + (finalLanguage != null ? finalLanguage : "")).appendDescription("\n").appendDescription(finalBody).appendDescription("```");
 

@@ -121,7 +121,7 @@ public class PluginSystem {
 	}
 
 	public static void loadPlugins(final Consumer<Void> callback) {
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			final File folder = new File("plugins");
 			if (!folder.exists()) {
 				folder.mkdirs();

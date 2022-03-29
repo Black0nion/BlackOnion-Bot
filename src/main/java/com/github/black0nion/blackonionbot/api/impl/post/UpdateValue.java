@@ -22,7 +22,7 @@ public class UpdateValue implements IPostRoute {
 		final String guildId = headers.get("guild");
 		Guild guild;
 		try {
-			guild = Bot.jda.getGuildById(guildId);
+			guild = Bot.getInstance().getJda().getGuildById(guildId);
 		} catch (final Exception e) {
 			return "bing bong request gone";
 		}

@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -40,9 +41,9 @@ public class GiveawaySystem {
 	public static void init() {
 		collection = MongoDB.DATABASE.getCollection("giveaways");
 
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			try {
-				Bot.jda.awaitReady();
+				Bot.getInstance().getJda().awaitReady();
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -78,7 +79,7 @@ public class GiveawaySystem {
 
 	public static void scheduleGiveaway(final Giveaway giveaway) {
 		final Date endDate = giveaway.endDate();
-		final BlackGuild guild = BlackGuild.from(Bot.jda.getGuildById(giveaway.guildId()));
+		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJda().getGuildById(giveaway.guildId()));
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
 			if (msg == null) {
@@ -86,14 +87,14 @@ public class GiveawaySystem {
 				return;
 			}
 
-			Bot.scheduledExecutor.schedule(() -> endGiveaway(giveaway, msg, guild), endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
+			Bot.getInstance().getScheduledExecutor().schedule(() -> endGiveaway(giveaway, msg, guild), endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
 		});
 	}
 
 	public static void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
 			msg.retrieveReactionUsers("\uD83C\uDF89").queue(users -> {
-				final SelfUser selfUser = Bot.jda.getSelfUser();
+				final SelfUser selfUser = Bot.getInstance().getJda().getSelfUser();
 				if (users.size() == 0 || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
 					deleteGiveaway(giveaway);
@@ -106,7 +107,7 @@ public class GiveawaySystem {
 				final String[] winners = new String[winnerCount];
 				final long[] winnersIds = new long[winnerCount];
 
-				Collections.shuffle(users, Bot.RANDOM);
+				Collections.shuffle(users, ThreadLocalRandom.current());
 
 				for (int i = 0; i < winners.length; i++) {
 					final User currentWinner = users.get(i);

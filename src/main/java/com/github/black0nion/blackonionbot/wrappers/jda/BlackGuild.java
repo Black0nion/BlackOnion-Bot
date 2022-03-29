@@ -69,7 +69,7 @@ public class BlackGuild extends GuildImpl {
 	@Nullable
 	public static BlackGuild from(final long guildid) {
 		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
-		return first.isPresent() ? first.get().getValue() : from(Bot.jda.getGuildById(guildid));
+		return first.isPresent() ? first.get().getValue() : from(Bot.getInstance().getJda().getGuildById(guildid));
 	}
 
 	private Language language;

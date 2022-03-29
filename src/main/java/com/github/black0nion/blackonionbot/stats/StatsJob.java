@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.stats;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+
 public class StatsJob implements Runnable {
 	@Override
 	public void run() {
@@ -8,5 +10,6 @@ public class StatsJob implements Runnable {
 		StatisticsManager.GUILD_COUNT.set(StatisticsManager.reloadGuildCount());
 		StatisticsManager.USER_COUNT.set(StatisticsManager.reloadUserCount());
 		StatisticsManager.UPTIME.set((System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) / 1000F);
+		StatisticsManager.PING.set(Bot.getInstance().getJda().getGatewayPing());
 	}
 }

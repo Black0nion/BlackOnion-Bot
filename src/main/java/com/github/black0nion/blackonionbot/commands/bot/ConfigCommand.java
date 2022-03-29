@@ -176,9 +176,9 @@ public class ConfigCommand extends TextCommand {
 				} else if (parameterType == TextChannel.class) {
 					final Object arg = args[i];
 					if (arg instanceof String) {
-						parsed[i] = Bot.jda.getTextChannelById((String) arg);
+						parsed[i] = Bot.getInstance().getJda().getTextChannelById((String) arg);
 					} else if (arg instanceof Long) {
-						parsed[i] = Bot.jda.getTextChannelById((Long) arg);
+						parsed[i] = Bot.getInstance().getJda().getTextChannelById((Long) arg);
 					} else {
 						args[i] = null;
 					}

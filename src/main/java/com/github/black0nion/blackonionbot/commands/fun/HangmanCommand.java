@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,7 +49,7 @@ public class HangmanCommand extends TextCommand {
 		}
 
 		final List<String> wordsInThisLang = hangmanWords.get(cmde.getLanguage());
-		final String solution = wordsInThisLang.get(Bot.RANDOM.nextInt(wordsInThisLang.size()));
+		final String solution = wordsInThisLang.get(ThreadLocalRandom.current().nextInt(wordsInThisLang.size()));
 		cmde.reply(cmde.success().setTitle("hangman"), msg -> {
 			ingamePlayers.add(author.getIdLong());
 			rerun(msg, cmde, solution, new ArrayList<>());
@@ -72,7 +73,7 @@ public class HangmanCommand extends TextCommand {
 			return;
 		}
 
-		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.EVENT_WAITER.waitForEvent(
+		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
 			MessageReceivedEvent.class,
 			event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
 			event -> {

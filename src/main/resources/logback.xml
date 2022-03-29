@@ -17,9 +17,9 @@
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>files/logs/archive/%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern>
-            <!-- Keep logs for 4 weeks -->
-            <maxHistory>4</maxHistory>
+            <fileNamePattern>files/logs/archive/%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- Keep logs for 30 days -->
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
 

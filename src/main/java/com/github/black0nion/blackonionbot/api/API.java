@@ -190,7 +190,7 @@ public class API {
 					if (e instanceof JSONException) {
 						return exception("Invalid JSON!", 400, response);
 					} else {
-						logger.error("API Error happened! Path " + url + " - from IP " + ip, e);
+						logger.error("api Error happened! Path " + url + " - from IP " + ip, e);
 						return exception("Internal server error!", 500, response);
 					}
 				}

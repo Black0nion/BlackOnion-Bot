@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -44,7 +45,7 @@ public class TicTacToe {
 		this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		this.guild = BlackGuild.from(channel.getGuild());
 
-		this.currentPlayer = Bot.RANDOM.nextInt(2) == 0 ? FieldType.X : FieldType.O;
+		this.currentPlayer = ThreadLocalRandom.current().nextInt(2) == 0 ? FieldType.X : FieldType.O;
 
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {

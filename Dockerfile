@@ -1,8 +1,7 @@
 FROM gradle:7.4-jdk17-alpine AS build
 
-WORKDIR /bot
-
 COPY --chown=gradle:gradle . /bot
+
 WORKDIR /bot
 
 RUN gradle build downloadDependencies --no-daemon

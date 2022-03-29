@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class TicTacToeCommand extends TextCommand {
 				return;
 			}
 			message.reply(getTranslation("ttt_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
-			Bot.EVENT_WAITER.waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
+			Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
 				if (event.getAuthor().isBot()) return;
 				final BlackUser eventAuthor = BlackUser.from(event.getAuthor());
 				if (eventAuthor.getId().equals(challenged.getId()))
@@ -75,7 +76,7 @@ public class TicTacToeCommand extends TextCommand {
 
 	public void rerun(final TicTacToe game, final TextChannel channel) {
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
-		Bot.EVENT_WAITER.waitForEvent(ButtonInteractionEvent.class, answerEvent -> answerEvent.getGuild() != null && answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && answerEvent.getMessage().getIdLong() == game.getMessage().getIdLong() && game.isPlayer(answerEvent.getUser().getId()), answerEvent -> {
+		Bot.getInstance().getEventWaiter().waitForEvent(ButtonInteractionEvent.class, answerEvent -> answerEvent.getGuild() != null && answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && answerEvent.getMessage().getIdLong() == game.getMessage().getIdLong() && game.isPlayer(answerEvent.getUser().getId()), answerEvent -> {
 			answerEvent.deferEdit().queue();
 			final BlackUser author = BlackUser.from(answerEvent.getUser());
 			final String id = answerEvent.getButton().getId();
@@ -123,7 +124,7 @@ public class TicTacToeCommand extends TextCommand {
 			if (game.getPlayerY().isBot()) {
 				try {
 					// fake delay
-					Thread.sleep(Bot.RANDOM.nextInt(1000) + 1000 * (game.getMoves() / 2L + 1));
+					Thread.sleep(ThreadLocalRandom.current().nextInt(1000) + 1000 * (game.getMoves() / 2L + 1));
 				} catch (final InterruptedException ex) {
 					ex.printStackTrace();
 				}

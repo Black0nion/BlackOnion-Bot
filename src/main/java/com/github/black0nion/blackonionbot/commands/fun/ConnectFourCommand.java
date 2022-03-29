@@ -42,7 +42,7 @@ public class ConnectFourCommand extends TextCommand {
 				return;
 			}
 			message.reply(getTranslation("c4_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
-			Bot.EVENT_WAITER.waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
+			Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
 				final BlackUser answerUser = BlackUser.from(event.getAuthor());
 				if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId()))
 					if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
@@ -68,7 +68,7 @@ public class ConnectFourCommand extends TextCommand {
 	}
 
 	public void rerun(final ConnectFour game, final CommandEvent cmde) {
-		Bot.EVENT_WAITER.waitForEvent(MessageReceivedEvent.class, answerEvent -> game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
+		Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, answerEvent -> game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
 			final String msg = answerEvent.getMessage().getContentRaw();
 			final BlackUser author = BlackUser.from(answerEvent.getAuthor());
 			final BlackGuild guild = BlackGuild.from(answerEvent.getGuild());

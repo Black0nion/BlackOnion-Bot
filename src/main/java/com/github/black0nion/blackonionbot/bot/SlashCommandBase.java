@@ -125,7 +125,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
 
-		Bot.executor.submit(Dashboard::init);
+		Bot.getInstance().getExecutor().submit(Dashboard::init);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -162,7 +162,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			HashMap<String, StartsWithArrayList> autoComplete = autoCompletes.get(name);
 			if (autoComplete.containsKey(event.getFocusedOption().getName())) {
 				List<String> options = autoComplete.get(event.getFocusedOption().getName()).getElementsStartingWith(event.getFocusedOption().getValue(), true);
-				event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).toList()).queue();
+				event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).limit(25).toList()).queue();
 			}
 		}
 	}

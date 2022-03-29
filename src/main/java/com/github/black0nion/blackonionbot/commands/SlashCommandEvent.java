@@ -142,7 +142,7 @@ public class SlashCommandEvent {
 			}
 		}
 
-		this.error(title, name, value);
+		this.reply(this.error().setTitle(title).addField(name, value, false));
 	}
 
 	public void exception() {
@@ -150,8 +150,8 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
-		this.send("errorwithmessage", new Placeholder("msg", t != null ? t.getClass().getSimpleName() + ": " + t.getMessage() : "null"));
+		if (t != null && !(t instanceof DummyException)) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
+		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof DummyException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
 	}
 
 	public void reply(final EmbedBuilder builder) {

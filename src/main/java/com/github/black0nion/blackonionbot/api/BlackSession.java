@@ -11,6 +11,7 @@ import org.bson.Document;
 import javax.annotation.Nullable;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackSession {
 
@@ -50,7 +51,7 @@ public class BlackSession {
 	private static final int RIGHT_LIMIT_2 = 'z';
 	private static final int RIGHT_LIMIT_3 = '9';
 	public static String generateSessionId() {
-		final String generatedId = Bot.RANDOM.ints(LEFT_LIMIT_3, RIGHT_LIMIT_2 + 1)
+		final String generatedId = ThreadLocalRandom.current().ints(LEFT_LIMIT_3, RIGHT_LIMIT_2 + 1)
 			.filter(i ->  ((i <= RIGHT_LIMIT_1 && i >= LEFT_LIMIT_1)
 						|| (i <= RIGHT_LIMIT_2 && i >= LEFT_LIMIT_2)
 						|| (i <= RIGHT_LIMIT_3 && i >= LEFT_LIMIT_3)))

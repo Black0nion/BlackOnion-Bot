@@ -44,7 +44,7 @@ public class StatsCommand extends TextCommand {
 				.addField("commandsexecuted", StatisticsManager.COMMANDS_EXECUTED.get(), true)
 				.addField("messagessent", StatisticsManager.MESSAGES_SENT.get(), true)
 				.addField("commands", CommandBase.commandsArray.size() + SlashCommandBase.commands.size(), true)
-				.addField("ping", e.getJDA().getGatewayPing() + "ms", true)
+				.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
 				.addField("usercount", StatisticsManager.getUserCount(), true)
 				.addField("guildcount", StatisticsManager.getGuildCount(), true)
 				.addField("uptime", Utils.parseDate(diff), true)

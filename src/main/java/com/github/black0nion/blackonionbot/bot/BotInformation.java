@@ -1,12 +1,11 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.OS;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.io.Files;
 import com.mongodb.client.model.Filters;
-import com.sun.jna.platform.win32.Advapi32Util;
 import org.bson.Document;
 
 import java.io.File;
@@ -17,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.sun.jna.platform.win32.WinReg.HKEY_LOCAL_MACHINE;
+import static com.github.black0nion.blackonionbot.misc.OS.*;
 
 public class BotInformation {
 
@@ -37,7 +36,7 @@ public class BotInformation {
 
 	@Reloadable("botinformation")
 	public static void init() {
-		Bot.executor.submit(() -> {
+		Bot.getInstance().getExecutor().submit(() -> {
 			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
 			if (doc != null) {
 				supportServer = doc.getLong("guildid");
@@ -45,20 +44,19 @@ public class BotInformation {
 			}
 
 			try {
-				System.out.println(OSBEAN);
 				if (OSBEAN == null) {
 					OSBEAN = ManagementFactory.getOperatingSystemMXBean();
 				}
 
 				if (OS == null) {
 					if (OSBEAN.getName().toLowerCase().contains("windows")) {
-						OS = com.github.black0nion.blackonionbot.misc.OS.WINDOWS;
+						OS = WINDOWS;
 						OS_NAME = OSBEAN.getName();
 					} else if (OSBEAN.getName().toLowerCase().contains("mac")) {
-						OS = com.github.black0nion.blackonionbot.misc.OS.MACOS;
+						OS = MACOS;
 						OS_NAME = "macOS :vomitting:";
 					} else if (OSBEAN.getName().toLowerCase().contains("linux")) {
-						OS = com.github.black0nion.blackonionbot.misc.OS.LINUX;
+						OS = LINUX;
 						final File cpuinfofile = new File("/etc/os-release");
 						final HashMap<String, String> osInfo = new HashMap<>();
 						final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
@@ -69,15 +67,12 @@ public class BotInformation {
 
 						OS_NAME = osInfo.get("PRETTY_NAME").replace("\"", "");
 					} else {
-						OS = com.github.black0nion.blackonionbot.misc.OS.UNKNOWN;
+						OS = UNKNOWN;
 						OS_NAME = "UNKOWN";
 					}
 				}
 
-				if (OS == com.github.black0nion.blackonionbot.misc.OS.WINDOWS) {
-					CPU_NAME = Advapi32Util.registryGetStringValue(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "ProcessorNameString");
-					CPU_MHZ = String.valueOf(Advapi32Util.registryGetValue(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\", "~MHZ"));
-				} else {
+				if (OS != WINDOWS) {
 					final File cpuinfofile = new File("/proc/cpuinfo");
 					final HashMap<String, String> cpuinfo = new HashMap<>();
 					final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);

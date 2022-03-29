@@ -45,7 +45,7 @@ public class ConfigManager {
 			assert in != null;
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 				// Use resource
-				metadata = Bot.GSON.fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
+				metadata = Bot.getInstance().getGson().fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
 				logger.info("Loaded metadata!");
 			} catch (Exception e) {
 				logger.error("Failed to load metadata", e);

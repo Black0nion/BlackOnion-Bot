@@ -100,9 +100,9 @@ public class Dashboard {
 				} else if (parameterType == TextChannel.class) {
 					final Object arg = args[i];
 					if (arg instanceof String) {
-						parsed[i] = Bot.jda.getTextChannelById((String) arg);
+						parsed[i] = Bot.getInstance().getJda().getTextChannelById((String) arg);
 					} else if (arg instanceof Long) {
-						parsed[i] = Bot.jda.getTextChannelById((Long) arg);
+						parsed[i] = Bot.getInstance().getJda().getTextChannelById((Long) arg);
 					} else {
 						args[i] = null;
 					}
@@ -111,10 +111,10 @@ public class Dashboard {
 				} else if (parameterType == int.class || parameterType == Integer.class) {
 					parsed[i] = parseInt(args[i]);
 				} else if (parameterType.isEnum()) {
-					final Method parse = parameterType.getDeclaredMethod("parse", String.class);
-					if (parse != null) {
+					try {
+						final Method parse = parameterType.getDeclaredMethod("parse", String.class);
 						parsed[i] = parse.invoke(parameterType, (String) args[i]);
-					} else {
+					} catch (final NoSuchMethodException ignored) {
 						parsed[i] = Enum.valueOf((Class<? extends Enum>) parameterType, (String) args[i]);
 					}
 				} else if (parameterType.isArray()) {
@@ -171,10 +171,10 @@ public class Dashboard {
 			final Object arg = args[j];
 			if (arg == null) {
 				obj[index] = null;
-			} else if (arg instanceof Integer) {
-				obj[index] = (Integer) arg;
-			} else if (arg instanceof Long) {
-				obj[index] = (Integer) arg;
+			} else if (arg instanceof Integer in) {
+				obj[index] = in;
+			} else if (arg instanceof Long l) {
+				obj[index] = l.intValue();
 			} else if (arg instanceof String) {
 				if (Utils.isInteger(String.valueOf(arg))) {
 					obj[index] = Integer.valueOf(String.valueOf(arg));

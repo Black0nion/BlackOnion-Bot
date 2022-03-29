@@ -40,10 +40,10 @@ public class Vote implements IPostRoute {
 
 		final long channelId = Config.vote_channel;
 		if (channelId != -1) {
-			final TextChannel channel = Bot.jda.getTextChannelById(channelId);
+			final TextChannel channel = Bot.getInstance().getJda().getTextChannelById(channelId);
 			if (channel != null) {
 				final String userid = body.getString("user");
-				Objects.requireNonNull(Bot.jda.getGuildById(BotInformation.supportServer)).retrieveMemberById(userid).queue(member -> {
+				Objects.requireNonNull(Bot.getInstance().getJda().getGuildById(BotInformation.supportServer)).retrieveMemberById(userid).queue(member -> {
 					final User user = member.getUser();
 					channel
 						.sendMessageEmbeds(new TranslatedEmbed()
@@ -54,7 +54,7 @@ public class Vote implements IPostRoute {
 							.setTimestamp(Instant.now())
 							.build())
 						.queue();
-				}, bruh -> Bot.jda.retrieveUserById(userid).queue(user -> channel
+				}, bruh -> Bot.getInstance().getJda().retrieveUserById(userid).queue(user -> channel
 					.sendMessageEmbeds(new TranslatedEmbed()
 						.setColor(EmbedUtils.BLACK_ONION_COLOR)
 						.setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** (" + user

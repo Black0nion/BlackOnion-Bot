@@ -23,6 +23,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -72,17 +73,6 @@ public class CommandBase extends ListenerAdapter {
 				e.printStackTrace();
 			}
 		}
-
-		Bot.executor.submit(() -> {
-			//noinspection Convert2MethodRef
-			Dashboard.init();
-			/*
-				StringSelection stringSelection = new StringSelection(commandsJSON.toString());
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				clipboard.setContents(stringSelection, null);
-				System.out.println(commandsJSON);
-			*/
-		});
 	}
 
 	@Override
@@ -92,7 +82,7 @@ public class CommandBase extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(final MessageReceivedEvent event) {
-		if (event.getAuthor().isBot()) return;
+		if (event.getAuthor().isBot() || event.getChannelType() != ChannelType.TEXT) return;
 		final BlackUser author = BlackUser.from(event.getAuthor());
 
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
@@ -166,7 +156,7 @@ public class CommandBase extends ListenerAdapter {
 				return;
 			}
 
-			Bot.executor.submit(() -> {
+			Bot.getInstance().getExecutor().submit(() -> {
 				cmde.setCommand(cmd);
 				cmd.execute(args, cmde, event, message, member, author, guild, channel);
 			});

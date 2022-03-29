@@ -18,8 +18,7 @@ public class StartsWithArrayList extends ArrayList<String> {
 		if (ignoreCase) prefix = prefix.toLowerCase();
 		List<String> result = new ArrayList<>();
 		for (String element : this) {
-			if (ignoreCase) element = element.toLowerCase();
-			if (element.startsWith(prefix)) {
+			if ((ignoreCase ? element.toLowerCase() : element).startsWith(prefix)) {
 				result.add(element);
 			}
 		}

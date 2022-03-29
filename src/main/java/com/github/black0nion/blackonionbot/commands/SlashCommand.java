@@ -63,7 +63,7 @@ public abstract class SlashCommand extends GenericCommand {
 
 	protected void updateAutoComplete(String option, Collection<String> values) {
 		HashMap<String, StartsWithArrayList> prevAutocomplete = Optional.ofNullable(SlashCommandBase.getAutoComplete(this)).orElseGet(HashMap::new);
-		prevAutocomplete.put(option, new StartsWithArrayList(values));
+		prevAutocomplete.put(option, values instanceof StartsWithArrayList value ? value : new StartsWithArrayList(values));
 		SlashCommandBase.addAutocomplete(prevAutocomplete, this);
 	}
 

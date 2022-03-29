@@ -229,7 +229,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	}
 
 	private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
-		return Bot.scheduledExecutor.schedule(() -> {
+		return Bot.getInstance().getScheduledExecutor().schedule(() -> {
 			logger.info("IP {} timed out.", session.getIp());
 			session.close(4408, "Timed out.");
 		}, 1, TimeUnit.MINUTES);
@@ -239,7 +239,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		if (response == null) {
 			response = new JSONObject();
 		} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
-			response = Bot.GSON.toJson(response);
+			response = Bot.getInstance().getGson().toJson(response);
 		}
 
 		if (request != null && request.has("id")) {
