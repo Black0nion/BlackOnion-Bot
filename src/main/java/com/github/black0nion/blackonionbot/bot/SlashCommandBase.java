@@ -4,13 +4,14 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
-import com.github.black0nion.blackonionbot.misc.*;
+import com.github.black0nion.blackonionbot.misc.Category;
+import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -24,7 +25,6 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -58,7 +58,6 @@ public class SlashCommandBase extends ListenerAdapter {
 	public static void addCommands() {
 		commands.clear();
 		commandsInCategory.clear();
-		autoCompletes.clear();
 		commandsJson = new JSONObject();
 		final JSONArray commands = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
@@ -133,16 +132,6 @@ public class SlashCommandBase extends ListenerAdapter {
 		return (T) commandInstances.get(clazz);
 	}
 
-	private static final HashMap<String, HashMap<String, StartsWithArrayList>> autoCompletes = new HashMap<>();
-
-	public static HashMap<String, StartsWithArrayList> getAutoComplete(SlashCommand cmd) {
-		return autoCompletes.get(cmd.getData().getName());
-	}
-
-	public static void addAutocomplete(HashMap<String, StartsWithArrayList> autoComplete, SlashCommand slashCommand) {
-		autoCompletes.put(slashCommand.getData().getName(), autoComplete);
-	}
-
 	public static void updateCommandsDev(JDA jda) {
 		if (Config.dev_guild != -1) {
 			Objects.requireNonNull(jda.getGuildById(Config.dev_guild))
@@ -158,11 +147,11 @@ public class SlashCommandBase extends ListenerAdapter {
 	@Override
 	public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
 		String name = event.getName();
-		if (autoCompletes.containsKey(name)) {
-			HashMap<String, StartsWithArrayList> autoComplete = autoCompletes.get(name);
-			if (autoComplete.containsKey(event.getFocusedOption().getName())) {
-				List<String> options = autoComplete.get(event.getFocusedOption().getName()).getElementsStartingWith(event.getFocusedOption().getValue(), true);
-				event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).limit(25).toList()).queue();
+		if (commands.containsKey(name)) {
+			try {
+				commands.get(name).getValue().handleAutoComplete(event);
+			} catch (Exception e) {
+				logger.error("An issue happened trying to handle AutoComplete: " + e);
 			}
 		}
 	}

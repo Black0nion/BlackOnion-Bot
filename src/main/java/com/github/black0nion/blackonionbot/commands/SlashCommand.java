@@ -4,22 +4,20 @@ import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
-import com.google.common.collect.Maps;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
@@ -37,12 +35,16 @@ public abstract class SlashCommand extends GenericCommand {
 	private final boolean isPremium;
 	private final boolean isEphemeral;
 	private final boolean isAdminGuild;
+	/**
+	 * option name : choices
+	 */
+	private final Map<String, StartsWithArrayList> autoCompletes = new HashMap<>();
 
-	public SlashCommand(String name, String description) {
+	protected SlashCommand(String name, String description) {
 		this(builder(Commands.slash(name, description)));
 	}
 
-	public SlashCommand(SlashCommandBuilder builder) {
+	protected SlashCommand(SlashCommandBuilder builder) {
 		this.data = builder.getData();
 		this.category = gOD(builder.getCategory(), Category.OTHER);
 		this.progress = gOD(builder.getProgress(), Progress.DONE);
@@ -55,16 +57,29 @@ public abstract class SlashCommand extends GenericCommand {
 		this.isEphemeral = builder.isEphemeral();
 		this.isAdminGuild = builder.isAdminGuild();
 		if (!builder.getAutoComplete().isEmpty()) {
-			SlashCommandBase.addAutocomplete(builder.getAutoComplete(), this);
+			builder.getAutoComplete().entrySet().forEach(this::updateAutoComplete);
 		}
 	}
 
 	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
 
+	protected void updateAutoComplete(Map.Entry<String, StartsWithArrayList> entry) {
+		Checks.notNull(entry, "Entry");
+		this.updateAutoComplete(entry.getKey(), entry.getValue());
+	}
+
 	protected void updateAutoComplete(String option, Collection<String> values) {
-		HashMap<String, StartsWithArrayList> prevAutocomplete = Optional.ofNullable(SlashCommandBase.getAutoComplete(this)).orElseGet(HashMap::new);
-		prevAutocomplete.put(option, values instanceof StartsWithArrayList value ? value : new StartsWithArrayList(values));
-		SlashCommandBase.addAutocomplete(prevAutocomplete, this);
+		Checks.notNull(option, "Option");
+		Checks.notNull(values, "Values");
+		Checks.notEmpty(values, "Values");
+		autoCompletes.put(option, values instanceof StartsWithArrayList value ? value : new StartsWithArrayList(values));
+	}
+
+	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
+		StartsWithArrayList autoComplete = autoCompletes.get(event.getFocusedOption().getName());
+		Checks.notNull(autoComplete, "AutoComplete Choices");
+		List<String> options = autoComplete.getElementsStartingWith(event.getFocusedOption().getValue(), true);
+		event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).limit(25).toList()).queue();
 	}
 
 	@Override
