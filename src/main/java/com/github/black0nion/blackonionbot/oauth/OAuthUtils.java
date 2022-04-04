@@ -29,7 +29,7 @@ public class OAuthUtils {
 
 	public static final DiscordOAuth OAUTH_HANDLER = new DiscordOAuth(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, SCOPES);
 
-	public static final Pattern TOKEN_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
+	public static final Pattern TOKEN_PATTERN = Pattern.compile("[a-zA-Z\\d]{30,32}");
 
 	public static String getAuthorizeURL() {
 		return OAUTH_HANDLER.getAuthorizationURL(null);

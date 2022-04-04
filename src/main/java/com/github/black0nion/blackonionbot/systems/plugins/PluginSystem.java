@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -23,9 +20,7 @@ import java.util.function.Consumer;
  */
 public class PluginSystem {
 
-	private static final HashMap<Plugin, PluginInformation> plugins = new HashMap<>();
-	private static final List<String> pluginNames = new ArrayList<>();
-	private static final List<String> pluginClasses = new ArrayList<>();
+	private static final Map<Plugin, PluginInformation> plugins = new HashMap<>();
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginSystem.class);
 
@@ -59,16 +54,13 @@ public class PluginSystem {
 							.startThread()
 							.join();
 				} catch(Exception e) {
-					e.printStackTrace();
 					plugins.get(plugin).setState(PluginState.ERRORED);
-					logger.info("Plugin {} crashed!", pluginName);
+					logger.error("Plugin " + pluginName + " crashed!", e);
 				} finally {
 					logger.info("Plugin {} terminated.", pluginName);
 				}
 			}, "[PLUGIN LOADER] " + pluginName).startThread(), threadGroup);
 			information.setState(PluginState.RUNNING);
-			pluginNames.add(pluginName);
-			pluginClasses.add(classInfo.getName());
 
 			plugins.put(plugin, information);
 			logger.info("The Plugin \"{}\" stored in file \"{}\" got loaded successfully!", pluginName, jarName);
@@ -104,15 +96,12 @@ public class PluginSystem {
 					} else {
 						info.setState(PluginState.STOPPED);
 					}
-					pluginNames.remove(plugin.getName());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}).setThreadName("[PLUGIN SHUTDOWN HANDLER] " + plugin).start();
 		});
 		plugins.clear();
-		pluginClasses.clear();
-		pluginNames.clear();
 	}
 
 	@Reloadable("plugins")
@@ -143,13 +132,5 @@ public class PluginSystem {
 				callback.accept(null);
 			}
 		});
-	}
-
-	public static List<String> getPluginNames() {
-		return pluginNames;
-	}
-
-	public static List<String> getPluginClasses() {
-		return pluginClasses;
 	}
 }

@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.utils.config.BotMetadata;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import io.prometheus.client.hotspot.DefaultExports;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
@@ -19,6 +20,11 @@ import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 
 public class StatisticsManager extends ListenerAdapter {
+
+	static {
+		// JVM Stats, collected by Prometheus
+		DefaultExports.initialize();
+	}
 
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	private static final String NAMESPACE = "blackonionbot";
@@ -53,12 +59,27 @@ public class StatisticsManager extends ListenerAdapter {
 		.labelNames("type", "command", "guild_id", "guild", "channel_id", "channel")
 		.register();
 
+	public static final Counter TOTAL_COMMANDS_EXECUTED = Counter.build()
+		.name("total_commands_executed")
+		.help("Total number of commands executed")
+		.namespace(NAMESPACE)
+		.create();
+
 	public static final Counter MESSAGES_SENT = Counter.build()
 		.name("messages_sent")
 		.help("Total number of messages sent")
 		.namespace(NAMESPACE)
 		.labelNames("guild_id", "guild", "channel_id", "channel")
 		.register();
+
+	/**
+	 * Only required for internal use.
+	 */
+	public static final Counter TOTAL_MESSAGES_SENT = Counter.build()
+		.name("total_messages_sent")
+		.help("Total number of messages sent")
+		.namespace(NAMESPACE)
+		.create();
 
 	public static final Counter PROFANITY_FILTERED = Counter.build()
 		.name("profanity_filtered")
@@ -137,8 +158,9 @@ public class StatisticsManager extends ListenerAdapter {
 		return userCount;
 	}
 
-	public static double getGatewayPing() {
-		return PING.get();
+	public static long getGatewayPing() {
+		// JDA's method returns a long
+		return (long) PING.get();
 	}
 
 	public static double getProcessCpuLoad() {

@@ -1,19 +1,18 @@
 package com.github.black0nion.blackonionbot.api.impl.post;
 
-import java.util.HashMap;
-
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import org.bson.Document;
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IPostRoute;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.mongodb.client.model.Filters;
+import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import spark.Request;
-import spark.Response;
-
-import static com.github.black0nion.blackonionbot.api.API.exception;
+import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * Logs out a user from a session (deletes their session id from the database
@@ -24,22 +23,29 @@ import static com.github.black0nion.blackonionbot.api.API.exception;
 public class Logout implements IPostRoute {
 
 	@Override
-	public String url() {
+	public @Nonnull String url() {
 		return "logout";
 	}
 
 	@Override
-	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession session, DiscordUser user) {
-		final Document doc = BlackSession.collection.find(Filters.eq("sessionid", request.headers("sessionid"))).first();
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
+		Bson filter = Filters.eq("sessionid", assertMatches(ctx.header("sessionid"), BlackSession.SESSIONID_REGEX));
+		final Document doc = BlackSession.collection.find(filter).first();
+
 		if (doc != null) {
-			BlackSession.collection.deleteOne(Filters.eq("sessionid", request.headers("sessionid")));
+			BlackSession.collection.deleteOne(Filters.eq("sessionid", ctx.header("sessionid")));
 			return "";
 		}
-		return exception("Session not found", 401, response);
+		throw new UnauthorizedResponse("Invalid session id");
 	}
 
 	@Override
 	public boolean requiresLogin() {
 		return true;
+	}
+
+	@Override
+	public String[] requiredHeaders() {
+		return new String[] { "sessionid" };
 	}
 }

@@ -10,6 +10,8 @@
         </encoder>
     </appender>
 
+    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
+
     <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>files/logs/all.log</file>
         <encoder>
@@ -26,10 +28,12 @@
     <logger name="com.github.black0nion.blackonionbot" level="${LOG_LEVEL:-INFO}" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
+        <appender-ref ref="METRICS"/>
     </logger>
 
-    <root level="warn">
+    <root level="${ROOT_LOG_LEVEL:-WARN}">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
+        <appender-ref ref="METRICS"/>
     </root>
 </configuration>

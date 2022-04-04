@@ -26,21 +26,23 @@ public class BlackSession {
 	}
 
 	/**
-	 * The websocket will connect and then provide a session id to login to. If the
+	 * The websocket will connect and then provide a session id to log in to. If the
 	 * websocket connection isn't logged in, use {@link OAuthUtils#loginWithDiscord(String)}
 	 * <p>
-	 * Workflow:
-	 * <p>
-	 * - client gets a session id using {@link OAuthUtils#loginWithDiscord(String)}
-	 * - client saves the session id
-	 * - client uses this session id to authorize in the future
+	 * Auth flow:
+	 * <ul>
+	 * 	<li>client gets a session id using {@link OAuthUtils#loginWithDiscord(String)}</li>
+	 * 	<li>client saves the session id</li>
+	 * 	<li>client uses this session id to authorize in the future</li>
+	 * </ul>
 	 */
 	public void loginToSession(final String sessionId) throws ExecutionException, InputMismatchException, NullPointerException {
 		final Document doc = collection.find(Filters.eq("sessionid", sessionId)).first();
-		if (doc != null) {
-			this.sessionId = sessionId;
-			this.user = OAuthUtils.getUserWithToken(doc.getString("access_token"), doc.getString("refresh_token"));
-		} else throw new NullPointerException("Session id not found");
+
+		if (doc == null) throw new NullPointerException("Session id not found");
+
+		this.sessionId = sessionId;
+		this.user = OAuthUtils.getUserWithToken(doc.getString("access_token"), doc.getString("refresh_token"));
 	}
 
 	private static final int TARGET_STRING_LENGTH = 69;
@@ -55,7 +57,7 @@ public class BlackSession {
 			.filter(i ->  ((i <= RIGHT_LIMIT_1 && i >= LEFT_LIMIT_1)
 						|| (i <= RIGHT_LIMIT_2 && i >= LEFT_LIMIT_2)
 						|| (i <= RIGHT_LIMIT_3 && i >= LEFT_LIMIT_3)))
-			.limit(TARGET_STRING_LENGTH + 2)
+			.limit(TARGET_STRING_LENGTH)
 			.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
 			.toString();
 
@@ -64,6 +66,8 @@ public class BlackSession {
 
 		return generatedId;
 	}
+
+	public static final String SESSIONID_REGEX = "[a-zA-Z\\d]{69}";
 
 	public DiscordUser getUser() {
 		return this.user;

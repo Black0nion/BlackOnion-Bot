@@ -89,7 +89,10 @@ public class CommandBase extends ListenerAdapter {
 		final BlackMember member = BlackMember.from(event.getMember());
 		final String prefix = guild.getPrefix();
 		final TextChannel channel = event.getTextChannel();
+
 		StatisticsManager.MESSAGES_SENT.labels(guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
+		StatisticsManager.TOTAL_MESSAGES_SENT.inc();
+
 		final Message message = event.getMessage();
 		final String msgContent = message.getContentRaw();
 		final List<Attachment> attachments = message.getAttachments();
@@ -124,6 +127,7 @@ public class CommandBase extends ListenerAdapter {
 				return;
 
 			StatisticsManager.COMMANDS_EXECUTED.labels("text", cmd.getName(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
+			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[]{};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[]{};

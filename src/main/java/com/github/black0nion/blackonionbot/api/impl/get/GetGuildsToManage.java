@@ -4,22 +4,20 @@ import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import io.javalin.http.Context;
 import net.dv8tion.jda.api.entities.Guild;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import spark.Request;
-import spark.Response;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
 import java.util.List;
-
-import static com.github.black0nion.blackonionbot.api.API.*;
+import java.util.Map;
 
 public class GetGuildsToManage implements IGetRoute {
 
 	@Override
-	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, @SuppressWarnings("NullableProblems") final @Nonnull BlackSession session, DiscordUser user) {
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
 		final JSONObject guildsObj = new JSONObject()
 			.put("id", Long.parseLong(user.getUser().getId()))
 			.put("name", user.getUser().getUsername())
@@ -27,31 +25,28 @@ public class GetGuildsToManage implements IGetRoute {
 			.put("locale", user.getUser().getLocale())
 			.put("mfa", user.getUser().getMfaEnabled());
 
-		try {
-			final List<io.mokulu.discord.oauth.model.Guild> guildsResponse = user.getGuilds();
-			if (guildsResponse == null) return exception("No guilds found", response);
-			final JSONArray guilds = new JSONArray();
-
-			guildsResponse.forEach(oauthGuild -> {
-				final JSONObject guildAsJson = new JSONObject();
-				final Guild guild = Bot.getInstance().getJda().getGuildById(oauthGuild.getId());
-				final long permissions = oauthGuild.getPermissions();
-				if ((permissions & (1 << 3 | 1 << 5)) != 0) {
-					guildAsJson.put("bot_in_guild", guild != null);
-					guilds.put(guildAsJson);
-				}
-			});
-
-			guildsObj.put("guilds", guilds);
-			return guildsObj.toString();
-		} catch (final Exception e) {
-			e.printStackTrace();
-			return exception(e, response);
+		final List<io.mokulu.discord.oauth.model.Guild> guildsResponse = user.getGuilds();
+		if (guildsResponse == null) {
+			throw new NullPointerException("Guilds response is null");
 		}
+		final JSONArray guilds = new JSONArray();
+
+		guildsResponse.forEach(oauthGuild -> {
+			final JSONObject guildAsJson = new JSONObject();
+			final Guild guild = Bot.getInstance().getJda().getGuildById(oauthGuild.getId());
+			final long permissions = oauthGuild.getPermissions();
+			if ((permissions & (1 << 3 | 1 << 5)) != 0) {
+				guildAsJson.put("bot_in_guild", guild != null);
+				guilds.put(guildAsJson);
+			}
+		});
+
+		guildsObj.put("guilds", guilds);
+		return guildsObj;
 	}
 
 	@Override
-	public String url() {
+	public @Nonnull String url() {
 		return "guilds";
 	}
 

@@ -1,8 +1,11 @@
 package com.github.black0nion.blackonionbot.api.routes;
 
 import com.github.black0nion.blackonionbot.utils.Time;
+import io.javalin.http.HandlerType;
 
-public interface IPostRoute extends IRoute {
+import javax.annotation.Nonnull;
+
+public interface IPostRoute extends IHttpRoute {
 
     @Override
     default boolean requiresLogin() {
@@ -15,7 +18,7 @@ public interface IPostRoute extends IRoute {
     }
 
     @Override
-    default HttpMethod type() {
-		return HttpMethod.POST;
+    default @Nonnull HandlerType type() {
+		return HandlerType.POST;
     }
 }

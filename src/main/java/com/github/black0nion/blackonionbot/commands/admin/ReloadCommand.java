@@ -72,6 +72,7 @@ public class ReloadCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		e.deferReply().queue();
 		if (reloadableMethods == null) {
 			initReloadableMethods();
 		}

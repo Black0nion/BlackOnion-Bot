@@ -14,14 +14,15 @@ import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.Permission;
 import org.bson.Document;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,11 +34,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.black0nion.blackonionbot.systems.dashboard.ResponseCode.*;
 
-@WebSocket
 public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	@Override
-	public String getRoute() {
+	public @Nonnull String url() {
 		return "dashboard";
 	}
 
@@ -47,7 +47,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	private static final LoadingCache<Session, BlackWebsocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
 		public @NotNull BlackWebsocketSession load(final @NotNull Session key) throws IllegalArgumentException, ExecutionException {
-			return new BlackWebsocketSession(key);
+		return new BlackWebsocketSession(key);
 		}
 	});
 
@@ -55,8 +55,8 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashboardWebsocket.class);
 
-	@OnWebSocketConnect
-	public void connected(final Session sessionRaw) {
+	@Override
+	public void onConnect(Session sessionRaw) {
 		try {
 			final String sessionId = sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
 			if (sessionId == null) {
@@ -68,18 +68,28 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 				sessionRaw.close(4401, "Unauthorized");
 				return;
 			}
-			boolean hasError = false;
-			BlackWebsocketSession session = null;
+			BlackWebsocketSession session;
 			try {
 				session = blackWebsocketSessions.get(sessionRaw);
 			} catch (Exception e) {
-				hasError = true;
-			}
-			if (hasError || session.getUser() == null) {
+				e.printStackTrace();
+				Throwable cause = e;
+				while ((cause = cause.getCause()) != null) {
+					if (cause instanceof HttpStatusException http) {
+						sessionRaw.close(4000 + http.getStatusCode(), "Unauthorized");
+						return;
+					}
+				}
 				sessionRaw.close(4401, "Unauthorized");
 				return;
 			}
-			LOGGED_IN.send(session, null);
+
+			if (session.getUser() == null) {
+				sessionRaw.close(4401, "Unauthorized");
+				return;
+			}
+
+			LOGGED_IN.send(session);
 			sessions.add(session);
 			futures.put(sessionRaw, this.scheduleTimeout(session));
 			logger.info("IP {} connected to dashboard websocket", session.getIp());
@@ -88,13 +98,13 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		}
 	}
 
-	@OnWebSocketClose
-	public void closed(final Session session, final int statusCode, final String reason) {
+	@Override
+	public void onClose(final Session session, final int statusCode, final String reason) {
 		sessions.remove(session);
 	}
 
-	@OnWebSocketMessage
-	public void message(final Session sessionUnchecked, final String messageRaw) {
+	@Override
+	public void onMessage(final Session sessionUnchecked, final String messageRaw) {
 		final BlackWebsocketSession session = blackWebsocketSessions.getUnchecked(sessionUnchecked);
 		logger.info("IP {}: received {}", session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), messageRaw.replace("\n", "\\n"));
 		if (messageRaw.charAt(0) == 'r') {
@@ -102,7 +112,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 				final String[] args = messageRaw.split(" ");
 				final int id = args[0].length();
 				if (args.length < 2 || !Utils.isInteger(messageRaw.substring(1, id))) {
-					WRONG_ARGUMENTS.send(session, null);
+					WRONG_ARGUMENTS.send(session);
 					return;
 				}
 				final JSONObject request = new JSONObject(messageRaw.substring(id)).put("id", messageRaw.substring(1, id));
@@ -218,7 +228,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		return guild;
 	}
 
-	@OnWebSocketError
+	@Override
 	public void onError(final Session session, final Throwable error) {
 		error.printStackTrace();
 		try {

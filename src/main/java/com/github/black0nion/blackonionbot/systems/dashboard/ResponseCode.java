@@ -50,6 +50,10 @@ public enum ResponseCode {
 		return this.json;
 	}
 
+	public void send(final BlackWebsocketSession session) {
+		send(session, null);
+	}
+
 	public void send(final BlackWebsocketSession session, final JSONObject request) {
 		DashboardWebsocket.reply(session, request, this.getJson());
 	}

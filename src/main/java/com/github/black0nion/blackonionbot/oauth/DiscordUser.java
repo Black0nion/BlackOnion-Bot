@@ -5,6 +5,7 @@ import io.mokulu.discord.oauth.DiscordAPI;
 import io.mokulu.discord.oauth.model.Guild;
 import io.mokulu.discord.oauth.model.TokensResponse;
 import io.mokulu.discord.oauth.model.User;
+import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -42,6 +43,20 @@ public class DiscordUser {
 
 	public User getUser() {
 		return user;
+	}
+
+	public JSONObject getUserAsJson() {
+		return new JSONObject()
+			.put("id", user.getId())
+			.put("username", user.getUsername())
+			.put("avatar", user.getAvatar())
+			.put("discriminator", user.getDiscriminator())
+			.put("mfa_enabled", user.getMfaEnabled())
+			.put("locale", user.getLocale())
+			.put("verified", user.getVerified())
+			.put("email", user.getEmail())
+			.put("flags", user.getFlags())
+			.put("premium_type", user.getPremiumType());
 	}
 
 	public DiscordAPI getAPI() {

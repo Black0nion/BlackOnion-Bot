@@ -1,45 +1,30 @@
 package com.github.black0nion.blackonionbot.api.routes;
 
-import java.util.HashMap;
+import com.github.black0nion.blackonionbot.utils.Time;
+import io.javalin.http.BadRequestResponse;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.black0nion.blackonionbot.api.BlackSession;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import org.json.JSONObject;
-
-import com.github.black0nion.blackonionbot.utils.Time;
-
-import spark.Request;
-import spark.Response;
-
 public interface IRoute {
-	Object handle(Request request, Response response, JSONObject body, HashMap<String, String> headers, @Nullable BlackSession session, DiscordUser user);
-
+	@Nonnull
 	String url();
 
-	Time rateLimit();
-
-	default boolean requiresLogin() {
-		return false;
+	/**
+	 * @return The {@link Time#time() amount} of valid requests per {@link Time#unit() unit}.
+	 */
+	@Nullable
+	default Time rateLimit() {
+		return null;
 	}
 
-	default CustomPermission[] requiredCustomPermissions() {
-		return new CustomPermission[0];
+	default String assertMatches(String input, String regex) {
+		return assertMatches(input, "Input", regex);
 	}
 
-	default boolean isJson() {
-		return true;
+	default String assertMatches(String input, String name, String regex) {
+		if (!input.matches(regex))
+			throw new BadRequestResponse(name + " does not match regex: " + regex);
+		return input;
 	}
-
-	default String[] requiredParameters() {
-		return new String[0];
-	}
-
-	default String[] requiredBodyParameters() {
-		return new String[0];
-	}
-
-	HttpMethod type();
 }

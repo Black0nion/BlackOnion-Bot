@@ -151,7 +151,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			try {
 				commands.get(name).getValue().handleAutoComplete(event);
 			} catch (Exception e) {
-				logger.error("An issue happened trying to handle AutoComplete: " + e);
+				logger.error("An issue happened trying to handle AutoComplete", e);
 			}
 		}
 	}
@@ -208,6 +208,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			}
 
 			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getCommandPath(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
+			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
@@ -217,7 +218,8 @@ public class SlashCommandBase extends ListenerAdapter {
 				if (cmd.isHidden(author)) return;
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
-			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
+			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions))
+				return;
 			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;

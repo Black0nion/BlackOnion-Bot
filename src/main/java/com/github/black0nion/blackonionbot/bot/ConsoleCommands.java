@@ -1,12 +1,12 @@
 package com.github.black0nion.blackonionbot.bot;
 
+import com.github.black0nion.blackonionbot.api.API;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Spark;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -36,9 +36,8 @@ public class ConsoleCommands {
 				} else if (input.equalsIgnoreCase("shutdown")) {
 					logger.warn("Shutting down...");
 					Bot.getInstance().getJda().shutdown();
-					Spark.stop();
 					PluginSystem.disablePlugins();
-					Spark.awaitStop();
+					API.getApp().close();
 					logger.warn("Successfully disconnected!");
 					System.exit(0);
 				} else {

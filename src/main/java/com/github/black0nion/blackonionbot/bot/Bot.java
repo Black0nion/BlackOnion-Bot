@@ -16,7 +16,6 @@ import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
-import com.github.black0nion.blackonionbot.systems.news.Newssystem;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
@@ -161,7 +160,6 @@ public class Bot extends ListenerAdapter {
 		runnables.addAndGetSelf(BotInformation::init)
 				.addAndGetSelf(GiveawaySystem::init)
 				.addAndGetSelf(PlayerManager::init)
-				.addAndGetSelf(Newssystem::init)
 				.addAndGetSelf(API::init)
 				.addAndGetSelf(PluginSystem::loadPlugins)
 				.addAndGetSelf(ConsoleCommands::run)

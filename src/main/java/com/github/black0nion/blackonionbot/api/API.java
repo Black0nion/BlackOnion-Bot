@@ -1,51 +1,56 @@
 package com.github.black0nion.blackonionbot.api;
 
 import com.beust.jcommander.internal.Lists;
-import com.github.black0nion.blackonionbot.api.routes.IRoute;
+import com.github.black0nion.blackonionbot.api.impl.get.Paths;
+import com.github.black0nion.blackonionbot.api.routes.IHttpRoute;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.utils.BlackRateLimiter;
+import com.github.black0nion.blackonionbot.utils.DummyException;
+import com.github.black0nion.blackonionbot.stats.JettyCollector;
+import com.github.black0nion.blackonionbot.utils.Time;
 import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.json.JSONException;
+import io.javalin.Javalin;
+import io.javalin.http.*;
+import io.javalin.http.util.JsonEscapeUtil;
+import io.javalin.http.util.NaiveRateLimit;
+import io.javalin.jetty.JettyUtil;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.json.JSONObject;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Response;
-import spark.Route;
-import spark.Spark;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class API {
+	private static final Logger logger = LoggerFactory.getLogger(API.class);
+	private static final List<IHttpRoute> httpRoutes = new ArrayList<>();
+	private static Javalin app;
 
-	private static final HashMap<String, IRoute> requests = new HashMap<>();
-	private static final List<String> websocketEndpoints = new ArrayList<>();
-
-	private static final HashMap<String, BlackRateLimiter> rateLimiters = new HashMap<>();
-
-	private static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("dashboard-sessions");
-
-	@Reloadable("ratelimits")
-	public static void clearRateLimits() {
-		rateLimiters.clear();
+	public static Javalin getApp() {
+		return app;
 	}
 
 	@Reloadable("api")
 	public static void init() {
-		requests.clear();
-		websocketEndpoints.clear();
-		clearRateLimits();
+		if (app != null) {
+			app.close();
+		}
 
-		Spark.stop();
-		Spark.awaitStop();
-
-		Spark.port(Config.api_port > 0 ? Config.api_port : 187);
+		StatisticsHandler statisticsHandler = new StatisticsHandler();
+		JettyCollector.initialize(statisticsHandler);
+		app = Javalin.create(config -> {
+			config.registerPlugin(new Paths.PathListener());
+			config.enableCorsForAllOrigins();
+			config.server(() -> {
+				// forcefully get default server (the same as Javalin.create() does)
+				Server server = JettyUtil.getOrDefault(null);
+				server.setHandler(statisticsHandler);
+				return server;
+			});
+		}).start(Config.api_port > 0 ? Config.api_port : 187);
 
 		final Reflections reflections = new Reflections(API.class.getPackage().getName());
 
@@ -53,199 +58,134 @@ public class API {
 		final Set<Class<? extends IWebSocketEndpoint>> websocketsClasses = reflections.getSubTypesOf(IWebSocketEndpoint.class);
 
 		for (final Class<? extends IWebSocketEndpoint> websockets : websocketsClasses) {
-			IWebSocketEndpoint endpoint;
 			try {
-				endpoint = websockets.getConstructor().newInstance();
-				Spark.webSocket("/ws/" + endpoint.getRoute(), websockets);
-				websocketEndpoints.add("/ws/" + endpoint.getRoute());
+				IWebSocketEndpoint endpoint = websockets.getConstructor().newInstance();
+				app.ws("/ws/" + endpoint.url(), ws -> {
+					ws.onConnect(ctx -> endpoint.onConnect(ctx.session));
+					ws.onMessage(ctx -> endpoint.onMessage(ctx.session, ctx.message()));
+					ws.onClose(ctx -> endpoint.onClose(ctx.session, ctx.status(), ctx.reason()));
+					ws.onError(ctx -> endpoint.onError(ctx.session, ctx.error()));
+				});
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
 		//endregion
 
-		Spark.init();
-
 		//region Map Requests
-		final Set<Class<? extends IRoute>> requestClasses = reflections.getSubTypesOf(IRoute.class);
+		final Set<Class<? extends IHttpRoute>> requestClasses = reflections.getSubTypesOf(IHttpRoute.class);
 
 		for (final Class<?> req : requestClasses) {
 			try {
-				if (IRoute.class.isAssignableFrom(req) && !req.isInterface()) {
-					final IRoute newInstance = (IRoute) req.getConstructor().newInstance();
-					requests.put("/api/" + newInstance.url(), newInstance);
+				// filter out interfaces like IPostRoute and IGetRoute
+				if (IHttpRoute.class.isAssignableFrom(req) && !req.isInterface()) {
+					httpRoutes.add((IHttpRoute) req.getConstructor().newInstance());
 				}
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
-		//endregion
 
-		// Error handling
-		Spark.internalServerError((request, response) -> {
-			response.header("Access-Control-Allow-Origin", "*");
-			response.type("application/json");
-			logger.error("Some internal server error happened! URL: " + request.url());
-			return exception("Internal server error", 500, response);
+		ExceptionHandler<Exception> exceptionHandler = (e, ctx) -> {
+			// dummy exceptions are just to instantly return from a handler, we don't care about them
+			if (e instanceof DummyException) return;
+
+			// only log unexpected exceptions
+			if (!(e instanceof HttpResponseException))
+				logger.error("API Error happened", e);
+
+			@Nullable final HttpResponseException http = e instanceof HttpResponseException eAsHttp ? eAsHttp : null;
+			ctx.status(http != null ? http.getStatus() : 500).result(
+                "{" +
+                "\n   \"message\": \"" + JsonEscapeUtil.INSTANCE.escape(e.getMessage()) + "\"," +
+                "\n   \"status\": " + (http != null ? http.getStatus() : 500) +
+                "\n}").contentType(ContentType.APPLICATION_JSON);
+
+			if (ctx.status() == 429) {
+				logger.warn("IP {} exceeded rate limit for {} which is {}", ctx.ip(), ctx.path(),
+					// oh my god why am I introducing such code
+					http != null && http.getMessage() != null ? http.getMessage().replaceFirst("Rate limit exceeded - Server allows ", "").replace(".", "") : "unknown"
+				);
+			}
+		};
+		app.exception(Exception.class, exceptionHandler);
+		app.exception(HttpResponseException.class, exceptionHandler);
+
+		app.before(ctx -> {
+			final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
+			logger.info("{} Request from IP {} > {}", ctx.method(), ip, ctx.fullUrl());
 		});
 
-		final String ratelimited = new JSONObject().put("error", "ratelimited").toString();
-		Spark.before((req, res) -> {
-			final String ip = req.headers("X-Real-IP") != null ? req.headers("X-Real-IP") : req.ip();
-			logger.info("IP {} > {} AS {}", ip, req.url(), req.requestMethod());
-			if (!(!requests.containsKey(req.uri()) && !websocketEndpoints.contains(req.uri()))) {
-				// TODO: ratelimit for websockets
-				final IRoute request = requests.get(req.uri());
-				// null if it's a websocket endpoint
-				if (request == null) return;
-				if (rateLimiters.containsKey(ip)) {
-					final BlackRateLimiter limiter = rateLimiters.get(ip);
-					if (!limiter.tryAcquire()) {
-						logger.info("IP {} got ratelimited! Sent {} requests over the limit", ip, limiter.getTooMany());
-						res.status(429);
-						Spark.halt(ratelimited);
-					}
-				} else {
-					rateLimiters.put(ip, BlackRateLimiter.create(request.rateLimit()));
-				}
-			}
-		});
-
-		for (final IRoute req : requests.values()) {
-			if (req.url() == null) {
-				logger.error("Path is null: {}", req.getClass().getName());
-				continue;
-			}
-
+		for (final IHttpRoute req : httpRoutes) {
 			final String url = "/api/" + req.url();
-			final Route route = (request, response) -> {
-				final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
-				try {
-					response.header("Access-Control-Allow-Origin", "*");
+			final Handler handler = ctx -> {
+				Time rateLimit = req.rateLimit();
+				if (rateLimit != null)
+					NaiveRateLimit.requestPerTimeUnit(ctx, rateLimit.time(), rateLimit.unit());
 
-					//region Headers
-					final HashMap<String, String> headers = new HashMap<>();
-					request.headers().forEach(head -> headers.put(head.toLowerCase(), request.headers(head)));
+				if (req.isJson())
+					ctx.contentType(ContentType.APPLICATION_JSON);
 
-					if (!headers.keySet().containsAll(Arrays.asList(req.requiredParameters()))) {
-						List<String> requiredParams = Lists.newArrayList(req.requiredParameters());
-						requiredParams.removeAll(headers.keySet());
-						return exception("Parameters missing: " + requiredParams, 400, response);
-					}
-					//endregion
+				//region Headers
+				final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+				headers.putAll(ctx.headerMap());
 
-					//region Body
-					JSONObject body = new JSONObject();
-					if (req.requiredBodyParameters().length != 0) {
-						body = new JSONObject(request.body());
-					}
+				List<String> requiredHeaders = Lists.newArrayList(req.requiredHeaders());
+				if (req.requiresLogin()) requiredHeaders.add("sessionid");
 
-					for (final String parameter : req.requiredBodyParameters()) {
-						if (!body.has(parameter)) {
-							return exception("Parameter missing: " + parameter, 400, response);
-						}
-					}
-					//endregion
+				if (!headers.keySet().containsAll(requiredHeaders)) {
+					requiredHeaders.removeAll(headers.keySet());
+					throw new BadRequestResponse("Missing headers: " + requiredHeaders);
+				}
+				//endregion
 
-					//region Session
-					BlackSession session = null;
-					if (req.requiresLogin()) {
-						final String sessionId = request.headers("sessionid");
-						if (sessionId == null) return exception("No sessionid provided!", 401, response);
-						final Bson filter = Filters.eq("sessionid", sessionId);
-						final Document sessionInfo = collection.find(filter).first();
-						if (sessionInfo != null) {
-							if (!(sessionInfo.containsKey("access_token") && sessionInfo.containsKey("refresh_token"))) {
-								collection.deleteOne(filter);
-								return exception("Session has no tokens!", 401, response);
-							} else {
-								// everything good, the session is existing and even has tokens, great
-								try {
-									session = new BlackSession(sessionId);
-								} catch (Exception e) {
-									if (e instanceof InputMismatchException) {
-										return exception("Session is invalid!", 401, response);
-									} else if (e instanceof NullPointerException) {
-										logger.error("Session ID is null, shouldn't happen because of the filter before!");
-										return exception(e, response);
-									} else {
-										logger.error("Unknown exception: " + e.getMessage());
-										return exception(e, response);
-									}
-								}
-							}
-						} else {
-							return exception("No session info found!", 401, response);
-						}
+				//region Body
+				JSONObject body = new JSONObject();
+				if (req.requiredBodyParameters().length != 0) {
+					body = new JSONObject(ctx.body());
+				}
 
-						if (session.getUser() == null) {
-							return exception("Not logged in!", 401, response);
-						}
-					}
-					//endregion
-
-					return req.handle(request, response, body, headers, session, session != null ? session.getUser() : null);
-				} catch (final Exception e) {
-					response.type("application/json");
-					if (e instanceof JSONException) {
-						return exception("Invalid JSON!", 400, response);
-					} else {
-						logger.error("api Error happened! Path " + url + " - from IP " + ip, e);
-						return exception("Internal server error!", 500, response);
+				for (final String parameter : req.requiredBodyParameters()) {
+					if (!body.has(parameter)) {
+						throw new BadRequestResponse("Missing parameter in body: " + parameter);
 					}
 				}
+				//endregion
+
+				//region Session
+				BlackSession session = null;
+				if (req.requiresLogin()) {
+					final String sessionId = ctx.header("sessionid");
+					if (sessionId == null) throw new UnauthorizedResponse("No SessionID provided");
+					if (!sessionId.matches(BlackSession.SESSIONID_REGEX)) throw new UnauthorizedResponse("Invalid SessionID");
+					try {
+						session = new BlackSession(sessionId);
+					} catch (Exception e) {
+						if (e instanceof InputMismatchException) {
+							throw new UnauthorizedResponse("Invalid Session");
+						} else if (e instanceof NullPointerException) {
+							logger.error("Session ID is null, shouldn't happen because of the filter before!");
+						}
+						throw e;
+					}
+
+					if (session.getUser() == null) {
+						throw new UnauthorizedResponse("No user found");
+					}
+				}
+				//endregion
+
+				// Objects.toString to make it null safe
+				Object result = req.handle(ctx, body, headers, session, session != null ? session.getUser() : null);
+				if (result instanceof JSONObject json) {
+					ctx.contentType(ContentType.APPLICATION_JSON);
+					result = json.toString();
+				}
+				ctx.result(Objects.toString(result));
 			};
 
-			switch (req.type()) {
-				case GET -> Spark.get(url, route);
-				case POST -> Spark.post(url, route);
-				case PUT -> Spark.put(url, route);
-				case PATCH -> Spark.patch(url, route);
-				case DELETE -> Spark.delete(url, route);
-				case HEAD -> Spark.head(url, route);
-				case TRACE -> Spark.trace(url, route);
-				case CONNECT -> Spark.connect(url, route);
-				case OPTIONS -> Spark.options(url, route);
-				default -> logger.error("Unknown type: " + req.type());
-			}
+			app.addHandler(req.type(), url, handler);
 		}
-
-		final spark.Route notFoundRoute = (request, response) -> {
-			if (websocketEndpoints.contains(request.uri()) && request.headers("upgrade") != null) return null;
-			response.header("Access-Control-Allow-Origin", "*");
-			return exception("Not found!", 404, response);
-		};
-
-		Spark.notFound(notFoundRoute);
-		Spark.get("*", notFoundRoute);
-		Spark.post("*", notFoundRoute);
+		logger.info("Started API server!");
 	}
-
-	public static String exception(Throwable e) {
-		return "{\"error\":\"" + e.getMessage() + "\"}";
-	}
-
-	public static String exception(Throwable e, Response response) {
-		response.status(500);
-		response.type("application/json");
-		return exception(e);
-	}
-
-	public static String exception(String text) {
-		return "{\"error\":\"" + text + "\"}";
-	}
-
-	public static String exception(String text, Response response) {
-		response.status(500);
-		response.type("application/json");
-		return exception(text);
-	}
-
-	public static String exception(String text, int code, Response response) {
-		response.status(code);
-		response.type("application/json");
-		return "{\"error\":\"" + text + "\"}";
-	}
-
-	private static final Logger logger = LoggerFactory.getLogger(API.class);
 }

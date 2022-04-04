@@ -78,7 +78,7 @@
   "error": "Error",
   "errorcantplayagainst": "You can't play against %enemy%!",
   "errorhappened": "A error happened!",
-  "errorwithmessage": "An error occured! Message: %msg%",
+  "errorwithmessage": "An error occured! Message: `%msg%`",
   "experimental": "experimental",
   "fieldoccopied": "This field is already occopied!",
   "files": "Files",

@@ -1,41 +1,40 @@
 package com.github.black0nion.blackonionbot.api.impl.post;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Objects;
-
-import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IPostRoute;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
-
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import spark.Request;
-import spark.Response;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+
+import javax.annotation.Nonnull;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
 
 // TODO: this is absolutely terrible
 public class Vote implements IPostRoute {
 
 	@Override
-	public String url() {
+	public @Nonnull String url() {
 		return "vote";
 	}
 
 	@Override
-	public String handle(final Request request, final Response response, final JSONObject body, final HashMap<String, String> headers, final BlackSession u, DiscordUser discordUser) {
-		final String ip = request.headers("X-Real-IP") != null ? request.headers("X-Real-IP") : request.ip();
-		if (!ip.equals("159.203.105.187") || !headers.containsKey("authorization") || !headers.get("authorization").equals(Config.topgg_auth)) {
-			response.status(401);
-			return "get outta here";
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser dcUser) throws Exception {
+		final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
+		assert ip != null;
+		if (!ip.equals("159.203.105.187") || !headers.get("authorization").equals(Config.topgg_auth)) {
+			throw new UnauthorizedResponse();
 		}
 
 		final long channelId = Config.vote_channel;
@@ -79,7 +78,12 @@ public class Vote implements IPostRoute {
 	}
 
 	@Override
-	public String[] requiredParameters() {
+	public String[] requiredHeaders() {
 		return new String[] { "authorization" };
+	}
+
+	@Override
+	public boolean isJson() {
+		return false;
 	}
 }

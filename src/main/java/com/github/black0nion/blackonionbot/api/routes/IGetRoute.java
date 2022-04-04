@@ -1,15 +1,18 @@
 package com.github.black0nion.blackonionbot.api.routes;
 
 import com.github.black0nion.blackonionbot.utils.Time;
+import io.javalin.http.HandlerType;
 
-public interface IGetRoute extends IRoute {
+import javax.annotation.Nonnull;
+
+public interface IGetRoute extends IHttpRoute {
     @Override
     default Time rateLimit() {
 	return Time.MINUTES(40);
     }
 
     @Override
-    default HttpMethod type() {
-	return HttpMethod.GET;
+    default @Nonnull HandlerType type() {
+	return HandlerType.GET;
     }
 }
