@@ -40,7 +40,6 @@ public class UnbanCommand extends SlashCommand {
       BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
     var user = e.getOption(USER, OptionMapping::getAsUser);
     var reason = e.getOption(REASON, OptionMapping::getAsString);
-    // TODO: Implement
     guild.retrieveBan(user).queue(success -> {
       guild.unban(user).reason(reason).queue(
           v -> e.reply("I have unbanned the user " + user.getAsMention() + " for " + reason)
