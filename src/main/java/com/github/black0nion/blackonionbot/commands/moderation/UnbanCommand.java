@@ -1,5 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -11,14 +14,21 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.List;
 
-public class UnbanCommand extends TextCommand {
-
+public class UnbanCommand extends SlashCommand {
+	private static final String USER = "user";
 	public UnbanCommand() {
-		this.setCommand("unban", "unyeet").setSyntax("<@User>").setRequiredArgumentCount(1).setRequiredPermissions(Permission.BAN_MEMBERS).setRequiredBotPermissions(Permission.BAN_MEMBERS);
+		super(builder(Commands.slash("unban", "Used to unban a user")
+				.addOption(OptionType.USER, USER, "The user to unban"))
+				.setRequiredPermissions(Permission.BAN_MEMBERS)
+				.setRequiredBotPermissions(Permission.BAN_MEMBERS));
 	}
 
 	@Override
@@ -42,5 +52,11 @@ public class UnbanCommand extends TextCommand {
 				}, fail -> cmde.error("usernotfound", "tagornameuser"));
 			} catch (final Exception ignored) {}
 		}
+	}
+
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var user = e.getOption(USER, OptionMapping::getAsUser);
+		//TODO: Implement
 	}
 }
