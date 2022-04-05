@@ -19,44 +19,35 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class UnbanCommand extends SlashCommand {
-	private static final String USER = "user";
-	public UnbanCommand() {
-		super(builder(Commands.slash("unban", "Used to unban a user")
-				.addOption(OptionType.USER, USER, "The user to unban"))
-				.setRequiredPermissions(Permission.BAN_MEMBERS)
-				.setRequiredBotPermissions(Permission.BAN_MEMBERS));
-	}
+  private static final String USER = "user";
+  private static final String REASON = "reason";
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final List<Member> mentionedMembers = message.getMentionedMembers();
-		if (mentionedMembers.size() != 0) {
-			final BlackUser bannedUser = BlackUser.from(mentionedMembers.get(0));
-			guild.retrieveBan(bannedUser).queue(ban -> cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + ban.getReason() + "**")));
-			guild.unban(bannedUser).queue();
-		} else {
-			try {
-				if (!Utils.isLong(args[1])) {
-					cmde.sendPleaseUse();
-					return;
-				}
+  public UnbanCommand() {
+    super(builder(Commands.slash("unban", "Used to unban a user")
+        .addOption(OptionType.USER, USER, "The user to unban")
+        .addOption(OptionType.STRING, REASON, "The reason for the unban"))
+            .setRequiredPermissions(Permission.BAN_MEMBERS)
+            .setRequiredBotPermissions(Permission.BAN_MEMBERS));
+  }
 
-				guild.retrieveBanById(args[1]).queue(ban -> {
-					final String reason = ban.getReason();
-					guild.unban(ban.getUser()).queue();
-					cmde.success("unban", "userunbanned", "bannedfor", new Placeholder("reason", "**" + reason + "**"));
-				}, fail -> cmde.error("usernotfound", "tagornameuser"));
-			} catch (final Exception ignored) {}
-		}
-	}
+  @Override
+  public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+      BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+    var user = e.getOption(USER, OptionMapping::getAsUser);
+    var reason = e.getOption(REASON, OptionMapping::getAsString);
+    // TODO: Implement
+    guild.retrieveBan(user).queue(success -> {
+      guild.unban(user).reason(reason).queue(
+          v -> e.reply("I have unbanned the user " + user.getAsMention() + " for " + reason)
+              .queue(),
+          fail -> e.reply("I could not unban the user " + user.getAsMention() + " for " + reason)
+              .queue());
 
-	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		var user = e.getOption(USER, OptionMapping::getAsUser);
-		//TODO: Implement
-	}
+    }, fail -> e.reply("I could not find the user " + user.getAsMention() + " to unban").queue());
+  }
 }

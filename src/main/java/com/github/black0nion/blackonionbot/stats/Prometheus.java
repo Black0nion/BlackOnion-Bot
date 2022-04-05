@@ -10,16 +10,14 @@ import java.io.IOException;
 
 public class Prometheus {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Prometheus.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Prometheus.class);
 
-	@Reloadable("prometheus")
-	public static void init() {
-		try {
-			new HTTPServer.Builder()
-				.withPort(Config.prometheus_port)
-				.build();
-		} catch (IOException ex) {
-			LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);
-		}
-	}
+  @Reloadable("prometheus")
+  public static void init() {
+    try {
+      new HTTPServer.Builder().withPort(Config.prometheus_port).build();
+    } catch (IOException ex) {
+      LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);
+    }
+  }
 }

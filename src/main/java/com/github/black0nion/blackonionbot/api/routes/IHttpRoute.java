@@ -12,28 +12,29 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public interface IHttpRoute extends IRoute {
-	Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception;
+  Object handle(Context ctx, JSONObject body, Map<String, String> headers,
+      @Nullable BlackSession session, DiscordUser user) throws Exception;
 
-	@Nonnull
-	HandlerType type();
+  @Nonnull
+  HandlerType type();
 
-	default String[] requiredHeaders() {
-		return new String[0];
-	}
+  default String[] requiredHeaders() {
+    return new String[0];
+  }
 
-	default String[] requiredBodyParameters() {
-		return new String[0];
-	}
+  default String[] requiredBodyParameters() {
+    return new String[0];
+  }
 
-	default boolean isJson() {
-		return true;
-	}
+  default boolean isJson() {
+    return true;
+  }
 
-	default boolean requiresLogin() {
-		return false;
-	}
+  default boolean requiresLogin() {
+    return false;
+  }
 
-	default CustomPermission[] requiredCustomPermissions() {
-		return new CustomPermission[0];
-	}
+  default CustomPermission[] requiredCustomPermissions() {
+    return new CustomPermission[0];
+  }
 }

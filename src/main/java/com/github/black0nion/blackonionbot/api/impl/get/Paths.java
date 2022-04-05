@@ -26,53 +26,57 @@ import static java.util.stream.Collectors.toList;
 
 public class Paths implements IGetRoute {
 
-	@Override
-	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
-		PathListener instance = PathListener.getInstance();
-		Map<HandlerType, List<String>> collected = instance.handlerMetaInfoList.stream().collect(
-			Collectors.groupingBy(HandlerMetaInfo::getHttpMethod, mapping(HandlerMetaInfo::getPath, toList()))
-		);
-		return new JSONObject(collected).put("WS", new JSONArray(instance.wsHandlerMetaInfoList.stream().map(WsHandlerMetaInfo::getPath).toList()));
-	}
+  @Override
+  public Object handle(Context ctx, JSONObject body, Map<String, String> headers,
+      @Nullable BlackSession session, DiscordUser user) throws Exception {
+    PathListener instance = PathListener.getInstance();
+    Map<HandlerType, List<String>> collected =
+        instance.handlerMetaInfoList.stream().collect(Collectors.groupingBy(
+            HandlerMetaInfo::getHttpMethod, mapping(HandlerMetaInfo::getPath, toList())));
+    return new JSONObject(collected).put("WS", new JSONArray(
+        instance.wsHandlerMetaInfoList.stream().map(WsHandlerMetaInfo::getPath).toList()));
+  }
 
-	@Override
-	public @Nonnull String url() {
-		return "paths";
-	}
+  @Override
+  public @Nonnull String url() {
+    return "paths";
+  }
 
-	@Override
-	public boolean requiresLogin() {
-		return true;
-	}
+  @Override
+  public boolean requiresLogin() {
+    return true;
+  }
 
-	@Override
-	public CustomPermission[] requiredCustomPermissions() {
-		return new CustomPermission[] { CustomPermission.ADMIN };
-	}
+  @Override
+  public CustomPermission[] requiredCustomPermissions() {
+    return new CustomPermission[] {CustomPermission.ADMIN};
+  }
 
-	/**
-	 * A listener that listens for all the paths that are registered to the Javalin instance.
-	 * Taken from {@link io.javalin.core.util.RouteOverviewConfig RouteOverviewConfig} and {@link io.javalin.core.util.RouteOverviewUtil RouteOverviewUtil}
-	 * @author tipsy, SIMULATAN
-	 */
-	public static class PathListener implements Plugin {
-		final List<HandlerMetaInfo> handlerMetaInfoList = new ArrayList<>();
-		final List<WsHandlerMetaInfo> wsHandlerMetaInfoList = new ArrayList<>();
+  /**
+   * A listener that listens for all the paths that are registered to the Javalin instance. Taken
+   * from {@link io.javalin.core.util.RouteOverviewConfig RouteOverviewConfig} and
+   * {@link io.javalin.core.util.RouteOverviewUtil RouteOverviewUtil}
+   * 
+   * @author tipsy, SIMULATAN
+   */
+  public static class PathListener implements Plugin {
+    final List<HandlerMetaInfo> handlerMetaInfoList = new ArrayList<>();
+    final List<WsHandlerMetaInfo> wsHandlerMetaInfoList = new ArrayList<>();
 
-		private static PathListener instance;
+    private static PathListener instance;
 
-		public static PathListener getInstance() {
-			return instance;
-		}
+    public static PathListener getInstance() {
+      return instance;
+    }
 
-		public PathListener() {
-			instance = this;
-		}
+    public PathListener() {
+      instance = this;
+    }
 
-		@Override
-		public void apply(@NotNull Javalin app) {
-			app.events(it -> it.handlerAdded(handlerMetaInfoList::add));
-			app.events(it -> it.wsHandlerAdded(wsHandlerMetaInfoList::add));
-		}
-	}
+    @Override
+    public void apply(@NotNull Javalin app) {
+      app.events(it -> it.handlerAdded(handlerMetaInfoList::add));
+      app.events(it -> it.wsHandlerAdded(wsHandlerMetaInfoList::add));
+    }
+  }
 }

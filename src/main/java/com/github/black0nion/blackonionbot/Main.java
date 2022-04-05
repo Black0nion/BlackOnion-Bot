@@ -4,12 +4,12 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 
 public class Main {
 
-	public static void main(final String[] args) {
-		try {
-			new Bot(args);
-		} catch (final Throwable ex) {
-			System.err.print("UNCAUGHT ERROR: ");
-			ex.printStackTrace();
-		}
-	}
+  public static void main(final String[] args) {
+    try {
+      new Bot(args);
+    } catch (final Throwable ex) {
+      System.err.print("UNCAUGHT ERROR: ");
+      ex.printStackTrace();
+    }
+  }
 }

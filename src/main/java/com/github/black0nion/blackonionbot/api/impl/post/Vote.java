@@ -24,66 +24,65 @@ import java.util.Objects;
 // TODO: this is absolutely terrible
 public class Vote implements IPostRoute {
 
-	@Override
-	public @Nonnull String url() {
-		return "vote";
-	}
+  @Override
+  public @Nonnull String url() {
+    return "vote";
+  }
 
-	@Override
-	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser dcUser) throws Exception {
-		final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
-		assert ip != null;
-		if (!ip.equals("159.203.105.187") || !headers.get("authorization").equals(Config.topgg_auth)) {
-			throw new UnauthorizedResponse();
-		}
+  @Override
+  public Object handle(Context ctx, JSONObject body, Map<String, String> headers,
+      @Nullable BlackSession session, DiscordUser dcUser) throws Exception {
+    final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
+    assert ip != null;
+    if (!ip.equals("159.203.105.187") || !headers.get("authorization").equals(Config.topgg_auth)) {
+      throw new UnauthorizedResponse();
+    }
 
-		final long channelId = Config.vote_channel;
-		if (channelId != -1) {
-			final TextChannel channel = Bot.getInstance().getJda().getTextChannelById(channelId);
-			if (channel != null) {
-				final String userid = body.getString("user");
-				Objects.requireNonNull(Bot.getInstance().getJda().getGuildById(BotInformation.supportServer)).retrieveMemberById(userid).queue(member -> {
-					final User user = member.getUser();
-					channel
-						.sendMessageEmbeds(new TranslatedEmbed()
-							.setColor(EmbedUtils.BLACK_ONION_COLOR)
-							.setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** (" + user
-								.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
-							.setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
-							.setTimestamp(Instant.now())
-							.build())
-						.queue();
-				}, bruh -> Bot.getInstance().getJda().retrieveUserById(userid).queue(user -> channel
-					.sendMessageEmbeds(new TranslatedEmbed()
-						.setColor(EmbedUtils.BLACK_ONION_COLOR)
-						.setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** (" + user
-							.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
-						.setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
-						.setTimestamp(Instant.now())
-						.build())
-					.queue()));
-			}
-		}
-		return "";
-	}
+    final long channelId = Config.vote_channel;
+    if (channelId != -1) {
+      final TextChannel channel = Bot.getInstance().getJda().getTextChannelById(channelId);
+      if (channel != null) {
+        final String userid = body.getString("user");
+        Objects
+            .requireNonNull(Bot.getInstance().getJda().getGuildById(BotInformation.supportServer))
+            .retrieveMemberById(userid).queue(member -> {
+              final User user = member.getUser();
+              channel.sendMessageEmbeds(new TranslatedEmbed().setColor(EmbedUtils.BLACK_ONION_COLOR)
+                  .setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** ("
+                      + user.getId()
+                      + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
+                  .setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
+                  .setTimestamp(Instant.now()).build()).queue();
+            }, bruh -> Bot.getInstance().getJda().retrieveUserById(userid)
+                .queue(user -> channel.sendMessageEmbeds(new TranslatedEmbed()
+                    .setColor(EmbedUtils.BLACK_ONION_COLOR)
+                    .setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** ("
+                        + user.getId()
+                        + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
+                    .setFooter("Thanks for voting!", user.getEffectiveAvatarUrl())
+                    .setTimestamp(Instant.now()).build()).queue()));
+      }
+    }
+    return "";
+  }
 
-	@Override
-	public boolean requiresLogin() {
-		return false;
-	}
+  @Override
+  public boolean requiresLogin() {
+    return false;
+  }
 
-	@Override
-	public String[] requiredBodyParameters() {
-		return new String[] { "user" };
-	}
+  @Override
+  public String[] requiredBodyParameters() {
+    return new String[] {"user"};
+  }
 
-	@Override
-	public String[] requiredHeaders() {
-		return new String[] { "authorization" };
-	}
+  @Override
+  public String[] requiredHeaders() {
+    return new String[] {"authorization"};
+  }
 
-	@Override
-	public boolean isJson() {
-		return false;
-	}
+  @Override
+  public boolean isJson() {
+    return false;
+  }
 }

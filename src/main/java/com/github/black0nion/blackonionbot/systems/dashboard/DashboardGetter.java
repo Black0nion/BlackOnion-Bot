@@ -1,7 +1,5 @@
 /**
- * Date: 27.05.2021
- * Copyright 2021 BlackOnion
- * File: DashboardGetter.java
+ * Date: 27.05.2021 Copyright 2021 BlackOnion File: DashboardGetter.java
  *
  * @author: _SIM_
  */
@@ -22,20 +20,18 @@ import com.github.black0nion.blackonionbot.misc.GuildType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public abstract @interface DashboardGetter {
-    /**
-     * How this works: Make a DashboardSetter and make properties for it. Then you
-     * make a DashboardGetter and set the id to the id of the previously created
-     * DashboardSetter
-     *
-     * @return The id of the Getter
-     */
-    public String value();
+  /**
+   * How this works: Make a DashboardSetter and make properties for it. Then you make a
+   * DashboardGetter and set the id to the id of the previously created DashboardSetter
+   *
+   * @return The id of the Getter
+   */
+  public String value();
 
-    /**
-     * The guild type required to get a information, will return unauthorized when
-     * not allowed to
-     */
-    public GuildType guildTypeRequired() default GuildType.NORMAL;
+  /**
+   * The guild type required to get a information, will return unauthorized when not allowed to
+   */
+  public GuildType guildTypeRequired() default GuildType.NORMAL;
 
-    public boolean nullable() default false;
+  public boolean nullable() default false;
 }

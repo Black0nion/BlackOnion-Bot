@@ -9,17 +9,16 @@ import java.lang.annotation.Target;
 import net.dv8tion.jda.api.Permission;
 
 /**
- * Annotate a Method with this annotation and it will automatically get
- * registered as a valid config getter for the
- * {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
+ * Annotate a Method with this annotation and it will automatically get registered as a valid config
+ * getter for the {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
  */
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ConfigGetter {
 
-    String key();
+  String key();
 
-    Permission[] requiredPermissions() default {};
+  Permission[] requiredPermissions() default {};
 
-    String description() default "EMPTY";
+  String description() default "EMPTY";
 }

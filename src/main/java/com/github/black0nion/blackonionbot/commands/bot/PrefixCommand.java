@@ -18,27 +18,29 @@ import java.util.regex.Pattern;
 
 public class PrefixCommand extends SlashCommand {
 
-	private static final Pattern PREFIX_PATTERN = Pattern.compile("^[a-zA-Z?:()/&%$§!*;.,-_+#'~|><°^={}\\[\\]´`]{1,10}$");
+  private static final Pattern PREFIX_PATTERN =
+      Pattern.compile("^[a-zA-Z?:()/&%$§!*;.,-_+#'~|><°^={}\\[\\]´`]{1,10}$");
 
-	public PrefixCommand() {
-		super(builder(Commands.slash("prefix", "Change the prefix of the bot for this guild")
-			.addOption(OptionType.STRING, "prefix", "The prefix to set"))
-			.notToggleable()
-			.setRequiredPermissions(Permission.MANAGE_SERVER));
-	}
+  public PrefixCommand() {
+    super(builder(Commands.slash("prefix", "Change the prefix of the bot for this guild")
+        .addOption(OptionType.STRING, "prefix", "The prefix to set")).notToggleable()
+            .setRequiredPermissions(Permission.MANAGE_SERVER));
+  }
 
-	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		String prefix = e.getOption("prefix", OptionMapping::getAsString);
-		if (prefix == null) {
-			cmde.send("myprefixis", new Placeholder("prefix", Utils.escapeMarkdown(guild.getPrefix())));
-		} else {
-			if (PREFIX_PATTERN.matcher(prefix).matches()) {
-				guild.setPrefix(prefix);
-				cmde.send("prefixchanged", new Placeholder("prefix", Utils.escapeMarkdown(prefix)));
-			} else {
-				cmde.send("prefixinvalid", new Placeholder("format", PREFIX_PATTERN.pattern().replaceAll("[_*~`]", "\\$0")));
-			}
-		}
-	}
+  @Override
+  public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member,
+      BlackUser author, BlackGuild guild, TextChannel channel) {
+    String prefix = e.getOption("prefix", OptionMapping::getAsString);
+    if (prefix == null) {
+      cmde.send("myprefixis", new Placeholder("prefix", Utils.escapeMarkdown(guild.getPrefix())));
+    } else {
+      if (PREFIX_PATTERN.matcher(prefix).matches()) {
+        guild.setPrefix(prefix);
+        cmde.send("prefixchanged", new Placeholder("prefix", Utils.escapeMarkdown(prefix)));
+      } else {
+        cmde.send("prefixinvalid",
+            new Placeholder("format", PREFIX_PATTERN.pattern().replaceAll("[_*~`]", "\\$0")));
+      }
+    }
+  }
 }

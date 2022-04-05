@@ -19,24 +19,26 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
  */
 public class LoopCommand extends SlashCommand {
 
-	public LoopCommand() {
-		super("loop", "Loops the current queue");
-	}
+  public LoopCommand() {
+    super("loop", "Loops the current queue");
+  }
 
-	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			//noinspection ConstantConditions - intent is enabled, so it shouldn't be null
-			final AudioChannel memberChannel = member.getVoiceState().getChannel();
-			if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-				guild.setLoop(!guild.loopActivated());
-				cmde.success("loopswitched", "loopisnow", new Placeholder("status", cmde.getTranslation(guild.loopActivated() ? "on" : "off")));
-			} else {
-				cmde.error("notinsamevc", "dontstopotherpplmusic");
-			}
-		} else {
-			cmde.error("notconnected", "startmusictostop");
-		}
-	}
+  @Override
+  public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member,
+      BlackUser author, BlackGuild guild, TextChannel channel) {
+    final GuildVoiceState state = guild.getSelfMember().getVoiceState();
+    if (state != null && state.getChannel() != null) {
+      // noinspection ConstantConditions - intent is enabled, so it shouldn't be null
+      final AudioChannel memberChannel = member.getVoiceState().getChannel();
+      if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
+        guild.setLoop(!guild.loopActivated());
+        cmde.success("loopswitched", "loopisnow",
+            new Placeholder("status", cmde.getTranslation(guild.loopActivated() ? "on" : "off")));
+      } else {
+        cmde.error("notinsamevc", "dontstopotherpplmusic");
+      }
+    } else {
+      cmde.error("notconnected", "startmusictostop");
+    }
+  }
 }

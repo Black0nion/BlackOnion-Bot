@@ -14,31 +14,33 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayCommand extends TextCommand {
 
-	public PlayCommand() {
-		this.setCommand("play")
-			.setSyntax("<url / search term>")
-			.setRequiredArgumentCount(1)
-			.setRequiredBotPermissions(Permission.VOICE_SPEAK);
-	}
+  public PlayCommand() {
+    this.setCommand("play").setSyntax("<url / search term>").setRequiredArgumentCount(1)
+        .setRequiredBotPermissions(Permission.VOICE_SPEAK);
+  }
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final GuildVoiceState state = member.getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			final StringBuilder builder = new StringBuilder();
-			for (int i = 1; i < args.length; i++) builder.append(args[i]).append(" ");
+  @Override
+  public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
+      final Message message, final BlackMember member, final BlackUser author,
+      final BlackGuild guild, final TextChannel channel) {
+    final GuildVoiceState state = member.getVoiceState();
+    if (state != null && state.getChannel() != null) {
+      final StringBuilder builder = new StringBuilder();
+      for (int i = 1; i < args.length; i++)
+        builder.append(args[i]).append(" ");
 
-			String url = builder.toString().trim();
-			if (!url.startsWith("http"))
-				url = "ytsearch:" + url;
+      String url = builder.toString().trim();
+      if (!url.startsWith("http"))
+        url = "ytsearch:" + url;
 
-			final AudioManager audioManager = e.getGuild().getAudioManager();
-			final AudioChannel memberChannel = member.getVoiceState().getChannel();
+      final AudioManager audioManager = e.getGuild().getAudioManager();
+      final AudioChannel memberChannel = member.getVoiceState().getChannel();
 
-			audioManager.openAudioConnection(memberChannel);
+      audioManager.openAudioConnection(memberChannel);
 
-			PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), url, audioManager, memberChannel);
-		} else
-			cmde.error("notinvc", "goinvc");
-	}
+      PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), url, audioManager,
+          memberChannel);
+    } else
+      cmde.error("notinvc", "goinvc");
+  }
 }

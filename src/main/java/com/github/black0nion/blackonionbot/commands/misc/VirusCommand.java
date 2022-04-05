@@ -13,12 +13,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class VirusCommand extends TextCommand {
 
-	public VirusCommand() {
-		this.setCommand("viruscheck", "virus").setSyntax("<url / attachement>").setProgress(Progress.PAUSED);
-	}
+  public VirusCommand() {
+    this.setCommand("viruscheck", "virus").setSyntax("<url / attachement>")
+        .setProgress(Progress.PAUSED);
+  }
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		cmde.reply(cmde.success().setTitle("VirusTotal", "https://www.virustotal.com/gui/home/upload").addField("virustotalfieldtitle", "virustotalinfo", false));
-	}
+  @Override
+  public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
+      final Message message, final BlackMember member, final BlackUser author,
+      final BlackGuild guild, final TextChannel channel) {
+    cmde.reply(cmde.success().setTitle("VirusTotal", "https://www.virustotal.com/gui/home/upload")
+        .addField("virustotalfieldtitle", "virustotalinfo", false));
+  }
 }

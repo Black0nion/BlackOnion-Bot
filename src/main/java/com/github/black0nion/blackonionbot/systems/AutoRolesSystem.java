@@ -13,27 +13,28 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class AutoRolesSystem extends ListenerAdapter {
-	@Override
-	public void onGuildMemberJoin(final GuildMemberJoinEvent event) {
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		final BlackUser user = BlackUser.from(event.getUser());
+  @Override
+  public void onGuildMemberJoin(final GuildMemberJoinEvent event) {
+    final BlackGuild guild = BlackGuild.from(event.getGuild());
+    final BlackUser user = BlackUser.from(event.getUser());
 
-		final List<Long> autoroles = guild.getAutoRoles();
-		final List<Long> removedRoles = new ArrayList<>();
+    final List<Long> autoroles = guild.getAutoRoles();
+    final List<Long> removedRoles = new ArrayList<>();
 
-		if (Utils.handleRights(guild, user, null, Permission.MANAGE_ROLES)) return;
+    if (Utils.handleRights(guild, user, null, Permission.MANAGE_ROLES))
+      return;
 
-		for (final long roleid : autoroles) {
-			final Role role = guild.getRoleById(roleid);
-			if (role == null)
-				removedRoles.add(roleid);
-			else
-				guild.addRoleToMember(user.getIdLong(), role).queue();
-		}
+    for (final long roleid : autoroles) {
+      final Role role = guild.getRoleById(roleid);
+      if (role == null)
+        removedRoles.add(roleid);
+      else
+        guild.addRoleToMember(user.getIdLong(), role).queue();
+    }
 
-		if (removedRoles.size() != 0) {
-			autoroles.removeAll(removedRoles);
-			guild.setAutoRoles(autoroles);
-		}
- 	}
+    if (removedRoles.size() != 0) {
+      autoroles.removeAll(removedRoles);
+      guild.setAutoRoles(autoroles);
+    }
+  }
 }

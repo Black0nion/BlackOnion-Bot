@@ -7,18 +7,18 @@ import javax.annotation.Nonnull;
 
 public interface IPostRoute extends IHttpRoute {
 
-    @Override
-    default boolean requiresLogin() {
-		return true;
-    }
+  @Override
+  default boolean requiresLogin() {
+    return true;
+  }
 
-    @Override
-    default Time rateLimit() {
-		return Time.MINUTES(20);
-    }
+  @Override
+  default Time rateLimit() {
+    return Time.MINUTES(20);
+  }
 
-    @Override
-    default @Nonnull HandlerType type() {
-		return HandlerType.POST;
-    }
+  @Override
+  default @Nonnull HandlerType type() {
+    return HandlerType.POST;
+  }
 }
