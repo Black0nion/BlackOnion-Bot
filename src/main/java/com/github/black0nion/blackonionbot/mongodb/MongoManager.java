@@ -1,16 +1,15 @@
 package com.github.black0nion.blackonionbot.mongodb;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.ConnectionString;
 import com.mongodb.client.*;
-import org.bson.Document;
-
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoManager {
 

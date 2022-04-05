@@ -1,9 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
-import org.json.JSONObject;
-
 import com.github.black0nion.blackonionbot.api.BlackWebsocketSession;
 import com.github.black0nion.blackonionbot.api.impl.DashboardWebsocket;
+import org.json.JSONObject;
 
 public enum ResponseCode {
 

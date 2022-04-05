@@ -1,30 +1,27 @@
 package com.github.black0nion.blackonionbot.systems.antiswear;
 
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.DELETE;
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.OFF;
-import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.REPLACE;
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-import club.minnced.discord.webhook.WebhookClient;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import net.dv8tion.jda.api.entities.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Utils;
-
-import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import net.dv8tion.jda.api.Permission;
+import static com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType.*;
 
 public class AntiSwearSystem {
 

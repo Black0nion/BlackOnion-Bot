@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.api;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthUtils;

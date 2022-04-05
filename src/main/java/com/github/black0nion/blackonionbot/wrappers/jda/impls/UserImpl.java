@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.wrappers.jda.impls;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.PrivateChannel;

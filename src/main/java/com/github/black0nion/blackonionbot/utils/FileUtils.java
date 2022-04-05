@@ -1,12 +1,11 @@
 package com.github.black0nion.blackonionbot.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class FileUtils {
 

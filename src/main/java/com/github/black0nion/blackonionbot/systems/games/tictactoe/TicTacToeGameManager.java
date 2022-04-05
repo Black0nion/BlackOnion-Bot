@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
+import net.dv8tion.jda.api.entities.TextChannel;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class TicTacToeGameManager {
   private static final List<TicTacToe> games = new ArrayList<>();

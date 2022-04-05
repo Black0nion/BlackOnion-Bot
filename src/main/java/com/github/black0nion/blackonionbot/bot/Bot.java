@@ -46,7 +46,10 @@ import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {

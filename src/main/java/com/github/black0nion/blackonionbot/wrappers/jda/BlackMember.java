@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.impls.MemberImpl;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.wrappers.jda.impls.MemberImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

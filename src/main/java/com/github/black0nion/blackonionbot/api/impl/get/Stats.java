@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 import java.util.Map;
 
 import static com.github.black0nion.blackonionbot.bot.BotInformation.*;

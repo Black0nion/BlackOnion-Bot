@@ -1,14 +1,13 @@
 package com.github.black0nion.blackonionbot.utils;
 
-import java.awt.Color;
-import java.time.Instant;
-
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
+
+import java.awt.*;
+import java.time.Instant;
 
 public class EmbedUtils {
 
