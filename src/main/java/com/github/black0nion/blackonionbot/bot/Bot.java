@@ -54,150 +54,146 @@ import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
 
-  public static final List<String> launchArguments = new ArrayList<>();
+	public static final List<String> launchArguments = new ArrayList<>();
 
-  private static Bot instance;
+	private static Bot instance;
 
-  public static Bot getInstance() {
-    return instance;
-  }
+	public static Bot getInstance() {
+		return instance;
+	}
 
-  private JDA jda;
+	private JDA jda;
 
-  public JDA getJda() {
-    return jda;
-  }
+	public JDA getJda() {
+		return jda;
+	}
 
-  private final Logger logger = LoggerFactory.getLogger(Bot.class);
-  private final ExecutorService executor = Executors.newCachedThreadPool();
-  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-  private final Gson gson =
-      new GsonBuilder().registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT).create();
-  private final EventWaiter eventWaiter = new EventWaiter();
-  private final HttpClient httpClient =
-      HttpClient.newBuilder().executor(Executors.newCachedThreadPool(new ThreadFactory() {
-        private final ThreadGroup group = new ThreadGroup("HttpClient");
+	private final Logger logger = LoggerFactory.getLogger(Bot.class);
+	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+	private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT).create();
+	private final EventWaiter eventWaiter = new EventWaiter();
+	private final HttpClient httpClient = HttpClient.newBuilder()
+			.executor(Executors.newCachedThreadPool(new ThreadFactory() {
+				private final ThreadGroup group = new ThreadGroup("HttpClient");
 
-        @Override
-        public Thread newThread(@NotNull Runnable r) {
-          return new Thread(group, r);
-        }
-      })).followRedirects(HttpClient.Redirect.ALWAYS).build();
+				@Override
+				public Thread newThread(@NotNull Runnable r) {
+					return new Thread(group, r);
+				}
+			})).followRedirects(HttpClient.Redirect.ALWAYS).build();
 
-  // region Getters
-  public ExecutorService getExecutor() {
-    return executor;
-  }
+	// region Getters
+	public ExecutorService getExecutor() {
+		return executor;
+	}
 
-  public ScheduledExecutorService getScheduledExecutor() {
-    return scheduledExecutor;
-  }
+	public ScheduledExecutorService getScheduledExecutor() {
+		return scheduledExecutor;
+	}
 
-  public Gson getGson() {
-    return gson;
-  }
+	public Gson getGson() {
+		return gson;
+	}
 
-  public EventWaiter getEventWaiter() {
-    return eventWaiter;
-  }
+	public EventWaiter getEventWaiter() {
+		return eventWaiter;
+	}
 
-  public HttpClient getHttpClient() {
-    return httpClient;
-  }
-  // endregion
+	public HttpClient getHttpClient() {
+		return httpClient;
+	}
+	// endregion
 
-  public Bot(String[] args) throws IOException {
-    instance = this;
-    launchArguments.addAll(Arrays.asList(args));
-    Utils.printLogo();
-    SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
-    ConfigManager.loadConfig();
-    DockerManager.init();
-    logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
-    // noinspection ResultOfMethodCallIgnored
-    new File("files").mkdirs();
+	public Bot(String[] args) throws IOException {
+		instance = this;
+		launchArguments.addAll(Arrays.asList(args));
+		Utils.printLogo();
+		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
+		ConfigManager.loadConfig();
+		DockerManager.init();
+		logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
+		// noinspection ResultOfMethodCallIgnored
+		new File("files").mkdirs();
 
-    MongoManager.connect(Config.mongo_connection_string);
+		MongoManager.connect(Config.mongo_connection_string);
 
-    final JDABuilder builder = JDABuilder
-        .createDefault(Config.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
-            GatewayIntent.GUILD_MESSAGE_REACTIONS)
-        .disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE))
-        .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL)
-        .enableIntents(GatewayIntent.GUILD_MEMBERS).setMaxReconnectDelay(32).addEventListeners(
-            new CommandBase(), new SlashCommandBase(), this, new ReactionRoleSystem(),
-            new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
+		final JDABuilder builder = JDABuilder
+				.createDefault(Config.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES,
+						GatewayIntent.GUILD_MESSAGE_REACTIONS)
+				.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOTE))
+				.enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS).setMaxReconnectDelay(32)
+				.addEventListeners(new CommandBase(), new SlashCommandBase(), this, new ReactionRoleSystem(),
+						new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
 
-    LanguageSystem.init();
-    // the constructor already needs the initialized hashmap
-    ReloadCommand.initReloadableMethods();
-    CommandBase.addCommands();
-    SlashCommandBase.addCommands();
-    builder.setStatus(StatusCommand.getStatusFromConfig());
-    builder.setActivity(ActivityCommand.getActivity());
+		LanguageSystem.init();
+		// the constructor already needs the initialized hashmap
+		ReloadCommand.initReloadableMethods();
+		CommandBase.addCommands();
+		SlashCommandBase.addCommands();
+		builder.setStatus(StatusCommand.getStatusFromConfig());
+		builder.setActivity(ActivityCommand.getActivity());
 
-    try {
-      this.jda = builder.build();
-    } catch (final Exception e) {
-      e.printStackTrace();
-      logger.error(
-          "Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
-      logger.error("Terminating bot.");
-      System.exit(-1);
-      return;
-    }
+		try {
+			this.jda = builder.build();
+		} catch (final Exception e) {
+			e.printStackTrace();
+			logger.error(
+					"Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
+			logger.error("Terminating bot.");
+			System.exit(-1);
+			return;
+		}
 
-    try {
-      Paginator paginator = PaginatorBuilder.createPaginator().setHandler(jda).shouldEventLock(true)
-          .setDeleteOnCancel(true).shouldRemoveOnReact(true).build();
-      Pages.activate(paginator);
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.exit(-1);
-    }
+		try {
+			Paginator paginator = PaginatorBuilder.createPaginator().setHandler(jda).shouldEventLock(true)
+					.setDeleteOnCancel(true).shouldRemoveOnReact(true).build();
+			Pages.activate(paginator);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 
-    ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
-    runnables.addAndGetSelf(BotInformation::init).addAndGetSelf(GiveawaySystem::init)
-        .addAndGetSelf(PlayerManager::init).addAndGetSelf(API::init)
-        .addAndGetSelf(PluginSystem::loadPlugins).addAndGetSelf(ConsoleCommands::run)
-        .addAndGetSelf(Prometheus::init);
-    ExecutorService asyncStartup = Executors.newFixedThreadPool(runnables.size());
-    runnables.forEach(asyncStartup::submit);
+		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
+		runnables.addAndGetSelf(BotInformation::init).addAndGetSelf(GiveawaySystem::init)
+				.addAndGetSelf(PlayerManager::init).addAndGetSelf(API::init).addAndGetSelf(PluginSystem::loadPlugins)
+				.addAndGetSelf(ConsoleCommands::run).addAndGetSelf(Prometheus::init);
+		ExecutorService asyncStartup = Executors.newFixedThreadPool(runnables.size());
+		runnables.forEach(asyncStartup::submit);
 
-    Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, 15,
-        TimeUnit.SECONDS);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, 15, TimeUnit.SECONDS);
 
-    Runtime.getRuntime().addShutdownHook(new Thread(MongoManager::disconnect));
-  }
+		Runtime.getRuntime().addShutdownHook(new Thread(MongoManager::disconnect));
+	}
 
-  @Override
-  public void onReady(final ReadyEvent e) {
-    final JDA jda = e.getJDA();
-    BotInformation.SELF_USER_ID = jda.getSelfUser().getIdLong();
-    logger.info(
-        "Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator()
-            + " in " + (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
+	@Override
+	public void onReady(final ReadyEvent e) {
+		final JDA jda = e.getJDA();
+		BotInformation.SELF_USER_ID = jda.getSelfUser().getIdLong();
+		logger.info("Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in "
+				+ (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
 
-    jda.getPresence().setActivity(ActivityCommand.getActivity());
+		jda.getPresence().setActivity(ActivityCommand.getActivity());
 
-    SlashCommandBase.updateCommandsDev(jda);
-  }
+		SlashCommandBase.updateCommandsDev(jda);
+	}
 
-  @Reloadable("commands")
-  public static void updateCommands() {
-    CommandBase.addCommands();
-    SlashCommandBase.addCommands();
-  }
+	@Reloadable("commands")
+	public static void updateCommands() {
+		CommandBase.addCommands();
+		SlashCommandBase.addCommands();
+	}
 
-  @Override
-  public void onDisconnect(final DisconnectEvent event) {
-    final CloseCode closeCode = event.getCloseCode();
-    logger.error("Disconnected from Discord! Code: "
-        + (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
-  }
+	@Override
+	public void onDisconnect(final DisconnectEvent event) {
+		final CloseCode closeCode = event.getCloseCode();
+		logger.error("Disconnected from Discord! Code: "
+				+ (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
+	}
 
-  @Override
-  public void onReconnected(final @NotNull ReconnectedEvent event) {
-    logger.info("Reconnected to Discord.");
-  }
+	@Override
+	public void onReconnected(final @NotNull ReconnectedEvent event) {
+		logger.info("Reconnected to Discord.");
+	}
 }

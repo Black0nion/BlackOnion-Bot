@@ -23,29 +23,28 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
  */
 public class PauseCommand extends SlashCommand {
 
-  public PauseCommand() {
-    super("pause", "Pause the current track");
-  }
+	public PauseCommand() {
+		super("pause", "Pause the current track");
+	}
 
-  @Override
-  public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member,
-      BlackUser author, BlackGuild guild, TextChannel channel) {
-    final GuildVoiceState state = guild.getSelfMember().getVoiceState();
-    if (state != null && state.getChannel() != null) {
-      // noinspection ConstantConditions - intent is enabled, so it shouldn't be null
-      final AudioChannel memberChannel = member.getVoiceState().getChannel();
-      if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-        final GuildMusicManager musicManager =
-            PlayerManager.getInstance().getMusicManager(e.getTextChannel());
-        musicManager.scheduler.player.setPaused(true);
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
+			BlackGuild guild, TextChannel channel) {
+		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
+		if (state != null && state.getChannel() != null) {
+			// noinspection ConstantConditions - intent is enabled, so it shouldn't be null
+			final AudioChannel memberChannel = member.getVoiceState().getChannel();
+			if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
+				final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
+				musicManager.scheduler.player.setPaused(true);
 
-        cmde.success("musicpaused", "useresume", new Placeholder("command",
-            CommandEvent.getCommandHelp(guild, CommandBase.commands.get("resume"))));
-      } else {
-        cmde.error("notinsamevc", "dontstopotherpplmusic");
-      }
-    } else {
-      cmde.error("notconnected", "startmusictostop");
-    }
-  }
+				cmde.success("musicpaused", "useresume", new Placeholder("command",
+						CommandEvent.getCommandHelp(guild, CommandBase.commands.get("resume"))));
+			} else {
+				cmde.error("notinsamevc", "dontstopotherpplmusic");
+			}
+		} else {
+			cmde.error("notconnected", "startmusictostop");
+		}
+	}
 }

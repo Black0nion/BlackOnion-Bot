@@ -13,24 +13,24 @@ import java.util.Map;
 
 public class Login implements IPostRoute {
 
-  @Override
-  public Object handle(Context ctx, JSONObject body, Map<String, String> headers,
-      @Nullable BlackSession session, DiscordUser user) throws Exception {
-    return OAuthUtils.loginWithDiscord(ctx.header("code"));
-  }
+	@Override
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session,
+			DiscordUser user) throws Exception {
+		return OAuthUtils.loginWithDiscord(ctx.header("code"));
+	}
 
-  @Override
-  public @Nonnull String url() {
-    return "login";
-  }
+	@Override
+	public @Nonnull String url() {
+		return "login";
+	}
 
-  @Override
-  public boolean requiresLogin() {
-    return false;
-  }
+	@Override
+	public boolean requiresLogin() {
+		return false;
+	}
 
-  @Override
-  public String[] requiredHeaders() {
-    return new String[] {"code"};
-  }
+	@Override
+	public String[] requiredHeaders() {
+		return new String[]{"code"};
+	}
 }

@@ -15,30 +15,26 @@ import java.time.Duration;
 
 public class SetWelcomeChannelCommand extends TextCommand {
 
-  public SetWelcomeChannelCommand() {
-    this.setCommand("setwelcomechannel", "setwelcomechat").setSyntax("[clear / off]")
-        .setRequiredBotPermissions(Permission.MESSAGE_MANAGE)
-        .setRequiredPermissions(Permission.MANAGE_SERVER);
-  }
+	public SetWelcomeChannelCommand() {
+		this.setCommand("setwelcomechannel", "setwelcomechat").setSyntax("[clear / off]")
+				.setRequiredBotPermissions(Permission.MESSAGE_MANAGE).setRequiredPermissions(Permission.MANAGE_SERVER);
+	}
 
-  @Override
-  public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-      final Message message, final BlackMember member, final BlackUser author,
-      final BlackGuild guild, final TextChannel channel) {
-    message.delete().queue();
-    if (args.length >= 2
-        && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
-      guild.setJoinChannel(-1);
-      message
-          .replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
-              .addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build())
-          .delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-    } else {
-      guild.setJoinChannel(channel.getIdLong());
-      message
-          .replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
-              .addField("welcomechannelset", "welcomechannelsetinfo", false).build())
-          .delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
-    }
-  }
+	@Override
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
+			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
+			final TextChannel channel) {
+		message.delete().queue();
+		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
+			guild.setJoinChannel(-1);
+			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
+					.addField("welcomechannelcleared", "welcomechannelclearedinfo", false).build())
+					.delay(Duration.ofSeconds(5)).flatMap(Message::delete).queue();
+		} else {
+			guild.setJoinChannel(channel.getIdLong());
+			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
+					.addField("welcomechannelset", "welcomechannelsetinfo", false).build()).delay(Duration.ofSeconds(5))
+					.flatMap(Message::delete).queue();
+		}
+	}
 }

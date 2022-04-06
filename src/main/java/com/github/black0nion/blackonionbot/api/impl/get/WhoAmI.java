@@ -12,19 +12,19 @@ import java.util.Map;
 
 public class WhoAmI implements IGetRoute {
 
-  @Override
-  public Object handle(Context ctx, JSONObject body, Map<String, String> headers,
-      @Nullable BlackSession session, DiscordUser user) throws Exception {
-    return user.getUserAsJson();
-  }
+	@Override
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session,
+			DiscordUser user) throws Exception {
+		return user.getUserAsJson();
+	}
 
-  @Override
-  public @Nonnull String url() {
-    return "whoami";
-  }
+	@Override
+	public @Nonnull String url() {
+		return "whoami";
+	}
 
-  @Override
-  public boolean requiresLogin() {
-    return true;
-  }
+	@Override
+	public boolean requiresLogin() {
+		return true;
+	}
 }

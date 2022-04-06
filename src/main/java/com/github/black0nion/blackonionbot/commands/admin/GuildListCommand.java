@@ -24,45 +24,44 @@ import java.util.concurrent.TimeUnit;
 
 public class GuildListCommand extends SlashCommand {
 
-  public GuildListCommand() {
-    super(builder("guilds", "List all guilds").setAdminGuild());
-  }
+	public GuildListCommand() {
+		super(builder("guilds", "List all guilds").setAdminGuild());
+	}
 
-  @Override
-  public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member,
-      BlackUser author, BlackGuild eventGuild, TextChannel channel) {
-    final List<Page> pages = new ArrayList<>();
-    final EmbedBuilder baseEmbed = cmde.success().setTitle("Guilds").setDescription("```");
-    EmbedBuilder currentEmbed = new EmbedBuilder(baseEmbed);
-    boolean found = false;
-    for (Guild guild : e.getJDA().getGuilds()) {
-      found = true;
-      System.out.println(guild.getOwner());
-      @Nullable
-      BlackUser owner = Optional.ofNullable(guild.getOwner()).map(Member::getUser)
-          .map(BlackUser::from).orElse(null);
-      String text = "- " + Utils.escapeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
-      try {
-        if (currentEmbed.getDescriptionBuilder().length() + text.length()
-            + 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH)
-          throw new Exception();
-        currentEmbed.appendDescription("\n" + text + " (Owner: "
-            + (owner == null ? cmde.getTranslation("empty") : owner.getEscapedEffectiveName())
-            + ")");
-      } catch (Exception ignored) {
-        pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
-        currentEmbed = new EmbedBuilder(baseEmbed);
-        currentEmbed.appendDescription(text);
-      }
-    }
-    pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
-    // TODO: Fix
-    if (!found)
-      cmde.send("noguildsfound");
-    else {
-      cmde.reply((MessageEmbed) pages.get(0).getContent(),
-          success -> success.retrieveOriginal().queue(message -> Pages.paginate(message, pages,
-              true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong())));
-    }
-  }
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
+			BlackGuild eventGuild, TextChannel channel) {
+		final List<Page> pages = new ArrayList<>();
+		final EmbedBuilder baseEmbed = cmde.success().setTitle("Guilds").setDescription("```");
+		EmbedBuilder currentEmbed = new EmbedBuilder(baseEmbed);
+		boolean found = false;
+		for (Guild guild : e.getJDA().getGuilds()) {
+			found = true;
+			System.out.println(guild.getOwner());
+			@Nullable
+			BlackUser owner = Optional.ofNullable(guild.getOwner()).map(Member::getUser).map(BlackUser::from)
+					.orElse(null);
+			String text = "- " + Utils.escapeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
+			try {
+				if (currentEmbed.getDescriptionBuilder().length() + text.length()
+						+ 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH)
+					throw new Exception();
+				currentEmbed.appendDescription("\n" + text + " (Owner: "
+						+ (owner == null ? cmde.getTranslation("empty") : owner.getEscapedEffectiveName()) + ")");
+			} catch (Exception ignored) {
+				pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
+				currentEmbed = new EmbedBuilder(baseEmbed);
+				currentEmbed.appendDescription(text);
+			}
+		}
+		pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
+		// TODO: Fix
+		if (!found)
+			cmde.send("noguildsfound");
+		else {
+			cmde.reply((MessageEmbed) pages.get(0).getContent(),
+					success -> success.retrieveOriginal().queue(message -> Pages.paginate(message, pages, true, 2,
+							TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong())));
+		}
+	}
 }

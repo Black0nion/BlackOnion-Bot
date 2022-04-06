@@ -9,16 +9,17 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotate a Method with this annotation and it will automatically get registered as a valid config
- * getter for the {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
+ * Annotate a Method with this annotation and it will automatically get
+ * registered as a valid config getter for the
+ * {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
  */
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ConfigGetter {
 
-  String key();
+	String key();
 
-  Permission[] requiredPermissions() default {};
+	Permission[] requiredPermissions() default {};
 
-  String description() default "EMPTY";
+	String description() default "EMPTY";
 }

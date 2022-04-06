@@ -13,16 +13,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SetBotLogsChannelCommand extends TextCommand {
 
-  public SetBotLogsChannelCommand() {
-    this.setCommand("setbotlogschannel").setRequiredCustomPermissions(CustomPermission.ADMIN);
-  }
+	public SetBotLogsChannelCommand() {
+		this.setCommand("setbotlogschannel").setRequiredCustomPermissions(CustomPermission.ADMIN);
+	}
 
-  @Override
-  public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-      final Message message, final BlackMember member, final BlackUser author,
-      final BlackGuild guild, final TextChannel channel) {
-    BotInformation.botLogsChannel = channel.getIdLong();
-    guild.save("botlogschannel", channel.getIdLong());
-    cmde.success("savedbotlogschannel", "thisisbotlogschannel");
-  }
+	@Override
+	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
+			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
+			final TextChannel channel) {
+		BotInformation.botLogsChannel = channel.getIdLong();
+		guild.save("botlogschannel", channel.getIdLong());
+		cmde.success("savedbotlogschannel", "thisisbotlogschannel");
+	}
 }

@@ -16,41 +16,40 @@ import java.util.Map;
 
 public class GetGuildsToManage implements IGetRoute {
 
-  @Override
-  public Object handle(Context ctx, JSONObject body, Map<String, String> headers,
-      @Nullable BlackSession session, DiscordUser user) throws Exception {
-    final JSONObject guildsObj = new JSONObject().put("id", Long.parseLong(user.getUser().getId()))
-        .put("name", user.getUser().getUsername())
-        .put("discriminator", user.getUser().getDiscriminator())
-        .put("locale", user.getUser().getLocale()).put("mfa", user.getUser().getMfaEnabled());
+	@Override
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session,
+			DiscordUser user) throws Exception {
+		final JSONObject guildsObj = new JSONObject().put("id", Long.parseLong(user.getUser().getId()))
+				.put("name", user.getUser().getUsername()).put("discriminator", user.getUser().getDiscriminator())
+				.put("locale", user.getUser().getLocale()).put("mfa", user.getUser().getMfaEnabled());
 
-    final List<io.mokulu.discord.oauth.model.Guild> guildsResponse = user.getGuilds();
-    if (guildsResponse == null) {
-      throw new NullPointerException("Guilds response is null");
-    }
-    final JSONArray guilds = new JSONArray();
+		final List<io.mokulu.discord.oauth.model.Guild> guildsResponse = user.getGuilds();
+		if (guildsResponse == null) {
+			throw new NullPointerException("Guilds response is null");
+		}
+		final JSONArray guilds = new JSONArray();
 
-    guildsResponse.forEach(oauthGuild -> {
-      final JSONObject guildAsJson = new JSONObject();
-      final Guild guild = Bot.getInstance().getJda().getGuildById(oauthGuild.getId());
-      final long permissions = oauthGuild.getPermissions();
-      if ((permissions & (1 << 3 | 1 << 5)) != 0) {
-        guildAsJson.put("bot_in_guild", guild != null);
-        guilds.put(guildAsJson);
-      }
-    });
+		guildsResponse.forEach(oauthGuild -> {
+			final JSONObject guildAsJson = new JSONObject();
+			final Guild guild = Bot.getInstance().getJda().getGuildById(oauthGuild.getId());
+			final long permissions = oauthGuild.getPermissions();
+			if ((permissions & (1 << 3 | 1 << 5)) != 0) {
+				guildAsJson.put("bot_in_guild", guild != null);
+				guilds.put(guildAsJson);
+			}
+		});
 
-    guildsObj.put("guilds", guilds);
-    return guildsObj;
-  }
+		guildsObj.put("guilds", guilds);
+		return guildsObj;
+	}
 
-  @Override
-  public @Nonnull String url() {
-    return "guilds";
-  }
+	@Override
+	public @Nonnull String url() {
+		return "guilds";
+	}
 
-  @Override
-  public boolean requiresLogin() {
-    return true;
-  }
+	@Override
+	public boolean requiresLogin() {
+		return true;
+	}
 }
