@@ -1,71 +1,76 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-public class BanCommand extends TextCommand {
+public class BanCommand extends SlashCommand {
+  private static final String USER = "user";
+  private static final String REASON = "reason";
+  private static final String DEL_DAYS = "delDays";
 
   public BanCommand() {
-    this.setCommand("ban", "permayeet").setSyntax("<@User> [reason]").setRequiredArgumentCount(1)
-        .setRequiredPermissions(Permission.BAN_MEMBERS)
-        .setRequiredBotPermissions(Permission.BAN_MEMBERS);
+    super(builder(Commands.slash("ban", "Used to ban a user from the server.")
+        .addOption(OptionType.USER, USER, "The user to ban.", true)
+        .addOption(OptionType.STRING, REASON, "The reason for the ban.", true)
+        .addOptions(new OptionData(OptionType.INTEGER, DEL_DAYS,
+            "The amount of days to delete messages from the user.", true)
+                .addChoices(deleationDays))).setRequiredPermissions(Permission.BAN_MEMBERS)
+                    .setRequiredBotPermissions(Permission.BAN_MEMBERS));
+
   }
 
-  @Override
-  public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-      final Message message, final BlackMember member, final BlackUser author,
-      final BlackGuild guild, final TextChannel channel) {
-    final List<Member> mentionedMembers = message.getMentionedMembers();
-    Language authorLanguage = author.getLanguage() != null ? author.getLanguage()
-        : guild.getLanguage() != null ? guild.getLanguage() : LanguageSystem.getDefaultLanguage();
-    if (mentionedMembers.size() == 0) {
-      message.replyEmbeds(
-          EmbedUtils.getErrorEmbed(author, guild).addField(cmde.getTranslation("wrongargument"),
-              cmde.getTranslation("tagornameuser"), false).build())
-          .queue();
-    } else {
-      String banMessage = authorLanguage.getTranslationNonNull("yougotbanned");
-      final BlackMember userToBan = BlackMember.from(mentionedMembers.get(0));
+  private static final List<Command.Choice> deleationDays =
+      List.of(new Command.Choice("None", 0), new Command.Choice("One Day", 1),
+          new Command.Choice("Two Days", 2), new Command.Choice("Three Days", 3),
+          new Command.Choice("Four Days", 4), new Command.Choice("Five Days", 5),
+          new Command.Choice("Six Days", 6), new Command.Choice("Seven Days", 7));
 
-      assert userToBan != null;
-      if (member.canInteract(userToBan)) {
-        if (args.length >= 3) {
-          banMessage = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-          guild.ban(userToBan, 0, banMessage).queue();
-        } else {
-          guild.ban(userToBan, 0).queue();
-        }
-        final String finalBanMessage = banMessage;
-        cmde.success("Ban", "usergotbanned", "message", new Placeholder("msg", banMessage));
-        userToBan.getBlackUser().openPrivateChannel()
-            .queue(
-                c -> c
-                    .sendMessageEmbeds(
-                        EmbedUtils.getErrorEmbed(author, guild).setTitle("Ban")
-                            .addField(authorLanguage.getTranslation("yougotbanned"),
-                                authorLanguage.getTranslation("message",
-                                    new Placeholder("msg", finalBanMessage)),
-                                false)
-                            .build())
-                    .queue());
-      } else {
-        cmde.error("usertoopowerful", "loweruserthanu");
-      }
+  @Override
+  public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+      BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+    var userOptionMapping = e.getOption(USER);
+    var banUser = Objects.requireNonNull(userOptionMapping, "The user is null").getAsUser();
+    var banMember = userOptionMapping.getAsMember();
+    var reason = e.getOption(REASON, OptionMapping::getAsString);
+    var delDays = e.getOption(DEL_DAYS, OptionMapping::getAsInt);
+
+    if (reason.length() > 512) {
+      e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
+      return;
+    }
+
+    if (banMember != null) {
+      var banMemberAsUser = banMember.getUser();
+      guild
+          .retrieveBan(
+              banMemberAsUser)
+          .queue(
+              fail -> e.reply("The member " + banMemberAsUser.getAsTag() + " is already banned.")
+                  .queue(),
+              success -> guild.ban(banMember, delDays, reason)
+                  .queue(success2 -> e.reply("The member " + banMemberAsUser.getAsTag()
+                      + " has been banned for the reason " + reason).queue()));
+    } else {
+      guild.retrieveBan(Objects.requireNonNull(banUser))
+          .queue(fail -> e.reply("The user " + banUser.getAsTag() + " is already banned.").queue(),
+              success -> guild.ban(banUser, delDays, reason).queue(success2 -> e.reply(
+                  "The user " + banUser.getAsTag() + " has been banned for the reason " + reason)
+                  .queue()));
     }
   }
 }

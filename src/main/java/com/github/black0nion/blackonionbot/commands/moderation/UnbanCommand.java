@@ -21,8 +21,8 @@ public class UnbanCommand extends SlashCommand {
 
   public UnbanCommand() {
     super(builder(Commands.slash("unban", "Used to unban a user")
-        .addOption(OptionType.USER, USER, "The user to unban")
-        .addOption(OptionType.STRING, REASON, "The reason for the unban"))
+        .addOption(OptionType.USER, USER, "The user to unban", true)
+        .addOption(OptionType.STRING, REASON, "The reason for the unban", true))
             .setRequiredPermissions(Permission.BAN_MEMBERS)
             .setRequiredBotPermissions(Permission.BAN_MEMBERS));
   }
@@ -33,15 +33,16 @@ public class UnbanCommand extends SlashCommand {
     var user = e.getOption(USER, OptionMapping::getAsUser);
     var reason = e.getOption(REASON, OptionMapping::getAsString);
 
-    if(reason.length() > 512) {
+    if (reason.length() > 512) {
       e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
       return;
     }
 
-    guild.retrieveBan(Objects.requireNonNull(user)).queue(success -> guild.unban(user).reason(reason).queue(
-        v -> e.reply("I have unbanned the user " + user.getAsMention() + " for " + reason)
-            .queue(),
-        fail -> e.reply("I could not unban the user " + user.getAsMention())
-            .queue()), fail -> e.reply("I could not find the user " + user.getAsMention() + " to unban").queue());
+    guild.retrieveBan(Objects.requireNonNull(user)).queue(
+        success -> guild.unban(user).reason(reason).queue(
+            v -> e.reply("I have unbanned the user " + user.getAsMention() + " for " + reason)
+                .queue(),
+            fail -> e.reply("I could not unban the user " + user.getAsMention()).queue()),
+        fail -> e.reply("I could not find the user " + user.getAsMention() + " to unban").queue());
   }
 }
