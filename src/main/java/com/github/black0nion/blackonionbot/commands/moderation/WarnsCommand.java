@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -26,9 +27,9 @@ public class WarnsCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
-			final TextChannel channel) {
+	public void execute(final String @NotNull [] args, final CommandEvent cmde, final MessageReceivedEvent e,
+						final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
+						final TextChannel channel) {
 		final String user = args[1];
 		final BlackMember mentionedMember;
 		if (Utils.isLong(user)) {

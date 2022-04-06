@@ -22,15 +22,15 @@ public class KickCommand extends SlashCommand {
 
 	public KickCommand() {
 		super(builder(Commands.slash("kick", "Used to kick a user from a server")
-				.addOption(OptionType.USER, USER, "The user to kick")
-				.addOption(OptionType.STRING, REASON, "The reason for the kick"))
+				.addOption(OptionType.USER, USER, "The user to kick", true)
+				.addOption(OptionType.STRING, REASON, "The reason for the kick", true))
 						.setRequiredPermissions(Permission.KICK_MEMBERS)
 						.setRequiredBotPermissions(Permission.KICK_MEMBERS));
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
-						BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, BlackGuild guild, TextChannel channel) {
 		var memberToKick = e.getOption(USER, OptionMapping::getAsMember);
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
