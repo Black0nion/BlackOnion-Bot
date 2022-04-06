@@ -44,7 +44,7 @@ public class WarnCommand extends SlashCommand {
 		Warn warn;
 
 		if (reason.length() > 512) {
-			e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
+			cmde.error("reasonoption", "reasonoption");
 			return;
 		}
 
@@ -56,8 +56,7 @@ public class WarnCommand extends SlashCommand {
 				var memberToWarn = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
 				if (memberToWarn != null) {
 					memberToWarn.warn(warn);
-					e.reply("I have warned " + memberToWarn.getAsMention() + " for " + reason).setEphemeral(true)
-							.queue();
+					cmde.success("memberwarned", "memberwarned");
 				}
 			}
 		} else {
@@ -65,7 +64,7 @@ public class WarnCommand extends SlashCommand {
 					reason);
 			var userToWarn = BlackUser.from(e.getJDA().retrieveUserById(warnUser.getId()).submit().join());
 			userToWarn.warn(warn);
-			e.reply("I have warned " + userToWarn.getAsMention() + " for " + reason).setEphemeral(true).queue();
+			cmde.success("userwarned", "userwarned");
 		}
 	}
 }

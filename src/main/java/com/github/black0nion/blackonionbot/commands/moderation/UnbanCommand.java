@@ -34,7 +34,7 @@ public class UnbanCommand extends SlashCommand {
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
 		if (reason.length() > 512) {
-			e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
+			cmde.error("reasonoption", "reasonoption");
 			return;
 		}
 

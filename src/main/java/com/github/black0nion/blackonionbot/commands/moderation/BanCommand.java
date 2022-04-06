@@ -48,7 +48,7 @@ public class BanCommand extends SlashCommand {
 		var delDays = e.getOption(DEL_DAYS, OptionMapping::getAsInt);
 
 		if (reason.length() > 512) {
-			e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
+			cmde.error("reasonoption", "reasonoption");
 			return;
 		}
 

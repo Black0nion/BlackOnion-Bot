@@ -44,17 +44,17 @@ public class ClearWarnCommand extends SlashCommand {
 		if (warnMember != null) {
 			var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
 			if (blackMember == null) {
-				e.reply("The member you specified does not exist.").setEphemeral(true).queue();
+				cmde.error("memberisinvalid", "memberisinvalid");
 				return;
 			}
 			final List<Warn> memberWarns = blackMember.getWarns();
 			for (final Warn warn : memberWarns) {
 				if (warn.date() == warnId) {
 					blackMember.deleteWarn(warn);
-					e.reply("The warn has been deleted.").queue();
+					cmde.success("warndeleted", "warndeleted");
 					return;
 				} else {
-					e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
+					cmde.error("warnidisinvalid", "warnidisinvalid");
 				}
 			}
 		} else {
@@ -63,10 +63,10 @@ public class ClearWarnCommand extends SlashCommand {
 			for (final Warn warn : userWarns) {
 				if (warn.date() == warnId) {
 					blackUser.deleteWarn(warn);
-					e.reply("The warn has been deleted.").queue();
+					cmde.success("warndeleted", "warndeleted");
 					return;
 				} else {
-					e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
+					cmde.error("warnidisinvalid", "warnidisinvalid");
 				}
 			}
 		}

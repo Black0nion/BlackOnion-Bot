@@ -35,13 +35,12 @@ public class KickCommand extends SlashCommand {
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
 		if (memberToKick == null) {
-			e.reply("The provided member is invalid please double check the name of the member").setEphemeral(true)
-					.queue();
+			cmde.error("memberisnull","memberisnull");
 			return;
 		}
 
 		if (reason.length() > 512) {
-			e.reply("The reason cannot be longer than 512 characters.").setEphemeral(true).queue();
+			cmde.error("reasonoption", "reasonoption");
 			return;
 		}
 
