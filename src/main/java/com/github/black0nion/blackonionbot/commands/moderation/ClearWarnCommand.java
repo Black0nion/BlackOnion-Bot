@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author _SIM_
@@ -35,23 +36,38 @@ public class ClearWarnCommand extends SlashCommand {
 	@Override
 	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
 			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var warnMember = e.getOption(USER, OptionMapping::getAsMember);
+		var warnUserOption = e.getOption(USER);
+		var warnUser = Objects.requireNonNull(warnUserOption).getAsUser();
+		var warnMember = warnUserOption.getAsMember();
 		var warnId = e.getOption(WARN_ID, OptionMapping::getAsLong);
 
-		var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
-		if (blackMember == null) {
-			e.reply("The member you specified does not exist.").setEphemeral(true).queue();
-			return;
-		}
-
-		final List<Warn> warns = blackMember.getWarns();
-		for (final Warn warn : warns) {
-			if (warn.date() == warnId) {
-				blackMember.deleteWarn(warn);
-				e.reply("The warn has been deleted.").queue();
+		if (warnMember != null) {
+			var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
+			if (blackMember == null) {
+				e.reply("The member you specified does not exist.").setEphemeral(true).queue();
 				return;
-			} else {
-				e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
+			}
+			final List<Warn> memberWarns = blackMember.getWarns();
+			for (final Warn warn : memberWarns) {
+				if (warn.date() == warnId) {
+					blackMember.deleteWarn(warn);
+					e.reply("The warn has been deleted.").queue();
+					return;
+				} else {
+					e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
+				}
+			}
+		} else {
+			var blackUser = BlackUser.from(e.getJDA().retrieveUserById(warnUser.getId()).submit().join());
+			final List<Warn> userWarns = blackUser.getWarns();
+			for (final Warn warn : userWarns) {
+				if (warn.date() == warnId) {
+					blackUser.deleteWarn(warn);
+					e.reply("The warn has been deleted.").queue();
+					return;
+				} else {
+					e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
+				}
 			}
 		}
 	}

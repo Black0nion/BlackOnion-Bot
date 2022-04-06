@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -28,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class BlackUser extends UserImpl {
+	private final List<Warn> warns = new ArrayList<>();
+	private static final MongoCollection<Document> warnsCollection = MongoDB.DATABASE.getCollection("warns");
 
 	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder()
 			.expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
@@ -169,5 +172,40 @@ public class BlackUser extends UserImpl {
 	public String toString() {
 		return "BlackUser{" + "fullName=" + this.getFullName() + "language=" + language + ", permissions=" + permissions
 				+ '}';
+	}
+
+	public void warn(final Warn w) {
+		this.warns.add(w);
+		final Document doc = new Document();
+		doc.putAll(this.getIdentifier());
+		doc.put("issuer", w.issuer());
+		final long l = w.date();
+		doc.put("date", l);
+		if (w.reason() != null) {
+			doc.put("reason", w.reason());
+		}
+		warnsCollection.insertOne(doc);
+	}
+
+	public void deleteWarn(final Warn w) {
+		this.warns.remove(w);
+		warnsCollection.deleteOne(this.getIdentifier().append("date", w.date()));
+	}
+
+	public List<Warn> getWarns() {
+		return this.warns;
+	}
+
+	// TODO: check why it's never used
+	public void saveWarns() {
+		warnsCollection.insertMany(this.warns.stream().map(warn -> {
+			final Document doc = new Document();
+			doc.put("issuer", warn.issuer());
+			doc.putAll(this.getIdentifier());
+			if (warn.reason() != null) {
+				doc.put("reason", warn.reason());
+			}
+			return doc;
+		}).collect(Collectors.toList()));
 	}
 }
