@@ -26,7 +26,7 @@ public class ClearCommand extends SlashCommand {
 	public ClearCommand() {
 		super(builder(Commands.slash("clear", "Clear a certain amount of messages")
 				.addOptions(new OptionData(OptionType.INTEGER, "amount", "Amount of messages to delete", true)
-						.setRequiredRange(1, 100))).setRequiredPermissions(Permission.MESSAGE_MANAGE).setEphemeral(true)
+						.setRequiredRange(2, 100))).setRequiredPermissions(Permission.MESSAGE_MANAGE).setEphemeral(true)
 								.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
 	}
 
