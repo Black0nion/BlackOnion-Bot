@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.Objects;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
+@Deprecated(since = "6/4/2022")
 public abstract class TextCommand extends GenericCommand {
 
 	private String[] command = null;
