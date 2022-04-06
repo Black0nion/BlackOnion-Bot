@@ -102,8 +102,7 @@ spotless {
 		endWithNewline()
 	}
 	java {
-		// Use the default importOrder configuration
-		removeUnusedImports()
+		//See https://github.com/diffplug/spotless/tree/main/plugin-gradle#eclipse-jdt
 		eclipse()
 	}
 }
