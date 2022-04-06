@@ -31,8 +31,8 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
-			BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		try {
 			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
 
@@ -66,7 +66,8 @@ public class ClearCommand extends SlashCommand {
 		}
 	}
 
-	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount, List<Message> messages) {
+	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount,
+			@NotNull List<Message> messages) {
 		channel.deleteMessages(messages).queue(success -> {
 			if (messages.size() > amount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),

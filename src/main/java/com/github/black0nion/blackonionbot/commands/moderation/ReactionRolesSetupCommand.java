@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +30,9 @@ public class ReactionRolesSetupCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message,
-			final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(String[] args, final @NotNull CommandEvent cmde, final @NotNull MessageReceivedEvent e,
+			final @NotNull Message message, final BlackMember member, final BlackUser author,
+			final @NotNull BlackGuild guild, final TextChannel channel) {
 		args = message.getContentDisplay().split(" ");
 		final List<TextChannel> channels = message.getMentionedChannels();
 		final List<Role> roles = message.getMentionedRoles();

@@ -28,7 +28,7 @@ public class UnbanCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
 			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var user = e.getOption(USER, OptionMapping::getAsUser);
 		var reason = e.getOption(REASON, OptionMapping::getAsString);

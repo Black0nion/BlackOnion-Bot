@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +25,9 @@ public class AutoRolesCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
-			final TextChannel channel) {
+	public void execute(final String[] args, final @NotNull CommandEvent cmde, final MessageReceivedEvent e,
+			final @NotNull Message message, final BlackMember member, final BlackUser author,
+			final @NotNull BlackGuild guild, final TextChannel channel) {
 		final List<String> argsList = Arrays.asList(args);
 		if (argsList.contains("@everyone") || argsList.contains("@here")) {
 			cmde.error("invalidrole", "iseveryone");

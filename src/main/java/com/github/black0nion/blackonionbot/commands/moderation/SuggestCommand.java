@@ -26,7 +26,7 @@ public class SuggestCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
 			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
 		final long suggestionsChannelId = guild.getSuggestionsChannel();

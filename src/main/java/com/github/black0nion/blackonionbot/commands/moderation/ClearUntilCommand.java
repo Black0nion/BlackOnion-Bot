@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -30,8 +31,8 @@ public class ClearUntilCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
-			BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		try {
 			String messageIdString = e.getOption("messageid", OptionMapping::getAsString);
 			if (!Utils.isLong(messageIdString)) {

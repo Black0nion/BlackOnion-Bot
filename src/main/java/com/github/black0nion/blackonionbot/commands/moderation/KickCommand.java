@@ -29,8 +29,8 @@ public class KickCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+			@NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var memberToKick = e.getOption(USER, OptionMapping::getAsMember);
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
@@ -57,8 +57,8 @@ public class KickCommand extends SlashCommand {
 		}
 	}
 
-	private static void kickMember(@NotNull Member member, String reason, @NotNull JDA jda, Guild guild,
-			SlashCommandInteractionEvent event) {
+	private static void kickMember(@NotNull Member member, String reason, @NotNull JDA jda, @NotNull Guild guild,
+			@NotNull SlashCommandInteractionEvent event) {
 		jda.openPrivateChannelById(member.getUser().getIdLong())
 				.flatMap(channel -> channel
 						.sendMessage("You have been kicked from the server for the following reason: " + reason + "\n"

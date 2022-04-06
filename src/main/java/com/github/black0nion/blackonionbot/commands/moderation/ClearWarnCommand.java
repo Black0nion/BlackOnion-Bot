@@ -34,7 +34,7 @@ public class ClearWarnCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
 			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var warnUserOption = e.getOption(USER);
 		var warnUser = Objects.requireNonNull(warnUserOption).getAsUser();

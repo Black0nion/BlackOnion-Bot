@@ -39,8 +39,8 @@ public class BanCommand extends SlashCommand {
 			new Command.Choice("Seven Days", 7));
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var userOptionMapping = e.getOption(USER);
 		var banUser = Objects.requireNonNull(userOptionMapping, "The user is null").getAsUser();
 		var banMember = userOptionMapping.getAsMember();

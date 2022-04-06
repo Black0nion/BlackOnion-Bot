@@ -35,8 +35,8 @@ public class WarnCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+			@NotNull BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var warnUserOption = e.getOption(USER);
 		var warnUser = Objects.requireNonNull(warnUserOption).getAsUser();
 		var warnMember = warnUserOption.getAsMember();

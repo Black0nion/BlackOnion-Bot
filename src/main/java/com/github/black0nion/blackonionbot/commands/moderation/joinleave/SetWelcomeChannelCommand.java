@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
@@ -21,9 +22,9 @@ public class SetWelcomeChannelCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
-			final TextChannel channel) {
+	public void execute(final String @NotNull [] args, final CommandEvent cmde, final MessageReceivedEvent e,
+			final @NotNull Message message, final BlackMember member, final BlackUser author,
+			final @NotNull BlackGuild guild, final @NotNull TextChannel channel) {
 		message.delete().queue();
 		if (args.length >= 2 && (args[1].equalsIgnoreCase("clear") || args[1].equalsIgnoreCase("off"))) {
 			guild.setJoinChannel(-1);
