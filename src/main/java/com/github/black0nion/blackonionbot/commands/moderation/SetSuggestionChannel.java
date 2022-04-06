@@ -33,6 +33,7 @@ public class SetSuggestionChannel extends SlashCommand {
 			var textChannel = e.getOption(CHANNEL, OptionMapping::getAsTextChannel);
 			guild.setSuggestionsChannel(textChannel);
 		} else {
+			cmde.send("nottextchannel");
 			e.reply("The suggestions channel must be a text channel.").setEphemeral(true).queue();
 		}
 	}

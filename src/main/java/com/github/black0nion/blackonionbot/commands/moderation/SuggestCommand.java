@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 public class SuggestCommand extends SlashCommand {
 	private static final String SUGGESTION = "suggestion";
@@ -25,19 +26,17 @@ public class SuggestCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author,
-			BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
 		final long suggestionsChannelId = guild.getSuggestionsChannel();
 
 		if (suggestionsChannelId == -1) {
-			e.reply("A suggestion channel has not been set. Please do this by doing /setsuggestionchannel")
-					.setEphemeral(true).queue();
+			cmde.send("invalidsuggestionschannel");
 		} else {
 			final TextChannel suggestionsChannel = guild.getTextChannelById(suggestionsChannelId);
 			if (suggestionsChannel == null) {
-				e.reply("The suggestions channel has no been found. Please set it by doing /setsuggestionchannel")
-						.setEphemeral(true).queue();
+				cmde.send("invalidsuggestionschannel");
 			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
 					Permission.MESSAGE_ADD_REACTION))) {
 				e.replyEmbeds(Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_SEND,
@@ -50,8 +49,7 @@ public class SuggestCommand extends SlashCommand {
 							msg.addReaction("U+1F44D").queue();
 							msg.addReaction("U+1F44E").queue();
 						});
-				e.reply("Your suggestion has been sent to the suggestions channel. Thank you for your contribution!")
-						.queue();
+				cmde.send("suggestionsucess");
 			}
 		}
 	}

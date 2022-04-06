@@ -48,7 +48,7 @@ public class BanCommand extends SlashCommand {
 		var delDays = e.getOption(DEL_DAYS, OptionMapping::getAsInt);
 
 		if (reason.length() > 512) {
-			cmde.error("reasonoption", "reasonoption");
+			cmde.send("reasonoption");
 			return;
 		}
 

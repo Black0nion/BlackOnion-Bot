@@ -44,7 +44,7 @@ public class ClearWarnCommand extends SlashCommand {
 		if (warnMember != null) {
 			var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
 			if (blackMember == null) {
-				cmde.error("memberisinvalid", "memberisinvalid");
+				cmde.send("memberisinvalid");
 				return;
 			}
 			final List<Warn> memberWarns = blackMember.getWarns();

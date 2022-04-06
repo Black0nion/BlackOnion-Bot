@@ -44,7 +44,7 @@ public class WarnCommand extends SlashCommand {
 		Warn warn;
 
 		if (reason.length() > 512) {
-			cmde.error("reasonoption", "reasonoption");
+			cmde.send("reasonoption");
 			return;
 		}
 

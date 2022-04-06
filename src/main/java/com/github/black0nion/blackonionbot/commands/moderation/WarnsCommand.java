@@ -28,8 +28,8 @@ public class WarnsCommand extends TextCommand {
 
 	@Override
 	public void execute(final String @NotNull [] args, final CommandEvent cmde, final MessageReceivedEvent e,
-						final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
-						final TextChannel channel) {
+			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
+			final TextChannel channel) {
 		final String user = args[1];
 		final BlackMember mentionedMember;
 		if (Utils.isLong(user)) {

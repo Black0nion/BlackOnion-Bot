@@ -35,12 +35,12 @@ public class KickCommand extends SlashCommand {
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
 		if (memberToKick == null) {
-			cmde.error("memberisnull","memberisnull");
+			cmde.send("memberisnull");
 			return;
 		}
 
 		if (reason.length() > 512) {
-			cmde.error("reasonoption", "reasonoption");
+			cmde.send("reasonoption");
 			return;
 		}
 
