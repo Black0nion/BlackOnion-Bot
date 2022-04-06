@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.Objects;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
+@ReplaceWith("SlashCommand")
 @Deprecated(since = "6/4/2022")
 public abstract class TextCommand extends GenericCommand {
 
