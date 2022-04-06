@@ -3,76 +3,56 @@
  */
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
  * @author _SIM_
  */
-public class ClearWarnCommand extends TextCommand {
-
+public class ClearWarnCommand extends SlashCommand {
+	private static final String USER = "user";
+	private static final String WARN_ID = "warnid";
 	public ClearWarnCommand() {
-		this.setCommand("clearwarn", "clearwarns").setSyntax("<@User> <warnid>").setRequiredArgumentCount(2)
-				.setRequiredPermissions(Permission.KICK_MEMBERS);
+		super(builder(Commands.slash("clearwarn", "Used to clear a warn.")
+				.addOption(OptionType.USER, USER, "The user to clear the warn from.", true)
+				.addOption(OptionType.NUMBER, WARN_ID, "The id of the warn to clear.", true))
+						.setRequiredPermissions(Permission.KICK_MEMBERS));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e,
-			final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild,
-			final TextChannel channel) {
-		final String user = args[1];
-		final BlackMember mentionedMember;
-		if (Utils.isLong(user)) {
-			mentionedMember = BlackMember.from(guild.retrieveMemberById(user).submit().join());
-			if (mentionedMember == null) {
-				cmde.error("usernotfound", "inputnumber");
-				return;
-			}
-		} else {
-			final List<Member> mentionedMembers = message.getMentionedMembers();
-			if (mentionedMembers.size() != 0) {
-				if (args[1].replace("!", "").equalsIgnoreCase(mentionedMembers.get(0).getAsMention())) {
-					mentionedMember = BlackMember.from(mentionedMembers.get(0));
-				} else {
-					cmde.sendPleaseUse();
-					return;
-				}
-			} else {
-				cmde.error("nousermentioned", "tagornameuser");
-				return;
-			}
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+		var warnMember = e.getOption(USER, OptionMapping::getAsMember);
+		var warnId = e.getOption(WARN_ID, OptionMapping::getAsLong);
+
+		var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
+		if (blackMember == null) {
+			e.reply("The member you specified does not exist.").setEphemeral(true).queue();
+			return;
 		}
 
-		try {
-			if (Utils.isLong(args[2])) {
-				final long warnId = Long.parseLong(args[2]);
-				assert mentionedMember != null;
-				final List<Warn> warns = mentionedMember.getWarns();
-				for (final Warn warn : warns) {
-					if (warn.date() == warnId) {
-						mentionedMember.deleteWarn(warn);
-						cmde.success("entrydeleted", "warndeleted");
-						return;
-					}
-				}
-				cmde.error("notfound", "warnnotfound");
+		final List<Warn> warns = blackMember.getWarns();
+		for (final Warn warn : warns) {
+			if (warn.date() == warnId) {
+				blackMember.deleteWarn(warn);
+				e.reply("The warn has been deleted.").queue();
+				return;
 			} else {
-				cmde.sendPleaseUse();
+				e.reply("The warn you specified does not exist.").setEphemeral(true).queue();
 			}
-		} catch (final Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 }
