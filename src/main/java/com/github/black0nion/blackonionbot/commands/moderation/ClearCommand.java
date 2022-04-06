@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -22,9 +24,10 @@ import java.util.List;
 public class ClearCommand extends SlashCommand {
 
 	public ClearCommand() {
-		super(builder(Commands.slash("clear", "Clear a certain amount of messages").addOption(OptionType.INTEGER,
-				"amount", "Amount of messages to delete", true)).setRequiredPermissions(Permission.MESSAGE_MANAGE)
-						.setEphemeral(true).setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
+		super(builder(Commands.slash("clear", "Clear a certain amount of messages")
+				.addOptions(new OptionData(OptionType.INTEGER, "amount", "Amount of messages to delete", true)
+						.setRequiredRange(1, 100))).setRequiredPermissions(Permission.MESSAGE_MANAGE).setEphemeral(true)
+								.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
 	}
 
 	@Override
@@ -32,10 +35,6 @@ public class ClearCommand extends SlashCommand {
 			BlackGuild guild, TextChannel channel) {
 		try {
 			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
-			if (amount == null || amount < 2 || amount > 100) {
-				cmde.send("toomanymessages");
-				return;
-			}
 
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {
@@ -67,7 +66,7 @@ public class ClearCommand extends SlashCommand {
 		}
 	}
 
-	static void deleteMessages(SlashCommandEvent cmde, TextChannel channel, int amount, List<Message> messages) {
+	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount, List<Message> messages) {
 		channel.deleteMessages(messages).queue(success -> {
 			if (messages.size() > amount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),

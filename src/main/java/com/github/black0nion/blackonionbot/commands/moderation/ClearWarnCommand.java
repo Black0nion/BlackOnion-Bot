@@ -54,7 +54,7 @@ public class ClearWarnCommand extends SlashCommand {
 					cmde.success("warndeleted", "warndeleted");
 					return;
 				} else {
-					cmde.error("warnidisinvalid", "warnidisinvalid");
+					cmde.send("invalidwarnid");
 				}
 			}
 		} else {
@@ -66,7 +66,7 @@ public class ClearWarnCommand extends SlashCommand {
 					cmde.success("warndeleted", "warndeleted");
 					return;
 				} else {
-					cmde.error("warnidisinvalid", "warnidisinvalid");
+					cmde.send("invalidwarnid");
 				}
 			}
 		}

@@ -56,7 +56,7 @@ public class WarnCommand extends SlashCommand {
 				var memberToWarn = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
 				if (memberToWarn != null) {
 					memberToWarn.warn(warn);
-					cmde.success("memberwarned", "memberwarned");
+					cmde.send("memberwarned");
 				}
 			}
 		} else {
@@ -64,7 +64,7 @@ public class WarnCommand extends SlashCommand {
 					reason);
 			var userToWarn = BlackUser.from(e.getJDA().retrieveUserById(warnUser.getId()).submit().join());
 			userToWarn.warn(warn);
-			cmde.success("userwarned", "userwarned");
+			cmde.send("userwarned");
 		}
 	}
 }
