@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 @ReplaceWith("SlashCommand")
+@ForRemoval(deadline = "when discord remove prefix command")
 @Deprecated(since = "6/4/2022")
 public abstract class TextCommand extends GenericCommand {
 
