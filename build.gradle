@@ -16,6 +16,9 @@ repositories {
             includeGroup "com.sedmelluq"
         }
     }
+
+    maven { url "https://m2.chew.pro/releases" }
+
     maven {
         url "https://jitpack.io"
         name "jitpack"
@@ -36,7 +39,7 @@ dependencies {
 
     implementation "net.dv8tion:JDA:5.0.0-alpha.9"
     implementation "com.github.BlitzOffline:Pagination-Utils:master-SNAPSHOT"
-    implementation "com.github.JDA-Applications.JDA-Utilities:jda-utilities-commons:dfd5c6f599"
+    implementation 'pw.chew:jda-chewtils:1.24.1'
 
     implementation "com.github.Mokulu:discord-oauth2-api:1.0.2"
 
