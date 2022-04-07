@@ -17,8 +17,14 @@ repositories {
         }
     }
 
-    maven { url "https://m2.chew.pro/releases" }
-
+    maven {
+        url "https://m2.chew.pro/releases"
+        name "m2-chew"
+        content {
+            includeGroup "pw.chew"
+        }
+    }
+    
     maven {
         url "https://jitpack.io"
         name "jitpack"
