@@ -25,6 +25,7 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +83,7 @@ public class PlayerManager {
 		});
 	}
 
-	public void loadAndPlay(final BlackUser author, final TextChannel channel, @NotNull String trackUrl, final AudioManager manager, final AudioChannel vc) {
+	public void loadAndPlay(final BlackUser author, final TextChannel channel, @Nonnull String trackUrl, final AudioManager manager, final AudioChannel vc) {
 		final GuildMusicManager musicManager = this.getMusicManager(channel);
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
 		MusicSystem.channels.put(guild.getIdLong(), channel.getIdLong());
