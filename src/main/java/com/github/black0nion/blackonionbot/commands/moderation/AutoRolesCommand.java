@@ -1,82 +1,74 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-public class AutoRolesCommand extends TextCommand {
+public class AutoRolesCommand extends SlashCommand {
+	private static final String CREATE_COMMAND = "create";
+	private static final String REMOVE_COMMAND = "remove";
+	private static final String CREATE_ROLE = "role";
+	private static final String REMOVE_ROLE = "role";
 
 	public AutoRolesCommand() {
-		this.setCommand("autoroles", "autorole").setSyntax("<create | remove / delete> <@role | roleid>")
-				.setRequiredArgumentCount(2).setRequiredPermissions(Permission.MANAGE_ROLES)
-				.setRequiredBotPermissions(Permission.MESSAGE_MANAGE);
+		super(builder(Commands.slash("autoroles", "Used to manage the auto roles of the server.").addSubcommands(
+				new SubcommandData(CREATE_COMMAND, "Used to create a new auto role.").addOption(OptionType.ROLE,
+						CREATE_ROLE, "The role to add.", true),
+				new SubcommandData(REMOVE_COMMAND, "Used to remove an auto role.").addOption(OptionType.ROLE,
+						REMOVE_ROLE, "The role to remove.", true))).setRequiredPermissions(Permission.MANAGE_ROLES)
+								.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
 	}
 
 	@Override
-	public void execute(final String[] args, final @NotNull CommandEvent cmde, final MessageReceivedEvent e,
-			final @NotNull Message message, final BlackMember member, final BlackUser author,
-			final @NotNull BlackGuild guild, final TextChannel channel) {
-		final List<String> argsList = Arrays.asList(args);
-		if (argsList.contains("@everyone") || argsList.contains("@here")) {
-			cmde.error("invalidrole", "iseveryone");
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+						BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+		switch (Objects.requireNonNull(e.getSubcommandName())) {
+			case CREATE_COMMAND -> setCreateCommand(cmde, e, guild);
+			case REMOVE_COMMAND -> setRemoveCommand(cmde, e, guild);
+			default -> cmde.send("invalidsubcommand");
+		}
+	}
+
+	public void setCreateCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+								 @NotNull BlackGuild guild) {
+		var role = e.getOption(CREATE_ROLE, OptionMapping::getAsRole);
+		var roleId = Objects.requireNonNull(role).getIdLong();
+		final List<Long> tempList = guild.getAutoRoles();
+		if (tempList.contains(roleId)) {
+			cmde.success("alreadyexisting", "thisalreadyexisting");
 			return;
-		}
+		} else
+			tempList.add(roleId);
+		guild.addAutoRole(roleId);
+		cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
+	}
 
-		final List<Role> roles = message.getMentionedRoles();
-		Long roleID = null;
-		Role role = null;
-		if (roles.size() != 0) {
-			if (roles.get(0).getAsMention().equals(args[2])) {
-				role = roles.get(0);
-				roleID = roles.get(0).getIdLong();
-			} else {
-				cmde.sendPleaseUse();
-				return;
-			}
-		} else {
-			try {
-				role = guild.getRoleById(args[2]);
-				if (role != null)
-					roleID = Long.parseLong(args[2]);
-			} catch (final NumberFormatException ignored) {
-			}
-			if (roleID == null) {
-				cmde.sendPleaseUse();
-				return;
-			}
-		}
-
+	public void setRemoveCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+								 @NotNull BlackGuild guild) {
+		var role = e.getOption(REMOVE_ROLE, OptionMapping::getAsRole);
+		var roleId = Objects.requireNonNull(role).getIdLong();
 		final List<Long> tempList = guild.getAutoRoles();
 
-		if (args[1].equalsIgnoreCase("create")) {
-			if (tempList.contains(roleID)) {
-				cmde.success("alreadyexisting", "thisalreadyexisting");
-				return;
-			} else
-				tempList.add(roleID);
-			guild.addAutoRole(roleID);
-			cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
-		} else if (args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")) {
-			if (!tempList.contains(roleID)) {
-				cmde.error("notfound", "thisnotfound");
-				return;
-			} else
-				tempList.remove(roleID);
-			guild.removeAutoRole(roleID);
-			cmde.success("autorolesdeleted", "autoroledeletedinfo", new Placeholder("role", role.getAsMention()));
+		if (!tempList.contains(roleId)) {
+			cmde.error("notfound", "thisnotfound");
+			return;
 		} else
-			cmde.sendPleaseUse();
+			tempList.remove(roleId);
+		guild.removeAutoRole(roleId);
+		cmde.success("autorolesdeleted", "autoroledeletedinfo", new Placeholder("role", role.getAsMention()));
 	}
 }

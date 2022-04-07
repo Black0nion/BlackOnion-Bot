@@ -26,6 +26,7 @@ import java.util.Objects;
 public class ClearWarnCommand extends SlashCommand {
 	private static final String USER = "user";
 	private static final String WARN_ID = "warnid";
+
 	public ClearWarnCommand() {
 		super(builder(Commands.slash("clearwarn", "Used to clear a warn.")
 				.addOption(OptionType.USER, USER, "The user to clear the warn from.", true)

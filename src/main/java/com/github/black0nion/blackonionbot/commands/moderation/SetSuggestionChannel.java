@@ -34,7 +34,6 @@ public class SetSuggestionChannel extends SlashCommand {
 			guild.setSuggestionsChannel(textChannel);
 		} else {
 			cmde.send("nottextchannel");
-			e.reply("The suggestions channel must be a text channel.").setEphemeral(true).queue();
 		}
 	}
 }
