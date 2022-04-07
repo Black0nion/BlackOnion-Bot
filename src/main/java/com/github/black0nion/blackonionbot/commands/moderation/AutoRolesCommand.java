@@ -34,8 +34,7 @@ public class AutoRolesCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-						BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		switch (Objects.requireNonNull(e.getSubcommandName())) {
 			case CREATE_COMMAND -> setCreateCommand(cmde, e, guild);
 			case REMOVE_COMMAND -> setRemoveCommand(cmde, e, guild);
@@ -43,8 +42,7 @@ public class AutoRolesCommand extends SlashCommand {
 		}
 	}
 
-	public void setCreateCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
-								 @NotNull BlackGuild guild) {
+	public void setCreateCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var role = e.getOption(CREATE_ROLE, OptionMapping::getAsRole);
 		var roleId = Objects.requireNonNull(role).getIdLong();
 		final List<Long> tempList = guild.getAutoRoles();
@@ -57,8 +55,7 @@ public class AutoRolesCommand extends SlashCommand {
 		cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
 	}
 
-	public void setRemoveCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
-								 @NotNull BlackGuild guild) {
+	public void setRemoveCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var role = e.getOption(REMOVE_ROLE, OptionMapping::getAsRole);
 		var roleId = Objects.requireNonNull(role).getIdLong();
 		final List<Long> tempList = guild.getAutoRoles();

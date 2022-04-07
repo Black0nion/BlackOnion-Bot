@@ -38,33 +38,27 @@ public class ClearWarnCommand extends SlashCommand {
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
 			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var warnUserOption = e.getOption(USER);
-		var warnUser = Objects.requireNonNull(warnUserOption).getAsUser();
-		var warnMember = warnUserOption.getAsMember();
+		var warnUser =  BlackUser.from(Objects.requireNonNull(warnUserOption).getAsUser());
+		var warnMember =  BlackMember.from(warnUserOption.getAsMember());
 		var warnId = e.getOption(WARN_ID, OptionMapping::getAsLong);
 
 		if (warnMember != null) {
-			var blackMember = BlackMember.from(guild.retrieveMemberById(warnMember.getId()).submit().join());
-			if (blackMember == null) {
-				cmde.send("memberisinvalid");
-				return;
-			}
-			final List<Warn> memberWarns = blackMember.getWarns();
+			final List<Warn> memberWarns = warnMember.getWarns();
 			for (final Warn warn : memberWarns) {
 				if (warn.date() == warnId) {
-					blackMember.deleteWarn(warn);
-					cmde.success("warndeleted", "warndeleted");
+					warnMember.deleteWarn(warn);
+					cmde.send("warndeleted");
 					return;
 				} else {
 					cmde.send("invalidwarnid");
 				}
 			}
 		} else {
-			var blackUser = BlackUser.from(e.getJDA().retrieveUserById(warnUser.getId()).submit().join());
-			final List<Warn> userWarns = blackUser.getWarns();
+			final List<Warn> userWarns = warnUser.getWarns();
 			for (final Warn warn : userWarns) {
 				if (warn.date() == warnId) {
-					blackUser.deleteWarn(warn);
-					cmde.success("warndeleted", "warndeleted");
+					warnUser.deleteWarn(warn);
+					cmde.send("warndeleted");
 					return;
 				} else {
 					cmde.send("invalidwarnid");

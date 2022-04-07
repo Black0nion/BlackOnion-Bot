@@ -31,14 +31,14 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		try {
 			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
 
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {
-					final OffsetDateTime firstValidDate = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2)
+					final OffsetDateTime firstValidDate = OffsetDateTime.now(ZoneOffset.UTC)
+							.minusWeeks(2)
 							.plusSeconds(1);
 					final List<Message> messages = new ArrayList<>();
 					int i = amount;
@@ -66,8 +66,7 @@ public class ClearCommand extends SlashCommand {
 		}
 	}
 
-	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount,
-			@NotNull List<Message> messages) {
+	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount, @NotNull List<Message> messages) {
 		channel.deleteMessages(messages).queue(success -> {
 			if (messages.size() > amount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),

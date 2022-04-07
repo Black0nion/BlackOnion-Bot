@@ -21,7 +21,7 @@ public class SuggestCommand extends SlashCommand {
 	private static final String SUGGESTION = "suggestion";
 
 	public SuggestCommand() {
-		super(builder(Commands.slash("suggest", "Used to of a suggestion").addOption(OptionType.STRING, SUGGESTION,
+		super(builder(Commands.slash("suggest", "Used to send a suggestion.").addOption(OptionType.STRING, SUGGESTION,
 				"The suggestion to send", true)));
 	}
 
