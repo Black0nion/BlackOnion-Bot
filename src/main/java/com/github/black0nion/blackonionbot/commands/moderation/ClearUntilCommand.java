@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -25,13 +26,13 @@ public class ClearUntilCommand extends SlashCommand {
 	public ClearUntilCommand() {
 		super(builder(Commands.slash("clearuntil", "Clear all messages until a certain one")
 				.addOption(OptionType.STRING, "messageid", "The message id of the last message to be kept", true))
-			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE)
-			.setRequiredPermissions(Permission.MESSAGE_MANAGE)
-			.setEphemeral());
+						.setRequiredBotPermissions(Permission.MESSAGE_MANAGE)
+						.setRequiredPermissions(Permission.MESSAGE_MANAGE).setEphemeral());
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		try {
 			String messageIdString = e.getOption("messageid", OptionMapping::getAsString);
 			if (!Utils.isLong(messageIdString)) {
@@ -47,7 +48,8 @@ public class ClearUntilCommand extends SlashCommand {
 							cmde.error("toomanymessages", "toomanymessagesinfo", new Placeholder("msgcount", msgsize));
 							return;
 						}
-						final OffsetDateTime lastValidTime = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2).plusSeconds(1);
+						final OffsetDateTime lastValidTime = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(2)
+								.plusSeconds(1);
 						final List<Message> messages = new ArrayList<>();
 						int i = msgsize + 1;
 						for (final Message m : msgs.getRetrievedHistory()) {

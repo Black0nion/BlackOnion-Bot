@@ -1,26 +1,39 @@
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
-public class SetSuggestionChannel extends TextCommand {
+import java.util.Objects;
 
+public class SetSuggestionChannel extends SlashCommand {
+	private static final String CHANNEL = "channel";
 	public SetSuggestionChannel() {
-		this.setCommand("setsuggestionchannel", "setsuggestionschannel", "setsuggestchannel")
-			.setRequiredPermissions(Permission.MESSAGE_MANAGE)
-			.setRequiredBotPermissions(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION);
+		super(builder(Commands.slash("set_suggestion_channel", "Used to set the channel where suggestions are sent to.")
+				.addOption(OptionType.CHANNEL, CHANNEL, "The channel to send suggestions to."))
+						.setRequiredPermissions(Permission.MANAGE_CHANNEL)
+						.setRequiredBotPermissions(Permission.MANAGE_SERVER));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		cmde.success("suggestionchannelset", "thisissuggestionchannel");
-		guild.setSuggestionsChannel(channel.getIdLong());
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+		var suggestionsChannel = e.getOption(CHANNEL, OptionMapping::getChannelType);
+
+		if (Objects.requireNonNull(suggestionsChannel).isMessage()) {
+			var textChannel = e.getOption(CHANNEL, OptionMapping::getAsTextChannel);
+			guild.setSuggestionsChannel(textChannel);
+		} else {
+			cmde.send("nottextchannel");
+		}
 	}
 }

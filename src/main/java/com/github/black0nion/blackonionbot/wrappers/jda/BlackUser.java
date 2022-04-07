@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
+import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.UserImpl;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
@@ -156,6 +157,44 @@ public class BlackUser extends UserImpl {
 	@Override
 	protected MongoCollection<Document> getCollection() {
 		return configs;
+	}
+
+	private static final MongoCollection<Document> warnsCollection = MongoDB.DATABASE.getCollection("warns");
+	private final List<Warn> warns = new ArrayList<>();
+
+	public void warn(final Warn w) {
+		this.warns.add(w);
+		final Document doc = new Document();
+		doc.putAll(this.getIdentifier());
+		doc.put("issuer", w.issuer());
+		final long l = w.date();
+		doc.put("date", l);
+		if (w.reason() != null) {
+			doc.put("reason", w.reason());
+		}
+		warnsCollection.insertOne(doc);
+	}
+
+	public void deleteWarn(final Warn w) {
+		this.warns.remove(w);
+		warnsCollection.deleteOne(this.getIdentifier().append("date", w.date()));
+	}
+
+	// TODO: check why it's never used
+	public void saveWarns() {
+		warnsCollection.insertMany(this.warns.stream().map(warn -> {
+			final Document doc = new Document();
+			doc.put("issuer", warn.issuer());
+			doc.putAll(this.getIdentifier());
+			if (warn.reason() != null) {
+				doc.put("reason", warn.reason());
+			}
+			return doc;
+		}).collect(Collectors.toList()));
+	}
+
+	public List<Warn> getWarns() {
+		return this.warns;
 	}
 
 	@Override

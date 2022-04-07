@@ -3,73 +3,67 @@
  */
 package com.github.black0nion.blackonionbot.commands.moderation;
 
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author _SIM_
  */
-public class ClearWarnCommand extends TextCommand {
+public class ClearWarnCommand extends SlashCommand {
+	private static final String USER = "user";
+	private static final String WARN_ID = "warnid";
 
 	public ClearWarnCommand() {
-		this.setCommand("clearwarn", "clearwarns").setSyntax("<@User> <warnid>").setRequiredArgumentCount(2).setRequiredPermissions(Permission.KICK_MEMBERS);
+		super(builder(Commands.slash("clearwarn", "Used to clear a warn.")
+				.addOption(OptionType.USER, USER, "The user to clear the warn from.", true)
+				.addOption(OptionType.NUMBER, WARN_ID, "The id of the warn to clear.", true))
+						.setRequiredPermissions(Permission.KICK_MEMBERS));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final String user = args[1];
-		final BlackMember mentionedMember;
-		if (Utils.isLong(user)) {
-			mentionedMember = BlackMember.from(guild.retrieveMemberById(user).submit().join());
-			if (mentionedMember == null) {
-				cmde.error("usernotfound", "inputnumber");
-				return;
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+		var warnUserOption = e.getOption(USER);
+		var warnUser =  BlackUser.from(Objects.requireNonNull(warnUserOption).getAsUser());
+		var warnMember =  BlackMember.from(warnUserOption.getAsMember());
+		var warnId = e.getOption(WARN_ID, OptionMapping::getAsLong);
+
+		if (warnMember != null) {
+			final List<Warn> memberWarns = warnMember.getWarns();
+			for (final Warn warn : memberWarns) {
+				if (warn.date() == warnId) {
+					warnMember.deleteWarn(warn);
+					cmde.send("warndeleted");
+					return;
+				} else {
+					cmde.send("invalidwarnid");
+				}
 			}
 		} else {
-			final List<Member> mentionedMembers = message.getMentionedMembers();
-			if (mentionedMembers.size() != 0) {
-				if (args[1].replace("!", "").equalsIgnoreCase(mentionedMembers.get(0).getAsMention())) {
-					mentionedMember = BlackMember.from(mentionedMembers.get(0));
-				} else {
-					cmde.sendPleaseUse();
+			final List<Warn> userWarns = warnUser.getWarns();
+			for (final Warn warn : userWarns) {
+				if (warn.date() == warnId) {
+					warnUser.deleteWarn(warn);
+					cmde.send("warndeleted");
 					return;
+				} else {
+					cmde.send("invalidwarnid");
 				}
-			} else {
-				cmde.error("nousermentioned", "tagornameuser");
-				return;
 			}
-		}
-
-		try {
-			if (Utils.isLong(args[2])) {
-				final long warnId = Long.parseLong(args[2]);
-				assert mentionedMember != null;
-				final List<Warn> warns = mentionedMember.getWarns();
-				for (final Warn warn : warns) {
-					if (warn.date() == warnId) {
-						mentionedMember.deleteWarn(warn);
-						cmde.success("entrydeleted", "warndeleted");
-						return;
-					}
-				}
-				cmde.error("notfound", "warnnotfound");
-			} else {
-				cmde.sendPleaseUse();
-			}
-		} catch (final Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 }
