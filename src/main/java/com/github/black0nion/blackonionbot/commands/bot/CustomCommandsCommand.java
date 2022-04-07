@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.stream.Collectors;
 
-public class CustomCommandsCommand extends TextCommand {
+public class CustomCommandsCommand extends SlashCommand {
 
 	public CustomCommandsCommand() {
 		this.setCommand("customcommand", "cc", "ccs").setSyntax("<list | create | delete> [command (required for create and delete)]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);

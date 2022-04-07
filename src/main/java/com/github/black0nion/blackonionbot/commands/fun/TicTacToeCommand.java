@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToe;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToeBot;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
 
-public class TicTacToeCommand extends TextCommand {
+public class TicTacToeCommand extends SlashCommand {
 
 	public TicTacToeCommand() {
 		this.setCommand("tictactoe", "ttt").setSyntax("<@User / mention me to play against me!>").setRequiredBotPermissions(Permission.MESSAGE_MANAGE);

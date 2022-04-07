@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.*;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 /**
  * @author _SIM_
  */
-public class VolumeCommand extends TextCommand {
+public class VolumeCommand extends SlashCommand {
 
 	public VolumeCommand() {
 		this.setCommand("volume", "earrapestrength").setSyntax("<volume>").setRequiredArgumentCount(1);

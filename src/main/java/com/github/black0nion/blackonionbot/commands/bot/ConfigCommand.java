@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetResponse;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 // TODO: new config system
-public class ConfigCommand extends TextCommand {
+public class ConfigCommand extends SlashCommand {
 
 	public ConfigCommand() {
 		getters.clear();

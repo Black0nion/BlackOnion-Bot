@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
 
-public class ConnectFourCommand extends TextCommand {
+public class ConnectFourCommand extends SlashCommand {
 
 	public ConnectFourCommand() {
 		this.setCommand("connect4", "connectfour", "viergewinnt", "4gewinnt");

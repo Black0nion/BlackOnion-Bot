@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import net.dv8tion.jda.api.entities.Message;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Objects;
 
-public class NowPlayingCommand extends TextCommand {
+public class NowPlayingCommand extends SlashCommand {
 
     public NowPlayingCommand() {
 	this.setCommand("nowplaying");

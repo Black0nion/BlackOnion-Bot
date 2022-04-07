@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import static com.github.black0nion.blackonionbot.utils.config.Config.metadata;
 
-public class SupportCommand extends TextCommand {
+public class SupportCommand extends SlashCommand {
 
 	public SupportCommand() {
 		this.setCommand("support", "authors");

@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class UserInfoCommand extends TextCommand {
+public class UserInfoCommand extends SlashCommand {
 
 	private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 

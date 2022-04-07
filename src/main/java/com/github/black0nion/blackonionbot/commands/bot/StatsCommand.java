@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
@@ -32,7 +31,7 @@ public class StatsCommand extends SlashCommand {
 			cmde.reply(cmde
 				.success()
 				.setTitle("Bot Stats")
-				.addField("prefix", "`" + guild.getPrefix() + "`", true)
+				.addField("prefix", "/", true)
 				.addField("runmode", Config.run_mode.name().toUpperCase(), true)
 				.addField("os", OS_NAME, true)
 				.addField("cpuname", CPU_NAME, true)
@@ -42,7 +41,7 @@ public class StatsCommand extends SlashCommand {
 				.addField("files", metadata.files(), true)
 				.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
 				.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
-				.addField("commands", CommandBase.commandsArray.size() + SlashCommandBase.commands.size(), true)
+				.addField("commands", SlashCommandBase.commands.size() + SlashCommandBase.commands.size(), true)
 				.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
 				.addField("usercount", StatisticsManager.getUserCount(), true)
 				.addField("guildcount", StatisticsManager.getGuildCount(), true)

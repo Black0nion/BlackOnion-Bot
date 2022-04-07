@@ -1,12 +1,11 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -16,18 +15,21 @@ import com.google.common.collect.Lists;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class HelpCommand extends TextCommand {
+public class HelpCommand extends SlashCommand {
 
 	public HelpCommand() {
-		this.setCommand("help").notToggleable();
+
+		super(builder(Commands.slash("help", "used to get help")));
 	}
 
 	@Override
@@ -170,5 +172,10 @@ public class HelpCommand extends TextCommand {
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);
 		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getCommand()[0]))).setEmbeds().setActionRows().queue());
+	}
+
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+
 	}
 }

@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.information;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-public class WeatherCommand extends TextCommand {
+public class WeatherCommand extends SlashCommand {
 
 	public WeatherCommand() {
 		this.setCommand("weather").setSyntax("<City Name>").setRequiredArgumentCount(1);

@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author _SIM_
  */
-public class HangmanCommand extends TextCommand {
+public class HangmanCommand extends SlashCommand {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 

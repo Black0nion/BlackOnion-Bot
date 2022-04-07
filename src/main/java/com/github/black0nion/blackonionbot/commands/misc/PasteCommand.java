@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,7 +19,7 @@ import java.net.http.HttpResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PasteCommand extends TextCommand {
+public class PasteCommand extends SlashCommand {
 
 	public PasteCommand() {
 		this.setCommand("paste", "uploadtext").setSyntax("<text (codeblock with language specification if wanted)>").setRequiredArgumentCount(1);

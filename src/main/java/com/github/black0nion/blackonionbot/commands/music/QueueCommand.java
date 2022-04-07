@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.music;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.MusicSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.List;
 import java.util.Objects;
 
-public class QueueCommand extends TextCommand {
+public class QueueCommand extends SlashCommand {
 
 	public QueueCommand() {
 		this.setCommand("queue", "playlist");
