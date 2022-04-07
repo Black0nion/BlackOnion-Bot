@@ -14,22 +14,23 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.methods.TrackRequest;
-import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
-import com.wrapper.spotify.models.ClientCredentials;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
+import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
+import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerManager {
-	private static PlayerManager INSTANCE;
-	private static Api spotifyApi;
+	private static PlayerManager instance;
+	private static SpotifyApi spotifyApi;
 	private final Map<Long, GuildMusicManager> musicManagers;
 	private final AudioPlayerManager audioPlayerManager;
 
@@ -47,14 +48,14 @@ public class PlayerManager {
 			return;
 		}
 
-		spotifyApi = new Api.Builder().clientId(Config.spotify_client_id).clientSecret(Config.spotify_client_secret).build();
+		spotifyApi = new SpotifyApi.Builder().setClientId(Config.spotify_client_id).setClientSecret(Config.spotify_client_secret).build();
 
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				try {
-					final ClientCredentialsGrantRequest clientCredentialsRequest = spotifyApi.clientCredentialsGrant().build();
-					final ClientCredentials credentials = clientCredentialsRequest.get();
+					final ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
+					final ClientCredentials credentials = clientCredentialsRequest.execute();
 					spotifyApi.setAccessToken(credentials.getAccessToken());
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -64,11 +65,11 @@ public class PlayerManager {
 	}
 
 	public static PlayerManager getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new PlayerManager();
+		if (instance == null) {
+			instance = new PlayerManager();
 		}
 
-		return INSTANCE;
+		return instance;
 	}
 
 	public GuildMusicManager getMusicManager(final TextChannel channel) {
@@ -81,7 +82,7 @@ public class PlayerManager {
 		});
 	}
 
-	public void loadAndPlay(final BlackUser author, final TextChannel channel, String trackUrl, final AudioManager manager, final AudioChannel vc) {
+	public void loadAndPlay(final BlackUser author, final TextChannel channel, @NotNull String trackUrl, final AudioManager manager, final AudioChannel vc) {
 		final GuildMusicManager musicManager = this.getMusicManager(channel);
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
 		MusicSystem.channels.put(guild.getIdLong(), channel.getIdLong());
@@ -89,9 +90,9 @@ public class PlayerManager {
 		if (trackUrl.contains("spotify.com")) {
 			final String[] parsed = trackUrl.split("/track/");
 			if (parsed.length == 2) {
-				final TrackRequest request = spotifyApi.getTrack(parsed[1]).build();
+				final GetTrackRequest request = spotifyApi.getTrack(parsed[1]).build();
 				try {
-					trackUrl = "ytsearch:" + request.get().getName();
+					trackUrl = "ytsearch:" + request.execute().getName();
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
