@@ -41,7 +41,7 @@ public class StatsCommand extends SlashCommand {
 				.addField("files", metadata.files(), true)
 				.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
 				.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
-				.addField("commands", SlashCommandBase.commands.size() + SlashCommandBase.commands.size(), true)
+				.addField("commands", SlashCommandBase.commands.size(), true)
 				.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
 				.addField("usercount", StatisticsManager.getUserCount(), true)
 				.addField("guildcount", StatisticsManager.getGuildCount(), true)
