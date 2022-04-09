@@ -24,23 +24,9 @@ public class PollCommand extends SlashCommand {
 				.addOption(OptionType.String, YES_QUESTION,"The question to ask for yes.", true)
 				.addOption(OptionType.String, NO_QUESTION,"The question to ask for no.", true)));
 	}
-
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		cmde.success("poll", String.join(" ", Utils.removeFirstArg(args)), "polltutorial", msg -> {
-			msg.addReaction("tick:822036832422068225").queue();
-			msg.addReaction("cross:822036805117018132").queue();
-		});
-	}
-
+	
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		var yesQuestion = e.getOption(YES_QUESTION, OptionMapping::getAsString);
-		var noQuestion = e.getOption(NO_QUESTION, OptionMapping::getAsString);
-
-		if (yesQuestion == null || noQuestion == null) {
-			cmde.error("poll", "You must provide both a yes and no question.");
-		} else {
-		}
+		//TODO: Set it were the discord user sets a poll channel and the poll is sent to it.
 	}
 }
