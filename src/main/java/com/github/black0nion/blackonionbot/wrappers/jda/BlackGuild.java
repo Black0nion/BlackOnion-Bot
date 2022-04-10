@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.GenericCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
@@ -82,6 +81,7 @@ public class BlackGuild extends GuildImpl {
 	private long joinChannel;
 	private String leaveMessage;
 	private long leaveChannel;
+	private long pollChannel;
 	@Nullable
 	private List<GenericCommand> disabledCommands;
 	private long suggestionsChannel;
@@ -111,6 +111,7 @@ public class BlackGuild extends GuildImpl {
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
 			this.leaveMessage = Utils.gOD(config.getString("leavemessage"), langNonNull.getTranslationNonNull("defaultleavemessage"));
 			this.leaveChannel = Utils.gOD(config.getLong("leavechannel"), -1L);
+			this.pollChannel = Utils.gOD(config.getLong("pollchannel"), -1L);
 			this.suggestionsChannel = Utils.gOD(config.getLong("suggestionschannel"), -1L);
 			this.autoRoles = Utils.gOD(config.getList("autoroles", Long.class), new ArrayList<>());
 			this.antiSwearWhitelist = Utils.gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
@@ -247,6 +248,20 @@ public class BlackGuild extends GuildImpl {
 		}
 	}
 
+	public void setPollChannel(long pollChannelId) {
+		this.pollChannel = pollChannelId;
+		if (pollChannelId == -1) {
+			this.clear("pollchannel");
+		} else {
+			this.save("pollchannel", pollChannelId);
+		}
+	}
+
+	@ConfigGetter(key = "pollchannel", requiredPermissions = { Permission.MANAGE_SERVER }, description = "Set the Channel were the Polls should be sent to")
+	public TextChannel getPollChannel() {
+		return this.guild.getTextChannelById(this.pollChannel);
+	}
+
 	public @Nullable List<GenericCommand> getDisabledCommands() {
 		return this.disabledCommands;
 	}
@@ -254,12 +269,9 @@ public class BlackGuild extends GuildImpl {
 	public void setDisabledCommands(final String[] disabledCommands) {
 		this.setDisabledCommands(Arrays.stream(disabledCommands)
 			.map(cmd ->
-				Optional.ofNullable((GenericCommand) CommandBase.commands.get(cmd))
-					.orElse(
 						Optional.ofNullable(SlashCommandBase.commands.get(cmd))
 							.map(Pair::getValue)
 							.orElse(null)
-					)
 			)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList()));
