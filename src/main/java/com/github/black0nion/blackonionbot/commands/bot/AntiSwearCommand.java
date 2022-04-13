@@ -2,6 +2,7 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
@@ -13,32 +14,42 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
 public class AntiSwearCommand extends SlashCommand {
-
+	private static final String STATUS = "status";
+	private static final String REPLACE = "replace";
+	private static final String OFF = "off";
+	private static final String DELETE = "delete";
 	public AntiSwearCommand() {
-		this.setCommand("antiswear")
-			.setSyntax("<replace | delete | off>")
-			.setRequiredArgumentCount(1)
-			.setRequiredPermissions(Permission.ADMINISTRATOR)
-			.premiumRequired();
+		super(builder(Commands.slash("antiswear", "Used to enable/disable the anti-swear system.")
+				.addOptions(new OptionData(OptionType.STRING, STATUS, "Used to change the status of the anti-swear system.", true)
+						.addChoice("Replace", REPLACE)
+						.addChoice("Off", OFF)
+						.addChoice("Delete", DELETE)))
+				.setRequiredPermissions(Permission.ADMINISTRATOR));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		if (Utils.handleRights(guild, author, channel, Permission.MESSAGE_MANAGE)) return;
-		if (args.length >= 2) {
-			final String type = args[1];
-			final AntiSwearType parsedType = AntiSwearType.parse(type);
-			if (parsedType != null) {
-				guild.setAntiSwearType(parsedType);
-				cmde.success("antiswearstatuschanged", "antiswearis", new Placeholder("status", cmde.getTranslation(parsedType.name())));
-			} else {
-				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", CommandEvent.getPleaseUse(guild, author, this), false).build()).queue();
-			}
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var status = e.getOption(STATUS, OptionMapping::getAsString);
+		if(status.equals(REPLACE)) {
+			guild.setAntiSwearType(AntiSwearType.REPLACE);
+			cmde.success("antiswearstatuschanged", "antiswearis", new Placeholder("status", cmde.getTranslation(REPLACE)));
+		} else if(status.equals(OFF)) {
+			guild.setAntiSwearType(AntiSwearType.OFF);
+			cmde.success("antiswearstatuschanged", "antiswearis", new Placeholder("status", cmde.getTranslation(OFF)));
+		} else if(status.equals(DELETE)) {
+			guild.setAntiSwearType(AntiSwearType.DELETE);
+			cmde.success("antiswearstatuschanged", "antiswearis", new Placeholder("status", cmde.getTranslation(DELETE)));
 		} else {
-			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSwearType().name(), author, guild)), LanguageSystem.getTranslation("howtoantisweartoggle", author, guild).replace("%command%", "``" + CommandEvent.getCommandHelp(guild, this) + "``"), false).build()).queue();
+			cmde.sendPleaseUse();
 		}
 	}
 }

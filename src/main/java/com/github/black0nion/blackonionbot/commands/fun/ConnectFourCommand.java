@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.fun;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFour;
 import com.github.black0nion.blackonionbot.systems.games.connectfour.ConnectFourGameManager;
@@ -14,7 +15,12 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Optional;
@@ -23,50 +29,48 @@ import java.util.concurrent.TimeUnit;
 import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
 
 public class ConnectFourCommand extends SlashCommand {
-
+	private static final String USER = "user";
 	public ConnectFourCommand() {
-		this.setCommand("connect4", "connectfour", "viergewinnt", "4gewinnt");
+
+		super(builder(Commands.slash("Connect 4","Use this command to play Connect 4 with another user.")
+				.addOption(OptionType.USER, USER, "The user you want to challenge")));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		if (message.getMentionedUsers().size() != 0) {
-			final BlackUser challenged = BlackUser.from(message.getMentionedUsers().get(0));
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+			var challenged = BlackUser.from(e.getOption(USER, OptionMapping::getAsUser));
 			if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
-				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
+				e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
 				return;
 			}
 			if (ConnectFourGameManager.isIngame(author.getId()) || ConnectFourGameManager.isIngame(challenged.getId())) {
-				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("alreadyingame", author, guild), getTranslation("nomultitasking", author, guild), false).build()).queue();
+				e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("alreadyingame", author, guild), getTranslation("nomultitasking", author, guild), false).build()).queue();
 				return;
 			}
-			message.reply(getTranslation("c4_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
+			e.reply(getTranslation("c4_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
 			Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
 				final BlackUser answerUser = BlackUser.from(event.getAuthor());
 				if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId()))
 					if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
-						message.replyEmbeds(EmbedUtils.getSuccessEmbed(answerUser, guild).addField(getTranslation("challengeaccepted", answerUser, guild), getTranslation("playingagainst", answerUser, guild).replace("%challenger%", author.getEscapedName()), false).build()).queue();
+						e.replyEmbeds(EmbedUtils.getSuccessEmbed(answerUser, guild).addField(getTranslation("challengeaccepted", answerUser, guild), getTranslation("playingagainst", answerUser, guild).replace("%challenger%", author.getEscapedName()), false).build()).queue();
 
 						final ConnectFour game = ConnectFourGameManager.createGame(channel, author, challenged);
 						this.rerun(game, cmde);
 					} else {
-						isDeclined(message, guild, event, answerUser, getTranslation("declined", answerUser, guild), getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), getTranslation("answerwithyes", answerUser, guild));
+						isDeclined(e, guild, event, answerUser, getTranslation("declined", answerUser, guild), getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), getTranslation("answerwithyes", answerUser, guild));
 					}
-			}, 1, TimeUnit.MINUTES, () -> message.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
-		} else {
-			message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("nousermentioned", author, guild), getTranslation("inputusertoplayagainst", author, guild), false).build()).queue();
-		}
+			}, 1, TimeUnit.MINUTES, () -> e.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
 	}
 
-	static void isDeclined(Message message, BlackGuild guild, MessageReceivedEvent event, BlackUser answerUser, String declined, String challengedeclined, String arentyoubraveenough, String answerwithyes) {
+	static void isDeclined(SlashCommandInteractionEvent e, BlackGuild guild, @NotNull MessageReceivedEvent event, BlackUser answerUser, String declined, String challengedeclined, String arentyoubraveenough, String answerwithyes) {
 		if (event.getMessage().getContentRaw().equalsIgnoreCase("no")) {
-			message.replyEmbeds(EmbedUtils.getErrorEmbed(answerUser, guild).setTitle(declined).addField(challengedeclined, arentyoubraveenough, false).build()).queue();
+			e.replyEmbeds(EmbedUtils.getErrorEmbed(answerUser, guild).setTitle(declined).addField(challengedeclined, arentyoubraveenough, false).build()).queue();
 		} else {
-			message.replyEmbeds(EmbedUtils.getErrorEmbed(answerUser, guild).addField(challengedeclined, answerwithyes, false).build()).queue();
+			e.replyEmbeds(EmbedUtils.getErrorEmbed(answerUser, guild).addField(challengedeclined, answerwithyes, false).build()).queue();
 		}
 	}
 
-	public void rerun(final ConnectFour game, final CommandEvent cmde) {
+	public void rerun(final ConnectFour game, final SlashCommandEvent cmde) {
 		Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, answerEvent -> game.isPlayer(answerEvent.getAuthor().getId()), answerEvent -> {
 			final String msg = answerEvent.getMessage().getContentRaw();
 			final BlackUser author = BlackUser.from(answerEvent.getAuthor());

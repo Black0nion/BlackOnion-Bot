@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -8,44 +9,39 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.List;
 
 public class AvatarCommand extends SlashCommand {
-
+	private static final String USER = "user";
 	public AvatarCommand() {
-		this.setCommand("avatar", "profilepicture", "pb", "pfp").setSyntax("<@User / UserID>");
+		super(builder(Commands.slash("avatar", "Used to get the avatar of a user.")
+				.addOption(OptionType.USER, USER, "The user to get the avatar of.")));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		BlackUser mentionedUser = author;
-		if (args.length > 1) {
-			final String user = String.join(" ", Utils.removeFirstArg((args)));
-			final List<User> mentionedBlackUsers = message.getMentionedUsers();
-			if (!mentionedBlackUsers.isEmpty()) {
-				mentionedUser = BlackUser.from(mentionedBlackUsers.get(0));
-			} else {
-				if (!Utils.isLong(user)) {
-					cmde.sendPleaseUse();
-					return;
-				}
-
-				e.getJDA().retrieveUserById(user.trim()).queue(uzer -> print(cmde, author, BlackUser.from(uzer)), failure -> cmde.exception());
-				return;
-			}
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var user = e.getOption(USER, OptionMapping::getAsMember);
+		var selfBlackMember = BlackMember.from(e.getMember());
+		if(user == null) {
+			cmde.reply(cmde.success()
+					.setTitle(cmde.getTranslation("pfpof") + " " + selfBlackMember.getEffectiveName(), selfBlackMember.getEffectiveAvatarUrl())
+					.setImage(selfBlackMember.getEffectiveAvatarUrl() + "?size=2048")
+					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
+					.setTimestamp(Instant.now()));
+		} else {
+			cmde.reply(cmde.success()
+					.setTitle(cmde.getTranslation("pfpof") + " " + user.getEffectiveName(), user.getEffectiveAvatarUrl())
+					.setImage(user.getEffectiveAvatarUrl() + "?size=2048")
+					.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
+					.setTimestamp(Instant.now()));
 		}
-
-		print(cmde, author, mentionedUser);
-	}
-
-	private static void print(final CommandEvent cmde, final BlackUser author, final BlackUser mentionedUser) {
-		cmde.reply(cmde.success()
-			.setTitle(cmde.getTranslation("pfpof") + " " + mentionedUser.getEscapedEffectiveName(), mentionedUser.getEffectiveAvatarUrl())
-			.setImage(mentionedUser.getEffectiveAvatarUrl() + "?size=2048")
-			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl())
-			.setTimestamp(Instant.now()));
 	}
 }
