@@ -28,7 +28,7 @@ public class SupportCommand extends SlashCommand {
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		cmde.reply(cmde.success()
-				.addField("Get help", "[Discord Server](https://discord.gg/ZzGKy9RCBY)", false)
+				.addField("Get help", "[Discord Server](https://dsc.gg/blackonion)", false)
 				.addField("Bot Developers", bot_developers, false)
 				.addField("BlackOnion Authors", blackonion_authors, false));
 	}

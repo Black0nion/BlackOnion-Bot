@@ -30,6 +30,7 @@ public class AvatarCommand extends SlashCommand {
 	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		var user = e.getOption(USER, OptionMapping::getAsMember);
 		var selfBlackMember = BlackMember.from(e.getMember());
+
 		if(user == null) {
 			cmde.reply(cmde.success()
 					.setTitle(cmde.getTranslation("pfpof") + " " + selfBlackMember.getEffectiveName(), selfBlackMember.getEffectiveAvatarUrl())
