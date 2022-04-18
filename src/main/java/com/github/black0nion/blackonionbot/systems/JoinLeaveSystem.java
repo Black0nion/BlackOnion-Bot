@@ -95,7 +95,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
-			final String prefix = guild.getPrefix();
+			final String prefix = guild.getPrefix().getValueOrDefault();
 
 			guild.retrieveOwner().queue(user -> {
 				final BlackUser author = BlackUser.from(user.getUser());
@@ -109,7 +109,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 					e.printStackTrace();
 				}
 
-				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
+				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().getValue().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
 					logger.error("{} (G: {}) added me but is not a beta guild!", guild.getName(), guild.getId());

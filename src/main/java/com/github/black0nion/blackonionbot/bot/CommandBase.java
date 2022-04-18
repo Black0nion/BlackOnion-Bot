@@ -87,7 +87,8 @@ public class CommandBase extends ListenerAdapter {
 
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackMember member = BlackMember.from(event.getMember());
-		final String prefix = guild.getPrefix();
+		// leftover, will get removed by the migrate all commands pr
+		final String prefix = "!";
 		final TextChannel channel = event.getTextChannel();
 
 		StatisticsManager.MESSAGES_SENT.labels(guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
@@ -141,7 +142,7 @@ public class CommandBase extends ListenerAdapter {
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
-			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+			else if (cmd.isPremiumCommand() && !guild.getGuildType().getValue().higherThanOrEqual(GuildType.PREMIUM)) {
 				message.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;
 			} else if (cmd.getRequiredArgumentCount() + 1 > args.length) {

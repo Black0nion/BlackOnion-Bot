@@ -6,12 +6,6 @@
  */
 package com.github.black0nion.blackonionbot.systems.antispoiler;
 
-/**
- * @author _SIM_
- * Date: 25.05.2021
- * Copyright 2021 BlackOnion
- * Class Name: AntiSpoilerType
- */
 public enum AntiSpoilerType {
 	DELETE("Deletes the message, never to be seen again."),
 	REPLACE("Removes the spoilers from the message and resends the message without them."),

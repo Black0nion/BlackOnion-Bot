@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.misc;
 
+import com.github.black0nion.blackonionbot.systems.settings.Setting;
+
 public enum GuildType {
 	/**
 	 * Code: 0

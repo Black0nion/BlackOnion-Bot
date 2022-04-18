@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -33,7 +34,7 @@ public class CustomCommandsCommand extends TextCommand {
 				e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(),
 				e -> {
 					final String contentRaw = e.getMessage().getContentRaw();
-					if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+					if (contentRaw.startsWith(cmde.getGuild().getPrefix().getValueOrDefault()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 						cmde.error("aborting", "byeeee");
 						return;
 					}
@@ -47,7 +48,7 @@ public class CustomCommandsCommand extends TextCommand {
 		cmde.getMessage().replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
-			if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+			if (contentRaw.startsWith(cmde.getGuild().getPrefix().getValueOrDefault()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 				cmde.error("aborting", "cya");
 				return;
 			}
@@ -75,7 +76,7 @@ public class CustomCommandsCommand extends TextCommand {
 			cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
 		} else if (mode.equalsIgnoreCase("create") || mode.equalsIgnoreCase("setup")) {
 			final String commandName = args[2].toLowerCase();
-			final int maxCount = guild.getGuildType().getMaxCustomCommands();
+			final int maxCount = guild.getGuildType().getValueNN().getMaxCustomCommands();
 
 			if (guild.getCustomCommands().size() >= maxCount) {
 				cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
@@ -117,7 +118,7 @@ public class CustomCommandsCommand extends TextCommand {
 	private void askForType(final String command, final CommandEvent cmde) {
 		cmde.getMessage().replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
-			if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+			if (contentRaw.startsWith(cmde.getGuild().getPrefix().getValueOrDefault()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 				cmde.error("aborting", "byeeee");
 				return;
 			}

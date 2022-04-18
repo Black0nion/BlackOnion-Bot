@@ -33,13 +33,13 @@ public class AntiSwearCommand extends TextCommand {
 			final String type = args[1];
 			final AntiSwearType parsedType = AntiSwearType.parse(type);
 			if (parsedType != null) {
-				guild.setAntiSwearType(parsedType);
+				guild.getAntiSwearType().setValue(parsedType);
 				cmde.success("antiswearstatuschanged", "antiswearis", new Placeholder("status", cmde.getTranslation(parsedType.name())));
 			} else {
 				message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("wrongargument", CommandEvent.getPleaseUse(guild, author, this), false).build()).queue();
 			}
 		} else {
-			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSwearType().name(), author, guild)), LanguageSystem.getTranslation("howtoantisweartoggle", author, guild).replace("%command%", "``" + CommandEvent.getCommandHelp(guild, this) + "``"), false).build()).queue();
+			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antiswearstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSwearType().getValue().name(), author, guild)), LanguageSystem.getTranslation("howtoantisweartoggle", author, guild).replace("%command%", "``" + CommandEvent.getCommandHelp(guild, this) + "``"), false).build()).queue();
 		}
 	}
 }

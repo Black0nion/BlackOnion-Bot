@@ -1,13 +1,13 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -43,11 +43,11 @@ public class GuildTypeCommand extends SlashCommand {
 			if (newGuildType != null) {
 				final GuildType parsedGuildType = GuildType.parse(newGuildType);
 				if (parsedGuildType != null) {
-					mentionedBlackGuild.setGuildType(parsedGuildType);
+					mentionedBlackGuild.getGuildType().setValue(parsedGuildType);
 					cmde.send("guildtypesetto", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
 				} else throw new IllegalArgumentException("Invalid guild type");
 			} else {
-				cmde.send("guildtypeis", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", mentionedBlackGuild.getGuildType().name()));
+				cmde.send("guildtypeis", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", mentionedBlackGuild.getGuildType().getValueNN().name()));
 			}
 		} else {
 			cmde.send("thisguildnotfound");

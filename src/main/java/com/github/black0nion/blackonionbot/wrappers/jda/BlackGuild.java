@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.GenericCommand;
+import com.github.black0nion.blackonionbot.commands.bot.PrefixCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.GuildType;
@@ -16,35 +17,50 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.settings.Setting;
+import com.github.black0nion.blackonionbot.systems.settings.impl.EnumSetting;
+import com.github.black0nion.blackonionbot.systems.settings.impl.LanguageSetting;
+import com.github.black0nion.blackonionbot.systems.settings.impl.ListSetting;
+import com.github.black0nion.blackonionbot.systems.settings.impl.StringSetting;
 import com.github.black0nion.blackonionbot.utils.Pair;
+import com.github.black0nion.blackonionbot.utils.PredicateBuilder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.mongodb.client.MongoCollection;
+import lombok.Getter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class BlackGuild extends GuildImpl {
 
+	private static final Logger logger = LoggerFactory.getLogger(BlackGuild.class);
+
 	private BlackMember selfBlackMember;
 
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
 		public @NotNull BlackGuild load(final @NotNull Guild guild) {
-		return new BlackGuild(guild);
+			return new BlackGuild(guild);
 		}
 	});
 
@@ -59,9 +75,11 @@ public class BlackGuild extends GuildImpl {
 		try {
 			return guilds.get(guild);
 		} catch (final Exception e) {
-			if (!(e instanceof IllegalStateException)) {
-				e.printStackTrace();
+			if (e.getCause() != null && (e instanceof ExecutionException || e instanceof UncheckedExecutionException)) {
+				e.getCause().printStackTrace();
+				return null;
 			}
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -72,12 +90,44 @@ public class BlackGuild extends GuildImpl {
 		return first.isPresent() ? first.get().getValue() : from(Bot.getInstance().getJda().getGuildById(guildid));
 	}
 
-	private Language language;
-	private GuildType guildType;
-	private AntiSpoilerType antiSpoilerType;
-	private AntiSwearType antiSwearType;
-	private List<String> antiSwearWhitelist;
-	private String prefix;
+	@Getter
+	@Nonnull
+	private final Setting<Language> language = add(new LanguageSetting.Builder("language").build());
+	@Getter
+	@Nonnull
+	private final Setting<GuildType> guildType = add(new EnumSetting.Builder<GuildType>()
+		.name("guild_type")
+		.defaultValue(GuildType.NORMAL)
+		.notNullable()
+		.build());
+	@Getter
+	@Nonnull
+	private final Setting<AntiSpoilerType> antiSpoilerType = add(new EnumSetting.Builder<AntiSpoilerType>()
+		.name("anti_spoiler_type")
+		.defaultValue(AntiSpoilerType.OFF)
+		.build());
+	@Getter
+	@Nonnull
+	private final Setting<AntiSwearType> antiSwearType = add(new EnumSetting.Builder<AntiSwearType>()
+		.name("anti_swear_type")
+		.defaultValue(AntiSwearType.OFF)
+		.notNullable()
+		.build());
+	@Getter
+	@Nonnull
+	private final Setting<List<String>> antiSwearWhitelist = add(new ListSetting.Builder<String>()
+		.name("anti_swear_whitelist")
+		.defaultValue(Lists.newArrayList())
+		.genericClass(String.class)
+		.build());
+	@Getter
+	@Nonnull
+	// TODO: delete when merging the slash commands branch
+	private final Setting<String> prefix = add(new StringSetting.Builder()
+		.name("prefix")
+		.defaultValue(Config.prefix)
+		.validator(PredicateBuilder.ofPattern(PrefixCommand.PREFIX_PATTERN))
+		.build());
 	private String joinMessage;
 	private long joinChannel;
 	private String leaveMessage;
@@ -88,9 +138,10 @@ public class BlackGuild extends GuildImpl {
 	private List<Long> autoRoles;
 	private boolean loop;
 	private HashMap<String, CustomCommand> customCommands;
-
 	private BlackGuild(@NotNull final Guild guild) {
 		super(guild);
+
+		loadSettings();
 
 		try {
 			Document config = configs.find(this.getIdentifier()).first();
@@ -101,19 +152,12 @@ public class BlackGuild extends GuildImpl {
 
 			// only to debug the configs
 			this.save("name", this.guild.getName());
-			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
-			final Language langNonNull = language != null ? language : LanguageSystem.getDefaultLanguage();
-			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-			this.prefix = Utils.gOD(config.getString("prefix"), Config.prefix);
-			this.antiSpoilerType = Utils.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
-			this.antiSwearType = Utils.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
-			this.joinMessage = Utils.gOD(config.getString("joinmessage"), langNonNull.getTranslationNonNull("defaultjoinmessage"));
+			this.joinMessage = Utils.gOD(config.getString("joinmessage"), LanguageSystem.getDefaultLanguage().getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
-			this.leaveMessage = Utils.gOD(config.getString("leavemessage"), langNonNull.getTranslationNonNull("defaultleavemessage"));
+			this.leaveMessage = Utils.gOD(config.getString("leavemessage"), LanguageSystem.getDefaultLanguage().getTranslationNonNull("defaultleavemessage"));
 			this.leaveChannel = Utils.gOD(config.getLong("leavechannel"), -1L);
 			this.suggestionsChannel = Utils.gOD(config.getLong("suggestionschannel"), -1L);
 			this.autoRoles = Utils.gOD(config.getList("autoroles", Long.class), new ArrayList<>());
-			this.antiSwearWhitelist = Utils.gOD(config.getList("antiswearwhitelist", String.class), new ArrayList<>());
 			this.loop = Utils.gOD(config.getBoolean("loop"), false);
 			this.customCommands = new HashMap<>();
 			Utils.gOD(Utils.gOD(config.getList("customcommands", Document.class), new ArrayList<Document>()).stream().map(cmd -> new CustomCommand(this, cmd)).collect(Collectors.toList()), new ArrayList<CustomCommand>()).forEach(cmd -> this.customCommands.put(cmd.getCommand(), cmd));
@@ -123,53 +167,12 @@ public class BlackGuild extends GuildImpl {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Nullable
-	public Language getLanguage() {
-		return this.language;
-	}
-
-	@DashboardGetter("setup.language")
-	public String getLanguageString() {
-		return this.language != null ? this.language.getLanguageCode() : null;
-	}
-
-	@DashboardSetter("setup.language")
-	public void setLanguage(final @Nullable String language) {
-		this.setLanguage(LanguageSystem.getLanguageFromName(language));
-	}
-
-	public void setLanguage(final @Nullable Language language) {
-		this.language = language;
-		if (language != null)
-			this.save("language", language.getLanguageCode());
-		else this.clear("language");
-	}
-
-	@DashboardGetter("setup.guildtype")
-	public GuildType getGuildType() {
-		return this.guildType;
-	}
-
-	public void setGuildType(final GuildType type) {
-		this.guildType = type;
-		this.save("guildtype", type.name());
+		logger.debug("Loaded guild settings: {}", this.getSettings().toString());
+		logger.info("Guild {} loaded.", this.guild.getName());
 	}
 
 	public boolean isPremium() {
-		return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
-	}
-
-	@DashboardGetter("general.prefix")
-	public String getPrefix() {
-		return this.prefix;
-	}
-
-	@DashboardSetter("general.prefix")
-	public void setPrefix(final String prefix) {
-		this.prefix = prefix;
-		this.save("prefix", prefix);
+		return this.guildType.getValueNN().higherThanOrEqual(GuildType.PREMIUM);
 	}
 
 	@DashboardGetter("utils.joinleave.join.message")
@@ -292,47 +295,6 @@ public class BlackGuild extends GuildImpl {
 
 		this.setDisabledCommands(this.disabledCommands);
 		return true;
-	}
-
-	public AntiSpoilerType getAntiSpoilerType() {
-		return this.antiSpoilerType;
-	}
-
-	public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
-		this.antiSpoilerType = antiSpoilerType;
-		this.save("antispoiler", antiSpoilerType.name());
-	}
-
-	public AntiSwearType getAntiSwearType() {
-		return this.antiSwearType;
-	}
-
-	public void setAntiSwearType(final AntiSwearType antiSwearType) {
-		this.antiSwearType = antiSwearType;
-		this.save("antiswear", antiSwearType.name());
-	}
-
-	public List<String> getAntiSwearWhitelist() {
-		return this.antiSwearWhitelist;
-	}
-
-	public void setAntiSwearWhitelist(final List<String> antiSwearWhitelist) {
-		this.antiSwearWhitelist = antiSwearWhitelist;
-		this.saveAntiSwearWhitelist();
-	}
-
-	public void addToAntiSwearWhitelist(final String toAdd) {
-		this.antiSwearWhitelist.add(toAdd);
-		this.saveAntiSwearWhitelist();
-	}
-
-	public void removeFromAntiSwearWhitelist(final String toRemove) {
-		this.antiSwearWhitelist.remove(toRemove);
-		this.saveAntiSwearWhitelist();
-	}
-
-	public void saveAntiSwearWhitelist() {
-		this.saveList("antiswearwhitelist", this.antiSwearWhitelist);
 	}
 
 	public long getSuggestionsChannel() {

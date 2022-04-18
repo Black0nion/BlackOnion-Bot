@@ -220,7 +220,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions))
 				return;
-			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+			else if (cmd.isPremiumCommand() && !guild.getGuildType().getValue().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;
 			}

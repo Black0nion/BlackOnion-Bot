@@ -147,7 +147,7 @@ public class TicTacToeCommand extends TextCommand {
 				this.rerun(game, channel);
 			}
 		}, 1, TimeUnit.MINUTES, () -> {
-			Language language = Optional.ofNullable(guild.getLanguage()).orElseGet(LanguageSystem::getDefaultLanguage);
+			Language language = guild.getLanguage().getValueOrElseGet(LanguageSystem::getDefaultLanguage);
 			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed().addField(language.getTranslationNonNull("timeout"), language.getTranslationNonNull("tooktoolong"), false).build()).setActionRows().queue();
 			TicTacToeGameManager.deleteGame(game);
 		});

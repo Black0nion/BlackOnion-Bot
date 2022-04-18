@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -18,10 +19,11 @@ public class GuildInfoCommand extends TextCommand {
 
 	@Override
 	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+		Language lang = guild.getLanguage().getValue();
 		cmde.reply(cmde.success().setTitle("guildinfo")
 			.setThumbnail(guild.getIconUrl())
 			.addField("name", guild.getEscapedName(), true)
-			.addField("language", guild.getLanguage() != null ? (guild.getLanguage().getName() + " (" + guild.getLanguage().getLanguageCode() + ")") : "none", true)
+			.addField("language", lang != null ? (lang.getName() + " (" + lang.getLanguageCode() + ")") : "none", true)
 			.addField("owner", guild.retrieveOwner().submit().join().getUser().getAsMention(), true)
 			.addField("serverid", guild.getId(), true)
 			.addField("rolecount", String.valueOf(guild.getRoles().size()), true)

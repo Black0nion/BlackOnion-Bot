@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import javax.annotation.Nonnull;
+
 public class AntiSpoilerCommand extends TextCommand {
 
 	public AntiSpoilerCommand() {
@@ -28,20 +30,25 @@ public class AntiSpoilerCommand extends TextCommand {
 		if (Utils.handleRights(guild, author, null, Permission.MESSAGE_MANAGE)) return;
 		if (args.length >= 2) {
 			final String type = args[1];
-			if (type.equalsIgnoreCase("replace")) {
-				guild.setAntiSpoilerType(AntiSpoilerType.REPLACE);
-				message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("remove"))), false).build()).queue();
-			} else if (type.equalsIgnoreCase("delete")) {
-				guild.setAntiSpoilerType(AntiSpoilerType.DELETE);
-				message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("delete"))), false).build()).queue();
-			} else if (type.equalsIgnoreCase("off")) {
-				guild.setAntiSpoilerType(AntiSpoilerType.OFF);
-				message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("antispoilerstatuschanged", cmde.getTranslation("antispoileris", new Placeholder("status", cmde.getTranslation("off"))), false).build()).queue();
-			} else {
+			AntiSpoilerType newType = AntiSpoilerType.parse(type);
+			if (newType == null) {
 				cmde.sendPleaseUse();
+				return;
 			}
+			guild.getAntiSpoilerType().setValue(newType);
+			cmde.success("antispoilerstatuschanged", "antispoileris", new Placeholder("status", switch (newType) {
+				case REPLACE -> "remove";
+				case DELETE -> "delete";
+				case OFF -> "off";
+			}));
 		} else {
-			message.replyEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField(LanguageSystem.getTranslation("antispoilerstatus", author, guild).replace("%status%", LanguageSystem.getTranslation(guild.getAntiSpoilerType().name(), author, guild)), LanguageSystem.getTranslation("howtoantispoilertoggle", author, guild).replace("%command%", "``" + CommandEvent.getCommandHelp(guild, this) + "``"), false).build()).queue();
+			// never happens because the setting is non-null
+			assert guild.getAntiSpoilerType().getValue() != null;
+			cmde.success("antispoilerstatus", "howtoantispoilertoggle", new Placeholder("status", switch (guild.getAntiSpoilerType().getValue()) {
+				case REPLACE -> "remove";
+				case DELETE -> "delete";
+				case OFF -> "off";
+			}), new Placeholder("command", "``" + CommandEvent.getCommandHelp(guild, this) + "``"));
 		}
 	}
 }

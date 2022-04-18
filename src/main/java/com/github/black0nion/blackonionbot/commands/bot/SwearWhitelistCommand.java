@@ -51,7 +51,7 @@ public class SwearWhitelistCommand extends TextCommand {
 			final boolean add = args[1].equalsIgnoreCase("add");
 
 			if (mentionedStuff.size() != 0) {
-				List<String> newWhitelist = guild.getAntiSwearWhitelist();
+				List<String> newWhitelist = guild.getAntiSwearWhitelist().getValue();
 				if (newWhitelist == null) {
 					newWhitelist = new ArrayList<>();
 				}
@@ -63,11 +63,11 @@ public class SwearWhitelistCommand extends TextCommand {
 				} else {
 					newWhitelist.removeAll(mentionedStuff);
 				}
-				guild.setAntiSwearWhitelist(newWhitelist);
+				guild.getAntiSwearWhitelist().setValue(newWhitelist);
 				cmde.success("whitelistupdated", (add ? cmde.getTranslation("addedtowhitelist", new Placeholder("add", mentionedStuff.toString())) : cmde.getTranslation("removedfromwhitelist", new Placeholder("removed", mentionedStuff.toString()))));
 			}
 		} else {
-			final List<String> whitelist = guild.getAntiSwearWhitelist();
+			final List<String> whitelist = guild.getAntiSwearWhitelist().getValue();
 			cmde.success("antiswearwhitelist", (whitelist != null && whitelist.size() != 0 ? whitelist.toString() : "empty"));
 		}
 	}

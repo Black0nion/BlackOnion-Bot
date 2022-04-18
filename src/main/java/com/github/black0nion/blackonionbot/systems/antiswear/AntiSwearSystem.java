@@ -35,12 +35,12 @@ public class AntiSwearSystem {
 		final String messageContent = message.getContentRaw();
 		final BlackUser user = author.getBlackUser();
 		if (user.isBot()) return false;
-		final AntiSwearType type = guild.getAntiSwearType();
+		final AntiSwearType type = guild.getAntiSwearType().getValue();
 		if (guild.isPremium()) {
 			if (type == OFF) return false;
 		} else {
 			if (type != OFF) {
-				guild.setAntiSwearType(OFF);
+				guild.getAntiSwearType().setValue(OFF);
 			}
 			return false;
 		}
@@ -50,7 +50,7 @@ public class AntiSwearSystem {
 		try {
 			if (messageContent.equalsIgnoreCase("")) return false;
 			// check for whitelist
-			final List<String> whitelist = guild.getAntiSwearWhitelist();
+			final List<String> whitelist = guild.getAntiSwearWhitelist().getValue();
 			if (whitelist != null && (whitelist.contains(channel.getAsMention()) || author.getRoles().stream().anyMatch(role -> whitelist.contains(role.getAsMention()))))
 				return false;
 			// Message messageRaw = event.getMessage();

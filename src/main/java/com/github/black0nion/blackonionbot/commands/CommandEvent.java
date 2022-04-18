@@ -195,7 +195,7 @@ public class CommandEvent {
 
 	public static String getCommandHelp(final BlackGuild guild, final TextCommand command) {
 		final String syntax = command.getSyntax();
-		return guild.getPrefix() + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "");
+		return "!" + command.getCommand()[0] + (syntax != null && !syntax.equalsIgnoreCase("") ? " " + syntax : "");
 	}
 
 	public EmbedBuilder getWrongArgument() {

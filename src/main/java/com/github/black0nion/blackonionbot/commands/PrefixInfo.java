@@ -27,7 +27,7 @@ public class PrefixInfo {
 					if (member.hasPermission(Permission.MANAGE_SERVER)) {
 						final String prefix = args[2];
 						if (prefix.length() < 10) {
-							guild.setPrefix(prefix);
+							guild.getPrefix().setValue(prefix);
 							cmde.success("prefixchanged",  "myprefixis", new Placeholder("prefix", prefix));
 						} else {
 							cmde.error("toolong", "undertenchars");
@@ -38,7 +38,7 @@ public class PrefixInfo {
 					return;
 				}
 			}
-			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix()), new Placeholder("command", "<@!" + BotInformation.SELF_USER_ID + "> prefix <prefix>"));
+			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix().getValueOrDefault()), new Placeholder("command", "<@!" + BotInformation.SELF_USER_ID + "> prefix <prefix>"));
 		}
 	}
 }

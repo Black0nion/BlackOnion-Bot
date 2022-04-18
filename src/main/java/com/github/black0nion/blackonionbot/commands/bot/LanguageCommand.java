@@ -67,11 +67,11 @@ public class LanguageCommand extends SlashCommand {
 			} else throw new NotImplementedException("Subcommand");
 		} else if (subcommandGroup.equalsIgnoreCase("guild")) {
 			if (subcommand.equalsIgnoreCase("get")) {
-				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(guild.getLanguage()).orElseGet(LanguageSystem::getDefaultLanguage).getFullName()));
+				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(guild.getLanguage().getValue()).orElseGet(LanguageSystem::getDefaultLanguage).getFullName()));
 			} else if (subcommand.equalsIgnoreCase("set")) {
 				cmde.handlePerms(Permission.MANAGE_SERVER);
 				// can't be null because of the checks above
-				guild.setLanguage(lang);
+				guild.getLanguage().setValue(lang);
 				cmde.setLanguage(lang);
 				cmde.send("languageupdated", new Placeholder("newlang", lang.getFullName()));
 			} else throw new NotImplementedException("Subcommand");

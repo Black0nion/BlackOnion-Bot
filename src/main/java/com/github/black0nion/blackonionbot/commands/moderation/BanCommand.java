@@ -21,7 +21,7 @@ import java.util.Objects;
 public class BanCommand extends SlashCommand {
 	private static final String USER = "user";
 	private static final String REASON = "reason";
-	private static final String DEL_DAYS = "delDays";
+	private static final String DEL_DAYS = "del_days";
 
 	public BanCommand() {
 		super(builder(Commands.slash("ban", "Used to ban a user from the server.")

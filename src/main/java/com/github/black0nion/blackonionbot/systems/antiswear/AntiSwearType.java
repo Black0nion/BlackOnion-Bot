@@ -6,12 +6,6 @@
  */
 package com.github.black0nion.blackonionbot.systems.antiswear;
 
-/**
- * @author _SIM_
- * Date: 25.05.2021
- * Copyright 2021 BlackOnion
- * Class Name: AntiSwearType
- */
 public enum AntiSwearType {
 	DELETE("Deletes the message, never to be seen again."),
 	REPLACE("Removes the profanity from the message with stars and resends the message without it."),

@@ -17,7 +17,6 @@ public class AntiSpoilerSystem {
 	/**
 	 * @return if the message contained a spoiler
 	 */
-	@SuppressWarnings("ConstantConditions")
 	public static boolean removeSpoilers(final CommandEvent event) {
 		final BlackGuild guild = event.getGuild();
 		final Message msg = event.getMessage();
@@ -25,7 +24,7 @@ public class AntiSpoilerSystem {
 		final BlackUser author = event.getUser();
 		final TextChannel channel = event.getChannel();
 		String newMessage = message;
-		final AntiSpoilerType type = guild.getAntiSpoilerType();
+		final AntiSpoilerType type = guild.getAntiSpoilerType().getValue();
 
 		if (type != OFF) {
 			long count = message.chars().filter(c -> c == '|').count();

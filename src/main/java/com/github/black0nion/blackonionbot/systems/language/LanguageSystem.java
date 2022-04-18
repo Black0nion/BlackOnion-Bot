@@ -7,7 +7,6 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -48,17 +47,14 @@ public class LanguageSystem {
 		try {
 			final Language userLang = author.getLanguage();
 			if (userLang != null) return userLang;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		try {
-			final Language guildLang = guild.getLanguage();
+			final Language guildLang = guild.getLanguage().getValue();
 			if (guildLang != null) return guildLang;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		try {
 			return defaultLocale;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		return null;
 	}
 
@@ -72,9 +68,10 @@ public class LanguageSystem {
 		return languages.get(name.toUpperCase());
 	}
 
+	// TODO: use SlashCommandEvent instead where possible
 	public static String getTranslation(final @Nullable String key, final @Nullable BlackUser author, final @Nullable BlackGuild guild) {
 		if (author != null && author.getLanguage() != null) return author.getLanguage().getTranslation(key);
-		if (guild != null && guild.getLanguage() != null) return guild.getLanguage().getTranslation(key);
+		if (guild != null && guild.getLanguage().getValue() != null) return guild.getLanguage().getValue().getTranslation(key);
 		return defaultLocale.getTranslation(key);
 	}
 

@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
@@ -107,7 +106,7 @@ public class ConnectFourCommand extends TextCommand {
 			}
 			this.rerun(game, cmde);
 		}, 1, TimeUnit.MINUTES, () -> {
-			Language lang = Optional.ofNullable(cmde.getGuild().getLanguage()).orElseGet(LanguageSystem::getDefaultLanguage);
+			Language lang = cmde.getGuild().getLanguage().getValueOrElseGet(LanguageSystem::getDefaultLanguage);
 			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed(null, cmde.getGuild()).addField(lang.getTranslation("timeout"), lang.getTranslation("tooktoolong"), false).build()).queue();
 			ConnectFourGameManager.deleteGame(game);
 		});
