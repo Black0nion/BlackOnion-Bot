@@ -28,7 +28,7 @@ public class AutoRolesSystem extends ListenerAdapter {
 			if (role == null)
 				removedRoles.add(roleid);
 			else
-				guild.addRoleToMember(user.getIdLong(), role).queue();
+				guild.addRoleToMember(user, role).queue();
 		}
 
 		if (removedRoles.size() != 0) {
