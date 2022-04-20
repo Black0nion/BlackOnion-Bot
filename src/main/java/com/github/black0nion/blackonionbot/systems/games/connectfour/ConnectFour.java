@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -100,7 +99,7 @@ public class ConnectFour {
 	public Point getCoordinatesFromString(final String input) {
 		final char[] charInput = input.toCharArray();
 		int y = -1;
-		for (int i = 0; i < Utils.alphabet.size(); i++) if (Utils.alphabet.get(i) == charInput[0]) y = i;
+		for (int i = 0; i < Utils.ALPHABET.size(); i++) if (Utils.ALPHABET.get(i) == charInput[0]) y = i;
 		// should never get called because isValidInput is called first
 		return new Point(Integer.parseInt(String.valueOf(charInput[1])), y);
 	}
@@ -109,7 +108,7 @@ public class ConnectFour {
 		final char[] charInput = input.toCharArray();
 		try {
 			final int numbAtOne = Integer.parseInt(String.valueOf(charInput[1]));
-			if (Utils.alphabet.contains(charInput[0]) && Utils.alphabet.indexOf(charInput[0]) < ConnectFourGameManager.WIDTH && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.HEIGHT)
+			if (Utils.ALPHABET.contains(charInput[0]) && Utils.ALPHABET.indexOf(charInput[0]) < ConnectFourGameManager.WIDTH && numbAtOne >= 0 && numbAtOne < ConnectFourGameManager.HEIGHT)
 				return true;
 		} catch (final Exception ignored) {
 		}

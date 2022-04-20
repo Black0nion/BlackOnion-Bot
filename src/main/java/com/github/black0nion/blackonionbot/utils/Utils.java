@@ -2,11 +2,11 @@ package com.github.black0nion.blackonionbot.utils;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -28,48 +28,21 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class Utils {
 
-	public static final List<Character> alphabet = new ArrayList<>();
+	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
 	public static final Permission[] EMPTY_PERMISSIONS = new Permission[0];
 
-	static {
-		alphabet.add('A');
-		alphabet.add('B');
-		alphabet.add('C');
-		alphabet.add('D');
-		alphabet.add('E');
-		alphabet.add('F');
-		alphabet.add('G');
-		alphabet.add('H');
-		alphabet.add('I');
-		alphabet.add('J');
-		alphabet.add('K');
-		alphabet.add('L');
-		alphabet.add('M');
-		alphabet.add('N');
-		alphabet.add('O');
-		alphabet.add('P');
-		alphabet.add('Q');
-		alphabet.add('R');
-		alphabet.add('S');
-		alphabet.add('T');
-		alphabet.add('U');
-		alphabet.add('V');
-		alphabet.add('W');
-		alphabet.add('X');
-		alphabet.add('Y');
-		alphabet.add('Z');
-	}
-
 	public static String getStringWithNLength(final String text, final int length) {
-	    return new String(new char[length]).replace("\0", text);
+		return text.repeat(length);
 	}
 
 	public static float map(final float value, final float minInput, final float maxInput, final float minMapped, final float maxMapped) {
@@ -275,16 +248,6 @@ public class Utils {
 			""");
 	}
 
-	private static final DecimalFormat ROUNDED_DOUBLE_DECIMALFORMAT;
-
-	static {
-		final DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
-		otherSymbols.setDecimalSeparator('.');
-		otherSymbols.setGroupingSeparator(',');
-		ROUNDED_DOUBLE_DECIMALFORMAT = new DecimalFormat("####0.00", otherSymbols);
-		ROUNDED_DOUBLE_DECIMALFORMAT.setGroupingUsed(false);
-	}
-
 	@Nonnull
 	public static <T> T gOD(final @Nullable T value, final @Nonnull T defaultValue) {
 		return value != null ? value : defaultValue;
@@ -331,8 +294,8 @@ public class Utils {
 	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) throws IOException {
 		return webhooks.stream()
 			.filter(Objects::nonNull)
-			.filter(webhook1 -> webhook1.getOwner() != null)
-			.filter(webhook1 -> webhook1.getName().equals("BlackOnion-Bot ContentModerator") && webhook1.getOwner().getIdLong() == BotInformation.SELF_USER_ID)
+			.filter(webhook -> webhook.getOwner() != null)
+			.filter(webhook -> webhook.getName().equals("BlackOnion-Bot ContentModerator") && webhook.getOwner().getIdLong() == Bot.getInstance().getSelfUserId())
 			.findFirst()
 			.orElse(channel
 				.createWebhook("BlackOnion-Bot ContentModerator")

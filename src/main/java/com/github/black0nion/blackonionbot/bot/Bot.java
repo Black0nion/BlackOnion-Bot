@@ -82,6 +82,8 @@ public class Bot extends ListenerAdapter {
 		.followRedirects(HttpClient.Redirect.ALWAYS)
 		.build();
 
+	private long selfUserId = -1;
+
 	//region Getters
 	public ExecutorService getExecutor() {
 		return executor;
@@ -101,6 +103,10 @@ public class Bot extends ListenerAdapter {
 
 	public HttpClient getHttpClient() {
 		return httpClient;
+	}
+
+	public long getSelfUserId() {
+		return selfUserId;
 	}
 	//endregion
 
@@ -157,13 +163,13 @@ public class Bot extends ListenerAdapter {
 		}
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
-		runnables.addAndGetSelf(BotInformation::init)
-				.addAndGetSelf(GiveawaySystem::init)
-				.addAndGetSelf(PlayerManager::init)
-				.addAndGetSelf(API::init)
-				.addAndGetSelf(PluginSystem::loadPlugins)
-				.addAndGetSelf(ConsoleCommands::run)
-				.addAndGetSelf(Prometheus::init);
+		runnables
+			.addAndGetSelf(GiveawaySystem::init)
+			.addAndGetSelf(PlayerManager::init)
+			.addAndGetSelf(API::init)
+			.addAndGetSelf(PluginSystem::loadPlugins)
+			.addAndGetSelf(ConsoleCommands::run)
+			.addAndGetSelf(Prometheus::init);
 		ExecutorService asyncStartup = Executors.newFixedThreadPool(runnables.size());
 		runnables.forEach(asyncStartup::submit);
 
@@ -175,7 +181,7 @@ public class Bot extends ListenerAdapter {
 	@Override
 	public void onReady(final ReadyEvent e) {
 		final JDA jda = e.getJDA();
-		BotInformation.SELF_USER_ID = jda.getSelfUser().getIdLong();
+		selfUserId = jda.getSelfUser().getIdLong();
 		logger.info("Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity());

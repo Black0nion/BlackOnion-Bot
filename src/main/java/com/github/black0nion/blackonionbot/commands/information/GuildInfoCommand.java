@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.time.format.DateTimeFormatter;
+
 public class GuildInfoCommand extends TextCommand {
 
 	public GuildInfoCommand() {
@@ -28,6 +30,6 @@ public class GuildInfoCommand extends TextCommand {
 			.addField("membercount", String.valueOf(guild.getMemberCount()), true)
 			.addField("channelcount", String.valueOf(guild.getChannels().size()), true)
 			.addField("boostlevel", guild.getBoostTier().name(), true)
-			.addField("created", BotInformation.DATE_PATTERN.format(guild.getTimeCreated()), true));
+			.addField("created", guild.getTimeCreated().format(BotInformation.DATE_TIME_FORMATTER), true));
 	}
 }
