@@ -16,11 +16,11 @@ import net.dv8tion.jda.api.requests.restaction.order.CategoryOrderAction;
 import net.dv8tion.jda.api.requests.restaction.order.ChannelOrderAction;
 import net.dv8tion.jda.api.requests.restaction.order.RoleOrderAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
+import net.dv8tion.jda.api.requests.restaction.pagination.BanPaginationAction;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.utils.concurrent.Task;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -50,28 +50,28 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> retrieveCommandById(@NotNull String id) {
+	public RestAction<Command> retrieveCommandById(@Nonnull String id) {
 		return this.guild.retrieveCommandById(id);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> retrieveCommandById(long id) {
+	public RestAction<Command> retrieveCommandById(long id) {
 		return this.guild.retrieveCommandById(id);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<net.dv8tion.jda.api.interactions.commands.Command> upsertCommand(@NotNull CommandData command) {
+	public RestAction<Command> upsertCommand(@Nonnull CommandData command) {
 		return this.guild.upsertCommand(command);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public CommandCreateAction upsertCommand(@NotNull String name, @NotNull String description) {
+	public CommandCreateAction upsertCommand(@Nonnull String name, @Nonnull String description) {
 		return this.guild.upsertCommand(name, description);
 	}
 
@@ -85,7 +85,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public CommandEditAction editCommandById(@NotNull String id) {
+	public CommandEditAction editCommandById(@Nonnull String id) {
 		return this.guild.editCommandById(id);
 	}
 
@@ -99,7 +99,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Void> deleteCommandById(@NotNull String commandId) {
+	public RestAction<Void> deleteCommandById(@Nonnull String commandId) {
 		return this.guild.deleteCommandById(commandId);
 	}
 
@@ -113,7 +113,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(@NotNull String commandId) {
+	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(@Nonnull String commandId) {
 		return this.guild.retrieveCommandPrivilegesById(commandId);
 	}
 
@@ -134,35 +134,35 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@NotNull String id, @NotNull Collection<? extends CommandPrivilege> privileges) {
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@Nonnull String id, @Nonnull Collection<? extends CommandPrivilege> privileges) {
 		return this.guild.updateCommandPrivilegesById(id, privileges);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@NotNull String id, @NotNull CommandPrivilege @NotNull ... privileges) {
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@Nonnull String id, @Nonnull CommandPrivilege... privileges) {
 		return this.guild.updateCommandPrivilegesById(id, privileges);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @NotNull Collection<? extends CommandPrivilege> privileges) {
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @Nonnull Collection<? extends CommandPrivilege> privileges) {
 		return this.guild.updateCommandPrivilegesById(id, privileges);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @NotNull CommandPrivilege @NotNull ... privileges) {
+	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @Nonnull CommandPrivilege... privileges) {
 		return this.guild.updateCommandPrivilegesById(id, privileges);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(@NotNull Map<String, ? extends Collection<CommandPrivilege>> privileges) {
+	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(@Nonnull Map<String, ? extends Collection<CommandPrivilege>> privileges) {
 		return this.guild.updateCommandPrivileges(privileges);
 	}
 
@@ -183,22 +183,8 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public MemberAction addMember(@NotNull String accessToken, @NotNull String userId) {
-		return this.guild.addMember(accessToken, userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public MemberAction addMember(@NotNull String accessToken, @NotNull User user) {
+	public MemberAction addMember(@Nonnull String accessToken, @Nonnull UserSnowflake user) {
 		return this.guild.addMember(accessToken, user);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public MemberAction addMember(@NotNull String accessToken, long userId) {
-		return this.guild.addMember(accessToken, userId);
 	}
 
 	@Override
@@ -397,7 +383,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
-	public boolean isMember(@NotNull User user) {
+	public boolean isMember(@Nonnull UserSnowflake user) {
 		return this.guild.isMember(user);
 	}
 
@@ -415,13 +401,13 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Member getMember(@NotNull User user) {
+	public Member getMember(@Nonnull UserSnowflake user) {
 		return this.guild.getMember(user);
 	}
 
 	@Override
 	@Nullable
-	public Member getMemberById(@NotNull String userId) {
+	public Member getMemberById(@Nonnull String userId) {
 		return this.guild.getMemberById(userId);
 	}
 
@@ -433,13 +419,13 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Member getMemberByTag(@NotNull String tag) {
+	public Member getMemberByTag(@Nonnull String tag) {
 		return this.guild.getMemberByTag(tag);
 	}
 
 	@Override
 	@Nullable
-	public Member getMemberByTag(@NotNull String username, @NotNull String discriminator) {
+	public Member getMemberByTag(@Nonnull String username, @Nonnull String discriminator) {
 		return this.guild.getMemberByTag(username, discriminator);
 	}
 
@@ -451,31 +437,31 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public List<Member> getMembersByName(@NotNull String name, boolean ignoreCase) {
+	public List<Member> getMembersByName(@Nonnull String name, boolean ignoreCase) {
 		return this.guild.getMembersByName(name, ignoreCase);
 	}
 
 	@Override
 	@Nonnull
-	public List<Member> getMembersByNickname(@org.jetbrains.annotations.Nullable String nickname, boolean ignoreCase) {
+	public List<Member> getMembersByNickname(@Nullable String nickname, boolean ignoreCase) {
 		return this.guild.getMembersByNickname(nickname, ignoreCase);
 	}
 
 	@Override
 	@Nonnull
-	public List<Member> getMembersByEffectiveName(@NotNull String name, boolean ignoreCase) {
+	public List<Member> getMembersByEffectiveName(@Nonnull String name, boolean ignoreCase) {
 		return this.guild.getMembersByEffectiveName(name, ignoreCase);
 	}
 
 	@Override
 	@Nonnull
-	public List<Member> getMembersWithRoles(@NotNull Role @NotNull ... roles) {
+	public List<Member> getMembersWithRoles(@Nonnull Role... roles) {
 		return this.guild.getMembersWithRoles(roles);
 	}
 
 	@Override
 	@Nonnull
-	public List<Member> getMembersWithRoles(@NotNull Collection<Role> roles) {
+	public List<Member> getMembersWithRoles(@Nonnull Collection<Role> roles) {
 		return this.guild.getMembersWithRoles(roles);
 	}
 
@@ -535,7 +521,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Role getRoleById(@NotNull String id) {
+	public Role getRoleById(@Nonnull String id) {
 		return this.guild.getRoleById(id);
 	}
 
@@ -553,7 +539,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public List<Role> getRolesByName(@NotNull String name, boolean ignoreCase) {
+	public List<Role> getRolesByName(@Nonnull String name, boolean ignoreCase) {
 		return this.guild.getRolesByName(name, ignoreCase);
 	}
 
@@ -565,13 +551,13 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Role getRoleByBot(@NotNull String userId) {
+	public Role getRoleByBot(@Nonnull String userId) {
 		return this.guild.getRoleByBot(userId);
 	}
 
 	@Override
 	@Nullable
-	public Role getRoleByBot(@NotNull User user) {
+	public Role getRoleByBot(@Nonnull User user) {
 		return this.guild.getRoleByBot(user);
 	}
 
@@ -595,7 +581,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Emote getEmoteById(@NotNull String id) {
+	public Emote getEmoteById(@Nonnull String id) {
 		return this.guild.getEmoteById(id);
 	}
 
@@ -613,7 +599,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public List<Emote> getEmotesByName(@NotNull String name, boolean ignoreCase) {
+	public List<Emote> getEmotesByName(@Nonnull String name, boolean ignoreCase) {
 		return this.guild.getEmotesByName(name, ignoreCase);
 	}
 
@@ -633,7 +619,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<ListedEmote> retrieveEmoteById(@NotNull String id) {
+	public RestAction<ListedEmote> retrieveEmoteById(@Nonnull String id) {
 		return this.guild.retrieveEmoteById(id);
 	}
 
@@ -647,36 +633,22 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<ListedEmote> retrieveEmote(@NotNull Emote emote) {
+	public RestAction<ListedEmote> retrieveEmote(@Nonnull Emote emote) {
 		return this.guild.retrieveEmote(emote);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<Ban>> retrieveBanList() {
+	public BanPaginationAction retrieveBanList() {
 		return this.guild.retrieveBanList();
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Ban> retrieveBanById(long userId) {
-		return this.guild.retrieveBanById(userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<Ban> retrieveBanById(@NotNull String userId) {
-		return this.guild.retrieveBanById(userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<Ban> retrieveBan(@NotNull User bannedUser) {
-		return this.guild.retrieveBan(bannedUser);
+	public RestAction<Ban> retrieveBan(@Nonnull UserSnowflake user) {
+		return this.guild.retrieveBan(user);
 	}
 
 	@Override
@@ -733,7 +705,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Void> delete(@org.jetbrains.annotations.Nullable String mfaCode) {
+	public RestAction<Void> delete(@Nullable String mfaCode) {
 		return this.guild.delete(mfaCode);
 	}
 
@@ -778,7 +750,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Template> createTemplate(@NotNull String name, @org.jetbrains.annotations.Nullable String description) {
+	public RestAction<Template> createTemplate(@Nonnull String name, @Nullable String description) {
 		return this.guild.createTemplate(name, description);
 	}
 
@@ -829,39 +801,39 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> findMembers(@NotNull Predicate<? super Member> filter) {
+	public Task<List<Member>> findMembers(@Nonnull Predicate<? super Member> filter) {
 		return this.guild.findMembers(filter);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> findMembersWithRoles(@NotNull Collection<Role> roles) {
+	public Task<List<Member>> findMembersWithRoles(@Nonnull Collection<Role> roles) {
 		return this.guild.findMembersWithRoles(roles);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> findMembersWithRoles(@NotNull Role @NotNull ... roles) {
+	public Task<List<Member>> findMembersWithRoles(@Nonnull Role... roles) {
 		return this.guild.findMembersWithRoles(roles);
 	}
 
 	@Override
 	@Nonnull
-	public Task<Void> loadMembers(@NotNull Consumer<Member> callback) {
+	public Task<Void> loadMembers(@Nonnull Consumer<Member> callback) {
 		return this.guild.loadMembers(callback);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMember(@NotNull User user) {
+	public RestAction<Member> retrieveMember(@Nonnull UserSnowflake user) {
 		return this.guild.retrieveMember(user);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMemberById(@NotNull String id) {
+	public RestAction<Member> retrieveMemberById(@Nonnull String id) {
 		return this.guild.retrieveMemberById(id);
 	}
 
@@ -879,13 +851,13 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMember(@NotNull User user, boolean update) {
+	public RestAction<Member> retrieveMember(@Nonnull User user, boolean update) {
 		return this.guild.retrieveMember(user, update);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMemberById(@NotNull String id, boolean update) {
+	public RestAction<Member> retrieveMemberById(@Nonnull String id, boolean update) {
 		return this.guild.retrieveMemberById(id, update);
 	}
 
@@ -904,63 +876,63 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembers(@NotNull Collection<User> users) {
+	public Task<List<Member>> retrieveMembers(@Nonnull Collection<? extends UserSnowflake> users) {
 		return this.guild.retrieveMembers(users);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(@NotNull Collection<Long> ids) {
+	public Task<List<Member>> retrieveMembersByIds(@Nonnull Collection<Long> ids) {
 		return this.guild.retrieveMembersByIds(ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(@NotNull String @NotNull ... ids) {
+	public Task<List<Member>> retrieveMembersByIds(@Nonnull String... ids) {
 		return this.guild.retrieveMembersByIds(ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(long @NotNull ... ids) {
+	public Task<List<Member>> retrieveMembersByIds(@Nonnull long... ids) {
 		return this.guild.retrieveMembersByIds(ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembers(boolean includePresence, @NotNull Collection<User> users) {
+	public Task<List<Member>> retrieveMembers(boolean includePresence, @Nonnull Collection<? extends UserSnowflake> users) {
 		return this.guild.retrieveMembers(includePresence, users);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, @NotNull Collection<Long> ids) {
+	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, @Nonnull Collection<Long> ids) {
 		return this.guild.retrieveMembersByIds(includePresence, ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, @NotNull String @NotNull ... ids) {
+	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, @Nonnull String... ids) {
 		return this.guild.retrieveMembersByIds(includePresence, ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, long @NotNull ... ids) {
+	public Task<List<Member>> retrieveMembersByIds(boolean includePresence, @Nonnull long... ids) {
 		return this.guild.retrieveMembersByIds(includePresence, ids);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public Task<List<Member>> retrieveMembersByPrefix(@NotNull String prefix, int limit) {
+	public Task<List<Member>> retrieveMembersByPrefix(@Nonnull String prefix, int limit) {
 		return this.guild.retrieveMembersByPrefix(prefix, limit);
 	}
 
@@ -974,355 +946,223 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Void> moveVoiceMember(@NotNull Member member, @org.jetbrains.annotations.Nullable AudioChannel audioChannel) {
+	public RestAction<Void> moveVoiceMember(@Nonnull Member member, @Nullable AudioChannel audioChannel) {
 		return this.guild.moveVoiceMember(member, audioChannel);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Void> kickVoiceMember(@NotNull Member member) {
+	public RestAction<Void> kickVoiceMember(@Nonnull Member member) {
 		return this.guild.kickVoiceMember(member);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> modifyNickname(@NotNull Member member, @org.jetbrains.annotations.Nullable String nickname) {
+	public AuditableRestAction<Void> modifyNickname(@Nonnull Member member, @Nullable String nickname) {
 		return this.guild.modifyNickname(member, nickname);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Integer> prune(int days, @NotNull Role @NotNull ... roles) {
+	public AuditableRestAction<Integer> prune(int days, @Nonnull Role... roles) {
 		return this.guild.prune(days, roles);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Integer> prune(int days, boolean wait, @NotNull Role @NotNull ... roles) {
+	public AuditableRestAction<Integer> prune(int days, boolean wait, @Nonnull Role... roles) {
 		return this.guild.prune(days, wait, roles);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> kick(@NotNull Member member, @org.jetbrains.annotations.Nullable String reason) {
-		return this.guild.kick(member, reason);
+	public AuditableRestAction<Void> kick(@Nonnull UserSnowflake user, @Nullable String reason) {
+		return this.guild.kick(user, reason);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> kick(@NotNull String userId, @org.jetbrains.annotations.Nullable String reason) {
-		return this.guild.kick(userId, reason);
+	public AuditableRestAction<Void> kick(@Nonnull UserSnowflake user) {
+		return this.guild.kick(user);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> kick(@NotNull Member member) {
-		return this.guild.kick(member);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> kick(@NotNull String userId) {
-		return this.guild.kick(userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull User user, int delDays, @org.jetbrains.annotations.Nullable String reason) {
+	public AuditableRestAction<Void> ban(@Nonnull UserSnowflake user, int delDays, @Nullable String reason) {
 		return this.guild.ban(user, delDays, reason);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull String userId, int delDays, @org.jetbrains.annotations.Nullable String reason) {
-		return this.guild.ban(userId, delDays, reason);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull Member member, int delDays, @org.jetbrains.annotations.Nullable String reason) {
-		return this.guild.ban(member, delDays, reason);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull Member member, int delDays) {
-		return this.guild.ban(member, delDays);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull User user, int delDays) {
+	public AuditableRestAction<Void> ban(@Nonnull UserSnowflake user, int delDays) {
 		return this.guild.ban(user, delDays);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> ban(@NotNull String userId, int delDays) {
-		return this.guild.ban(userId, delDays);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> unban(@NotNull User user) {
+	public AuditableRestAction<Void> unban(@Nonnull UserSnowflake user) {
 		return this.guild.unban(user);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> unban(@NotNull String userId) {
-		return this.guild.unban(userId);
+	public AuditableRestAction<Void> timeoutFor(@Nonnull UserSnowflake user, long amount, @Nonnull TimeUnit unit) {
+		return this.guild.timeoutFor(user, amount, unit);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutFor(@NotNull Member member, long amount, @NotNull TimeUnit unit) {
-		return this.guild.timeoutFor(member, amount, unit);
+	public AuditableRestAction<Void> timeoutFor(@Nonnull UserSnowflake user, @Nonnull Duration duration) {
+		return this.guild.timeoutFor(user, duration);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutFor(@NotNull Member member, @NotNull Duration duration) {
-		return this.guild.timeoutFor(member, duration);
+	public AuditableRestAction<Void> timeoutUntil(@Nonnull UserSnowflake user, @Nonnull TemporalAccessor temporal) {
+		return this.guild.timeoutUntil(user, temporal);
+	}
+
+	@Override
+	@Nonnull
+	public AuditableRestAction<Void> removeTimeout(@Nonnull UserSnowflake user) {
+		return this.guild.removeTimeout(user);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutUntil(@NotNull Member member, @NotNull TemporalAccessor temporal) {
-		return this.guild.timeoutUntil(member, temporal);
+	public AuditableRestAction<Void> deafen(@Nonnull UserSnowflake user, boolean deafen) {
+		return this.guild.deafen(user, deafen);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutForById(long userId, long amount, @NotNull TimeUnit unit) {
-		return this.guild.timeoutForById(userId, amount, unit);
+	public AuditableRestAction<Void> mute(@Nonnull UserSnowflake user, boolean mute) {
+		return this.guild.mute(user, mute);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutForById(@NotNull String userId, long amount, @NotNull TimeUnit unit) {
-		return this.guild.timeoutForById(userId, amount, unit);
+	public AuditableRestAction<Void> addRoleToMember(@Nonnull UserSnowflake user, @Nonnull Role role) {
+		return this.guild.addRoleToMember(user, role);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutForById(long userId, @NotNull Duration duration) {
-		return this.guild.timeoutForById(userId, duration);
+	public AuditableRestAction<Void> removeRoleFromMember(@Nonnull UserSnowflake user, @Nonnull Role role) {
+		return this.guild.removeRoleFromMember(user, role);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> timeoutForById(@NotNull String userId, @NotNull Duration duration) {
-		return this.guild.timeoutForById(userId, duration);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> timeoutUntilById(long userId, @NotNull TemporalAccessor temporal) {
-		return this.guild.timeoutUntilById(userId, temporal);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> timeoutUntilById(@NotNull String userId, @NotNull TemporalAccessor temporal) {
-		return this.guild.timeoutUntilById(userId, temporal);
-	}
-
-	@Override
-	@Nonnull
-	public AuditableRestAction<Void> removeTimeout(@NotNull Member member) {
-		return this.guild.removeTimeout(member);
-	}
-
-	@Override
-	@Nonnull
-	public AuditableRestAction<Void> removeTimeoutById(long userId) {
-		return this.guild.removeTimeoutById(userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> removeTimeoutById(@NotNull String userId) {
-		return this.guild.removeTimeoutById(userId);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> deafen(@NotNull Member member, boolean deafen) {
-		return this.guild.deafen(member, deafen);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> mute(@NotNull Member member, boolean mute) {
-		return this.guild.mute(member, mute);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> addRoleToMember(@NotNull Member member, @NotNull Role role) {
-		return this.guild.addRoleToMember(member, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> addRoleToMember(long userId, @NotNull Role role) {
-		return this.guild.addRoleToMember(userId, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> addRoleToMember(@NotNull String userId, @NotNull Role role) {
-		return this.guild.addRoleToMember(userId, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> removeRoleFromMember(@NotNull Member member, @NotNull Role role) {
-		return this.guild.removeRoleFromMember(member, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> removeRoleFromMember(long userId, @NotNull Role role) {
-		return this.guild.removeRoleFromMember(userId, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> removeRoleFromMember(@NotNull String userId, @NotNull Role role) {
-		return this.guild.removeRoleFromMember(userId, role);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> modifyMemberRoles(@NotNull Member member, @org.jetbrains.annotations.Nullable Collection<Role> rolesToAdd, @org.jetbrains.annotations.Nullable Collection<Role> rolesToRemove) {
+	public AuditableRestAction<Void> modifyMemberRoles(@Nonnull Member member, @Nullable Collection<Role> rolesToAdd, @Nullable Collection<Role> rolesToRemove) {
 		return this.guild.modifyMemberRoles(member, rolesToAdd, rolesToRemove);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> modifyMemberRoles(@NotNull Member member, @NotNull Role @NotNull ... roles) {
+	public AuditableRestAction<Void> modifyMemberRoles(@Nonnull Member member, @Nonnull Role... roles) {
 		return this.guild.modifyMemberRoles(member, roles);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> modifyMemberRoles(@NotNull Member member, @NotNull Collection<Role> roles) {
+	public AuditableRestAction<Void> modifyMemberRoles(@Nonnull Member member, @Nonnull Collection<Role> roles) {
 		return this.guild.modifyMemberRoles(member, roles);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> transferOwnership(@NotNull Member newOwner) {
+	public AuditableRestAction<Void> transferOwnership(@Nonnull Member newOwner) {
 		return this.guild.transferOwnership(newOwner);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<TextChannel> createTextChannel(@NotNull String name) {
+	public ChannelAction<TextChannel> createTextChannel(@Nonnull String name) {
 		return this.guild.createTextChannel(name);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<TextChannel> createTextChannel(@NotNull String name, @org.jetbrains.annotations.Nullable Category parent) {
+	public ChannelAction<TextChannel> createTextChannel(@Nonnull String name, @Nullable Category parent) {
 		return this.guild.createTextChannel(name, parent);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<NewsChannel> createNewsChannel(@NotNull String name) {
+	public ChannelAction<NewsChannel> createNewsChannel(@Nonnull String name) {
 		return this.guild.createNewsChannel(name);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<NewsChannel> createNewsChannel(@NotNull String name, @org.jetbrains.annotations.Nullable Category parent) {
+	public ChannelAction<NewsChannel> createNewsChannel(@Nonnull String name, @Nullable Category parent) {
 		return this.guild.createNewsChannel(name, parent);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<VoiceChannel> createVoiceChannel(@NotNull String name) {
+	public ChannelAction<VoiceChannel> createVoiceChannel(@Nonnull String name) {
 		return this.guild.createVoiceChannel(name);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<VoiceChannel> createVoiceChannel(@NotNull String name, @org.jetbrains.annotations.Nullable Category parent) {
+	public ChannelAction<VoiceChannel> createVoiceChannel(@Nonnull String name, @Nullable Category parent) {
 		return this.guild.createVoiceChannel(name, parent);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<StageChannel> createStageChannel(@NotNull String name) {
+	public ChannelAction<StageChannel> createStageChannel(@Nonnull String name) {
 		return this.guild.createStageChannel(name);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<StageChannel> createStageChannel(@NotNull String name, @org.jetbrains.annotations.Nullable Category parent) {
+	public ChannelAction<StageChannel> createStageChannel(@Nonnull String name, @Nullable Category parent) {
 		return this.guild.createStageChannel(name, parent);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public ChannelAction<Category> createCategory(@NotNull String name) {
+	public ChannelAction<Category> createCategory(@Nonnull String name) {
 		return this.guild.createCategory(name);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public <T extends ICopyableChannel> ChannelAction<T> createCopyOfChannel(@NotNull T channel) {
+	public <T extends ICopyableChannel> ChannelAction<T> createCopyOfChannel(@Nonnull T channel) {
 		return this.guild.createCopyOfChannel(channel);
 	}
 
@@ -1336,14 +1176,14 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RoleAction createCopyOfRole(@NotNull Role role) {
+	public RoleAction createCopyOfRole(@Nonnull Role role) {
 		return this.guild.createCopyOfRole(role);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Emote> createEmote(@NotNull String name, @NotNull Icon icon, @NotNull Role @NotNull ... roles) {
+	public AuditableRestAction<Emote> createEmote(@Nonnull String name, @Nonnull Icon icon, @Nonnull Role... roles) {
 		return this.guild.createEmote(name, icon, roles);
 	}
 
@@ -1371,14 +1211,14 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public CategoryOrderAction modifyTextChannelPositions(@NotNull Category category) {
+	public CategoryOrderAction modifyTextChannelPositions(@Nonnull Category category) {
 		return this.guild.modifyTextChannelPositions(category);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public CategoryOrderAction modifyVoiceChannelPositions(@NotNull Category category) {
+	public CategoryOrderAction modifyVoiceChannelPositions(@Nonnull Category category) {
 		return this.guild.modifyVoiceChannelPositions(category);
 	}
 
@@ -1394,186 +1234,6 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Nonnull
 	public RoleOrderAction modifyRolePositions(boolean useAscendingOrder) {
 		return this.guild.modifyRolePositions(useAscendingOrder);
-	}
-
-	@Override
-	@Nullable
-	public <T extends Channel> T getChannelById(@NotNull Class<T> type, @NotNull String id) {
-		return this.guild.getChannelById(type, id);
-	}
-
-	@Override
-	@Nullable
-	public <T extends Channel> T getChannelById(@NotNull Class<T> type, long id) {
-		return this.guild.getChannelById(type, id);
-	}
-
-	@Override
-	@Nullable
-	public GuildChannel getGuildChannelById(@NotNull String id) {
-		return this.guild.getGuildChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public GuildChannel getGuildChannelById(long id) {
-		return this.guild.getGuildChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public GuildChannel getGuildChannelById(@NotNull ChannelType type, @NotNull String id) {
-		return this.guild.getGuildChannelById(type, id);
-	}
-
-	@Override
-	@Nullable
-	public GuildChannel getGuildChannelById(@NotNull ChannelType type, long id) {
-		return this.guild.getGuildChannelById(type, id);
-	}
-
-	@Override
-	@Nonnull
-	public List<StageChannel> getStageChannelsByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getStageChannelsByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public StageChannel getStageChannelById(@NotNull String id) {
-		return this.guild.getStageChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public StageChannel getStageChannelById(long id) {
-		return this.guild.getStageChannelById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<StageChannel> getStageChannels() {
-		return this.guild.getStageChannels();
-	}
-
-	@Override
-	@Nonnull
-	public List<ThreadChannel> getThreadChannelsByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getThreadChannelsByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public ThreadChannel getThreadChannelById(@NotNull String id) {
-		return this.guild.getThreadChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public ThreadChannel getThreadChannelById(long id) {
-		return this.guild.getThreadChannelById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<ThreadChannel> getThreadChannels() {
-		return this.guild.getThreadChannels();
-	}
-
-	@Override
-	@Nonnull
-	public List<Category> getCategoriesByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getCategoriesByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public Category getCategoryById(@NotNull String id) {
-		return this.guild.getCategoryById(id);
-	}
-
-	@Override
-	@Nullable
-	public Category getCategoryById(long id) {
-		return this.guild.getCategoryById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<Category> getCategories() {
-		return this.guild.getCategories();
-	}
-
-	@Override
-	@Nonnull
-	public List<TextChannel> getTextChannelsByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getTextChannelsByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public TextChannel getTextChannelById(@NotNull String id) {
-		return this.guild.getTextChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public TextChannel getTextChannelById(long id) {
-		return this.guild.getTextChannelById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<TextChannel> getTextChannels() {
-		return this.guild.getTextChannels();
-	}
-
-	@Override
-	@Nonnull
-	public List<NewsChannel> getNewsChannelsByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getNewsChannelsByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public NewsChannel getNewsChannelById(@NotNull String id) {
-		return this.guild.getNewsChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public NewsChannel getNewsChannelById(long id) {
-		return this.guild.getNewsChannelById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<NewsChannel> getNewsChannels() {
-		return this.guild.getNewsChannels();
-	}
-
-	@Override
-	@Nonnull
-	public List<VoiceChannel> getVoiceChannelsByName(@NotNull String name, boolean ignoreCase) {
-		return this.guild.getVoiceChannelsByName(name, ignoreCase);
-	}
-
-	@Override
-	@Nullable
-	public VoiceChannel getVoiceChannelById(@NotNull String id) {
-		return this.guild.getVoiceChannelById(id);
-	}
-
-	@Override
-	@Nullable
-	public VoiceChannel getVoiceChannelById(long id) {
-		return this.guild.getVoiceChannelById(id);
-	}
-
-	@Override
-	@Nonnull
-	public List<VoiceChannel> getVoiceChannels() {
-		return this.guild.getVoiceChannels();
 	}
 
 	@Override
