@@ -1,0 +1,32 @@
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3.0.1
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3.1.1
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@859c33240bd026ce8d5f711f5adcc65c2f8eafc1
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@8a7ba1315bd74ba68dcb9ee794aac0d41f83c7c0
+        with:
+          arguments: build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: BlackOnion-Bot
+          path: build/libs
