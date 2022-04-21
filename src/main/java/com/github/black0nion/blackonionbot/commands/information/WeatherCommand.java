@@ -1,16 +1,19 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
-import net.dv8tion.jda.api.entities.Message;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -19,20 +22,21 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
-public class WeatherCommand extends TextCommand {
+public class WeatherCommand extends SlashCommand {
+	private static final String CITY_NAME = "city_name";
 
 	public WeatherCommand() {
-		this.setCommand("weather").setSyntax("<City Name>").setRequiredArgumentCount(1);
+		super(builder(Commands.slash("weather", "Used to get weather information for a city.")
+				.addOption(OptionType.STRING, CITY_NAME, "The city to get weather information for.", true)));
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		final String query = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		final String city = e.getOption(CITY_NAME, OptionMapping::getAsString);
 		try {
-			final JSONObject weather = getWeather(query);
+			final JSONObject weather = getWeather(city);
 			final JSONObject sys = weather.getJSONObject("sys");
 			final JSONObject main = weather.getJSONObject("main");
 			final Date sunrise = new Date(sys.getInt("sunrise") * 1000L);
@@ -40,13 +44,20 @@ public class WeatherCommand extends TextCommand {
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 			final JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			cmde.reply(cmde.success().setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png").setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org").addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true).addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true).addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true).addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true).addField("sunrise", sdf.format(sunrise), false).addField("sunset", sdf.format(sunset), false));
+			cmde.reply(cmde.success().setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
+					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
+					.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+					.addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+					.addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
+					.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+					.addField("sunrise", sdf.format(sunrise), false)
+					.addField("sunset", sdf.format(sunset), false));
 		} catch (final IOException ex) {
-			cmde.error("unknowncity", query);
+			cmde.error("unknowncity", city);
 		}
 	}
 
-	public static JSONObject getWeather(final String query) throws IOException {
+	public static @NotNull JSONObject getWeather(final String query) throws IOException {
 		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=metric&appid=" + Config.openweatherapikey);
 		final HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
