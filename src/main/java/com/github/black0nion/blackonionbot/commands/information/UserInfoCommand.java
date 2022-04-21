@@ -1,59 +1,38 @@
 package com.github.black0nion.blackonionbot.commands.information;
 
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.User.UserFlag;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class UserInfoCommand extends TextCommand {
-
+public class UserInfoCommand extends SlashCommand {
+	private static final String USER = "user";
 	private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
 	public UserInfoCommand() {
-		this.setCommand("userinfo").setSyntax("[@User | UserID]");
+
+		super(builder(Commands.slash("userinfo", "Used to get information about a member.")
+				.addOption(OptionType.USER,USER, "The member to get information about.", false)));
 	}
 
-	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember eventMember, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		BlackMember statsMember;
-		BlackUser statsUser;
-		if (message.getMentionedMembers().size() > 0) {
-			statsMember = BlackMember.from(message.getMentionedMembers().get(0));
-			assert statsMember != null;
-			statsUser = statsMember.getBlackUser();
-			cmde.reply(getUserInfo(cmde, statsUser, statsMember));
-		} else if (args.length >= 2) {
-			try {
-				Long.parseLong(args[1]);
-			} catch (final Exception ex) {
-				cmde.error("notfound", "usernotfound");
-				return;
-			}
-			e.getJDA().retrieveUserById(args[1]).queue(idUser ->
-					guild.retrieveMember(idUser).queue(
-						member -> cmde.reply(getUserInfo(cmde, Objects.requireNonNull(BlackUser.from(idUser)), BlackMember.from(member, guild))),
-						error -> cmde.reply(getUserInfo(cmde, Objects.requireNonNull(BlackUser.from(idUser)), null))), new ErrorHandler().handle(ErrorResponse.UNKNOWN_USER, error -> cmde.error("notfound", "usernotfound")).handle(Throwable.class, err -> cmde.exception()));
-		} else {
-			statsUser = author;
-			statsMember = eventMember;
-			cmde.reply(getUserInfo(cmde, statsUser, statsMember));
-		}
-	}
-
-	private static EmbedBuilder getUserInfo(final CommandEvent cmde, final BlackUser statsUser, final BlackMember statsMember) {
+	static @NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final Member member) {
+		var statsUser = BlackUser.from(user);
+		var statsMember = BlackMember.from(member);
 		final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
 
 		final TranslatedEmbed builder = cmde.success();
@@ -73,5 +52,15 @@ public class UserInfoCommand extends TextCommand {
 			builder.addField("boosted", statsMember.getTimeBoosted().format(pattern), true);
 		}
 		return builder;
+	}
+
+	@Override
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var givenMember = e.getOption(USER, OptionMapping::getAsMember);
+
+		getUserInfo(cmde, Objects.requireNonNullElseGet(givenMember.getUser(),
+						() -> Objects.requireNonNull(e.getMember().getUser())),
+				Objects.requireNonNullElseGet(givenMember,
+						() -> Objects.requireNonNull(e.getMember())));
 	}
 }
