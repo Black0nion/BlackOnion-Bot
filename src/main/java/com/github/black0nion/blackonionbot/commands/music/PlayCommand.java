@@ -21,7 +21,7 @@ public class PlayCommand extends SlashCommand {
 	private static final String URL_OR_NAME = "url_or_name";
 	public PlayCommand() {
 		super(builder(Commands.slash("play", "Used to play a song from a url or a search query.")
-				.addOption(OptionType.STRING, URL_OR_NAME, "The url or search query to play."))
+				.addOption(OptionType.STRING, URL_OR_NAME, "The url or search query to play.", true))
 				.setRequiredBotPermissions(Permission.VOICE_SPEAK));
 	}
 

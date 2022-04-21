@@ -25,7 +25,7 @@ public class VolumeCommand extends SlashCommand {
 	private static final String VOLUME = "volume";
 	public VolumeCommand() {
 		super(builder(Commands.slash("volume", "Set the volume of the player")
-				.addOptions(new OptionData(OptionType.INTEGER,VOLUME, "The volume to set the player to")
+				.addOptions(new OptionData(OptionType.INTEGER,VOLUME, "The volume to set the player to", true)
 						.setRequiredRange(1, 100))));
 	}
 	@Override
