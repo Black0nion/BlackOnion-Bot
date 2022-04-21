@@ -14,15 +14,19 @@ import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.google.common.collect.Lists;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -34,11 +38,47 @@ public class HelpCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-
+	public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + cmde.getTranslation("modules")).setDescription(cmde.getTranslation("onlyexecutorcancontrol"));
+		final Category[] cats = Category.values();
+		final List<Button> buttons = new LinkedList<>();
+		for (int i = 0; i <= cats.length; i++) {
+			StringBuilder commandsInCategory = new StringBuilder();
+			Category category = null;
+			if (i == 0) {
+				commandsInCategory = new StringBuilder(", " + cmde.getTranslation("helpmodules"));
+			} else {
+				category = cats[i - 1];
+				if (CommandBase.commandsInCategory.containsKey(category)) {
+					for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
+						if (c.isVisible(author)) {
+							commandsInCategory.append(", ").append(c.getCommand()[0]);
+						}
+					}
+				} else System.out.println("wtf:  " + category);
+			}
+			if (commandsInCategory.length() <= 2) {
+				continue;
+			}
+			final String categoryName = Utils.firstLetterUppercase((category != null ? category.name() : cmde.getTranslation("modules")).toLowerCase());
+			if (category != null) {
+				builder.addField(categoryName, commandsInCategory.substring(1), false);
+				buttons.add(Button.primary(category.name(), categoryName));
+			} else {
+				builder.addField(cmde.getTranslation("modules"), commandsInCategory.substring(1), false);
+				buttons.add(Button.success("overview", cmde.getTranslation("modules")));
+			}
+		}
+		buttons.add(Button.danger("close", cmde.getTranslation("close")));
+		channel.sendMessageEmbeds(builder.build())
+				.setActionRows(Lists.partition(buttons, 5)
+						.stream()
+						.map(ActionRow::of)
+						.toList())
+				.queue(msg -> this.waitForHelpCatSelection(msg, member, cmde));
 	}
 
-	private void waitForHelpCatSelection(final @NotNull Message msg, final @NotNull BlackMember author, final @NotNull CommandEvent cmde) {
+	private void waitForHelpCatSelection(final @NotNull Message msg, final @NotNull BlackMember author, final @NotNull SlashCommandEvent cmde) {
 		Bot.getInstance().getEventWaiter().waitForEvent(ButtonInteractionEvent.class, event -> msg.getTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 			final Button button = event.getButton();
 
@@ -101,6 +141,6 @@ public class HelpCommand extends SlashCommand {
 
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);
-		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getCommand()[0]))).setEmbeds().setActionRows().queue());
+		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getName()))).setEmbeds().setActionRows().queue());
 	}
 }
