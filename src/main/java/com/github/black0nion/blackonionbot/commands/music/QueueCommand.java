@@ -44,6 +44,6 @@ public class QueueCommand extends SlashCommand {
 			}
 		}
 
-		e.replyEmbeds(builder.build()).queue();
+		cmde.reply(builder);
 	}
 }

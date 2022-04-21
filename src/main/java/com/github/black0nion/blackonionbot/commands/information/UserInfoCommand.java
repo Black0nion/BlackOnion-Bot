@@ -59,8 +59,8 @@ public class UserInfoCommand extends SlashCommand {
 		var givenMember = e.getOption(USER, OptionMapping::getAsMember);
 
 		getUserInfo(cmde, Objects.requireNonNullElseGet(givenMember.getUser(),
-						() -> Objects.requireNonNull(e.getMember().getUser())),
+						() -> Objects.requireNonNull(author)),
 				Objects.requireNonNullElseGet(givenMember,
-						() -> Objects.requireNonNull(e.getMember())));
+						() -> Objects.requireNonNull(member)));
 	}
 }
