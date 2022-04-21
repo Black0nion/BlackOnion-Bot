@@ -30,7 +30,7 @@ public class AntiSpoilerCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var status = e.getOption(STATUS, OptionMapping::getAsString);
 
 		if (status.equalsIgnoreCase("replace")) {

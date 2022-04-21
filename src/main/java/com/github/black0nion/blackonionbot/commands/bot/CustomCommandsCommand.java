@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class CustomCommandsCommand extends TextCommand {
 		this.setCommand("customcommand", "cc", "ccs").setSyntax("<list | create | delete> [command (required for create and delete)]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
 	}
 
-	private static void askForRaw(final String command, final CommandEvent cmde) {
+	private static void askForRaw(final @NotNull String command, final @NotNull CommandEvent cmde) {
 		cmde.getMessage().replyEmbeds(cmde.success()
 				.addField("messagetosend", "inputmessage", false)
 				.setDescription(cmde.getTranslation("leavetutorial"))
@@ -43,7 +44,7 @@ public class CustomCommandsCommand extends TextCommand {
 				}));
 	}
 
-	private static void askForReply(final String command, final CommandEvent cmde, final CustomCommand customCommand) {
+	private static void askForReply(final String command, final @NotNull CommandEvent cmde, final @NotNull CustomCommand customCommand) {
 		cmde.getMessage().replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
@@ -69,7 +70,7 @@ public class CustomCommandsCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String @NotNull [] args, final @NotNull CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final @NotNull BlackGuild guild, final TextChannel channel) {
 		final String mode = args[1];
 		if (mode.equalsIgnoreCase("list")) {
 			cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
@@ -101,7 +102,7 @@ public class CustomCommandsCommand extends TextCommand {
 		}
 	}
 
-	private void askForDelete(final String command, final CommandEvent cmde) {
+	private void askForDelete(final String command, final @NotNull CommandEvent cmde) {
 		cmde.getMessage().replyEmbeds(cmde.success().addField("areyousure", "@blaumeise was soll hier stehen?", false).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
@@ -114,7 +115,7 @@ public class CustomCommandsCommand extends TextCommand {
 		}));
 	}
 
-	private void askForType(final String command, final CommandEvent cmde) {
+	private void askForType(final @NotNull String command, final @NotNull CommandEvent cmde) {
 		cmde.getMessage().replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 			if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {

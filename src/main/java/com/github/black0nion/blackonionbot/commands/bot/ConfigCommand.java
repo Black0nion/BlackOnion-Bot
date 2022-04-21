@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -71,7 +72,7 @@ public class ConfigCommand extends TextCommand {
 	public static final HashMap<String, Quadruple<Method, ConfigGetter, Method, ConfigSetter>> both = new HashMap<>();
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String @NotNull [] args, final @NotNull CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		final String mode = args[1];
 		if (mode.equalsIgnoreCase("list")) {
 			String help = "```";
@@ -162,7 +163,7 @@ public class ConfigCommand extends TextCommand {
 	}
 
 	@SuppressWarnings("RedundantCast")
-	private static ConfigSetResponse saveValue(final Object objectToInvokeMethodIn, final Method method, final Consumer<Object[]> response, final Object... args) {
+	private static @NotNull ConfigSetResponse saveValue(final Object objectToInvokeMethodIn, final @NotNull Method method, final @NotNull Consumer<Object[]> response, final Object @NotNull ... args) {
 		try {
 			final Parameter[] parameters = method.getParameters();
 			final Object[] parsed = new Object[parameters.length];
@@ -242,7 +243,7 @@ public class ConfigCommand extends TextCommand {
 		}
 	}
 
-	private static String arrayToString(final Object[] input) {
+	private static @NotNull String arrayToString(final Object @NotNull [] input) {
 		final String[] result = new String[input.length];
 		for (int i = 0; i < input.length; i++) {
 			final Object obj = input[i];

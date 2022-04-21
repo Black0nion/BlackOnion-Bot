@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ public class GuildTypeCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		long guildID = Utils.getOrReplaceMessage(() -> Long.parseLong(Objects.requireNonNull(e.getOption("guildid", OptionMapping::getAsString))), "Invalid guild ID");
 		final Guild mentionedGuild = e.getJDA().getGuildById(guildID);
 		final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);

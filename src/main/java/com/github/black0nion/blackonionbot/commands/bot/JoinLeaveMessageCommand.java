@@ -31,7 +31,7 @@ public class JoinLeaveMessageCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var status = Objects.requireNonNull(e.getOption(STATUS, OptionMapping::getAsString));
 		var message = e.getOption(MESSAGE, OptionMapping::getAsString);
 		if(status.equals("join")) {
