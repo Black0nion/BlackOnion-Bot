@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands;
 
+import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
@@ -159,6 +161,11 @@ public class CommandEvent {
 
 	public void exception() {
 		this.error("errorhappened", "somethingwentwrong");
+	}
+
+	public void exception(@Nullable Throwable t) {
+		if (t != null && !(t instanceof DummyException)) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
+		this.error("errorhappened", t != null ? (t instanceof DummyException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null");
 	}
 
 	public void selfDestructingException() {

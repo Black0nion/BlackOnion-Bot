@@ -1,8 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.OS;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.misc.OperatingSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.io.Files;
 import com.mongodb.client.model.Filters;
@@ -14,65 +13,65 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.black0nion.blackonionbot.misc.OS.*;
+import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
 
 public class BotInformation {
 
-	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat("dd.MM.yyy HH:mm");
+	private static final String datePattern = "dd.MM.yyyy HH:mm";
+	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat(datePattern);
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
 
-	public static OperatingSystemMXBean OSBEAN = ManagementFactory.getOperatingSystemMXBean();
-	public static OS OS;
-	public static String OS_NAME = "N/A";
+	public static OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
+	public static final OperatingSystem OPERATING_SYSTEM;
+	public static final String OS_NAME;
 
-	public static String CPU_NAME = "N/A";
-	public static String CPU_MHZ = "N/A";
+	public static final String CPU_NAME;
+	public static final String CPU_MHZ;
 
-	public static long SELF_USER_ID;
+	public static long logsChannel;
+	public static final long SUPPORT_SERVER;
 
-	public static long botLogsChannel;
-	public static long supportServer;
-
-	@Reloadable("botinformation")
-	public static void init() {
+	static {
+		long supportServer = -1, logsChannel = -1;
 		try {
 			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
 			if (doc != null && doc.containsKey("guildid") && doc.containsKey("botlogschannel")) {
 				supportServer = doc.getLong("guildid");
-				botLogsChannel = doc.getLong("botlogschannel");
+				logsChannel = doc.getLong("botlogschannel");
 			}
 		} catch (Exception ignored) {
 			LoggerFactory.getLogger(BotInformation.class).warn("Could not load support server information from database");
 		}
+		SUPPORT_SERVER = supportServer;
+		BotInformation.logsChannel = logsChannel;
 
+		String osName = "Unknown", cpuName = "N/A", cpuMhz = "N/A";
+		OperatingSystem operatingSystem = UNKNOWN;
 		try {
-			if (OS == null) {
-				if (OSBEAN.getName().toLowerCase().contains("windows")) {
-					OS = WINDOWS;
-					OS_NAME = OSBEAN.getName();
-				} else if (OSBEAN.getName().toLowerCase().contains("mac")) {
-					OS = MACOS;
-					OS_NAME = "macOS :vomitting:";
-				} else if (OSBEAN.getName().toLowerCase().contains("linux")) {
-					OS = LINUX;
-					final File cpuinfofile = new File("/etc/os-release");
-					final HashMap<String, String> osInfo = new HashMap<>();
-					final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
-					for (final String key : input) {
-						final String[] pair = key.split("=", 2);
-						osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
-					}
-
-					OS_NAME = osInfo.get("PRETTY_NAME").replace("\"", "");
-				} else {
-					OS = UNKNOWN;
-					OS_NAME = "UNKOWN";
+			if (OS_BEAN.getName().toLowerCase().contains("windows")) {
+				operatingSystem = WINDOWS;
+				osName = OS_BEAN.getName();
+			} else if (OS_BEAN.getName().toLowerCase().contains("mac")) {
+				operatingSystem = MACOS;
+				osName = "macOS :vomitting:";
+			} else if (OS_BEAN.getName().toLowerCase().contains("linux")) {
+				operatingSystem = LINUX;
+				final File cpuinfofile = new File("/etc/os-release");
+				final HashMap<String, String> osInfo = new HashMap<>();
+				final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
+				for (final String key : input) {
+					final String[] pair = key.split("\\s*=\\s*", 2);
+					osInfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
 				}
+
+				osName = osInfo.get("PRETTY_NAME").replace("\"", "");
 			}
 
-			if (OS != WINDOWS) {
+			if (operatingSystem != WINDOWS) {
 				final File cpuinfofile = new File("/proc/cpuinfo");
 				final HashMap<String, String> cpuinfo = new HashMap<>();
 				final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
@@ -81,21 +80,28 @@ public class BotInformation {
 					cpuinfo.put(pair[0].trim(), pair.length == 1 ? "" : pair[1].trim());
 				}
 
-				CPU_NAME = cpuinfo.get("model name");
-				CPU_MHZ = cpuinfo.get("cpu MHz");
+				cpuName = cpuinfo.get("model name");
+				cpuMhz = cpuinfo.get("cpu MHz");
 			}
 
-			if (!"N/A".equals(CPU_NAME))
-				CPU_MHZ = CPU_MHZ.charAt(0) + "," + CPU_MHZ.substring(1, 3) + " GHz";
+			if (!"N/A".equals(cpuMhz))
+				cpuMhz = cpuMhz.charAt(0) + "," + cpuMhz.substring(1, 3) + " GHz";
 
-			if (CPU_NAME.contains("@")) {
-				CPU_NAME = CPU_NAME.split("@")[0].trim();
+			if (!"N/A".equals(cpuName)) {
+				if (cpuName.contains("@"))
+					cpuName = cpuName.split("@")[0].trim();
+
+				cpuName = cpuName
+					.replace("CPU", "")
+					.replaceAll("\\s+", " ")
+					.trim();
 			}
-
-			if (!"N/A".equals(OS_NAME))
-				CPU_NAME = CPU_NAME.replace("CPU", "").trim().replaceAll("\\s+", " ");
 		} catch (final Exception e) {
 			LoggerFactory.getLogger(BotInformation.class).error("Failed to load bot information", e);
 		}
+		OS_NAME = osName;
+		CPU_NAME = cpuName;
+		CPU_MHZ = cpuMhz;
+		OPERATING_SYSTEM = operatingSystem;
 	}
 }

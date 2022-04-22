@@ -254,6 +254,7 @@
   "onlyexecutorcancontrol": "Only the user who executed the command can interact with the menu!",
   "or": "or",
   "os": "OS",
+  "owner": "Owner",
   "pastecreated": "Paste created",
   "permissionsadded": "The following permissions got added to `%user%`: `%perms%`",
   "permissionsof": "Permissions of `%user%`:\n```%perms%```",

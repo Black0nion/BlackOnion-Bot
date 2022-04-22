@@ -103,8 +103,8 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				logger.info("I got added to the guild {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
 
 				try {
-					final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
-					guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
+					final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
+					guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -129,8 +129,8 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			logger.info("I got removed from the guild {} (G: {})", guild.getName(), guild.getId());
 
 			try {
-				final Guild guildById = event.getJDA().getGuildById(BotInformation.supportServer);
-				guildById.getTextChannelById(BotInformation.botLogsChannel).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", Utils.escapeMarkdown(guild.getName()) + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
+				guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", Utils.escapeMarkdown(guild.getName()) + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

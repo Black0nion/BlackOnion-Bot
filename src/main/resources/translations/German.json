@@ -250,6 +250,7 @@
   "onlyexecutorcancontrol": "Nur der Absender des Befehls kann mit dem Menü interagieren!",
   "or": "oder",
   "os": "OS",
+  "owner": "Inhaber",
   "pastecreated": "Paste erstellt",
   "permissionsadded": "Folgende Permissions wurden `%user%` hinzugefügt: `%perms%`",
   "permissionsof": "Permissions von `%user%`:\n```%perms%```",

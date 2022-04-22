@@ -36,7 +36,7 @@ public class StatsCommand extends SlashCommand {
 				.addField("runmode", Config.run_mode.name().toUpperCase(), true)
 				.addField("os", OS_NAME, true)
 				.addField("cpuname", CPU_NAME, true)
-				.addField("cpucores", OSBEAN.getAvailableProcessors(), true)
+				.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
 				.addField("cpuspeed", CPU_MHZ, true)
 				.addField("lines", metadata.lines_of_code(), true)
 				.addField("files", metadata.files(), true)

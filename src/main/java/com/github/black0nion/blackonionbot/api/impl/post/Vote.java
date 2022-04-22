@@ -42,7 +42,7 @@ public class Vote implements IPostRoute {
 			final TextChannel channel = Bot.getInstance().getJda().getTextChannelById(channelId);
 			if (channel != null) {
 				final String userid = body.getString("user");
-				Objects.requireNonNull(Bot.getInstance().getJda().getGuildById(BotInformation.supportServer)).retrieveMemberById(userid).queue(member -> {
+				Objects.requireNonNull(Bot.getInstance().getJda().getGuildById(BotInformation.SUPPORT_SERVER)).retrieveMemberById(userid).queue(member -> {
 					final User user = member.getUser();
 					channel
 						.sendMessageEmbeds(new TranslatedEmbed()

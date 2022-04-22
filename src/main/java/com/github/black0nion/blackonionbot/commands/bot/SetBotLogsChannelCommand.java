@@ -20,7 +20,7 @@ public class SetBotLogsChannelCommand extends TextCommand {
 
 	@Override
 	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-		BotInformation.botLogsChannel = channel.getIdLong();
+		BotInformation.logsChannel = channel.getIdLong();
 		guild.save("botlogschannel", channel.getIdLong());
 		cmde.success("savedbotlogschannel", "thisisbotlogschannel");
 	}
