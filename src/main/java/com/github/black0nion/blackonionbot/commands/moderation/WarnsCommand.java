@@ -48,7 +48,7 @@ public class WarnsCommand extends SlashCommand {
 			if (!warns.isEmpty()) {
 				result = new StringBuilder();
 				for (final Warn warn : warns) {
-					result.append("\n`- ").append(BotInformation.DATE_PATTERN.format(new Date(warn.date())))
+					result.append("\n`- ").append(BotInformation.datePattern.format(new Date(warn.date())))
 							.append(": `<@").append(warn.issuer()).append(">` > Reason: ")
 							.append(Optional.ofNullable(warn.reason()).map(str -> str.replace("`", "")).orElse(null))
 							.append(" (ID: ").append(warn.date()).append(")`");
@@ -65,7 +65,7 @@ public class WarnsCommand extends SlashCommand {
 			if (!warns.isEmpty()) {
 				result = new StringBuilder();
 				for (final Warn warn : warns) {
-					result.append("\n`- ").append(BotInformation.DATE_PATTERN.format(new Date(warn.date())))
+					result.append("\n`- ").append(BotInformation.datePattern.format(new Date(warn.date())))
 							.append(": `<@").append(warn.issuer()).append(">` > Reason: ")
 							.append(Optional.ofNullable(warn.reason()).map(str -> str.replace("`", "")).orElse(null))
 							.append(" (ID: ").append(warn.date()).append(")`");

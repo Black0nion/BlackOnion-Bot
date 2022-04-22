@@ -32,11 +32,11 @@ public class StatsCommand extends SlashCommand {
 			cmde.reply(cmde
 				.success()
 				.setTitle("Bot Stats")
-				.addField("prefix", "`" + guild.getPrefix() + "`", true)
+				.addField("prefix", "`" + "/" + "`", true)
 				.addField("runmode", Config.run_mode.name().toUpperCase(), true)
 				.addField("os", OS_NAME, true)
 				.addField("cpuname", CPU_NAME, true)
-				.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
+				.addField("cpucores", osBean.getAvailableProcessors(), true)
 				.addField("cpuspeed", CPU_MHZ, true)
 				.addField("lines", metadata.lines_of_code(), true)
 				.addField("files", metadata.files(), true)

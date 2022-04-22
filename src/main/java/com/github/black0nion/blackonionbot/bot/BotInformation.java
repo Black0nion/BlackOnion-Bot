@@ -12,6 +12,7 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -20,12 +21,13 @@ import java.util.List;
 import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
 
 public class BotInformation {
+	private BotInformation() {}
 
-	private static final String datePattern = "dd.MM.yyyy HH:mm";
-	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat(datePattern);
-	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
+	public static final DateFormat datePattern = DateFormat.getDateInstance(DateFormat.SHORT);
 
-	public static OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
+	public static final DateFormat dateTimeFormatter = DateFormat.getDateInstance(DateFormat.SHORT);
+
+	public static final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;
 	public static final String OS_NAME;
 
@@ -52,13 +54,13 @@ public class BotInformation {
 		String osName = "Unknown", cpuName = "N/A", cpuMhz = "N/A";
 		OperatingSystem operatingSystem = UNKNOWN;
 		try {
-			if (OS_BEAN.getName().toLowerCase().contains("windows")) {
+			if (osBean.getName().toLowerCase().contains("windows")) {
 				operatingSystem = WINDOWS;
-				osName = OS_BEAN.getName();
-			} else if (OS_BEAN.getName().toLowerCase().contains("mac")) {
+				osName = osBean.getName();
+			} else if (osBean.getName().toLowerCase().contains("mac")) {
 				operatingSystem = MACOS;
 				osName = "macOS :vomitting:";
-			} else if (OS_BEAN.getName().toLowerCase().contains("linux")) {
+			} else if (osBean.getName().toLowerCase().contains("linux")) {
 				operatingSystem = LINUX;
 				final File cpuinfofile = new File("/etc/os-release");
 				final HashMap<String, String> osInfo = new HashMap<>();
