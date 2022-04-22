@@ -58,9 +58,10 @@ public class UserInfoCommand extends SlashCommand {
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		var givenMember = e.getOption(USER, OptionMapping::getAsMember);
 
-		getUserInfo(cmde, Objects.requireNonNullElseGet(givenMember.getUser(),
-						() -> Objects.requireNonNull(author)),
-				Objects.requireNonNullElseGet(givenMember,
-						() -> Objects.requireNonNull(member)));
+		if (givenMember == null) {
+			getUserInfo(cmde, author, member);
+		} else {
+			getUserInfo(cmde, givenMember.getUser(), givenMember);
+		}
 	}
 }
