@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 import java.util.Map;
 
 import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
@@ -31,7 +30,7 @@ public class Stats implements IGetRoute {
 			.put("commands_executed", StatisticsManager.TOTAL_COMMANDS_EXECUTED.get())
 			.put("cpu", new JSONObject()
 					.put("cpu_name", CPU_NAME)
-					.put("cpu_cores", OSBEAN.getAvailableProcessors())
+					.put("cpu_cores", OS_BEAN.getAvailableProcessors())
 					.put("cpu_speed", CPU_MHZ))
 			.put("guild_count", StatisticsManager.getGuildCount())
 			.put("user_count", StatisticsManager.getUserCount())

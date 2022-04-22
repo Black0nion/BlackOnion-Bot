@@ -21,7 +21,7 @@ import java.util.Objects;
 public class BanCommand extends SlashCommand {
 	private static final String USER = "user";
 	private static final String REASON = "reason";
-	private static final String DEL_DAYS = "delDays";
+	private static final String DEL_DAYS = "del_days";
 
 	public BanCommand() {
 		super(builder(Commands.slash("ban", "Used to ban a user from the server.")
@@ -39,8 +39,7 @@ public class BanCommand extends SlashCommand {
 			new Command.Choice("Seven Days", 7));
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		var userOptionMapping = e.getOption(USER);
 		var banUser = Objects.requireNonNull(userOptionMapping, "The user is null").getAsUser();
 		var banMember = userOptionMapping.getAsMember();

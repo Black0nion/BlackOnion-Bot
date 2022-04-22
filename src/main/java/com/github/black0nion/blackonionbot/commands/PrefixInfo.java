@@ -1,11 +1,11 @@
 package com.github.black0nion.blackonionbot.commands;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -19,7 +19,7 @@ public class PrefixInfo {
 		final BlackMember member = cmde.getMember();
 
 		final String msgContent = message.getContentRaw();
-		if (msgContent.matches("<@!?" + BotInformation.SELF_USER_ID + "+>.*")) {
+		if (msgContent.matches("<@!?" + Bot.getInstance().getSelfUserId() + "+>.*")) {
 			final String[] args = msgContent.split(" ");
 			// @BlackOnion-Bot prefix ?
 			if (args.length >= 3) {
@@ -38,7 +38,7 @@ public class PrefixInfo {
 					return;
 				}
 			}
-			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix()), new Placeholder("command", "<@!" + BotInformation.SELF_USER_ID + "> prefix <prefix>"));
+			cmde.success("myprefixis", "changeprefix", new Placeholder("prefix", guild.getPrefix()), new Placeholder("command", "<@!" + Bot.getInstance().getSelfUserId() + "> prefix <prefix>"));
 		}
 	}
 }

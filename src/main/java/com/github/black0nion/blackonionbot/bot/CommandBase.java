@@ -13,6 +13,7 @@ import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
+import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -162,10 +163,13 @@ public class CommandBase extends ListenerAdapter {
 
 			Bot.getInstance().getExecutor().submit(() -> {
 				cmde.setCommand(cmd);
-				cmd.execute(args, cmde, event, message, member, author, guild, channel);
+				try {
+					cmd.execute(args, cmde, event, message, member, author, guild, channel);
+				} catch (Throwable t) {
+					if (!(t instanceof DummyException))
+						cmde.exception(t);
+				}
 			});
-
-			return;
 		}
 
 		// no command found
