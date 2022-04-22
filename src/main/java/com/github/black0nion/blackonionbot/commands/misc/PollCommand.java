@@ -2,22 +2,18 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.time.Instant;
-import java.util.List;
 
 public class PollCommand extends SlashCommand {
     private static final String TOPIC = "topic";
@@ -52,7 +48,7 @@ public class PollCommand extends SlashCommand {
     }
 
     @Override
-    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel pollChannel) {
         var optionOne = e.getOption(OPTION_ONE_NAME, OptionMapping::getAsString);
         var optionTwo = e.getOption(OPTION_TWO_NAME, OptionMapping::getAsString);
         var optionThree = e.getOption(OPTION_THREE_NAME, OptionMapping::getAsString);
@@ -68,35 +64,132 @@ public class PollCommand extends SlashCommand {
         embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
         embed.addField("Option 1", optionOne, true);
         embed.addField("Option 2", optionTwo, true);
-        //Have it were it checks if each option is null, if it is, it will not add it to the embed.
+        embed.setFooter("Poll created by " + author.getEscapedEffectiveName() + "#" + author.getDiscriminator(), author.getAvatarUrl());
+        embed.setTimestamp(Instant.now());
         if (optionThree != null) {
             embed.addField("Option 3", optionThree, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionFour != null) {
             embed.addField("Option 4", optionFour, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionFive != null) {
             embed.addField("Option 5", optionFive, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionSix != null) {
             embed.addField("Option 6", optionSix, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                                message.addReaction("\\u0036\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionSeven != null) {
             embed.addField("Option 7", optionSeven, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                                message.addReaction("\\u0036\\u20E3").queue();
+                                message.addReaction("\\u0037\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionEight != null) {
             embed.addField("Option 8", optionEight, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                                message.addReaction("\\u0036\\u20E3").queue();
+                                message.addReaction("\\u0037\\u20E3").queue();
+                                message.addReaction("\\u0038\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionNine != null) {
             embed.addField("Option 9", optionNine, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                                message.addReaction("\\u0036\\u20E3").queue();
+                                message.addReaction("\\u0037\\u20E3").queue();
+                                message.addReaction("\\u0038\\u20E3").queue();
+                                message.addReaction("\\u0039\\u20E3").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
         if (optionTen != null) {
             embed.addField("Option 10", optionTen, true);
+            pollChannel.sendMessageEmbeds(embed.build())
+                    .queue(
+                            message -> {
+                                message.addReaction("\\u0031\\u20E3").queue();
+                                message.addReaction("\\u0032\\u20E3").queue();
+                                message.addReaction("\\u0033\\u20E3").queue();
+                                message.addReaction("\\u0034\\u20E3").queue();
+                                message.addReaction("\\u0035\\u20E3").queue();
+                                message.addReaction("\\u0036\\u20E3").queue();
+                                message.addReaction("\\u0037\\u20E3").queue();
+                                message.addReaction("\\u0038\\u20E3").queue();
+                                message.addReaction("\\u0039\\u20E3").queue();
+                                message.addReaction("\\uD83D\\uDD1F").queue();
+                            }
+                    );
+            cmde.send("pollcreated");
         }
-        embed.setFooter("Poll created by " + author.getEscapedEffectiveName() + "#" + author.getDiscriminator(), author.getAvatarUrl());
-        embed.setTimestamp(Instant.now());
-
-        
     }
 
 }
