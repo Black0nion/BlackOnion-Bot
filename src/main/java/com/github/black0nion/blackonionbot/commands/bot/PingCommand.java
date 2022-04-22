@@ -12,12 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class PingCommand extends SlashCommand {
 
-	public PingCommand() {
-		super("ping", "Display the ping of the bot");
-	}
+    public PingCommand() {
+        super("ping", "Display the ping of the bot");
+    }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		e.deferReply().queue(msg -> e.getJDA().getRestPing().flatMap(time -> msg.editOriginal(cmde.getTranslation("myping", new Placeholder("ping", time)))).queue());
-	}
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        e.deferReply().queue(msg -> e.getJDA().getRestPing().flatMap(time -> msg.editOriginal(cmde.getTranslation("myping", new Placeholder("ping", time)))).queue());
+    }
 }

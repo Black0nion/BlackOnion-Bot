@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public class BugReportCommand extends SlashCommand {
 
     public BugReportCommand() {
-		super(builder("bug", "Displays information on how to report a bug"));
+        super(builder("bug", "Displays information on how to report a bug"));
     }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		cmde.success("foundabug", "plsreportbug", "inourgithubrepo", new Placeholder("repo", "[BlackOnion-Bugreports](https://github.com/Black0nion/BlackOnion-Bugreports)"));
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        cmde.success("foundabug", "plsreportbug", "inourgithubrepo", new Placeholder("repo", "[BlackOnion-Bugreports](https://github.com/Black0nion/BlackOnion-Bugreports)"));
     }
 }
