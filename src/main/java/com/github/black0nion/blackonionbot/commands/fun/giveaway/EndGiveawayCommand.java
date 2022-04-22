@@ -3,8 +3,8 @@ package com.github.black0nion.blackonionbot.commands.fun.giveaway;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 /**
  * @author _SIM_
  */
-public class EndGiveawayCommand extends TextCommand {
+public class EndGiveawayCommand extends SlashCommand {
 
     public EndGiveawayCommand() {
 	this.setCommand("endgiveaway").setSyntax("<messageid>").setRequiredArgumentCount(1);

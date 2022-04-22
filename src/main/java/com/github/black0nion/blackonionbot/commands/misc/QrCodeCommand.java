@@ -3,8 +3,8 @@ package com.github.black0nion.blackonionbot.commands.misc;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.google.zxing.BarcodeFormat;
@@ -14,43 +14,36 @@ import com.google.zxing.common.BitMatrix;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
-public class QrCodeCommand extends TextCommand {
+public class QrCodeCommand extends SlashCommand {
+    private static final String INPUT = "input";
 
     public QrCodeCommand() {
-        this.setCommand("qrcode", "qr").setRequiredArgumentCount(1).setSyntax("<input>");
+
+        super(builder(Commands.slash("qrcode", "Use this command to create a qrcode.")
+                .addOption(OptionType.STRING, INPUT, "The text you want to encode in the qrcode.", true)));
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        var input = e.getOption(INPUT, OptionMapping::getAsString);
         final String filePath = "tmp/" + System.currentTimeMillis() + ".png";
         final File file = new File(filePath);
-        file.getParentFile().mkdirs();
-
-        createQR(String.join(" ", Utils.removeFirstArg(args)), filePath, "UTF-8", 420, 420);
-
+        createQR(input, filePath, "UTF-8", 420, 420);
         final EmbedBuilder builder = EmbedUtils.getSuccessEmbed(author, guild).setTitle("qrcode", "https://zxing.github.io/zxing").setImage("attachment://qr.png");
-
         try {
-            channel.sendFile(new FileInputStream(file), "qr.png").reference(message).setEmbeds(builder.build()).queue(msg -> {
-                if (!file.delete()) {
-                    file.deleteOnExit();
-                }
-            }, error -> {
-                if (!file.delete()) {
-                    file.deleteOnExit();
-                }
-            });
-        } catch (final Exception ex) {
-            if (!file.delete()) {
-                file.deleteOnExit();
-            }
-            ex.printStackTrace();
-            message.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+            e.replyFile(new FileInputStream(file), "qr.png").addEmbeds(builder.build()).queue();
+        } catch (FileNotFoundException ex) {
+            cmde.send("Something went wrong while trying to send the qrcode.");
         }
     }
 

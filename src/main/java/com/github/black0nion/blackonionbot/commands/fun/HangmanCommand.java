@@ -4,8 +4,8 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author _SIM_
  */
-public class HangmanCommand extends TextCommand {
+public class HangmanCommand extends SlashCommand {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class HangmanCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(final String[] args, final SlashCommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
 		if (ingamePlayers.contains(author.getIdLong())) {
 			cmde.error("alreadyingame", "nomultitasking");
 			return;
@@ -56,12 +56,12 @@ public class HangmanCommand extends TextCommand {
 		});
 	}
 
-	private static void rerun(final Message msg, final CommandEvent cmde, final String solution, final List<Character> alreadyGuessed) {
+	private static void rerun(final SlashCommandEvent cmde, final String solution, final List<Character> alreadyGuessed) {
 		final String failedAttempts = getFailedAttempts(solution, alreadyGuessed);
 		final int failedAttemptsCount = failedAttempts.equalsIgnoreCase("") ? 0 : failedAttempts.split(", ").length;
 
 		if (failedAttemptsCount >= 7) {
-			msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue();
+			cmde.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue();
 			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}

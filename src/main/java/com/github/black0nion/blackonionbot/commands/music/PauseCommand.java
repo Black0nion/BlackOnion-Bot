@@ -4,7 +4,7 @@
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.bot.CommandBase;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
