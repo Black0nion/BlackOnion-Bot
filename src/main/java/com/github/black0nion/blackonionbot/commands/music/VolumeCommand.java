@@ -22,33 +22,35 @@ import org.jetbrains.annotations.NotNull;
  * @author _SIM_
  */
 public class VolumeCommand extends SlashCommand {
-	private static final String VOLUME = "volume";
-	public VolumeCommand() {
-		super(builder(Commands.slash("volume", "Set the volume of the player")
-				.addOptions(new OptionData(OptionType.INTEGER, VOLUME, "The volume to set the player to", true)
-						.setRequiredRange(1, 100))));
-	}
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var volume = e.getOption(VOLUME, OptionMapping::getAsInt);
-		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			if (!member.getVoiceState().inAudioChannel()) {
-				cmde.error("You are not in a voice channel!", "dummy lol");
-			}
+    private static final String VOLUME = "volume";
 
-			final AudioChannel memberChannel = member.getVoiceState().getChannel();
+    public VolumeCommand() {
+        super(builder(Commands.slash("volume", "Set the volume of the player")
+                .addOptions(new OptionData(OptionType.INTEGER, VOLUME, "The volume to set the player to", true)
+                        .setRequiredRange(1, 100))));
+    }
 
-			if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-				final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
-				musicManager.scheduler.player.setVolume(volume);
-				cmde.success("volumechanged", "volumesetto", new Placeholder("volume", volume));
-			} else {
-				cmde.error("notinsamevc", "dontstopotherpplmusic");
-			}
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        var volume = e.getOption(VOLUME, OptionMapping::getAsInt);
+        final GuildVoiceState state = guild.getSelfMember().getVoiceState();
+        if (state != null && state.getChannel() != null) {
+            if (!member.getVoiceState().inAudioChannel()) {
+                cmde.error("You are not in a voice channel!", "dummy lol");
+            }
 
-		}  else {
-			cmde.error("notconnected", "startmusictostop");
-		}
-	}
+            final AudioChannel memberChannel = member.getVoiceState().getChannel();
+
+            if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
+                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
+                musicManager.scheduler.player.setVolume(volume);
+                cmde.success("volumechanged", "volumesetto", new Placeholder("volume", volume));
+            } else {
+                cmde.error("notinsamevc", "dontstopotherpplmusic");
+            }
+
+        } else {
+            cmde.error("notconnected", "startmusictostop");
+        }
+    }
 }

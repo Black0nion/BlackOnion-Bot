@@ -1,17 +1,14 @@
 package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -26,6 +23,7 @@ import java.util.regex.Pattern;
 
 public class PasteCommand extends SlashCommand {
     private static final String TEXT = "text";
+
     public PasteCommand() {
         super(builder(Commands.slash("paste", "pastes a message to a past website")
                 .addOption(OptionType.STRING, TEXT, "the text to paste (code-block with language specification if wanted)", true)));
@@ -52,27 +50,27 @@ public class PasteCommand extends SlashCommand {
 
         final String finalLanguage = language;
         final String finalBody = body != null ? body : bodyRaw;
-            try {
-                HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create("https://paste.sv-studios.net/documents"))
-                        .POST(HttpRequest.BodyPublishers.ofString(finalBody))
-                        .header("Content-Type", "text/plain");
+        try {
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create("https://paste.sv-studios.net/documents"))
+                    .POST(HttpRequest.BodyPublishers.ofString(finalBody))
+                    .header("Content-Type", "text/plain");
 
-                if (finalLanguage != null) {
-                    requestBuilder.setHeader("language", finalLanguage);
-                }
-
-                final HttpResponse<String> response = Bot.getInstance().getHttpClient().send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
-
-                final JSONObject obj = new JSONObject(response.body());
-
-                final EmbedBuilder builder = cmde.success().setTitle("pastecreated", "https://paste.sv-studios.net/" + obj.getString("key")).setDescription("```" + (finalLanguage != null ? finalLanguage : "")).appendDescription("\n").appendDescription(finalBody).appendDescription("```");
-
-                cmde.reply(builder);
-
-                author.openPrivateChannel().queue(ch ->
-                        ch.sendMessageEmbeds(builder.appendDescription("\n" + cmde.getTranslation("yourcode").replace("%code%", obj.getString("deleteSecret"))).build()).queue());
-            } catch (final Exception ex) {
-                cmde.exception();
+            if (finalLanguage != null) {
+                requestBuilder.setHeader("language", finalLanguage);
             }
+
+            final HttpResponse<String> response = Bot.getInstance().getHttpClient().send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+
+            final JSONObject obj = new JSONObject(response.body());
+
+            final EmbedBuilder builder = cmde.success().setTitle("pastecreated", "https://paste.sv-studios.net/" + obj.getString("key")).setDescription("```" + (finalLanguage != null ? finalLanguage : "")).appendDescription("\n").appendDescription(finalBody).appendDescription("```");
+
+            cmde.reply(builder);
+
+            author.openPrivateChannel().queue(ch ->
+                    ch.sendMessageEmbeds(builder.appendDescription("\n" + cmde.getTranslation("yourcode").replace("%code%", obj.getString("deleteSecret"))).build()).queue());
+        } catch (final Exception ex) {
+            cmde.exception();
+        }
     }
 }

@@ -16,24 +16,25 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class SetSuggestionChannel extends SlashCommand {
-	private static final String CHANNEL = "channel";
-	public SetSuggestionChannel() {
-		super(builder(Commands.slash("set_suggestion_channel", "Used to set the channel where suggestions are sent to.")
-				.addOption(OptionType.CHANNEL, CHANNEL, "The channel to send suggestions to."))
-						.setRequiredPermissions(Permission.MANAGE_CHANNEL)
-						.setRequiredBotPermissions(Permission.MANAGE_SERVER));
-	}
+    private static final String CHANNEL = "channel";
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var suggestionsChannel = e.getOption(CHANNEL, OptionMapping::getChannelType);
+    public SetSuggestionChannel() {
+        super(builder(Commands.slash("set_suggestion_channel", "Used to set the channel where suggestions are sent to.")
+                .addOption(OptionType.CHANNEL, CHANNEL, "The channel to send suggestions to."))
+                .setRequiredPermissions(Permission.MANAGE_CHANNEL)
+                .setRequiredBotPermissions(Permission.MANAGE_SERVER));
+    }
 
-		if (Objects.requireNonNull(suggestionsChannel).isMessage()) {
-			var textChannel = e.getOption(CHANNEL, OptionMapping::getAsTextChannel);
-			guild.setSuggestionsChannel(textChannel);
-		} else {
-			cmde.send("nottextchannel");
-		}
-	}
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
+                        BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        var suggestionsChannel = e.getOption(CHANNEL, OptionMapping::getChannelType);
+
+        if (Objects.requireNonNull(suggestionsChannel).isMessage()) {
+            var textChannel = e.getOption(CHANNEL, OptionMapping::getAsTextChannel);
+            guild.setSuggestionsChannel(textChannel);
+        } else {
+            cmde.send("nottextchannel");
+        }
+    }
 }

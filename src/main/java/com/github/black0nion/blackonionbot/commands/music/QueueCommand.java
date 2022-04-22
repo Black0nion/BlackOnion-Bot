@@ -19,31 +19,31 @@ import java.util.Objects;
 
 public class QueueCommand extends SlashCommand {
 
-	public QueueCommand() {
-		super(builder(Commands.slash("queue", "Tells you the current queue.")));
-	}
+    public QueueCommand() {
+        super(builder(Commands.slash("queue", "Tells you the current queue.")));
+    }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.queue.size() == 0) {
-			cmde.error("queueempty", "addsomethingtoqueue");
-			return;
-		}
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        if (!MusicSystem.channels.containsKey(guild.getIdLong()) || guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())) == null || PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.queue.size() == 0) {
+            cmde.error("queueempty", "addsomethingtoqueue");
+            return;
+        }
 
-		final List<AudioTrack> tracks = PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.queue.stream().toList();
-		final EmbedBuilder builder = cmde.success();
-		if (tracks.size() <= 10) {
-			tracks.forEach(track -> builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false));
-		} else {
-			builder.setDescription(cmde.getTranslation("thistracksplus").replace("%tracks%", String.valueOf(tracks.size() - 10)));
-			for (int i = 0; i < tracks.size(); i++) {
-				final AudioTrack track = tracks.get(i);
-				if (i < 10) {
-					builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
-				}
-			}
-		}
+        final List<AudioTrack> tracks = PlayerManager.getInstance().getMusicManager(Objects.requireNonNull(guild.getTextChannelById(MusicSystem.channels.get(guild.getIdLong())))).scheduler.queue.stream().toList();
+        final EmbedBuilder builder = cmde.success();
+        if (tracks.size() <= 10) {
+            tracks.forEach(track -> builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false));
+        } else {
+            builder.setDescription(cmde.getTranslation("thistracksplus").replace("%tracks%", String.valueOf(tracks.size() - 10)));
+            for (int i = 0; i < tracks.size(); i++) {
+                final AudioTrack track = tracks.get(i);
+                if (i < 10) {
+                    builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
+                }
+            }
+        }
 
-		cmde.reply(builder);
-	}
+        cmde.reply(builder);
+    }
 }

@@ -17,56 +17,56 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
 public class KickCommand extends SlashCommand {
-	private static final String USER = "user";
-	private static final String REASON = "reason";
+    private static final String USER = "user";
+    private static final String REASON = "reason";
 
-	public KickCommand() {
-		super(builder(Commands.slash("kick", "Used to kick a user from a server")
-				.addOption(OptionType.USER, USER, "The user to kick", true)
-				.addOption(OptionType.STRING, REASON, "The reason for the kick", true))
-						.setRequiredPermissions(Permission.KICK_MEMBERS)
-						.setRequiredBotPermissions(Permission.KICK_MEMBERS));
-	}
+    public KickCommand() {
+        super(builder(Commands.slash("kick", "Used to kick a user from a server")
+                .addOption(OptionType.USER, USER, "The user to kick", true)
+                .addOption(OptionType.STRING, REASON, "The reason for the kick", true))
+                .setRequiredPermissions(Permission.KICK_MEMBERS)
+                .setRequiredBotPermissions(Permission.KICK_MEMBERS));
+    }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
-			@NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var memberToKick = e.getOption(USER, OptionMapping::getAsMember);
-		var reason = e.getOption(REASON, OptionMapping::getAsString);
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
+                        @NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        var memberToKick = e.getOption(USER, OptionMapping::getAsMember);
+        var reason = e.getOption(REASON, OptionMapping::getAsString);
 
-		if (memberToKick == null) {
-			cmde.send("memberisnull");
-			return;
-		}
+        if (memberToKick == null) {
+            cmde.send("memberisnull");
+            return;
+        }
 
-		if (reason.length() > 512) {
-			cmde.send("reasonoption");
-			return;
-		}
+        if (reason.length() > 512) {
+            cmde.send("reasonoption");
+            return;
+        }
 
-		if (member.canInteract(memberToKick)) {
-			kickMember(member, reason, e.getJDA(), guild, e);
-			guild.kick(memberToKick, reason).queue(success -> e
-					.reply("The member " + memberToKick.getUser().getAsTag() + " has been kicked from the server.")
-					.setEphemeral(true).queue(),
-					failure -> e.reply(
-							"The member " + memberToKick.getUser().getAsTag() + " could not be kicked from the server.")
-							.setEphemeral(true).queue());
-		} else {
-			e.reply("You cannot kick a member that is higher or equal to you.").setEphemeral(true).queue();
-		}
-	}
+        if (member.canInteract(memberToKick)) {
+            kickMember(member, reason, e.getJDA(), guild, e);
+            guild.kick(memberToKick, reason).queue(success -> e
+                            .reply("The member " + memberToKick.getUser().getAsTag() + " has been kicked from the server.")
+                            .setEphemeral(true).queue(),
+                    failure -> e.reply(
+                                    "The member " + memberToKick.getUser().getAsTag() + " could not be kicked from the server.")
+                            .setEphemeral(true).queue());
+        } else {
+            e.reply("You cannot kick a member that is higher or equal to you.").setEphemeral(true).queue();
+        }
+    }
 
-	private static void kickMember(@NotNull Member member, String reason, @NotNull JDA jda, @NotNull Guild guild,
-			@NotNull SlashCommandInteractionEvent event) {
-		jda.openPrivateChannelById(member.getUser().getIdLong())
-				.flatMap(channel -> channel
-						.sendMessage("You have been kicked from the server for the following reason: " + reason + "\n"
-								+ "If you believe this was done in error, please contact a server administrator." + "\n"
-								+ "This message was sent by the bot, please do not reply to this message."))
-				.mapToResult().flatMap(result -> guild.kick(member, reason))
-				.flatMap(success -> event.reply("I have kicked " + member.getUser().getAsTag()
-						+ " from the server for the following reason: " + reason))
-				.queue();
-	}
+    private static void kickMember(@NotNull Member member, String reason, @NotNull JDA jda, @NotNull Guild guild,
+                                   @NotNull SlashCommandInteractionEvent event) {
+        jda.openPrivateChannelById(member.getUser().getIdLong())
+                .flatMap(channel -> channel
+                        .sendMessage("You have been kicked from the server for the following reason: " + reason + "\n"
+                                + "If you believe this was done in error, please contact a server administrator." + "\n"
+                                + "This message was sent by the bot, please do not reply to this message."))
+                .mapToResult().flatMap(result -> guild.kick(member, reason))
+                .flatMap(success -> event.reply("I have kicked " + member.getUser().getAsTag()
+                        + " from the server for the following reason: " + reason))
+                .queue();
+    }
 }

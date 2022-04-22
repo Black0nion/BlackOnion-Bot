@@ -15,28 +15,28 @@ import org.jetbrains.annotations.NotNull;
 
 public class StopCommand extends SlashCommand {
 
-	public StopCommand() {
-		super("stop", "Stop the currently playing music");
-	}
+    public StopCommand() {
+        super("stop", "Stop the currently playing music");
+    }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			//noinspection ConstantConditions - intent is enabled, so it shouldn't be null
-			final AudioChannel memberChannel = member.getVoiceState().getChannel();
-			if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-				final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
-				musicManager.scheduler.player.stopTrack();
-				musicManager.scheduler.queue.clear();
-				guild.getAudioManager().closeAudioConnection();
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        final GuildVoiceState state = guild.getSelfMember().getVoiceState();
+        if (state != null && state.getChannel() != null) {
+            //noinspection ConstantConditions - intent is enabled, so it shouldn't be null
+            final AudioChannel memberChannel = member.getVoiceState().getChannel();
+            if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
+                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
+                musicManager.scheduler.player.stopTrack();
+                musicManager.scheduler.queue.clear();
+                guild.getAudioManager().closeAudioConnection();
 
-				cmde.success("musicstopped", "leftvc");
-			} else {
-				cmde.error("notinsamevc", "dontstopotherpplmusic");
-			}
-		} else {
-			cmde.error("notconnected", "startmusictostop");
-		}
-	}
+                cmde.success("musicstopped", "leftvc");
+            } else {
+                cmde.error("notinsamevc", "dontstopotherpplmusic");
+            }
+        } else {
+            cmde.error("notconnected", "startmusictostop");
+        }
+    }
 }

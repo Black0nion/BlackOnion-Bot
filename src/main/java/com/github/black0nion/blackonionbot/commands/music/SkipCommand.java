@@ -19,36 +19,36 @@ import org.jetbrains.annotations.NotNull;
 
 public class SkipCommand extends SlashCommand {
 
-	public SkipCommand() {
-		super(builder(Commands.slash("skip","Skip what you're currently playing.")));
-	}
+    public SkipCommand() {
+        super(builder(Commands.slash("skip", "Skip what you're currently playing.")));
+    }
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		final GuildVoiceState state = guild.getSelfMember().getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
-			final AudioPlayer player = musicManager.audioPlayer;
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+        final GuildVoiceState state = guild.getSelfMember().getVoiceState();
+        if (state != null && state.getChannel() != null) {
+            final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
+            final AudioPlayer player = musicManager.audioPlayer;
 
-			if (player.getPlayingTrack() == null) {
-				cmde.error("wiat what", "why am i even in here? i should've gotten disconnected, lol");
-				return;
-			}
+            if (player.getPlayingTrack() == null) {
+                cmde.error("wiat what", "why am i even in here? i should've gotten disconnected, lol");
+                return;
+            }
 
-			final AudioTrackInfo previousTrack = musicManager.scheduler.player.getPlayingTrack().getInfo();
-			if (musicManager.scheduler.queue.peek() != null) {
-				musicManager.scheduler.nextTrack();
-				final AudioTrackInfo newTrack = musicManager.scheduler.player.getPlayingTrack().getInfo();
-				cmde.success("songskipped", "songgotskipped",
-						new Placeholder("oldsong", Utils.escapeMarkdown(previousTrack.author + " - " + previousTrack.title)),
-						new Placeholder("newsong", Utils.escapeMarkdown(newTrack.author + " - " + newTrack.title)));
-			} else {
-				musicManager.audioPlayer.stopTrack();
-				guild.getAudioManager().closeAudioConnection();
-				cmde.success("songskipped", "queueemptyskip");
-			}
-		} else {
-			cmde.error("notconnected", "startmusictostop");
-		}
-	}
+            final AudioTrackInfo previousTrack = musicManager.scheduler.player.getPlayingTrack().getInfo();
+            if (musicManager.scheduler.queue.peek() != null) {
+                musicManager.scheduler.nextTrack();
+                final AudioTrackInfo newTrack = musicManager.scheduler.player.getPlayingTrack().getInfo();
+                cmde.success("songskipped", "songgotskipped",
+                        new Placeholder("oldsong", Utils.escapeMarkdown(previousTrack.author + " - " + previousTrack.title)),
+                        new Placeholder("newsong", Utils.escapeMarkdown(newTrack.author + " - " + newTrack.title)));
+            } else {
+                musicManager.audioPlayer.stopTrack();
+                guild.getAudioManager().closeAudioConnection();
+                cmde.success("songskipped", "queueemptyskip");
+            }
+        } else {
+            cmde.error("notconnected", "startmusictostop");
+        }
+    }
 }
