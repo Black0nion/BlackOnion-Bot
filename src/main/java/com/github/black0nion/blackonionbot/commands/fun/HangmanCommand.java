@@ -11,7 +11,6 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -63,34 +62,39 @@ public class HangmanCommand extends SlashCommand {
         final int failedAttemptsCount = failedAttempts.equalsIgnoreCase("") ? 0 : failedAttempts.split(", ").length;
 
         if (failedAttemptsCount >= 7) {
-            cmde.reply(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false));
+            e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> {
+                msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue();
+            });
             ingamePlayers.remove(cmde.getUser().getIdLong());
             return;
         }
 
         final EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
         if (won(solution, alreadyGuessed)) {
-            cmde.reply(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false));
+            e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> {
+                msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
+            });
             ingamePlayers.remove(cmde.getUser().getIdLong());
             return;
         }
-
-        e.replyEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
-                MessageReceivedEvent.class,
-                event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
-                event -> {
-                    if (event.getMessage().getContentRaw().equalsIgnoreCase(solution)) {
-                        cmde.reply(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false));
+        e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> {
+            msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
+                    MessageReceivedEvent.class,
+                    event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
+                    event -> {
+                        if (event.getMessage().getContentRaw().equalsIgnoreCase(solution)) {
+                            cmde.reply(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false));
+                            ingamePlayers.remove(cmde.getUser().getIdLong());
+                            return;
+                        }
+                        alreadyGuessed.add(event.getMessage().getContentRaw().toLowerCase().charAt(0));
+                        rerun(e, cmde, solution, alreadyGuessed);
+                    }, 1, TimeUnit.MINUTES, () -> {
+                        cmde.reply(cmde.success().addField("timeout", "tooktoolong", false));
                         ingamePlayers.remove(cmde.getUser().getIdLong());
-                        return;
                     }
-                    alreadyGuessed.add(event.getMessage().getContentRaw().toLowerCase().charAt(0));
-                    rerun(e, cmde, solution, alreadyGuessed);
-                }, 1, TimeUnit.MINUTES, () -> {
-                    cmde.reply(cmde.success().addField("timeout", "tooktoolong", false));
-                    ingamePlayers.remove(cmde.getUser().getIdLong());
-                }
-        ));
+            ));
+        });
     }
 
     private static String getDrawing(final int tries) {
