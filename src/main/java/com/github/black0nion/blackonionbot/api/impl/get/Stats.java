@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.api.impl.get;
 
 import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
@@ -22,7 +21,7 @@ public class Stats implements IGetRoute {
 	@Override
 	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
 		return new JSONObject()
-			.put("commands", CommandBase.commandsArray.size() + SlashCommandBase.commands.size())
+			.put("commands", SlashCommandBase.commands.size())
 			.put("code_stats", new JSONObject()
 					.put("line_count", Config.metadata.lines_of_code())
 					.put("file_count", Config.metadata.files()))

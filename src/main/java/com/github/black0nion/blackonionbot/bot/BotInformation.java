@@ -25,7 +25,7 @@ public class BotInformation {
 
 	public static final DateFormat datePattern = DateFormat.getDateInstance(DateFormat.SHORT);
 
-	public static final DateFormat dateTimeFormatter = DateFormat.getDateInstance(DateFormat.SHORT);
+	public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.getDateInstance(DateTimeFormatter.BASIC_ISO_DATE);
 
 	public static final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;

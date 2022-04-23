@@ -18,7 +18,7 @@ public class AntiSpoilerSystem {
 	 * @return if the message contained a spoiler
 	 */
 	@SuppressWarnings("ConstantConditions")
-	public static boolean removeSpoilers(final CommandEvent event) {
+	public static boolean removeSpoilers(final SlashCommandEvent event) {
 		final BlackGuild guild = event.getGuild();
 		final Message msg = event.getMessage();
 		final String message = msg.getContentRaw();

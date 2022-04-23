@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
@@ -41,7 +40,7 @@ public class CustomCommandsCommand extends SlashCommand {
                 .addOption(OptionType.STRING, COMMAND_NAME, "[command (required for create and delete)]")));
     }
 
-    private static void askForRaw(final @NotNull String command, final @NotNull CommandEvent cmde) {
+    private static void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde) {
         cmde.getMessage().replyEmbeds(cmde.success()
                         .addField("messagetosend", "inputmessage", false)
                         .setDescription(cmde.getTranslation("leavetutorial"))
@@ -60,7 +59,7 @@ public class CustomCommandsCommand extends SlashCommand {
                         }));
     }
 
-    private static void askForReply(final String command, final @NotNull CommandEvent cmde, final @NotNull CustomCommand customCommand) {
+    private static void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand) {
         cmde.getMessage().replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
             final String contentRaw = e.getMessage().getContentRaw();
 
@@ -118,7 +117,7 @@ public class CustomCommandsCommand extends SlashCommand {
         }
     }
 
-    private void askForDelete(final String command, final @NotNull CommandEvent cmde) {
+    private void askForDelete(final String command, final @NotNull SlashCommandEvent cmde) {
         cmde.getMessage().replyEmbeds(cmde.success().addField("areyousure", "@blaumeise was soll hier stehen?", false).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
             final String contentRaw = e.getMessage().getContentRaw();
 
@@ -140,7 +139,7 @@ public class CustomCommandsCommand extends SlashCommand {
             }
 
             if (contentRaw.equalsIgnoreCase("raw") || contentRaw.equalsIgnoreCase("message")) {
-                askForRaw(command, new CommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()));
+                askForRaw(command, new SlashCommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()));
             } else if (contentRaw.equalsIgnoreCase("embed")) {
                 // TODO: add embed
             } else {

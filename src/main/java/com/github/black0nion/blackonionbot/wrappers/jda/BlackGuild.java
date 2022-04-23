@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.GenericCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
@@ -254,12 +253,9 @@ public class BlackGuild extends GuildImpl {
 	public void setDisabledCommands(final String[] disabledCommands) {
 		this.setDisabledCommands(Arrays.stream(disabledCommands)
 			.map(cmd ->
-				Optional.ofNullable((GenericCommand) CommandBase.commands.get(cmd))
-					.orElse(
 						Optional.ofNullable(SlashCommandBase.commands.get(cmd))
 							.map(Pair::getValue)
 							.orElse(null)
-					)
 			)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList()));

@@ -3,7 +3,7 @@
  */
 package com.github.black0nion.blackonionbot.commands.music;
 
-import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.music.GuildMusicManager;
@@ -37,7 +37,7 @@ public class PauseCommand extends SlashCommand {
                 final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
                 musicManager.scheduler.player.setPaused(true);
 
-                cmde.success("musicpaused", "useresume", new Placeholder("command", CommandEvent.getCommandHelp(guild, CommandBase.commands.get("resume"))));
+                cmde.success("musicpaused", "useresume", new Placeholder("command", SlashCommandEvent.getCommandHelp(this)));
             } else {
                 cmde.error("notinsamevc", "dontstopotherpplmusic");
             }

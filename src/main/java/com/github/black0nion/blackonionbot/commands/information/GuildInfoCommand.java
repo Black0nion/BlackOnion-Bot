@@ -29,6 +29,6 @@ public class GuildInfoCommand extends SlashCommand {
                 .addField("membercount", String.valueOf(guild.getMemberCount()), true)
                 .addField("channelcount", String.valueOf(guild.getChannels().size()), true)
                 .addField("boostlevel", guild.getBoostTier().name(), true)
-                .addField("created", guild.getTimeCreated().format(BotInformation.DATE_TIME_FORMATTER), true));
+                .addField("created", guild.getTimeCreated().format(BotInformation.dateTimeFormatter), true));
     }
 }

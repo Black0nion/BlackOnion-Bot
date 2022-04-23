@@ -129,12 +129,11 @@ public class Bot extends ListenerAdapter {
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(new CommandBase(), new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
+			.addEventListeners(new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
 		ReloadCommand.initReloadableMethods();
-		CommandBase.addCommands();
 		SlashCommandBase.addCommands();
 		builder.setStatus(StatusCommand.getStatusFromConfig());
 		builder.setActivity(ActivityCommand.getActivity());
@@ -191,7 +190,6 @@ public class Bot extends ListenerAdapter {
 
 	@Reloadable("commands")
 	public static void updateCommands() {
-		CommandBase.addCommands();
 		SlashCommandBase.addCommands();
 	}
 
