@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.fun.giveaway;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -10,20 +11,27 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author _SIM_
  */
 public class EndGiveawayCommand extends SlashCommand {
+    private static final String MESSAGE_ID = "message_id";
 
     public EndGiveawayCommand() {
-        this.setCommand("endgiveaway").setSyntax("<messageid>").setRequiredArgumentCount(1);
+        super(builder(Commands.slash("end_giveaway", "Used to end a giveaway.")
+                .addOption(OptionType.STRING, MESSAGE_ID, "The message id of the giveaway.")));
     }
 
     @Override
-    public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
-        final String id = args[1];
+    public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        var id = e.getOption(MESSAGE_ID, OptionMapping::getAsString);
         if (Utils.isLong(id)) {
             final long idLong = Long.parseLong(id);
             final Giveaway giveaway = GiveawaySystem.getGiveaway(idLong);
