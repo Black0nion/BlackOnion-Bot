@@ -1,28 +1,44 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
+import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CustomCommandsCommand extends TextCommand {
+public class CustomCommandsCommand extends SlashCommand {
+    private static final String OPTION = "option";
+    private static final String COMMAND_NAME = "command_name";
+    private static final String LIST = "list";
+    private static final String CREATE = "create";
+    private static final String DELETE = "delete";
+    private static final String CLEAR = "clear";
 
     public CustomCommandsCommand() {
-        this.setCommand("customcommand", "cc", "ccs").setSyntax("<list | create | delete> [command (required for create and delete)]").setRequiredArgumentCount(1).setRequiredPermissions(Permission.ADMINISTRATOR);
+        super(builder(Commands.slash("customcommand", "Used to create a custom command.")
+                .addOptions(new OptionData(OptionType.STRING, OPTION, "The name of the command to set/get/clear.", true)
+                        .addChoice("List", LIST)
+                        .addChoice("Create", CREATE)
+                        .addChoice("Delete", DELETE))
+                .addOption(OptionType.STRING, COMMAND_NAME, "[command (required for create and delete)]")));
     }
 
     private static void askForRaw(final @NotNull String command, final @NotNull CommandEvent cmde) {
@@ -70,35 +86,35 @@ public class CustomCommandsCommand extends TextCommand {
     }
 
     @Override
-    public void execute(final String @NotNull [] args, final @NotNull CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final @NotNull BlackGuild guild, final TextChannel channel) {
-        final String mode = args[1];
-        if (mode.equalsIgnoreCase("list")) {
-            cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
-        } else if (mode.equalsIgnoreCase("create") || mode.equalsIgnoreCase("setup")) {
-            final String commandName = args[2].toLowerCase();
-            final int maxCount = guild.getGuildType().getMaxCustomCommands();
+    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        var option = e.getOption(OPTION, OptionMapping::getAsString);
+        switch (Objects.requireNonNull(option)) {
+            case LIST ->
+                    cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
+            case CREATE -> {
+                final String command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
+                final int maxCount = guild.getGuildType().getMaxCustomCommands();
+                if (guild.getCustomCommands().size() >= maxCount) {
+                    cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
+                    return;
+                }
 
-            if (guild.getCustomCommands().size() >= maxCount) {
-                cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
-                return;
+                if (SlashCommandBase.commands.containsKey(command) || guild.getCustomCommands().containsKey(command)) {
+                    cmde.error("alreadyexisting", "commandexisting");
+                    return;
+                }
+
+                this.askForType(command, cmde, e, guild, member, author);
             }
-
-            if (CommandBase.commands.containsKey(commandName) || guild.getCustomCommands().containsKey(commandName)) {
-                cmde.error("alreadyexisting", "commandexisting");
-                return;
+            case DELETE -> {
+                final String command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
+                if (guild.getCustomCommands().containsKey(command)) {
+                    this.askForType(command, cmde, e, guild, member, author);
+                } else {
+                    cmde.error("notfound", "commandnotfound");
+                }
             }
-
-            this.askForType(commandName, cmde);
-        } else if (mode.equalsIgnoreCase("delete")) {
-            final String commandName = args[2].toLowerCase();
-
-            if (guild.getCustomCommands().containsKey(commandName)) {
-                this.askForDelete(commandName, cmde);
-            } else {
-                cmde.error("notfound", "commandnotfound");
-            }
-        } else {
-            cmde.sendPleaseUse();
+            default -> cmde.sendPleaseUse();
         }
     }
 
@@ -115,8 +131,8 @@ public class CustomCommandsCommand extends TextCommand {
         }));
     }
 
-    private void askForType(final @NotNull String command, final @NotNull CommandEvent cmde) {
-        cmde.getMessage().replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+    private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+        slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
             final String contentRaw = e.getMessage().getContentRaw();
             if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
                 cmde.error("aborting", "byeeee");
@@ -128,7 +144,7 @@ public class CustomCommandsCommand extends TextCommand {
             } else if (contentRaw.equalsIgnoreCase("embed")) {
                 // TODO: add embed
             } else {
-                this.askForType(command, new CommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()));
+                this.askForType(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), slashCommandInteractionEvent, guild, member, user);
             }
         }));
     }
