@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.systems.antispoiler;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.commands.CommandEvent;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -10,24 +10,21 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.jetbrains.annotations.NotNull;
 
-import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.*;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem.AntiSpoilerType.*;
 
 public class AntiSpoilerSystem {
 	/**
 	 * @return if the message contained a spoiler
 	 */
-	@SuppressWarnings("ConstantConditions")
-	public static boolean removeSpoilers(final @NotNull SlashCommandEvent event, @NotNull SlashCommandInteractionEvent interactionEvent) {
+	public static boolean removeSpoilers(final CommandEvent event) {
 		final BlackGuild guild = event.getGuild();
-		final BlackUser author = event.getUser();
-		final Message msg = interactionEvent.getTextChannel().retrieveMessageById(interactionEvent.getTextChannel().getLatestMessageIdLong()).complete();
+		final Message msg = event.getMessage();
 		final String message = msg.getContentRaw();
+		final BlackUser author = event.getUser();
 		final TextChannel channel = event.getChannel();
-		final AntiSpoilerType type = guild.getAntiSpoilerType();
 		String newMessage = message;
+		final AntiSpoilerType type = guild.getAntiSpoilerType();
 
 		if (type != OFF) {
 			long count = message.chars().filter(c -> c == '|').count();
@@ -72,5 +69,20 @@ public class AntiSpoilerSystem {
 			}
 		}
 		return false;
+	}
+
+	public enum AntiSpoilerType {
+		DELETE,
+		REPLACE,
+		OFF;
+
+		public static AntiSpoilerType parse(final String input) {
+			if (input == null || input.isEmpty()) return null;
+			try {
+				return valueOf(input.toUpperCase());
+			} catch (Exception ignored) {
+				return null;
+			}
+		}
 	}
 }

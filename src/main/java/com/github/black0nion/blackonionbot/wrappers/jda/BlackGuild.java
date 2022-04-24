@@ -9,8 +9,7 @@ import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
-import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType;
-import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearType;
+import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -73,8 +72,7 @@ public class BlackGuild extends GuildImpl {
 
 	private Language language;
 	private GuildType guildType;
-	private AntiSpoilerType antiSpoilerType;
-	private AntiSwearType antiSwearType;
+	private AntiSpoilerSystem.AntiSpoilerType antiSpoilerType;
 	private List<String> antiSwearWhitelist;
 	private String prefix;
 	private String joinMessage;
@@ -104,8 +102,7 @@ public class BlackGuild extends GuildImpl {
 			final Language langNonNull = language != null ? language : LanguageSystem.getDefaultLanguage();
 			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
 			this.prefix = Utils.gOD(config.getString("prefix"), Config.prefix);
-			this.antiSpoilerType = Utils.gOD(AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerType.OFF);
-			this.antiSwearType = Utils.gOD(AntiSwearType.parse(config.getString("antiswear")), AntiSwearType.OFF);
+			this.antiSpoilerType = Utils.gOD(AntiSpoilerSystem.AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerSystem.AntiSpoilerType.OFF);
 			this.joinMessage = Utils.gOD(config.getString("joinmessage"), langNonNull.getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
 			this.leaveMessage = Utils.gOD(config.getString("leavemessage"), langNonNull.getTranslationNonNull("defaultleavemessage"));
@@ -290,22 +287,13 @@ public class BlackGuild extends GuildImpl {
 		return true;
 	}
 
-	public AntiSpoilerType getAntiSpoilerType() {
-		return this.antiSpoilerType;
+	public AntiSpoilerSystem.AntiSpoilerType getAntiSpoilerType() {
+		return this.antiSpoilerType != null ? this.antiSpoilerType : AntiSpoilerSystem.AntiSpoilerType.OFF;
 	}
 
-	public void setAntiSpoilerType(final AntiSpoilerType antiSpoilerType) {
+	public void setAntiSpoilerType(final AntiSpoilerSystem.AntiSpoilerType antiSpoilerType) {
 		this.antiSpoilerType = antiSpoilerType;
 		this.save("antispoiler", antiSpoilerType.name());
-	}
-
-	public AntiSwearType getAntiSwearType() {
-		return this.antiSwearType;
-	}
-
-	public void setAntiSwearType(final AntiSwearType antiSwearType) {
-		this.antiSwearType = antiSwearType;
-		this.save("antiswear", antiSwearType.name());
 	}
 
 	public List<String> getAntiSwearWhitelist() {
@@ -432,7 +420,6 @@ public class BlackGuild extends GuildImpl {
 			", language=" + language +
 			", guildType=" + guildType +
 			", antiSpoilerType=" + antiSpoilerType +
-			", antiSwearType=" + antiSwearType +
 			", antiSwearWhitelist=" + antiSwearWhitelist +
 			", prefix='" + prefix + '\'' +
 			", joinMessage='" + joinMessage + '\'' +
