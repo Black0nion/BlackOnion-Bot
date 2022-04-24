@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.slashcommands.bot;
+package com.github.black0nion.blackonionbot.slashcommands.information;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
