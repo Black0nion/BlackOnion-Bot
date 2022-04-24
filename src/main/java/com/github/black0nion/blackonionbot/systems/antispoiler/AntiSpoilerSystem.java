@@ -10,6 +10,8 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 
 import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.*;
 
@@ -18,14 +20,14 @@ public class AntiSpoilerSystem {
 	 * @return if the message contained a spoiler
 	 */
 	@SuppressWarnings("ConstantConditions")
-	public static boolean removeSpoilers(final SlashCommandEvent event) {
+	public static boolean removeSpoilers(final @NotNull SlashCommandEvent event, @NotNull SlashCommandInteractionEvent interactionEvent) {
 		final BlackGuild guild = event.getGuild();
-		final Message msg = event.getMessage();
-		final String message = msg.getContentRaw();
 		final BlackUser author = event.getUser();
+		final Message msg = interactionEvent.getTextChannel().retrieveMessageById(interactionEvent.getTextChannel().getLatestMessageIdLong()).complete();
+		final String message = msg.getContentRaw();
 		final TextChannel channel = event.getChannel();
-		String newMessage = message;
 		final AntiSpoilerType type = guild.getAntiSpoilerType();
+		String newMessage = message;
 
 		if (type != OFF) {
 			long count = message.chars().filter(c -> c == '|').count();

@@ -23,9 +23,12 @@ import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
 public class BotInformation {
 	private BotInformation() {}
 
-	public static final DateFormat datePattern = DateFormat.getDateInstance(DateFormat.SHORT);
+	private static final String PATTERN = "dd.MM.yyyy HH:mm";
 
-	public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.getDateInstance(DateTimeFormatter.BASIC_ISO_DATE);
+	@SuppressWarnings("java:S2885")
+	public static final SimpleDateFormat datePattern = new SimpleDateFormat(PATTERN);
+
+	public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(PATTERN);
 
 	public static final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;

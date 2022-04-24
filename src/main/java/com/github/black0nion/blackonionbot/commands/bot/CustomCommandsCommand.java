@@ -40,11 +40,11 @@ public class CustomCommandsCommand extends SlashCommand {
                 .addOption(OptionType.STRING, COMMAND_NAME, "[command (required for create and delete)]")));
     }
 
-    private static void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde) {
-        cmde.getMessage().replyEmbeds(cmde.success()
+    private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+        slashCommandInteractionEvent.replyEmbeds(cmde.success()
                         .addField("messagetosend", "inputmessage", false)
                         .setDescription(cmde.getTranslation("leavetutorial"))
-                        .setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build())
+                        .setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build())
                 .queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class,
                         e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(),
                         e -> {
@@ -55,12 +55,12 @@ public class CustomCommandsCommand extends SlashCommand {
                             }
 
                             final CustomCommand customCommand = new CustomCommand(cmde.getGuild(), command, contentRaw);
-                            askForReply(command, new CommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()), customCommand);
+                            askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), customCommand, slashCommandInteractionEvent, guild, member, user);
                         }));
     }
 
-    private static void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand) {
-        cmde.getMessage().replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), cmde.getJda().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+    private void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+        slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
             final String contentRaw = e.getMessage().getContentRaw();
 
             if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
@@ -74,7 +74,7 @@ public class CustomCommandsCommand extends SlashCommand {
             } else if (contentRaw.equalsIgnoreCase("false")) {
                 reply = false;
             } else {
-                askForReply(command, new CommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()), customCommand);
+                askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), customCommand, slashCommandInteractionEvent, guild, member, user);
                 return;
             }
 
@@ -117,8 +117,8 @@ public class CustomCommandsCommand extends SlashCommand {
         }
     }
 
-    private void askForDelete(final String command, final @NotNull SlashCommandEvent cmde) {
-        cmde.getMessage().replyEmbeds(cmde.success().addField("areyousure", "@blaumeise was soll hier stehen?", false).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
+    private void askForDelete(final String command, final @NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent slashCommandInteractionEvent) {
+        slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("areyousure", "@blaumeise was soll hier stehen?", false).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
             final String contentRaw = e.getMessage().getContentRaw();
 
             if (contentRaw.equalsIgnoreCase("true")) {
@@ -139,7 +139,7 @@ public class CustomCommandsCommand extends SlashCommand {
             }
 
             if (contentRaw.equalsIgnoreCase("raw") || contentRaw.equalsIgnoreCase("message")) {
-                askForRaw(command, new SlashCommandEvent(e, cmde.getGuild(), e.getMessage(), cmde.getMember(), cmde.getUser()));
+                askForRaw(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), slashCommandInteractionEvent, guild, member, user);
             } else if (contentRaw.equalsIgnoreCase("embed")) {
                 // TODO: add embed
             } else {
