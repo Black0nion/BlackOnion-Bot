@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -28,7 +29,8 @@ public class ToggleCommand extends SlashCommand {
 			)
 		)
 		.autocomplete("command", SlashCommandBase.commands.keySet())
-		.setRequiredPermissions(Permission.MANAGE_SERVER).notToggleable());
+		.setRequiredPermissions(Permission.MANAGE_SERVER)
+		.notToggleable());
 	}
 
 	public void updateAutoComplete() {
@@ -37,16 +39,21 @@ public class ToggleCommand extends SlashCommand {
 			.filter(e ->
 				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
-				&& currentCommand.get().isToggleable())
+					&& currentCommand.get().isToggleable())
 			.map(Map.Entry::getKey)
 			.toList());
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		final SlashCommand command = SlashCommandBase.commands.get(e.getOption("command", OptionMapping::getAsString)).getValue();
 		if (command == null || command.isHidden(author)) {
 			cmde.send("commandnotfound");
+			return;
+		}
+
+		if (!command.isToggleable()) {
+			cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
 			return;
 		}
 
@@ -57,8 +64,6 @@ public class ToggleCommand extends SlashCommand {
 			if (guild.setCommandActivated(command, newStatus)) {
 				final String commandName = command.getName().toUpperCase();
 				cmde.success("commandtoggled", "commandisnow", new Placeholder("command", commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
-			} else {
-				cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
 			}
 		}
 	}

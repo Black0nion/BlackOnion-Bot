@@ -1,14 +1,14 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,13 +20,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.internal.utils.Checks;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
 public class LanguageCommand extends SlashCommand {
 
 	private static final OptionData languageOptions = new OptionData(OptionType.STRING, "language", "The code of the language to set", true)
-			.addChoices(LanguageSystem.getLanguages().values().stream().map(e -> new Command.Choice(e.getName(), e.getLanguageCode())).toList());
+		.addChoices(LanguageSystem.getLanguages().values().stream().map(e -> new Command.Choice(e.getName(), e.getLanguageCode())).toList());
 
 	private static final SubcommandData[] subcommands = {
 		new SubcommandData("get", "Get the current language"),
@@ -42,7 +43,7 @@ public class LanguageCommand extends SlashCommand {
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		String subcommandGroup = null;
 		String subcommand;
 		Language lang = null;
