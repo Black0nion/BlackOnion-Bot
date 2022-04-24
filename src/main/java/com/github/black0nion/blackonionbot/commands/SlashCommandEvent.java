@@ -96,18 +96,7 @@ public class SlashCommandEvent {
 	}
 
 	public void success(String title, String name, String value, final Placeholder... placeholders) {
-		if (title != null) title = this.language.getTranslationNonNull(title);
-		if (name != null) name = this.language.getTranslationNonNull(name);
-		if (value != null) value = this.language.getTranslationNonNull(value);
-		if (!(value == null && name == null && title == null)) {
-			for (final Placeholder placeholder : placeholders) {
-				title = placeholder.process(title);
-				name = placeholder.process(name);
-				value = placeholder.process(value);
-			}
-		}
-
-		this.reply(this.success().setTitle(title).addField(name, value, false));
+		this.doReply(this.success(), title, name, value, placeholders);
 	}
 
 	public TranslatedEmbed loading() {
@@ -131,6 +120,10 @@ public class SlashCommandEvent {
 	}
 
 	public void error(String title, String name, String value, final Placeholder... placeholders) {
+		this.doReply(this.error(), title, name, value, placeholders);
+	}
+
+	private void doReply(TranslatedEmbed embed, String title, String name, String value, final Placeholder... placeholders) {
 		if (title != null) title = this.language.getTranslationNonNull(title);
 		if (name != null) name = this.language.getTranslationNonNull(name);
 		if (value != null) value = this.language.getTranslationNonNull(value);
@@ -142,7 +135,7 @@ public class SlashCommandEvent {
 			}
 		}
 
-		this.reply(this.error().setTitle(title).addField(name, value, false));
+		this.reply(embed.setTitle(title).addField(name, value, false));
 	}
 
 	public void exception() {
@@ -212,7 +205,7 @@ public class SlashCommandEvent {
 	}
 
 	public static String getCommandHelp(final SlashCommand command) {
-		return command.getData().getOptions().stream().map(data -> data.getName() + " - " + data.getDescription() + " : " + data.getType().name()).collect(Collectors.joining("\n"));
+		return "/" + command.getData().getName() + " " + command.getData().getOptions().stream().map(data -> data.getName() + " : " + data.getType().name()).collect(Collectors.joining(", "));
 	}
 
 	public String getTranslation(final String key) {
