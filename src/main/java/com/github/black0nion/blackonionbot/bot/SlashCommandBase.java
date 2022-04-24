@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.utils.config.Config;
@@ -19,11 +18,9 @@ import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -153,13 +150,6 @@ public class SlashCommandBase extends ListenerAdapter {
 			} catch (Exception e) {
 				logger.error("An issue happened trying to handle AutoComplete", e);
 			}
-		}
-	}
-
-	@Override
-	public void onMessageUpdate(final MessageUpdateEvent event) {
-		if (event.getChannelType() == ChannelType.TEXT) {
-			AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getTextChannel());
 		}
 	}
 

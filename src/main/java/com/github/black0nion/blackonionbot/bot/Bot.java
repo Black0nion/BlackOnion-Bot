@@ -30,6 +30,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import marcono1234.gson.recordadapter.RecordTypeAdapterFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
@@ -50,6 +51,16 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
+
+	public static final Icon BLACKONION_ICON;
+
+	static {
+		try {
+			BLACKONION_ICON = Icon.from(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static final List<String> launchArguments = new ArrayList<>();
 
