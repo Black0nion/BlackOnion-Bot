@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
@@ -173,7 +174,7 @@ public class SlashCommandBuilder {
         return this.isEphemeral;
     }
 
-    public HashMap<String, StartsWithArrayList> getAutoComplete() {
+    public Map<String, StartsWithArrayList> getAutoComplete() {
         return autoComplete;
     }
 }
