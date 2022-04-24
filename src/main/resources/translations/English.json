@@ -166,7 +166,7 @@
   "ipnotpublic": "This IP isn't public!",
   "iseveryone": "@everyone and @here can't be used!",
   "isnottimedout": "This member is not timed out.",
-  "istimedout": "The member is already time out.",
+  "istimedout": "The member is already timed out.",
   "itnowgoeson": "Es geht jetzt wieder weiter.",
   "joined": "Join date",
   "joinmessagesetto": "The join message got set to %msg%!",
