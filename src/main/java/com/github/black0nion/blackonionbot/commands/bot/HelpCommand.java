@@ -25,11 +25,14 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class HelpCommand extends SlashCommand {
+    private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
     private static final String COMMAND_NAME = "command_name";
 
     public HelpCommand() {
@@ -77,7 +80,7 @@ public class HelpCommand extends SlashCommand {
                                 commandsInCategory.append(", ").append(c.getName());
                             }
                         }
-                    } else System.out.println("wtf:  " + category);
+                    } else logger.error("wtf: '{}'", category);
                 }
                 if (commandsInCategory.length() <= 2) {
                     continue;
@@ -159,7 +162,7 @@ public class HelpCommand extends SlashCommand {
                         if (!command.isHidden(user) && (command.getCategory() == category) && command.getProgress() == pr) {
                             final String commandHelp = cmde.getTranslation("help" + command.getName().toLowerCase());
                             if (commandHelp == null) {
-                                System.out.println("Help for " + entry.getKey() + " not set!");
+                                logger.error("Help for '{}' not set!", entry.getKey());
                             }
                             builder.addField(pr.name().toUpperCase() + ": " + SlashCommandEvent.getCommandHelp(command), cmde.getTranslationOrEmpty("help" + command.getName()), false);
                         }

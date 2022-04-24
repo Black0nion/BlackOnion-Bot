@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class GuildListCommand extends SlashCommand {
+    private static final Logger logger = LoggerFactory.getLogger(GuildListCommand.class);
 
     public GuildListCommand() {
         super(builder("guilds", "List all guilds").setAdminGuild());
@@ -38,7 +41,7 @@ public class GuildListCommand extends SlashCommand {
         boolean found = false;
         for (Guild guild : e.getJDA().getGuilds()) {
             found = true;
-            System.out.println(guild.getOwner());
+            logger.info("'{}'", guild.getOwner());
             @Nullable BlackUser owner = Optional.ofNullable(guild.getOwner())
                     .map(Member::getUser)
                     .map(BlackUser::from)

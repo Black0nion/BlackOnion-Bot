@@ -1,6 +1,10 @@
 package com.github.black0nion.blackonionbot.systems.plugins;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class Plugin {
+	private static final Logger logger = LoggerFactory.getLogger(Plugin.class);
 
 	private final String name;
 
@@ -15,11 +19,11 @@ public abstract class Plugin {
 	public abstract void onEnable();
 
 	public void onDisable() {
-		System.out.println("[" + this.getName() + "] Plugin disabled.");
+		logger.info("['{}'] Plugin disabled.", this.getName());
 	}
 
 	public void onDisableNow() {
-		System.out.println("[" + this.getName() + "] Plugin force disabling...");
+		logger.info("['{}'] Plugin force disabling...", this.getName());
 	}
 
 	public final String getName() {

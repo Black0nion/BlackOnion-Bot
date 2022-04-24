@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.systems.language;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,7 +16,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Language {
-
+	private static final Logger logger = LoggerFactory.getLogger(Language.class);
 	private final String languageCode;
 	private final String name;
 	private final boolean isDefault;
@@ -52,7 +54,7 @@ public class Language {
 
 			for (final String key : translations.keySet()) {
 				if (!key.toLowerCase().equals(key))
-					System.out.println(key + " is not entirely in lower case! Please correct in " + this.languageCode + "!");
+					logger.error("'{}' is not entirely in lower case! Please correct in '{}' !", key, this.languageCode);
 				if (key.equalsIgnoreCase("metadata")) continue;
 				messages.put(key.toLowerCase(), translations.getString(key));
 			}

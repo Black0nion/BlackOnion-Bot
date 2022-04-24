@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Webhook;
@@ -16,6 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
@@ -36,6 +36,8 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class Utils {
+	private Utils() {}
+	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
@@ -240,7 +242,7 @@ public class Utils {
 	}
 
 	public static void printLogo() {
-		System.out.println("""
+		logger.info("""
 			   ___  __         __   ____       _                  ___       __
 			  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_
 			 / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/
@@ -291,7 +293,7 @@ public class Utils {
 		return clientBuilder.build();
 	}
 
-	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) throws IOException {
+	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) {
 		return webhooks.stream()
 			.filter(Objects::nonNull)
 			.filter(webhook -> webhook.getOwner() != null)
