@@ -271,6 +271,7 @@ public class BlackGuild extends GuildImpl {
 	}
 
 	public boolean setCommandActivated(final GenericCommand cmd, final boolean activated) {
+		System.out.println(cmd.getName() + " | " + cmd.isToggleable());
 		if (!cmd.isToggleable()) return false;
 		if (this.disabledCommands == null) {
 			if (activated) return true;
