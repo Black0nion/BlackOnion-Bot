@@ -11,8 +11,6 @@ import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
-import com.github.black0nion.blackonionbot.systems.antiswear.AntiSwearSystem;
-import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.FileUtils;
@@ -29,7 +27,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -77,11 +74,6 @@ public class CommandBase extends ListenerAdapter {
 	}
 
 	@Override
-	public void onMessageUpdate(final MessageUpdateEvent event) {
-		AntiSwearSystem.check(BlackGuild.from(event.getGuild()), BlackMember.from(event.getMember()), event.getMessage(), event.getTextChannel());
-	}
-
-	@Override
 	public void onMessageReceived(final MessageReceivedEvent event) {
 		if (event.getAuthor().isBot() || event.getChannelType() != ChannelType.TEXT) return;
 		final BlackUser author = BlackUser.from(event.getAuthor());
@@ -109,9 +101,6 @@ public class CommandBase extends ListenerAdapter {
 		}
 
 		if (locked) return;
-
-		final boolean containsProfanity = AntiSwearSystem.check(guild, member, message, channel);
-
 		final CommandEvent cmde = new CommandEvent(event, guild, message, member, author);
 
 		if (AntiSpoilerSystem.removeSpoilers(cmde)) return;
@@ -153,11 +142,6 @@ public class CommandBase extends ListenerAdapter {
 						message.delete().queue();
 					}
 				});
-				return;
-			}
-
-			if (containsProfanity) {
-				cmde.error("dontexecuteprofanitycommands", "pleaseremoveprofanity");
 				return;
 			}
 

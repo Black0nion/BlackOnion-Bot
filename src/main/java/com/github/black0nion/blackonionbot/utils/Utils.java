@@ -299,7 +299,7 @@ public class Utils {
 			.findFirst()
 			.orElse(channel
 				.createWebhook("BlackOnion-Bot ContentModerator")
-				.setAvatar(Icon.from(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("/logo.png"))))
+				.setAvatar(Bot.BLACKONION_ICON)
 				.submit()
 				.join());
 	}

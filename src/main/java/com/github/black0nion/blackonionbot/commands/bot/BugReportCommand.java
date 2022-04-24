@@ -18,6 +18,6 @@ public class BugReportCommand extends SlashCommand {
 
     @Override
     public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-        cmde.success("foundabug", "plsreportbug", "inourgithubrepo", new Placeholder("repo", "[BlackOnion-Bugreports](https://github.com/Black0nion/BlackOnion-Bugreports)"));
+        cmde.success("foundabug", "plsreportbug", "inourgithubrepo", new Placeholder("repo", "[BlackOnion-Bot](https://github.com/Black0nion/BlackOnion-Bot)"));
     }
 }

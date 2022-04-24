@@ -11,13 +11,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerType.*;
+import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem.AntiSpoilerType.*;
 
 public class AntiSpoilerSystem {
 	/**
 	 * @return if the message contained a spoiler
 	 */
-	@SuppressWarnings("ConstantConditions")
 	public static boolean removeSpoilers(final CommandEvent event) {
 		final BlackGuild guild = event.getGuild();
 		final Message msg = event.getMessage();
@@ -70,5 +69,20 @@ public class AntiSpoilerSystem {
 			}
 		}
 		return false;
+	}
+
+	public enum AntiSpoilerType {
+		DELETE,
+		REPLACE,
+		OFF;
+
+		public static AntiSpoilerType parse(final String input) {
+			if (input == null || input.isEmpty()) return null;
+			try {
+				return valueOf(input.toUpperCase());
+			} catch (Exception ignored) {
+				return null;
+			}
+		}
 	}
 }
