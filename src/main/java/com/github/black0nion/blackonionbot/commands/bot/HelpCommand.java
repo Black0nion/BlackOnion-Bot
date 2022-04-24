@@ -73,7 +73,7 @@ public class HelpCommand extends SlashCommand {
                     category = cats[i - 1];
                     if (SlashCommandBase.commandsInCategory.containsKey(category)) {
                         for (final SlashCommand c : SlashCommandBase.commandsInCategory.get(category)) {
-                            if (c.isHidden(author)) {
+                            if (!c.isHidden(author)) {
                                 commandsInCategory.append(", ").append(c.getName());
                             }
                         }
@@ -122,7 +122,7 @@ public class HelpCommand extends SlashCommand {
                     } else {
                         category = cats[i - 1];
                         for (final SlashCommand c : SlashCommandBase.commandsInCategory.get(category)) {
-                            if (c.isHidden(user)) {
+                            if (!c.isHidden(user)) {
                                 commandsInCategory.append(", ").append(c.getName());
                             }
                         }
@@ -139,27 +139,33 @@ public class HelpCommand extends SlashCommand {
             } else {
                 final Category category = Category.valueOf(button.getId());
                 builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
-                for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.commands.entrySet())
-                    if (entry.getValue().getValue().isHidden(user) && (entry.getValue().getValue().getCategory() == category))
-                        if (entry.getValue().getValue().getProgress() == Progress.DONE) {
-                            builder.addField(SlashCommandEvent.getCommandHelp(entry.getValue().getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getValue().getName()), false);
+                for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.commands.entrySet()) {
+                    var command = entry.getValue().getValue();
+                    if (!command.isHidden(user) && (command.getCategory() == category)) {
+                        if (command.getProgress() != Progress.DONE) {
+                            continue;
                         }
+                        builder.addField(SlashCommandEvent.getCommandHelp(command), cmde.getTranslationOrEmpty("help" + command.getName()), false);
+                    }
+                }
 
 
                 for (final Progress pr : Progress.values()) {
                     if (pr == Progress.DONE) {
                         continue;
                     }
-                    for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.commands.entrySet())
-                        if (entry.getValue().getValue().isHidden(user) && (entry.getValue().getValue().getCategory() == category) && entry.getValue().getValue().getProgress() == pr) {
-                            final String commandHelp = cmde.getTranslation("help" + entry.getValue().getValue().getName().toLowerCase());
+                    for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.commands.entrySet()) {
+                        var command = entry.getValue().getValue();
+                        if (!command.isHidden(user) && (command.getCategory() == category) && command.getProgress() == pr) {
+                            final String commandHelp = cmde.getTranslation("help" + command.getName().toLowerCase());
                             if (commandHelp == null) {
                                 System.out.println("Help for " + entry.getKey() + " not set!");
                             }
-                            builder.addField(pr.name().toUpperCase() + ": " + SlashCommandEvent.getCommandHelp(entry.getValue().getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getValue().getName()), false);
+                            builder.addField(pr.name().toUpperCase() + ": " + SlashCommandEvent.getCommandHelp(command), cmde.getTranslationOrEmpty("help" + command.getName()), false);
                         }
                     }
                 }
+            }
 
 
             event.editMessageEmbeds(builder.build()).queue();
