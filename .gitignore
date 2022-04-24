@@ -5,10 +5,6 @@
 # Compiled class file
 *.class
 
-# Log file
-# logfiles
-*.log
-
 # Package Files
 *.jar
 *.war
@@ -17,6 +13,14 @@
 *.zip
 *.tar.gz
 *.rar
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+*.log
+.idea
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -45,4 +49,3 @@ gradle-app.setting
 /files/
 # plugins for the bot
 /plugins
-.DS_Store
