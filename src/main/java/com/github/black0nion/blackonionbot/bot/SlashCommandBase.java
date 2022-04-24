@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
+import com.github.black0nion.blackonionbot.slashcommands.SlashCommand;
+import com.github.black0nion.blackonionbot.slashcommands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.slashcommands.admin.BanUsageCommand;
+import com.github.black0nion.blackonionbot.slashcommands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.RunMode;

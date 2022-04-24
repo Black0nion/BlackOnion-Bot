@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.api.API;
-import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.slashcommands.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.slashcommands.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.slashcommands.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.stats.Prometheus;

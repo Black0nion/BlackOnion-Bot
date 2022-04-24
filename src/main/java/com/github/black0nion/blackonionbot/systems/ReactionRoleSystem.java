@@ -37,7 +37,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 
 				e.getGuild().addRoleToMember(Objects.requireNonNull(e.getMember()), Objects.requireNonNull(e.getGuild().getRoleById(doc.getLong("roleid")))).queue();
 			} catch (final IllegalStateException ex1) {
-				logger.error("Emoji nicht erkannt: '{}'", e.getReactionEmote().getName());
+				logger.error("Unknown Emoji: '{}'", e.getReactionEmote().getName());
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 
 				e.getGuild().removeRoleFromMember(Objects.requireNonNull(e.getMember()), Objects.requireNonNull(e.getGuild().getRoleById(doc.getLong("roleid")))).queue();
 			} catch (final IllegalStateException ex1) {
-				logger.error("Emoji nicht erkannt: '{}'", e.getReactionEmote().getName());
+				logger.error("Unknown Emoji: '{}'", e.getReactionEmote().getName());
 			}
 		}
 	}
