@@ -65,6 +65,11 @@ public class TimeOutCommand extends SlashCommand {
         var day = e.getOption(DAYS, OptionMapping::getAsLong);
         var week = e.getOption(WEEKS, OptionMapping::getAsLong);
 
+        if(timeOutMember.isTimedOut()) {
+            cmde.send("istimedout");
+            return;
+        }
+
         final var error = "The total duration of the timeout is too long. The maximum duration is "
                 + MAX_TIMEOUT_DURATION_MIN + " minutes.";
 
