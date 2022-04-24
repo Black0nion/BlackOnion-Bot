@@ -3,7 +3,7 @@
 
 The official BlackOnion-Bot!
 
-Authors: mainly SIMULATAN
+Authors: mainly SIMULATAN + RealYusufIsmail
 
 ## How to run the Bot
 ### Development
