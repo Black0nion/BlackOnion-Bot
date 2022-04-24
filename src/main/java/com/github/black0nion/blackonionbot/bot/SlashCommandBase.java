@@ -116,7 +116,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			}
 		}
 		commandsJson.put("commands", commands);
-		logger.info("Generated Commands JSON: " + commands);
+		logger.info("Generated Commands JSON: '{}'", commands);
 		// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);

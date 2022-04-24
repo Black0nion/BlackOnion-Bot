@@ -128,7 +128,7 @@ public class Bot extends ListenerAdapter {
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 		ConfigManager.loadConfig();
 		DockerManager.init();
-		logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
+		logger.info("Starting BlackOnion-Bot in '{}' mode...", Config.run_mode );
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
@@ -192,7 +192,7 @@ public class Bot extends ListenerAdapter {
 	public void onReady(final ReadyEvent e) {
 		final JDA jda = e.getJDA();
 		selfUserId = jda.getSelfUser().getIdLong();
-		logger.info("Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
+		logger.info("Connected to '{}'#'{}' in '{}'ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity());
 
