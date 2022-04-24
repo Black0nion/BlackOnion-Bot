@@ -29,7 +29,8 @@ public class ToggleCommand extends SlashCommand {
                 )
         )
                 .autocomplete("command", SlashCommandBase.commands.keySet())
-                .setRequiredPermissions(Permission.MANAGE_SERVER).notToggleable());
+                .setRequiredPermissions(Permission.MANAGE_SERVER)
+                .notToggleable());
     }
 
     public void updateAutoComplete() {
@@ -51,6 +52,11 @@ public class ToggleCommand extends SlashCommand {
             return;
         }
 
+        if (!command.isToggleable()) {
+            cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
+            return;
+        }
+
         Boolean newStatus = e.getOption("on", OptionMapping::getAsBoolean);
         if (newStatus == null) {
             cmde.send("commandstatus", new Placeholder("cmd", command.getName()), new Placeholder("status", cmde.getTranslation(guild.isCommandActivated(command) ? "on" : "off")));
@@ -58,8 +64,6 @@ public class ToggleCommand extends SlashCommand {
             if (guild.setCommandActivated(command, newStatus)) {
                 final String commandName = command.getName().toUpperCase();
                 cmde.success("commandtoggled", "commandisnow", new Placeholder("command", commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
-            } else {
-                cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
             }
         }
     }

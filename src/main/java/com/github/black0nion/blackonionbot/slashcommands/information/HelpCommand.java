@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.slashcommands.SlashCommand;
 import com.github.black0nion.blackonionbot.slashcommands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -30,21 +31,35 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class HelpCommand extends SlashCommand {
     private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
-    private static final String COMMAND_NAME = "command_name";
+    private static final String COMMAND_OR_CATEGORY = "command_or_category";
 
     public HelpCommand() {
-
         super(builder(Commands.slash("help", "Used to get help on commands.")
-                .addOption(OptionType.STRING, COMMAND_NAME, "Used to retrieve help for a command", false))
+                .addOption(OptionType.STRING, COMMAND_OR_CATEGORY, "Used to retrieve help for a command / category", false, true))
                 .notToggleable());
+    }
+
+    public void updateAutoComplete() {
+        ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
+        List<String> result = SlashCommandBase.commands.entrySet().stream()
+                .filter(e ->
+                        ((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
+                                || currentCommand.get().getRequiredCustomPermissions().length == 0)
+                                && currentCommand.get().isToggleable())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(ArrayList::new));
+        List<String> categories = Arrays.stream(Category.values()).map(Category::name).toList();
+        result.addAll(categories);
+        this.updateAutoComplete(COMMAND_OR_CATEGORY, result);
     }
 
     @Override
     public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, @NotNull BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
-        var command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
+        var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
         if (command != null) {
             for (final Pair<Long, SlashCommand> entry : SlashCommandBase.commands.values()) {
                 final SlashCommand cmd = entry.getValue();

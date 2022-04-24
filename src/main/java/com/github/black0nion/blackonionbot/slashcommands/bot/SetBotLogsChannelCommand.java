@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class SetBotLogsChannelCommand extends SlashCommand {
 
     public SetBotLogsChannelCommand() {
-        super(builder(Commands.slash("setbotlogschannel", "Used to set the channel where bot logs are sent."))
+        super(builder("setbotlogschannel", "Used to set the channel where bot logs are sent.")
                 .setRequiredCustomPermissions(CustomPermission.ADMIN));
     }
 

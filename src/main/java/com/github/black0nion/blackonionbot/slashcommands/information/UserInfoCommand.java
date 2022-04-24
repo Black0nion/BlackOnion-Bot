@@ -27,7 +27,7 @@ public class UserInfoCommand extends SlashCommand {
     public UserInfoCommand() {
 
         super(builder(Commands.slash("userinfo", "Used to get information about a member.")
-                .addOption(OptionType.USER, USER, "The member to get information about.", false)));
+                .addOption(OptionType.USER,USER, "The member to get information about.", false)));
     }
 
     static @NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final @Nullable Member member) {

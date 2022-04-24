@@ -30,6 +30,7 @@ public class JoinLeaveMessageCommand extends SlashCommand {
                 .setRequiredPermissions(Permission.ADMINISTRATOR));
     }
 
+
     @Override
     public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
         var status = Objects.requireNonNull(e.getOption(STATUS, OptionMapping::getAsString));
