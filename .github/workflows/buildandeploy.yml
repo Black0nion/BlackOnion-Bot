@@ -47,6 +47,7 @@ jobs:
           docker tag $(docker images --filter 'label=build=true' -q | head -n 1) bob-build
 
       - name: Extract test report
+        id: extract-test-report
         uses: shrink/actions-docker-extract@v1
         env:
           REPO: ${{ steps.get_version.outputs.REPO }}
@@ -58,7 +59,7 @@ jobs:
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
-          path: /tmp/test-report/
+          path: ${{ steps.extract-test-report.outputs.destination }}
           name: Test Report
           retention-days: 7
 
