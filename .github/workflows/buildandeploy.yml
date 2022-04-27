@@ -20,7 +20,7 @@ jobs:
         id: get_version
         run: |
           REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
-          VERSION=$(echo $GITHUB_REF | cut -d / -f 3)
+          VERSION=$(echo $GITHUB_REF | cut -d / -f 3-)
           echo ::set-output name=REPO::$REPO
           echo ::set-output name=VERSION::$VERSION
           if [[ $VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
