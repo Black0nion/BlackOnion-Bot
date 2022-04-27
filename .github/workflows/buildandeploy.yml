@@ -21,17 +21,18 @@ jobs:
         run: |
           REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           VERSION=$(echo $GITHUB_REF | grep -o '[^/]*$')
+          FULL_VERSION=$(echo $GITHUB_REF | cut -d / -f 3-)
           echo ::set-output name=REPO::$REPO
           echo ::set-output name=VERSION::$VERSION
-          if [[ $VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
+          if [[ $FULL_VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
             TAG="latest"
-          elif [[ $VERSION =~ ^b[0-9]+.[0-9]+.[0-9]+$ ]]; then
+          elif [[ $FULL_VERSION =~ ^b[0-9]+.[0-9]+.[0-9]+$ ]]; then
             TAG="latest-beta"
           else
             TAG="latest-dev"
           fi
           echo ::set-output name=TAG::$TAG
-          echo "Version: $VERSION | Tag: $TAG"
+          echo "Full Version: $FULL_VERSION | Version: $VERSION | Tag: $TAG"
 
       - name: Build docker image
         env:
