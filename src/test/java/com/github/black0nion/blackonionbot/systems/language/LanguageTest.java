@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
-import lombok.extern.slf4j.Slf4j;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;

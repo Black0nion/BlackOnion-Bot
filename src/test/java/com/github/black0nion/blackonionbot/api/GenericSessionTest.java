@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
 import com.google.gson.Gson;
 import io.mokulu.discord.oauth.model.User;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ public class GenericSessionTest {
 	public static void init() {
 		GenericSession.setLogin(new GenericSession.ILogin() {
 			private boolean loggedInYet = false;
-			@SneakyThrows
+
 			@Override
 			public DiscordUser loginToSession(String sessionId) throws InputMismatchException, NullPointerException {
 				if (sessionId.equals(EXAMPLE_SESSION_ID) && loggedInYet) {

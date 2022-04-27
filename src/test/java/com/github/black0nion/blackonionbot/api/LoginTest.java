@@ -1,13 +1,13 @@
 package com.github.black0nion.blackonionbot.api;
 
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -15,8 +15,9 @@ import static com.github.black0nion.blackonionbot.Shared.HTTP_CLIENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Order(22)
-@Slf4j
 public class LoginTest {
+	private static final Logger log = LoggerFactory.getLogger(LoginTest.class);
+
 	@Test
 	public void test_create_session_id_no_code() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(getBaseBuilder().build())::execute);

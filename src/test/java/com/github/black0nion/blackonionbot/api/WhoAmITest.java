@@ -1,22 +1,23 @@
 package com.github.black0nion.blackonionbot.api;
 
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("ConstantConditions")
-@Slf4j
 @Order(25)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WhoAmITest {
 	private static final OkHttpClient client = new OkHttpClient();
+	private static final Logger log = LoggerFactory.getLogger(WhoAmITest.class);
 
 	@Test
 	public void test_no_sessionid() {
@@ -40,7 +41,7 @@ public class WhoAmITest {
 	@Test
 	public void test_create_session_id_no_code() {
 		Response response = assertDoesNotThrow(client.newCall(new Request.Builder()
-			.post(RequestBody.create(null, new byte[0]))
+			.post(RequestBody.create(new byte[0], null))
 			.url("http://localhost:187/api/login")
 			.addHeader("sessionid", GenericSessionTest.EXAMPLE_SESSION_ID)
 			.build())::execute);
