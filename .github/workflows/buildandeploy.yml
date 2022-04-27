@@ -44,13 +44,15 @@ jobs:
             -t ghcr.io/$REPO:$VERSION \
             -t ghcr.io/$REPO:$TAG .
 
+          docker tag $(docker images --filter 'label=build=true' -q | head -n 1) bob-build
+
       - name: Extract test report
         uses: shrink/actions-docker-extract@v1
         env:
           REPO: ${{ steps.get_version.outputs.REPO }}
           TAG: ${{ steps.get_version.outputs.TAG }}
         with:
-          image: ghcr.io/$REPO:$TAG
+          image: bob-build
           path: "/tmp/test-report/."
 
       - name: Upload test report

@@ -1,5 +1,7 @@
 FROM gradle:7.5-jdk17-alpine AS build
 
+LABEL build=true
+
 COPY --chown=gradle:gradle . /bot
 
 WORKDIR /bot
