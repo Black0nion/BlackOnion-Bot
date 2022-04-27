@@ -6,7 +6,7 @@ WORKDIR /bot
 
 RUN gradle build test downloadDependencies --no-daemon
 
-COPY /build/reports/tests/test/ /tmp/test-report/
+RUN cp build/reports/tests/test/ /tmp/test-report/ -r
 
 FROM eclipse-temurin:17-jre-alpine AS run
 
