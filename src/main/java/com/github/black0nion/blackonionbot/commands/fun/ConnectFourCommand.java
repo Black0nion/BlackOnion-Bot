@@ -32,8 +32,8 @@ public class ConnectFourCommand extends SlashCommand {
 
     public ConnectFourCommand() {
 
-        super(builder(Commands.slash("Connect 4", "Use this command to play Connect 4 with another user.")
-                .addOption(OptionType.USER, USER, "The user you want to challenge")));
+        super(builder(Commands.slash("connect4", "Use this command to play Connect 4 with another user.")
+                .addOption(OptionType.USER, USER, "The user you want to challenge", true)));
     }
 
     @Override

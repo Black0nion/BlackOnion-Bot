@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -317,5 +318,30 @@ public class Utils {
 			);
 		}
 		return jsonArray;
+	}
+
+	public static @NotNull String formatDuration(Duration duration) {
+		StringBuilder sb = new StringBuilder();
+		if (duration.toDays() > 0) {
+			sb.append(duration.toDays()).append(" day");
+			if (duration.toDays() > 1) {
+				sb.append("s");
+			}
+			sb.append(" ");
+		}
+		if (duration.toHours() > 0) {
+			sb.append(duration.toHours()).append(" hour");
+			if (duration.toHours() > 1) {
+				sb.append("s");
+			}
+			sb.append(" ");
+		}
+		if (duration.toMinutes() > 0) {
+			sb.append(duration.toMinutes()).append(" minute");
+			if (duration.toMinutes() > 1) {
+				sb.append("s");
+			}
+		}
+		return sb.toString();
 	}
 }
