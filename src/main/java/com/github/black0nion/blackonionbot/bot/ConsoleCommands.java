@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.api.API;
-import com.github.black0nion.blackonionbot.slashcommands.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.User;

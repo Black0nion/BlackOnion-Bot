@@ -29,7 +29,7 @@ public class Stats implements IGetRoute {
 			.put("commands_executed", StatisticsManager.TOTAL_COMMANDS_EXECUTED.get())
 			.put("cpu", new JSONObject()
 					.put("cpu_name", CPU_NAME)
-					.put("cpu_cores", osBean.getAvailableProcessors())
+					.put("cpu_cores", OS_BEAN.getAvailableProcessors())
 					.put("cpu_speed", CPU_MHZ))
 			.put("guild_count", StatisticsManager.getGuildCount())
 			.put("user_count", StatisticsManager.getUserCount())

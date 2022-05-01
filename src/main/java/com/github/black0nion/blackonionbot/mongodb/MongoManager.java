@@ -85,18 +85,4 @@ public class MongoManager {
 			collection.insertOne(updatedValue);
 		}
 	}
-
-	public static void removeValue(final MongoCollection<Document> collection, final BasicDBObject query, final String key) {
-		final BasicDBObject updateObject = new BasicDBObject();
-		updateObject.put("$unset", new Document(key, 1));
-
-		collection.updateOne(query, updateObject);
-	}
-
-	public static void removeValue(final MongoCollection<Document> collection, final BasicDBObject query, final Document remove) {
-		final BasicDBObject updateObject = new BasicDBObject();
-		updateObject.put("$unset", remove);
-
-		collection.updateOne(query, updateObject);
-	}
 }

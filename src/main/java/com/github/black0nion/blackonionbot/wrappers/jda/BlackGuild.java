@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.slashcommands.GenericCommand;
+import com.github.black0nion.blackonionbot.commands.GenericCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.GuildType;

@@ -12,7 +12,6 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ public class BotInformation {
 
 	public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(PATTERN);
 
-	public static final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+	public static final OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;
 	public static final String OS_NAME;
 
@@ -38,10 +37,12 @@ public class BotInformation {
 	public static final String CPU_MHZ;
 
 	public static long logsChannel;
+
 	public static final long SUPPORT_SERVER;
 
 	static {
-		long supportServer = -1, logsChannel = -1;
+		long supportServer = -1;
+		long logsChannel = -1;
 		try {
 			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
 			if (doc != null && doc.containsKey("guildid") && doc.containsKey("botlogschannel")) {
@@ -54,16 +55,18 @@ public class BotInformation {
 		SUPPORT_SERVER = supportServer;
 		BotInformation.logsChannel = logsChannel;
 
-		String osName = "Unknown", cpuName = "N/A", cpuMhz = "N/A";
+		String osName = "Unknown";
+		String cpuName = "N/A";
+		String cpuMhz = "N/A";
 		OperatingSystem operatingSystem = UNKNOWN;
 		try {
-			if (osBean.getName().toLowerCase().contains("windows")) {
+			if (OS_BEAN.getName().toLowerCase().contains("windows")) {
 				operatingSystem = WINDOWS;
-				osName = osBean.getName();
-			} else if (osBean.getName().toLowerCase().contains("mac")) {
+				osName = OS_BEAN.getName();
+			} else if (OS_BEAN.getName().toLowerCase().contains("mac")) {
 				operatingSystem = MACOS;
 				osName = "macOS :vomitting:";
-			} else if (osBean.getName().toLowerCase().contains("linux")) {
+			} else if (OS_BEAN.getName().toLowerCase().contains("linux")) {
 				operatingSystem = LINUX;
 				final File cpuinfofile = new File("/etc/os-release");
 				final HashMap<String, String> osInfo = new HashMap<>();

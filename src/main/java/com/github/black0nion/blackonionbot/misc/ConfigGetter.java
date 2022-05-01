@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.Permission;
 /**
  * Annotate a Method with this annotation and it will automatically get
  * registered as a valid config getter for the
- * {@link com.github.black0nion.blackonionbot.slashcommands.bot.ConfigCommand}!
+ * {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
  */
 @Retention(RUNTIME)
 @Target(METHOD)
