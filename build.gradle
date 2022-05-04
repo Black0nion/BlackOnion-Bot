@@ -59,7 +59,7 @@ dependencies {
 
     implementation "club.minnced:discord-webhooks:0.8.0"
 
-    implementation 'se.michaelthelin.spotify:spotify-web-api-java:7.0.1'
+    implementation 'se.michaelthelin.spotify:spotify-web-api-java:7.1.0'
 
     implementation "com.vdurmont:emoji-java:5.1.1"
 
