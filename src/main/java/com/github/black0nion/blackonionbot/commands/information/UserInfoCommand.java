@@ -21,46 +21,48 @@ import javax.annotation.Nullable;
 import java.time.format.DateTimeFormatter;
 
 public class UserInfoCommand extends SlashCommand {
-    private static final String USER = "user";
-    private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+	private static final String USER = "user";
+	private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    public UserInfoCommand() {
+	public UserInfoCommand() {
 
-        super(builder(Commands.slash("userinfo", "Used to get information about a member.")
-                .addOption(OptionType.USER, USER, "The member to get information about.", false)));
-    }
+		super(builder(Commands.slash("userinfo", "Used to get information about a member.")
+			.addOption(OptionType.USER, USER, "The member to get information about.", false)));
+	}
 
-    static @NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final @Nullable Member member) {
-        var statsUser = BlackUser.from(user);
-        var statsMember = member != null ? BlackMember.from(member) : null;
-        final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
+	static @NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final @Nullable Member member) {
+		var statsUser = BlackUser.from(user);
+		var statsMember = member != null ? BlackMember.from(member) : null;
 
-        final TranslatedEmbed builder = cmde.success();
-        builder.setTitle("userinfo");
-        final String avatarUrl = statsUser.getAvatarUrl();
-        builder.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl());
-        builder.addField("name", statsUser.getEscapedName(), true);
-        builder.addField("discriminator", statsUser.getDiscriminator(), true);
-        builder.addField("userid", statsUser.getId(), true);
-        builder.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false);
-        builder.addField("language", statsUser.getLanguage() != null ? statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")" : "nopreference", true);
-        builder.addField("created", statsUser.getTimeCreated().format(pattern), true);
-        if (statsMember != null) {
-            builder.addField("joined", statsMember.getTimeJoined().format(pattern), true);
-            if (statsMember.getTimeBoosted() != null)
-                builder.addField("boosted", statsMember.getTimeBoosted().format(pattern), true);
-        }
-        return builder;
-    }
+		final String avatarUrl = statsUser.getAvatarUrl();
+		final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
+		final TranslatedEmbed builder = cmde.success()
+			.setTitle("userinfo")
+			.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl())
+			.addField("name", statsUser.getEscapedName(), true)
+			.addField("discriminator", statsUser.getDiscriminator(), true)
+			.addField("userid", statsUser.getId(), true)
+			.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false)
+			.addField("language", statsUser.getLanguage() != null ? statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")" : "nopreference", true)
+			.addField("created", statsUser.getTimeCreated().format(pattern), true);
 
-    @Override
-    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-        var givenUser = e.getOption(USER, OptionMapping::getAsUser);
+		if (statsMember != null) {
+			builder.addField("joined", statsMember.getTimeJoined().format(pattern), true);
+			if (statsMember.getTimeBoosted() != null)
+				builder.addField("boosted", statsMember.getTimeBoosted().format(pattern), true);
+		}
 
-        if (givenUser == null) {
-            cmde.reply(getUserInfo(cmde, author, member));
-        } else {
-            guild.retrieveMember(givenUser).queue(loadedMember -> cmde.reply(getUserInfo(cmde, givenUser, loadedMember)), error -> cmde.reply(getUserInfo(cmde, givenUser, null)));
-        }
-    }
+		return builder;
+	}
+
+	@Override
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var givenUser = e.getOption(USER, OptionMapping::getAsUser);
+
+		if (givenUser == null) {
+			cmde.reply(getUserInfo(cmde, author, member));
+		} else {
+			guild.retrieveMember(givenUser).queue(loadedMember -> cmde.reply(getUserInfo(cmde, givenUser, loadedMember)), error -> cmde.reply(getUserInfo(cmde, givenUser, null)));
+		}
+	}
 }

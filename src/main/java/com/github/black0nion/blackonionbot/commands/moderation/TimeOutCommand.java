@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -40,21 +41,34 @@ public class TimeOutCommand extends SlashCommand {
 
 	public TimeOutCommand() {
 		super(builder(Commands.slash(TIME_OUT_NAME, "Used to timeout a user")
-			.addOption(OptionType.USER, USER_OPTION, "The user who you want to time out", true)
-			.addOption(OptionType.STRING, REASON_OPTION, "Why the user should be timed out", true)
-			.addOptions(
-				new OptionData(OptionType.INTEGER, MINUTES, "The length of the time out in minutes", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_MIN))
-			.addOptions(
-				new OptionData(OptionType.INTEGER, HOURS, "The length of the time out in hours", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_HOUR))
-			.addOptions(
-				new OptionData(OptionType.INTEGER, DAYS, "The length of the time out in days", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY))
-			.addOptions(
-				new OptionData(OptionType.INTEGER, WEEKS, "The length of the time out in weeks", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)))
+			.addSubcommands(
+				new SubcommandData("add", "Used to add a timeout to a user")
+					.addOption(OptionType.USER, USER_OPTION, "The user who you want to time out", true)
+					.addOption(OptionType.STRING, REASON_OPTION, "Why the user should be timed out", true)
+					.addOptions(
+						new OptionData(OptionType.INTEGER, MINUTES, "The length of the time out in minutes", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_MIN))
+					.addOptions(
+						new OptionData(OptionType.INTEGER, HOURS, "The length of the time out in hours", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_HOUR))
+					.addOptions(
+						new OptionData(OptionType.INTEGER, DAYS, "The length of the time out in days", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY))
+					.addOptions(
+						new OptionData(OptionType.INTEGER, WEEKS, "The length of the time out in weeks", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)),
+				new SubcommandData("remove", "Used to remove a timeout from a user")
+					.addOption(OptionType.USER, USER_OPTION, "The user who you want to remove the timeout from", true))
+			)
 			.setRequiredPermissions(Permission.MODERATE_MEMBERS));
 	}
 
 	@Override
 	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		switch (e.getSubcommandName()) {
+			case "add" -> addTimeout(cmde, e);
+			case "remove" -> removeTimeout(cmde, e);
+			default -> cmde.sendPleaseUse();
+		}
+	}
+
+	private static void addTimeout(SlashCommandEvent cmde, SlashCommandInteractionEvent e) {
 		var timeOutMember = e.getOption(USER_OPTION, OptionMapping::getAsMember);
 		if (timeOutMember == null) {
 			cmde.send("notamember");
@@ -119,5 +133,16 @@ public class TimeOutCommand extends SlashCommand {
 			new Placeholder("member", timeOutMember.getUser().getAsMention()),
 			new Placeholder("duration", Utils.formatDuration(totalDuration)),
 			new Placeholder(REASON_OPTION, reason));
+	}
+
+	private static void removeTimeout(SlashCommandEvent cmde, SlashCommandInteractionEvent e) {
+		var timeOutMember = e.getOption(USER_OPTION, OptionMapping::getAsMember);
+		if(!timeOutMember.isTimedOut()) {
+			cmde.send("isnottimedout");
+			return;
+		}
+
+		timeOutMember.removeTimeout().queue();
+		cmde.send("timedoutremoved");
 	}
 }

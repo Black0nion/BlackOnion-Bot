@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.GenericCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.GuildType;
@@ -46,7 +46,6 @@ public class BlackGuild extends GuildImpl {
 		}
 	});
 
-	@Deprecated
 	@Reloadable("guildcache")
 	public static void clearCache() {
 		guilds.invalidateAll();
@@ -80,7 +79,7 @@ public class BlackGuild extends GuildImpl {
 	private String leaveMessage;
 	private long leaveChannel;
 	@Nullable
-	private List<GenericCommand> disabledCommands;
+	private List<SlashCommand> disabledCommands;
 	private long suggestionsChannel;
 	private List<Long> autoRoles;
 	private boolean loop;
@@ -243,35 +242,30 @@ public class BlackGuild extends GuildImpl {
 		}
 	}
 
-	public @Nullable List<GenericCommand> getDisabledCommands() {
+	public @Nullable List<SlashCommand> getDisabledCommands() {
 		return this.disabledCommands;
 	}
 
 	public void setDisabledCommands(final String[] disabledCommands) {
 		this.setDisabledCommands(Arrays.stream(disabledCommands)
-			.map(cmd ->
-						Optional.ofNullable(SlashCommandBase.commands.get(cmd))
-							.map(Pair::getValue)
-							.orElse(null)
-			)
+			.map(SlashCommandBase::getCommand)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList()));
 	}
 
-	public void setDisabledCommands(final List<GenericCommand> disabledCommands) {
+	public void setDisabledCommands(final List<SlashCommand> disabledCommands) {
 		this.disabledCommands = disabledCommands;
 		if (disabledCommands == null)
 			this.clear("disabledcommands");
 		else
-			this.saveList("disabledcommands", disabledCommands.stream().map(GenericCommand::getName).collect(Collectors.toList()));
+			this.saveList("disabledcommands", disabledCommands.stream().map(SlashCommand::getName).collect(Collectors.toList()));
 	}
 
-	public boolean isCommandActivated(final GenericCommand cmd) {
+	public boolean isCommandActivated(final SlashCommand cmd) {
 		return this.disabledCommands == null || !this.disabledCommands.contains(cmd);
 	}
 
-	public boolean setCommandActivated(final GenericCommand cmd, final boolean activated) {
-		System.out.println(cmd.getName() + " | " + cmd.isToggleable());
+	public boolean setCommandActivated(final SlashCommand cmd, final boolean activated) {
 		if (!cmd.isToggleable()) return false;
 		if (this.disabledCommands == null) {
 			if (activated) return true;

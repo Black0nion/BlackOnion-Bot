@@ -243,7 +243,7 @@ public class Utils {
 	}
 
 	public static void printLogo() {
-		logger.info("""
+		System.out.println("""
 			   ___  __         __   ____       _                  ___       __
 			  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_
 			 / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/

@@ -16,15 +16,19 @@ import java.net.http.HttpResponse;
 
 public class TronaldDumpCommand extends SlashCommand {
 
-    public TronaldDumpCommand() {
-        super("tronalddump", "Shows you a random quote from tronald dump");
-    }
+	public TronaldDumpCommand() {
+		super("tronalddump", "Shows you a random quote from tronald dump");
+	}
 
-    @Override
-    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-        Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://tronalddump.io/random/quote")).header("Accept", "application/json").build(), HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body).thenAccept(response -> {
-                    cmde.reply(cmde.success().setThumbnail("https://www.tronalddump.io/img/tronalddump_850x850.png").setTitle("TronaldDump", "https://tronalddump.io").addField(new JSONObject(response).getString("value"), "bytronalddump", false));
-                });
-    }
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://tronalddump.io/random/quote")).header("Accept", "application/json").build(), HttpResponse.BodyHandlers.ofString())
+			.thenApply(HttpResponse::body).thenAccept(response ->
+				cmde.reply(cmde.success()
+					.setThumbnail("https://www.tronalddump.io/img/tronalddump_850x850.png")
+					.setTitle("TronaldDump", "https://tronalddump.io")
+					.addField(new JSONObject(response).getString("value"), "bytronalddump", false)
+				)
+			);
+	}
 }

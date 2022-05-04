@@ -69,6 +69,7 @@ public class Bot extends ListenerAdapter {
 	public static Bot getInstance() {
 		return instance;
 	}
+
 	private JDA jda;
 
 	public JDA getJda() {
@@ -85,6 +86,7 @@ public class Bot extends ListenerAdapter {
 	private final HttpClient httpClient = HttpClient.newBuilder()
 		.executor(Executors.newCachedThreadPool(new ThreadFactory() {
 			private final ThreadGroup group = new ThreadGroup("HttpClient");
+
 			@Override
 			public Thread newThread(@NotNull Runnable r) {
 				return new Thread(group, r);
@@ -128,7 +130,7 @@ public class Bot extends ListenerAdapter {
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 		ConfigManager.loadConfig();
 		DockerManager.init();
-		logger.info("Starting BlackOnion-Bot in '{}' mode...", Config.run_mode );
+		logger.info("Starting BlackOnion-Bot in '{}' mode...", Config.run_mode);
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 

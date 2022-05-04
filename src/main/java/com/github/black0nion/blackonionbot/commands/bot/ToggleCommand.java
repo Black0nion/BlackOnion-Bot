@@ -21,50 +21,52 @@ import java.util.Map;
 
 public class ToggleCommand extends SlashCommand {
 
-    public ToggleCommand() {
-        super(builder(Commands.slash("toggle", "Toggle commands")
-                .addOptions(
-                        new OptionData(OptionType.STRING, "command", "Command to toggle", true, true),
-                        new OptionData(OptionType.BOOLEAN, "on", "The new status", false)
-                )
-        )
-                .autocomplete("command", SlashCommandBase.commands.keySet())
-                .setRequiredPermissions(Permission.MANAGE_SERVER)
-                .notToggleable());
-    }
+	public static final String COMMAND = "command";
 
-    public void updateAutoComplete() {
-        ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
-        this.updateAutoComplete("command", SlashCommandBase.commands.entrySet().stream()
-                .filter(e ->
-                        ((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
-                                || currentCommand.get().getRequiredCustomPermissions().length == 0)
-                                && currentCommand.get().isToggleable())
-                .map(Map.Entry::getKey)
-                .toList());
-    }
+	public ToggleCommand() {
+		super(builder(Commands.slash("toggle", "Toggle commands")
+				.addOptions(
+					new OptionData(OptionType.STRING, COMMAND, "Command to toggle", true, true),
+					new OptionData(OptionType.BOOLEAN, "on", "The new status", false))
+			)
+			.autocomplete(COMMAND, SlashCommandBase.getCommands().keySet())
+			.setRequiredPermissions(Permission.MANAGE_SERVER)
+			.notToggleable()
+		);
+	}
 
-    @Override
-    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-        final SlashCommand command = SlashCommandBase.commands.get(e.getOption("command", OptionMapping::getAsString)).getValue();
-        if (command == null || command.isHidden(author)) {
-            cmde.send("commandnotfound");
-            return;
-        }
+	public void updateAutoComplete() {
+		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
+		this.updateAutoComplete(COMMAND, SlashCommandBase.getCommands().entrySet().stream()
+			.filter(e ->
+				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
+					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
+					&& currentCommand.get().isToggleable())
+			.map(Map.Entry::getKey)
+			.toList());
+	}
 
-        if (!command.isToggleable()) {
-            cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
-            return;
-        }
+	@Override
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+		final SlashCommand command = SlashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
+		if (command == null || command.isHidden(author)) {
+			cmde.send("commandnotfound");
+			return;
+		}
 
-        Boolean newStatus = e.getOption("on", OptionMapping::getAsBoolean);
-        if (newStatus == null) {
-            cmde.send("commandstatus", new Placeholder("cmd", command.getName()), new Placeholder("status", cmde.getTranslation(guild.isCommandActivated(command) ? "on" : "off")));
-        } else {
-            if (guild.setCommandActivated(command, newStatus)) {
-                final String commandName = command.getName().toUpperCase();
-                cmde.success("commandtoggled", "commandisnow", new Placeholder("command", commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
-            }
-        }
-    }
+		if (!command.isToggleable()) {
+			cmde.error("commandcantbetoggled", "thiscommandcantbetoggled");
+			return;
+		}
+
+		Boolean newStatus = e.getOption("on", OptionMapping::getAsBoolean);
+		if (newStatus == null) {
+			cmde.send("commandstatus", new Placeholder("cmd", command.getName()), new Placeholder("status", cmde.getTranslation(guild.isCommandActivated(command) ? "on" : "off")));
+		} else {
+			if (guild.setCommandActivated(command, newStatus)) {
+				final String commandName = command.getName().toUpperCase();
+				cmde.success("commandtoggled", "commandisnow", new Placeholder(COMMAND, commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
+			}
+		}
+	}
 }

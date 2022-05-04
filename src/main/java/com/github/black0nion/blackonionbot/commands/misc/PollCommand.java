@@ -2,194 +2,74 @@ package com.github.black0nion.blackonionbot.commands.misc;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
+import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class PollCommand extends SlashCommand {
-    private static final String TOPIC = "topic";
-    private static final String OPTION_ONE_NAME = "option_one";
-    private static final String OPTION_TWO_NAME = "option_two";
-    private static final String OPTION_THREE_NAME = "option_three";
-    private static final String OPTION_FOUR_NAME = "option_four";
-    private static final String OPTION_FIVE_NAME = "option_five";
-    private static final String OPTION_SIX_NAME = "option_six";
-    private static final String OPTION_SEVEN_NAME = "option_seven";
-    private static final String OPTION_EIGHT_NAME = "option_eight";
-    private static final String OPTION_NINE_NAME = "option_nine";
-    private static final String OPTION_TEN_NAME = "option_ten";
 
-    private static final OptionData[] choices = {
-            new OptionData(OptionType.STRING, OPTION_ONE_NAME, "Used to add one option to the poll.", true),
-            new OptionData(OptionType.STRING, OPTION_TWO_NAME, "Used to add two options to the poll.", true),
-            new OptionData(OptionType.STRING, OPTION_THREE_NAME, "Used to add three options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_FOUR_NAME, "Used to add four options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_FIVE_NAME, "Used to add five options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_SIX_NAME, "Used to add six options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_SEVEN_NAME, "Used to add seven options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_EIGHT_NAME, "Used to add eight options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_NINE_NAME, "Used to add nine options to the poll.", false),
-            new OptionData(OptionType.STRING, OPTION_TEN_NAME, "Used to add ten options to the poll.", false)
-    };
+	// used in unit tests, don't change the visibility
+	static final List<String> DIGITS_LIST = Arrays.asList("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
 
-    public PollCommand() {
-        super(builder(Commands.slash("poll", "Used to create a poll.")
-                .addOption(OptionType.STRING, TOPIC, "Used to set the topic of the poll.", true)
-                .addOptions(choices)));
-    }
+	static final List<String> DIGITS_UNICODE = Arrays.asList(
+		"\\u0030\\u20E3", // 0
+		"\\u0031\\u20E3", // 1
+		"\\u0032\\u20E3", // 2
+		"\\u0033\\u20E3", // 3
+		"\\u0034\\u20E3", // 4
+		"\\u0035\\u20E3", // 5
+		"\\u0036\\u20E3", // 6
+		"\\u0037\\u20E3", // 7
+		"\\u0038\\u20E3", // 8
+		"\\u0039\\u20E3", // 9
+		"\\u1F51F" // 10
+	);
 
-    @Override
-    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel pollChannel) {
-        var optionOne = e.getOption(OPTION_ONE_NAME, OptionMapping::getAsString);
-        var optionTwo = e.getOption(OPTION_TWO_NAME, OptionMapping::getAsString);
-        var optionThree = e.getOption(OPTION_THREE_NAME, OptionMapping::getAsString);
-        var optionFour = e.getOption(OPTION_FOUR_NAME, OptionMapping::getAsString);
-        var optionFive = e.getOption(OPTION_FIVE_NAME, OptionMapping::getAsString);
-        var optionSix = e.getOption(OPTION_SIX_NAME, OptionMapping::getAsString);
-        var optionSeven = e.getOption(OPTION_SEVEN_NAME, OptionMapping::getAsString);
-        var optionEight = e.getOption(OPTION_EIGHT_NAME, OptionMapping::getAsString);
-        var optionNine = e.getOption(OPTION_NINE_NAME, OptionMapping::getAsString);
-        var optionTen = e.getOption(OPTION_TEN_NAME, OptionMapping::getAsString);
+	private static final String TOPIC = "topic";
+	private static final String OPTION_PREFIX = "option_";
 
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
-        embed.addField("Option 1", optionOne, true);
-        embed.addField("Option 2", optionTwo, true);
-        embed.setFooter("Poll created by " + author.getEscapedEffectiveName() + "#" + author.getDiscriminator(), author.getAvatarUrl());
-        embed.setTimestamp(Instant.now());
-        if (optionThree != null) {
-            embed.addField("Option 3", optionThree, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionFour != null) {
-            embed.addField("Option 4", optionFour, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionFive != null) {
-            embed.addField("Option 5", optionFive, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionSix != null) {
-            embed.addField("Option 6", optionSix, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                                message.addReaction("\\u0036\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionSeven != null) {
-            embed.addField("Option 7", optionSeven, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                                message.addReaction("\\u0036\\u20E3").queue();
-                                message.addReaction("\\u0037\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionEight != null) {
-            embed.addField("Option 8", optionEight, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                                message.addReaction("\\u0036\\u20E3").queue();
-                                message.addReaction("\\u0037\\u20E3").queue();
-                                message.addReaction("\\u0038\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionNine != null) {
-            embed.addField("Option 9", optionNine, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                                message.addReaction("\\u0036\\u20E3").queue();
-                                message.addReaction("\\u0037\\u20E3").queue();
-                                message.addReaction("\\u0038\\u20E3").queue();
-                                message.addReaction("\\u0039\\u20E3").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-        if (optionTen != null) {
-            embed.addField("Option 10", optionTen, true);
-            pollChannel.sendMessageEmbeds(embed.build())
-                    .queue(
-                            message -> {
-                                message.addReaction("\\u0031\\u20E3").queue();
-                                message.addReaction("\\u0032\\u20E3").queue();
-                                message.addReaction("\\u0033\\u20E3").queue();
-                                message.addReaction("\\u0034\\u20E3").queue();
-                                message.addReaction("\\u0035\\u20E3").queue();
-                                message.addReaction("\\u0036\\u20E3").queue();
-                                message.addReaction("\\u0037\\u20E3").queue();
-                                message.addReaction("\\u0038\\u20E3").queue();
-                                message.addReaction("\\u0039\\u20E3").queue();
-                                message.addReaction("\\uD83D\\uDD1F").queue();
-                            }
-                    );
-            cmde.send("pollcreated");
-        }
-    }
+	private static final OptionData[] choices = IntStream.range(0, DIGITS_UNICODE.size())
+		.mapToObj(i -> new OptionData(OptionType.STRING, OPTION_PREFIX + DIGITS_LIST.get(i), "Choice #" + i))
+		.toArray(OptionData[]::new);
 
+	public PollCommand() {
+		super(builder(Commands.slash("poll", "Used to create a poll.")
+			.addOption(OptionType.STRING, TOPIC, "Used to set the topic of the poll.", true)
+			.addOptions(choices)));
+	}
+
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel pollChannel) {
+		TranslatedEmbed embed = cmde.success();
+		embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
+		embed.setFooter("Poll created by " + author.getEscapedEffectiveName() + "#" + author.getDiscriminator(), author.getAvatarUrl());
+
+		boolean hadNullOption = false;
+		int index = 0;
+		for (OptionData optionData : choices) {
+			var option = e.getOption(optionData.getName());
+			if (option != null) {
+				embed.addField(cmde.getTranslation("optionnumber", new Placeholder("num", index)), DIGITS_UNICODE.get(index));
+			} else {
+				if (hadNullOption) throw new InputMismatchException("Options have to be filled in order");
+				hadNullOption = true;
+			}
+			index++;
+		}
+		cmde.reply(embed);
+	}
 }

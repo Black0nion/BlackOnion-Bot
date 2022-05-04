@@ -27,7 +27,7 @@ public class BotInformation {
 	@SuppressWarnings("java:S2885")
 	public static final SimpleDateFormat datePattern = new SimpleDateFormat(PATTERN);
 
-	public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(PATTERN);
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
 
 	public static final OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;

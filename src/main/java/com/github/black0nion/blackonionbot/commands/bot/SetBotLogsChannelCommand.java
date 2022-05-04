@@ -13,15 +13,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class SetBotLogsChannelCommand extends SlashCommand {
 
-    public SetBotLogsChannelCommand() {
-        super(builder("setbotlogschannel", "Used to set the channel where bot logs are sent.")
-                .setRequiredCustomPermissions(CustomPermission.ADMIN));
-    }
+	public SetBotLogsChannelCommand() {
+		super(builder("setbotlogschannel", "Used to set the channel where bot logs are sent.")
+			.setRequiredCustomPermissions(CustomPermission.ADMIN));
+	}
 
-    @Override
-    public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, @NotNull TextChannel channel) {
-        BotInformation.logsChannel = channel.getIdLong();
-        guild.save("botlogschannel", channel.getIdLong());
-        cmde.success("savedbotlogschannel", "thisisbotlogschannel");
-    }
+	@Override
+	public void execute(@NotNull SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, @NotNull TextChannel channel) {
+		BotInformation.logsChannel = channel.getIdLong();
+		guild.save("botlogschannel", channel.getIdLong());
+		cmde.success("savedbotlogschannel", "thisisbotlogschannel");
+	}
 }

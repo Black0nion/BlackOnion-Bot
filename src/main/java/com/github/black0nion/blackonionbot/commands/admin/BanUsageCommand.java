@@ -25,57 +25,59 @@ import java.util.regex.Pattern;
 
 public class BanUsageCommand extends SlashCommand {
 
-    private static final SubcommandData[] data = {
-            new SubcommandData("user", "(un)ban a user").addOption(OptionType.USER, "targetuser", "user to (un)ban", true),
-            new SubcommandData("guild", "(un)ban a guild").addOption(OptionType.STRING, "targetguild", "guild to (un)ban", true),
-    };
+	private static final SubcommandData[] data = {
+		new SubcommandData("user", "(un)ban a user").addOption(OptionType.USER, "targetuser", "user to (un)ban", true),
+		new SubcommandData("guild", "(un)ban a guild").addOption(OptionType.STRING, "targetguild", "guild to (un)ban", true),
+	};
 
-    public BanUsageCommand() {
-        super(builder(
-                Commands.slash("usage", "(un)ban a user or a guild from using commands.")
-                        .addSubcommandGroups(
-                                new SubcommandGroupData("ban", "Ban a user or a guild from using commands.").addSubcommands(data),
-                                new SubcommandGroupData("unban", "Unban a user or a guild from using commands.").addSubcommands(data)))
-                .setHidden()
-                .setRequiredCustomPermissions(CustomPermission.BAN_USAGE)
-        );
-    }
+	public BanUsageCommand() {
+		super(builder(
+			Commands.slash("usage", "(un)ban a user or a guild from using commands.")
+				.addSubcommandGroups(
+					new SubcommandGroupData("ban", "Ban a user or a guild from using commands.").addSubcommands(data),
+					new SubcommandGroupData("unban", "Unban a user or a guild from using commands.").addSubcommands(data)))
+			.setHidden()
+			.setRequiredCustomPermissions(CustomPermission.BAN_USAGE)
+		);
+	}
 
-    public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("usagebans");
-    private static final Pattern guildIdPattern = Pattern.compile("^\\d{17,18}$");
+	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("usagebans");
+	private static final Pattern guildIdPattern = Pattern.compile("^\\d{17,18}$");
 
-    @Override
-    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-        final User user = e.getOption("targetuser", OptionMapping::getAsUser);
-        final String guildId = e.getOption("targetguild", OptionMapping::getAsString);
+	@Override
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		final User user = e.getOption("targetuser", OptionMapping::getAsUser);
+		final String guildId = e.getOption("targetguild", OptionMapping::getAsString);
 
-        assert e.getSubcommandGroup() != null;
+		assert e.getSubcommandGroup() != null : "Subcommand group is null";
 
-        if (user == null && guildId == null) {
-            cmde.send("wrongargumentcount");
-        } else {
-            if (user != null) {
-                if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
-                    MongoManager.insertOne(collection, new Document("userid", user.getIdLong()));
-                    cmde.send("cantusecommandsanymore", new Placeholder("userorguild", user.getAsTag()));
-                } else {
-                    collection.deleteOne(Filters.eq("userid", user.getIdLong()));
-                    cmde.send("userunbanned");
-                }
-            }
-            if (guildId != null) {
-                if (guildIdPattern.matcher(guildId).matches()) {
-                    if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
-                        MongoManager.insertOne(collection, new Document("guildid", guildId));
-                        cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
-                    } else {
-                        collection.deleteOne(Filters.eq("guildid", guildId));
-                        cmde.send("guildunbanned");
-                    }
-                } else {
-                    cmde.send("invalidguildid");
-                }
-            }
-        }
-    }
+		if (user == null && guildId == null) {
+			cmde.send("wrongargumentcount");
+			return;
+		}
+
+		if (user != null) {
+			if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
+				MongoManager.insertOne(collection, new Document("userid", user.getIdLong()));
+				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", user.getAsTag()));
+			} else {
+				collection.deleteOne(Filters.eq("userid", user.getIdLong()));
+				cmde.send("userunbanned");
+			}
+		}
+
+		if (guildId != null) {
+			if (guildIdPattern.matcher(guildId).matches()) {
+				if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
+					MongoManager.insertOne(collection, new Document("guildid", guildId));
+					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
+				} else {
+					collection.deleteOne(Filters.eq("guildid", guildId));
+					cmde.send("guildunbanned");
+				}
+			} else {
+				cmde.send("invalidguildid");
+			}
+		}
+	}
 }
