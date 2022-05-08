@@ -262,7 +262,7 @@
   "permissionsadded": "The following permissions got added to `%user%`: `%perms%`",
   "permissionsof": "Permissions of `%user%`:\n```%perms%```",
   "permissionsremoved": "The following permissions got removed from `%user%`: `%perms%`",
-  "pfpof": "Profile picture of",
+  "pfpof": "Profile picture of %user%",
   "ping": "Ping",
   "pinglong": "Ping!",
   "playingagainst": "You will be playing against %challenger%!",

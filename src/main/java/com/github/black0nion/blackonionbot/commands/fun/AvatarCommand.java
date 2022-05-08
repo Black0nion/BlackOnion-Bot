@@ -21,13 +21,13 @@ public class AvatarCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember eventMember, BlackUser author, BlackGuild guild, TextChannel channel) {
-		var user = e.getOption(USER, OptionMapping::getAsMember);
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+		var user = e.getOption(USER, OptionMapping::getAsUser);
 		if (user == null)
-			user = eventMember;
+			user = author;
 
 		cmde.reply(cmde.success()
-			.setTitle(cmde.getTranslation("pfpof") + " " + user.getEffectiveName(), user.getEffectiveAvatarUrl())
+			.setTitle(cmde.getTranslation("pfpof") + " " + user.getAsTag(), user.getEffectiveAvatarUrl())
 			.setImage(user.getEffectiveAvatarUrl() + "?size=2048")
 			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl()));
 	}

@@ -194,7 +194,7 @@ public class Bot extends ListenerAdapter {
 	public void onReady(final ReadyEvent e) {
 		final JDA jda = e.getJDA();
 		selfUserId = jda.getSelfUser().getIdLong();
-		logger.info("Connected to '{}'#'{}' in '{}'ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
+		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity());
 

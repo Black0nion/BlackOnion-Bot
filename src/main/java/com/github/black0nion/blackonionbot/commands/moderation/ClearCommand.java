@@ -43,6 +43,7 @@ public class ClearCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
+		System.out.println("LOL: " + e.getChannel().getLatestMessageId());
 		switch (e.getSubcommandName()) {
 			case "count" -> deleteCount(cmde, e, channel);
 			case "until" -> deleteUntil(cmde, e, channel);
@@ -95,7 +96,7 @@ public class ClearCommand extends SlashCommand {
 			final long messageId = Long.parseLong(messageIdString);
 			channel.retrieveMessageById(messageId).queue(msg -> {
 				try {
-					channel.getHistoryAfter(msg, 101).queue(msgs -> {
+					channel.getHistoryAfter(msg, 100).queue(msgs -> {
 						final int msgsize = msgs.size();
 						if (msgsize == 0 || msgsize > 100) {
 							cmde.error("toomanymessages", "toomanymessagesinfo", new Placeholder("msgcount", msgsize));
@@ -106,24 +107,21 @@ public class ClearCommand extends SlashCommand {
 						final List<Message> messages = new ArrayList<>();
 						int i = msgsize + 1;
 						for (final Message m : msgs.getRetrievedHistory()) {
-							if (!m.isPinned() && m.getTimeCreated().isAfter(lastValidTime)) {
+							if (m.getTimeCreated().isAfter(lastValidTime)) break;
+
+							if (!m.isPinned()) {
 								messages.add(m);
 							}
+
 							if (--i <= 0) {
 								break;
 							}
 						}
 
-						ClearCommand.deleteMessages(cmde, channel, messages.size(), messages);
+						ClearCommand.deleteMessages(cmde, channel, msgsize, messages);
 					});
 				} catch (final Exception ex) {
-					if (!(ex instanceof IllegalArgumentException)) {
-						ex.printStackTrace();
-						cmde.exception(ex);
-					} else {
-						ex.printStackTrace();
-						cmde.send("messagestooold");
-					}
+					cmde.exception(ex);
 				}
 			}, err -> cmde.error("nomessagesfound", "pleaseinputmessage"));
 		} catch (final Exception ignored) {
@@ -131,13 +129,13 @@ public class ClearCommand extends SlashCommand {
 		}
 	}
 
-	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int amount, @NotNull List<Message> messages) {
+	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int expectedCount, @NotNull List<Message> messages) {
 		channel.deleteMessages(messages).queue(success -> {
-			if (messages.size() > amount) {
+			if (messages.size() < expectedCount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),
-					new Placeholder("remaining", amount - messages.size()));
+					new Placeholder("remaining", expectedCount - messages.size()));
 			} else {
-				cmde.send("msgsgotdeleted", new Placeholder("msgcount", amount));
+				cmde.send("msgsgotdeleted", new Placeholder("msgcount", expectedCount));
 			}
 		}, cmde::exception);
 	}

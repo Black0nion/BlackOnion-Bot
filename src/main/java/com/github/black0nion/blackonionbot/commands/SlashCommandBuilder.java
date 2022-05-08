@@ -96,7 +96,7 @@ public class SlashCommandBuilder {
 	}
 
 	public SlashCommandBuilder setRequiredPermissions(final Permission... requiredPermissions) {
-		this.requiredPermissions = Objects.requireNonNullElseGet(requiredPermissions, () -> new Permission[] {});
+		this.requiredPermissions = Objects.requireNonNullElseGet(requiredPermissions, () -> Permission.EMPTY_PERMISSIONS);
 		return this;
 	}
 
@@ -105,7 +105,7 @@ public class SlashCommandBuilder {
 	}
 
 	public SlashCommandBuilder setRequiredBotPermissions(final Permission... requiredBotPermissions) {
-		this.requiredBotPermissions = Objects.requireNonNullElseGet(requiredBotPermissions, () -> new Permission[] {});
+		this.requiredBotPermissions = Objects.requireNonNullElseGet(requiredBotPermissions, () -> Permission.EMPTY_PERMISSIONS);
 		return this;
 	}
 

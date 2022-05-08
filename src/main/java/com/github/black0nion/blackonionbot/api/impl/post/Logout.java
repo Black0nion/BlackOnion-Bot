@@ -17,8 +17,6 @@ import java.util.Map;
 /**
  * Logs out a user from a session (deletes their session id from the database
  * and revoke token)
- *
- * @author _SIM_
  */
 public class Logout implements IPostRoute {
 

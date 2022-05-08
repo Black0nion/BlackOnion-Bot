@@ -19,6 +19,7 @@ import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -67,8 +68,10 @@ public class SlashCommandBase extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(SlashCommandBase.class);
 
 	public static void addCommands() {
+		commandCount = 0;
 		commands.clear();
 		commandsInCategory.clear();
+		commandInstances.clear();
 		commandsJson = new JSONObject();
 		final JSONArray commands = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
@@ -150,13 +153,13 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	public static void updateCommandsDev(JDA jda) {
 		if (Config.dev_guild != -1) {
-			Objects.requireNonNull(jda.getGuildById(Config.dev_guild))
-				.updateCommands()
-				.addCommands(commands.values().stream()
-					.map(Pair::getValue)
-					.map(SlashCommand::getData)
-					.toList())
-				.queue();
+			Guild guild = Objects.requireNonNull(jda.getGuildById(Config.dev_guild));
+			guild.updateCommands()
+				.addCommands(
+					commandInstances.values().stream()
+						.map(SlashCommand::getData)
+						.toList()
+				).queue();
 		}
 	}
 

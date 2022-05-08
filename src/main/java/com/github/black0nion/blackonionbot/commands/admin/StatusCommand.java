@@ -23,10 +23,10 @@ import java.util.Optional;
 
 public class StatusCommand extends SlashCommand {
 
-	public static final String STATUS = "status";
+	private static final String STATUS = "status";
 
 	public StatusCommand() {
-		super(builder(Commands.slash(STATUS, "Set the status of the bot").addOptions(
+		super(builder(Commands.slash("status", "Set the status of the bot").addOptions(
 			new OptionData(OptionType.STRING, STATUS, "The OnlineStatus of the bot", true)
 				.addChoices(Arrays.stream(OnlineStatus.values()).map(m -> new Command.Choice(m.name(), m.name())).toList())
 		)).setAdminGuild());

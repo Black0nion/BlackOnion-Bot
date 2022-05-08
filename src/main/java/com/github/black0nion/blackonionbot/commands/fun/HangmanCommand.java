@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author _SIM_
- */
 public class HangmanCommand extends SlashCommand {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();

@@ -53,7 +53,6 @@ public class WeatherCommand extends SlashCommand {
 				.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
 				.addField("sunrise", sdf.format(sunrise), false)
 				.addField("sunset", sdf.format(sunset), false));
-
 		} catch (final IOException ex) {
 			cmde.send("unknowncity");
 		}
