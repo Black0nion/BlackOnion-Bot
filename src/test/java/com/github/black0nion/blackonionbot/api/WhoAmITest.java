@@ -10,25 +10,25 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.black0nion.blackonionbot.Shared.HTTP_CLIENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("ConstantConditions")
 @Order(25)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WhoAmITest {
-	private static final OkHttpClient client = new OkHttpClient();
 	private static final Logger log = LoggerFactory.getLogger(WhoAmITest.class);
 
 	@Test
 	public void test_no_sessionid() {
-		Response response = assertDoesNotThrow(client.newCall(new Request.Builder().url("http://localhost:187/api/whoami").build())::execute);
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder().url("http://localhost:187/api/whoami").build())::execute);
 		assertDoesNotThrow(() -> new JSONObject(assertDoesNotThrow(response.body()::string)));
 		assertEquals(400, response.code());
 	}
 
 	@Test
 	public void test_invalid_session_id() {
-		Response response = assertDoesNotThrow(client.newCall(new Request.Builder()
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.url("http://localhost:187/api/whoami")
 			.addHeader("sessionid", "test")
 			.build())::execute);
@@ -40,7 +40,7 @@ public class WhoAmITest {
 
 	@Test
 	public void test_create_session_id_no_code() {
-		Response response = assertDoesNotThrow(client.newCall(new Request.Builder()
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.post(RequestBody.create(new byte[0], null))
 			.url("http://localhost:187/api/login")
 			.addHeader("sessionid", GenericSessionTest.EXAMPLE_SESSION_ID)
@@ -53,7 +53,7 @@ public class WhoAmITest {
 
 	@Test
 	public void test_valid_session_id_not_found() {
-		Response response = assertDoesNotThrow(client.newCall(new Request.Builder()
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.url("http://localhost:187/api/whoami")
 			.addHeader("sessionid", GenericSessionTest.VALID_UNKNOWN_SESSION_ID)
 			.build())::execute);
@@ -65,7 +65,7 @@ public class WhoAmITest {
 
 	@Test
 	public void test_user_created() {
-		Response response = assertDoesNotThrow(client.newCall(new Request.Builder()
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.url("http://localhost:187/api/whoami")
 			.addHeader("sessionid", GenericSessionTest.EXAMPLE_SESSION_ID)
 			.build())::execute);

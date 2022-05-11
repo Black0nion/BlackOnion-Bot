@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.api;
 
 import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.LoginFactory;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
 import com.google.gson.Gson;
@@ -28,7 +29,7 @@ public class GenericSessionTest {
 
 	@BeforeAll
 	public static void init() {
-		GenericSession.setLogin(new GenericSession.ILogin() {
+		LoginFactory.setInstance(() -> new LoginFactory.ILogin() {
 			private boolean loggedInYet = false;
 
 			@Override

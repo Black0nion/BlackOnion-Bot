@@ -44,7 +44,7 @@ public class GiveawaySystem {
 
 		Bot.getInstance().getExecutor().submit(() -> {
 			try {
-				Bot.getInstance().getJda().awaitReady();
+				Bot.getInstance().getJDA().awaitReady();
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -80,7 +80,7 @@ public class GiveawaySystem {
 
 	public static void scheduleGiveaway(final Giveaway giveaway) {
 		final Date endDate = giveaway.endDate();
-		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJda().getGuildById(giveaway.guildId()));
+		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
 			if (msg == null) {

@@ -72,7 +72,7 @@ public class Bot extends ListenerAdapter {
 
 	private JDA jda;
 
-	public JDA getJda() {
+	public JDA getJDA() {
 		return jda;
 	}
 

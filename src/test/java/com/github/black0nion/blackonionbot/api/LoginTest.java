@@ -15,11 +15,11 @@ import static com.github.black0nion.blackonionbot.Shared.HTTP_CLIENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Order(22)
-public class LoginTest {
+class LoginTest {
 	private static final Logger log = LoggerFactory.getLogger(LoginTest.class);
 
 	@Test
-	public void test_create_session_id_no_code() {
+	void test_create_session_id_no_code() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(getBaseBuilder().build())::execute);
 		assertNotNull(response);
 		assertEquals(400, response.code());
@@ -32,7 +32,7 @@ public class LoginTest {
 	}
 
 	@Test
-	public void test_create_session_id_invalid_code() {
+	void test_create_session_id_invalid_code() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(getBaseBuilder()
 			.addHeader("code", "invalid")
 			.build())::execute);
@@ -53,7 +53,7 @@ public class LoginTest {
 	}
 
 	@Test
-	public void test_create_session_id() {
+	void test_create_session_id() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(getBaseBuilder()
 			.addHeader("code", GenericSessionTest.EXAMPLE_CODE)
 			.build())::execute);

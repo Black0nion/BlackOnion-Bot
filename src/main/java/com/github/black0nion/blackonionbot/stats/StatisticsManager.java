@@ -142,7 +142,7 @@ public class StatisticsManager extends ListenerAdapter {
 	private static int guildCount = -1;
 
 	static int reloadGuildCount() {
-		return guildCount = (int) Bot.getInstance().getJda().getGuildCache().size();
+		return guildCount = (int) Bot.getInstance().getJDA().getGuildCache().size();
 	}
 
 	public static int getGuildCount() {
@@ -152,7 +152,7 @@ public class StatisticsManager extends ListenerAdapter {
 	private static long userCount = -1;
 
 	static long reloadUserCount() {
-		return userCount = Bot.getInstance().getJda().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		return userCount = Bot.getInstance().getJDA().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
 	}
 
 	public static long getUserCount() {

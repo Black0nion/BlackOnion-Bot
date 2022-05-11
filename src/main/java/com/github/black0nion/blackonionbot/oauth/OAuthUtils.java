@@ -1,14 +1,13 @@
 package com.github.black0nion.blackonionbot.oauth;
 
 import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.LoginFactory;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.mongodb.client.model.Filters;
 import io.mokulu.discord.oauth.DiscordAPI;
 import io.mokulu.discord.oauth.DiscordOAuth;
 import io.mokulu.discord.oauth.model.TokensResponse;
-import org.bson.Document;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -72,7 +71,7 @@ public class OAuthUtils {
 	private static ILoginWithCode impl = code -> {
 		final TokensResponse response = OAUTH_HANDLER.getTokens(code);
 		if (response == null) return null;
-		else return GenericSession.getLogin().createSession(response.getAccessToken(), response.getRefreshToken(), response.getExpiresIn());
+		else return LoginFactory.getImpl().createSession(response.getAccessToken(), response.getRefreshToken(), response.getExpiresIn());
 	};
 	public static void setLoginWithCodeImplementation(ILoginWithCode impl) {
 		OAuthUtils.impl = impl;
