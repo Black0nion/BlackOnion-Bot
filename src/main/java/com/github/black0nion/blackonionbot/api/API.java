@@ -166,12 +166,10 @@ public class API {
 					if (!sessionId.matches(GenericSession.SESSIONID_REGEX)) throw new BadRequestResponse("Invalid SessionID");
 					try {
 						session = new RestSession(sessionId);
-					} catch (Exception e) {
-						if (e instanceof InputMismatchException) {
-							throw new UnauthorizedResponse("Unknown Session");
-						} else if (e instanceof NullPointerException) {
-							logger.error("Session ID is null, shouldn't happen because of the filter before!");
-						}
+					} catch (InputMismatchException e) {
+						throw new UnauthorizedResponse("Unknown Session");
+					} catch (NullPointerException e) {
+						logger.error("Session ID is null, shouldn't happen because of the filter before!");
 						throw e;
 					}
 
