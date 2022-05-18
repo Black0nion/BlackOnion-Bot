@@ -1,14 +1,10 @@
 FROM gradle:7.5-jdk17-alpine AS build
 
-LABEL build=true
-
 COPY --chown=gradle:gradle . /bot
 
 WORKDIR /bot
 
 RUN gradle build downloadDependencies --no-daemon
-
-RUN cp build/reports/tests/test/ /tmp/test-report/ -r
 
 FROM eclipse-temurin:17-jre-alpine AS run
 

@@ -46,23 +46,6 @@ jobs:
 
           docker tag $(docker images --filter 'label=build=true' -q | head -n 1) bob-build
 
-      - name: Extract test report
-        id: extract-test-report
-        uses: shrink/actions-docker-extract@v1
-        env:
-          REPO: ${{ steps.get_version.outputs.REPO }}
-          TAG: ${{ steps.get_version.outputs.TAG }}
-        with:
-          image: bob-build
-          path: "/tmp/test-report/."
-
-      - name: Upload test report
-        uses: actions/upload-artifact@v3
-        with:
-          path: ${{ steps.extract-test-report.outputs.destination }}
-          name: Test Report
-          retention-days: 7
-
       - name: Push docker image
         id: push-image
         if: steps.get_version.outputs.TAG != 'latest-dev'
@@ -106,3 +89,9 @@ jobs:
           arguments: test jacocoTestReport
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/reports/tests/test/
+          name: Test Report
+          retention-days: 7

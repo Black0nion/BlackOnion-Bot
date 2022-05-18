@@ -6,9 +6,7 @@ import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
 import com.google.gson.Gson;
 import io.mokulu.discord.oauth.model.User;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.InputMismatchException;
 
@@ -53,13 +51,16 @@ public class GenericSessionTest {
 		});
 	}
 
-	@Test
-	public void test_id_generation() {
-		assertTrue(assertDoesNotThrow(GenericSession::generateSessionId).matches(GenericSession.SESSIONID_REGEX));
+	@RepeatedTest(50)
+	@DisplayName("test id generation")
+	void test_id_generation(RepetitionInfo info) {
+		for (int i = 0; i < info.getTotalRepetitions(); i++) {
+			assertTrue(assertDoesNotThrow(GenericSession::generateSessionId).matches(GenericSession.SESSIONID_REGEX));
+		}
 	}
 
 	@Test
-	public void test_code_pattern() {
+	void test_code_pattern() {
 		assertTrue(EXAMPLE_CODE.matches(OAuthUtils.TOKEN_PATTERN.toString()));
 		assertFalse("test".matches(OAuthUtils.TOKEN_PATTERN.toString()));
 	}
