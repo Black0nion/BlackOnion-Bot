@@ -24,31 +24,31 @@ jobs:
           REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           VERSION=$(echo $GITHUB_REF | grep -o '[^/]*$')
           FULL_VERSION=$(echo $GITHUB_REF | cut -d / -f 3-)
+          RELEASE=false
           echo ::set-output name=REPO::$REPO
           echo ::set-output name=VERSION::$VERSION
           if [[ $FULL_VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
             TAG="latest"
+            RELEASE=true
           elif [[ $FULL_VERSION =~ ^b[0-9]+.[0-9]+.[0-9]+$ ]]; then
             TAG="latest-beta"
+            RELEASE=true
           else
             TAG="latest-dev"
           fi
           echo ::set-output name=TAG::$TAG
-          echo "Full Version: $FULL_VERSION | Version: $VERSION | Tag: $TAG"
+          echo ::set-output name=RELEASE::$RELEASE
+          echo "Full Version: $FULL_VERSION | Version: $VERSION | Tag: $TAG | Release?: $RELEASE"
 
       - name: Build and push
         uses: docker/build-push-action@v3
-        env:
-          REPO: ${{ steps.get_version.outputs.REPO }}
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
-          TAG: ${{ steps.get_version.outputs.TAG }}
         with:
-          push: $( ${{ steps.get_version.outputs.TAG }} == "latest" || ${{ steps.get_version.outputs.TAG }} == "latest-beta" )
+          push: ${{ steps.get_version.outputs.RELEASE }}
           cache-from: type=gha
           cache-to: type=gha
           tags: |
-            ghcr.io/$REPO:$VERSION
-            ghcr.io/$REPO:$TAG
+            ghcr.io/${{ steps.get_version.outputs.REPO }}:${{ steps.get_version.outputs.VERSION }}
+            ghcr.io/${{ steps.get_version.outputs.REPO }}:${{ steps.get_version.outputs.TAG }}
 
   coverage:
     runs-on: ubuntu-latest
