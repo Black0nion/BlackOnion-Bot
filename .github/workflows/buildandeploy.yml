@@ -43,7 +43,7 @@ jobs:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
           TAG: ${{ steps.get_version.outputs.TAG }}
         with:
-          push: ${ ${{ steps.get_version.outputs.TAG }} == "latest" || ${{ steps.get_version.outputs.TAG }} == "latest-beta" }
+          push: $( ${{ steps.get_version.outputs.TAG }} == "latest" || ${{ steps.get_version.outputs.TAG }} == "latest-beta" )
           cache-from: type=gha
           cache-to: type=gha
           tags: |
