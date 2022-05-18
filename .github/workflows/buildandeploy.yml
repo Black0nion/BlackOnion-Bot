@@ -8,6 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Login to Github Packages Docker Registry
         if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v2
@@ -34,26 +36,19 @@ jobs:
           echo ::set-output name=TAG::$TAG
           echo "Full Version: $FULL_VERSION | Version: $VERSION | Tag: $TAG"
 
-      - name: Build docker image
+      - name: Build and push
+        uses: docker/build-push-action@v3
         env:
           REPO: ${{ steps.get_version.outputs.REPO }}
           VERSION: ${{ steps.get_version.outputs.VERSION }}
           TAG: ${{ steps.get_version.outputs.TAG }}
-        run: |
-          docker build \
-            -t ghcr.io/$REPO:$VERSION \
-            -t ghcr.io/$REPO:$TAG .
-
-      - name: Push docker image
-        id: push-image
-        if: steps.get_version.outputs.TAG != 'latest-dev'
-        env:
-          REPO: ${{ steps.get_version.outputs.REPO }}
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
-          TAG: ${{ steps.get_version.outputs.TAG }}
-        run: |
-          docker push ghcr.io/$REPO:$VERSION
-          docker push ghcr.io/$REPO:$TAG
+        with:
+          push: ${{ steps.get_version.outputs.TAG == "latest" || steps.get_version.outputs.TAG == "latest-beta" }}
+          cache-from: type=gha
+          cache-to: type=gha
+          tags: |
+            ghcr.io/$REPO:$VERSION
+            ghcr.io/$REPO:$TAG
 
   coverage:
     runs-on: ubuntu-latest
