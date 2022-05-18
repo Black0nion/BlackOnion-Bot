@@ -12,14 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Order(20)
 class ApiBaseTest {
+	public static final String API_BASE_URL = "http://localhost:8080/api";
+
 	@BeforeAll
 	public static void init() {
-		API.init();
+		API.startApi(8080);
 	}
 
 	@Test
 	void test_hello_world() {
-		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder().url("http://localhost:187/hello").build())::execute);
+		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder().url(API_BASE_URL + "/hello").build())::execute);
 		assertNotNull(response);
 		response.close();
 	}

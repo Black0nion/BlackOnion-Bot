@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 
 import static com.github.black0nion.blackonionbot.Shared.HTTP_CLIENT;
+import static com.github.black0nion.blackonionbot.api.ApiBaseTest.API_BASE_URL;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Order(22)
@@ -49,7 +50,7 @@ class LoginTest {
 	private Request.Builder getBaseBuilder() {
 		return new Request.Builder()
 			.post(RequestBody.create(new byte[0], null))
-			.url("http://localhost:187/api/login");
+			.url(API_BASE_URL + "/login");
 	}
 
 	@Test

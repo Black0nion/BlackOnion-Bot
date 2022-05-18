@@ -6,7 +6,7 @@ COPY --chown=gradle:gradle . /bot
 
 WORKDIR /bot
 
-RUN gradle build test downloadDependencies --no-daemon
+RUN gradle build downloadDependencies --no-daemon
 
 RUN cp build/reports/tests/test/ /tmp/test-report/ -r
 

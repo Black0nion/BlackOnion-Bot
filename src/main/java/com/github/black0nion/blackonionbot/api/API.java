@@ -37,6 +37,10 @@ public class API {
 
 	@Reloadable("api")
 	public static void init() {
+		startApi(Config.getInstance().getApiPort() > 0 ? Config.getInstance().getApiPort() : 187);
+	}
+
+	static void startApi(int port) {
 		if (app != null) {
 			app.close();
 		}
@@ -52,7 +56,7 @@ public class API {
 				server.setHandler(statisticsHandler);
 				return server;
 			});
-		}).start(Config.getInstance().getApiPort() > 0 ? Config.getInstance().getApiPort() : 187);
+		}).start(port);
 
 		final Reflections reflections = new Reflections(API.class.getPackage().getName());
 
