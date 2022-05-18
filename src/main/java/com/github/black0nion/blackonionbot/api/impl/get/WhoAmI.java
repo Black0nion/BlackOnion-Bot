@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.api.impl.get;
 
-import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
+import com.github.black0nion.blackonionbot.api.sessions.RestSession;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class WhoAmI implements IGetRoute {
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable RestSession session, DiscordUser user) throws Exception {
 		return user.getUserAsJson();
 	}
 

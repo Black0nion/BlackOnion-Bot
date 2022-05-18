@@ -17,6 +17,8 @@ public class LanguageSystem {
 	private LanguageSystem() {}
 	private static final Logger logger = LoggerFactory.getLogger(LanguageSystem.class);
 
+	private static final Logger log = LoggerFactory.getLogger(LanguageSystem.class);
+
 	private static final HashMap<String, Language> languages = new HashMap<>();
 	private static Language defaultLocale;
 	private static String languageString;
@@ -51,17 +53,14 @@ public class LanguageSystem {
 		try {
 			final Language userLang = author.getLanguage();
 			if (userLang != null) return userLang;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		try {
 			final Language guildLang = guild.getLanguage();
 			if (guildLang != null) return guildLang;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		try {
 			return defaultLocale;
-		} catch (final Exception ignored) {
-		}
+		} catch (final Exception ignored) {}
 		return null;
 	}
 

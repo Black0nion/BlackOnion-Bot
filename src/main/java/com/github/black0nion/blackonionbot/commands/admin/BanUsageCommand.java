@@ -41,7 +41,7 @@ public class BanUsageCommand extends SlashCommand {
 		);
 	}
 
-	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("usagebans");
+	public static final MongoCollection<Document> collection = MongoDB.getInstance().getDatabase().getCollection("usagebans");
 	private static final Pattern guildIdPattern = Pattern.compile("^\\d{17,18}$");
 
 	@Override

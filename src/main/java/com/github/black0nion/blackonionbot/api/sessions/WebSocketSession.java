@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.api;
+package com.github.black0nion.blackonionbot.api.sessions;
 
 import org.eclipse.jetty.websocket.api.*;
 import org.slf4j.Logger;
@@ -9,9 +9,9 @@ import java.net.InetSocketAddress;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 
-public class BlackWebsocketSession extends BlackSession implements org.eclipse.jetty.websocket.api.Session {
+public non-sealed class WebSocketSession extends GenericSession implements Session {
 
-	public BlackWebsocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {
+	public WebSocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {
 		super(sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol"));
 		this.session = sessionRaw;
 	}

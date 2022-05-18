@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.api.impl.get;
 
-import com.github.black0nion.blackonionbot.api.BlackSession;
 import com.github.black0nion.blackonionbot.api.routes.IGetRoute;
+import com.github.black0nion.blackonionbot.api.sessions.RestSession;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import io.javalin.Javalin;
@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 public class Paths implements IGetRoute {
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
+	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable RestSession session, DiscordUser user) throws Exception {
 		PathListener instance = PathListener.getInstance();
 		Map<HandlerType, List<String>> collected = instance.handlerMetaInfoList.stream().collect(
 			Collectors.groupingBy(HandlerMetaInfo::getHttpMethod, mapping(HandlerMetaInfo::getPath, toList()))

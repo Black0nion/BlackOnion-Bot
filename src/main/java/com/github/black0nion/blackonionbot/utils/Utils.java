@@ -41,6 +41,7 @@ import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -56,10 +57,6 @@ public class Utils {
 	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
-
-	public static String getStringWithNLength(final String text, final int length) {
-		return text.repeat(length);
-	}
 
 	public static float map(final float value, final float minInput, final float maxInput, final float minMapped, final float maxMapped) {
 		return (value - minInput) / (maxInput - minInput) * (maxMapped - minMapped) + minMapped;
@@ -436,5 +433,20 @@ public class Utils {
 			.map(InteractPage::new)
 			.map(Page.class::cast)
 			.toList();
+	}
+
+	public static <T> T replaceException(ThrowableSupplier<T> supplier, @Nullable Class<? extends Exception> toReplace, Class<? extends RuntimeException> replacement) {
+		try {
+			return supplier.get();
+		} catch (Throwable e) {
+			if (toReplace != null && e.getClass() == toReplace) {
+				try {
+					throw replacement.getDeclaredConstructor(String.class).newInstance(e.getMessage());
+				} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
 	}
 }

@@ -50,14 +50,14 @@ public class ActivityCommand extends SlashCommand {
 			if (type != null) {
 				Activity newActivity = getActivity(type, text);
 				e.getJDA().getPresence().setActivity(newActivity);
-				Config.activity_type = type;
-				Config.activity_name = text;
+				Config.getInstance().setActivityType(type);
+				Config.getInstance().setActivityName(text);
 				ConfigManager.saveConfig();
 				cmde.send("newactivity", new Placeholder("newactivity", newActivity.getName()));
 			} else cmde.send("invalidactivitytype");
 		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
-			Config.activity_type = null;
-			Config.activity_name = null;
+			Config.getInstance().setActivityType(null);
+			Config.getInstance().setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);
 			ConfigManager.saveConfig();
 			cmde.send("activitycleared");
@@ -75,7 +75,7 @@ public class ActivityCommand extends SlashCommand {
 
 	@Nullable
 	public static Activity getActivity() {
-		return getActivity(Config.activity_type, Config.activity_name);
+		return getActivity(Config.getInstance().getActivityType(), Config.getInstance().getActivityName());
 	}
 
 	@Nullable

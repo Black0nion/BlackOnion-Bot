@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.api.impl;
 
-import com.github.black0nion.blackonionbot.api.BlackSession;
-import com.github.black0nion.blackonionbot.api.BlackWebsocketSession;
+import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.WebSocketSession;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -44,10 +44,10 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private static final List<Session> sessions = new ArrayList<>();
 
-	private static final LoadingCache<Session, BlackWebsocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
+	private static final LoadingCache<Session, WebSocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
-		public @NotNull BlackWebsocketSession load(final @NotNull Session key) throws IllegalArgumentException, ExecutionException {
-		return new BlackWebsocketSession(key);
+		public @NotNull WebSocketSession load(final @NotNull Session key) throws IllegalArgumentException, ExecutionException {
+		return new WebSocketSession(key);
 		}
 	});
 
@@ -59,16 +59,12 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	public void onConnect(Session sessionRaw) {
 		try {
 			final String sessionId = sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
-			if (sessionId == null) {
+			if (sessionId == null || !sessionId.matches(GenericSession.generateSessionId())) {
 				sessionRaw.close(4401, "Unauthorized");
 				return;
 			}
-			final Document doc = BlackSession.collection.find(Filters.eq("sessionid", sessionId)).first();
-			if (doc == null) {
-				sessionRaw.close(4401, "Unauthorized");
-				return;
-			}
-			BlackWebsocketSession session;
+
+			WebSocketSession session;
 			try {
 				session = blackWebsocketSessions.get(sessionRaw);
 			} catch (Exception e) {
@@ -105,7 +101,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	@Override
 	public void onMessage(final Session sessionUnchecked, final String messageRaw) {
-		final BlackWebsocketSession session = blackWebsocketSessions.getUnchecked(sessionUnchecked);
+		final WebSocketSession session = blackWebsocketSessions.getUnchecked(sessionUnchecked);
 		logger.info("IP {}: received {}", session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), messageRaw.replace("\n", "\\n"));
 		if (messageRaw.charAt(0) == 'r') {
 			try {
@@ -210,7 +206,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		}
 	}
 
-	private BlackGuild getGuild(BlackWebsocketSession session, JSONObject request) throws IllegalArgumentException {
+	private BlackGuild getGuild(WebSocketSession session, JSONObject request) throws IllegalArgumentException {
 		final Object guildid = request.get("guildid");
 		BlackGuild guild;
 		if (guildid instanceof String) {
@@ -238,14 +234,14 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		}
 	}
 
-	private ScheduledFuture<?> scheduleTimeout(final BlackWebsocketSession session) {
+	private ScheduledFuture<?> scheduleTimeout(final WebSocketSession session) {
 		return Bot.getInstance().getScheduledExecutor().schedule(() -> {
 			logger.info("IP {} timed out.", session.getIp());
 			session.close(4408, "Timed out.");
 		}, 1, TimeUnit.MINUTES);
 	}
 
-	public static void reply(final BlackWebsocketSession session, final @Nullable JSONObject request, @Nullable Object response) {
+	public static void reply(final WebSocketSession session, final @Nullable JSONObject request, @Nullable Object response) {
 		if (response == null) {
 			response = new JSONObject();
 		} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {

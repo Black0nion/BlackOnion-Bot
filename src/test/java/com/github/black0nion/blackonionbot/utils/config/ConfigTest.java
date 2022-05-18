@@ -24,8 +24,14 @@ public class ConfigTest {
 		ConfigManager.set("test_number", "100");
 	}
 
-
 	@Order(2)
+	@Test
+	public void test_config_construction() {
+		new Config();
+		assertNotNull(Config.getInstance());
+	}
+
+
 	@Test
 	public void test_config_get_valid() {
 		assertEquals(DUMMY_TOKEN, Config.get("token", String.class));
@@ -36,7 +42,6 @@ public class ConfigTest {
 		assertDoesNotThrow(() -> Config.get("test_number", Integer.class, range(0, 100)));
 	}
 
-	@Order(3)
 	@Test
 	public void test_config_get_invalid() {
 		assertThrows(IllegalArgumentException.class, () -> Config.get("token", String.class, matchesRegex("^\\d$")));
@@ -45,16 +50,14 @@ public class ConfigTest {
 		assertThrows(IllegalArgumentException.class, () -> Config.get("not_existing", String.class, NonNull));
 	}
 
-	@Order(4)
 	@Test
 	public void test_config_loading() throws IOException {
 		ConfigManager.loadConfig();
 	}
 
-	@Order(5)
 	@Test
 	public void test_token_and_mongodb_existing() {
-		assertNotNull(Config.token);
-		assertNotNull(Config.mongo_connection_string);
+		assertNotNull(Config.getInstance().getToken());
+		assertNotNull(Config.getInstance().getMongoConnectionString());
 	}
 }

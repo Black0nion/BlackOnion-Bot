@@ -7,6 +7,7 @@ import io.mokulu.discord.oauth.model.TokensResponse;
 import io.mokulu.discord.oauth.model.User;
 import org.json.JSONObject;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,7 +26,9 @@ public class DiscordUser {
 	private String refreshToken;
 	private long expiresAt;
 	private DiscordAPI api;
-	private User user;
+	protected User user;
+
+	protected DiscordUser() {}
 
 	public DiscordUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
 		if (accessToken == null || api == null) {
@@ -46,6 +49,10 @@ public class DiscordUser {
 	}
 
 	public JSONObject getUserAsJson() {
+		return user == null ? null : userToJson(user);
+	}
+
+	public static JSONObject userToJson(@Nonnull User user) {
 		return new JSONObject()
 			.put("id", user.getId())
 			.put("username", user.getUsername())

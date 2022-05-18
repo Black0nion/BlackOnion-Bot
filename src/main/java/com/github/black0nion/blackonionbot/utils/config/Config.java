@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.google.gson.internal.Primitives;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,54 +15,166 @@ import java.util.regex.Pattern;
 
 import static com.github.black0nion.blackonionbot.utils.config.Flags.*;
 
+// the nullable things are already checked by the get value so the warnings can be ignored
 @SuppressWarnings("ConstantConditions")
 public class Config {
+	private static Config instance;
+	public Config() {
+		instance = this;
+	}
 
-	public static final String token = get("token", String.class, NonNull, matchesRegex("^[A-Za-z\\d]{24}.[\\w-]{6}.[\\w-]{26,40}$"));
-	public static final @Nonnull String prefix = get("prefix", String.class, defaultValue("*"), matchesRegex("\\w{1,10}"));
-	public static Activity.ActivityType activity_type = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.PLAYING));
-	public static String activity_name = get("activity_name", String.class, defaultValue(prefix));
-	public static OnlineStatus online_status = get("online_status", OnlineStatus.class, defaultValue(OnlineStatus.ONLINE));
+	@Contract(pure = true)
+	public static Config getInstance() {
+		return instance;
+	}
+
+	private final String token = get("token", String.class, NonNull, matchesRegex("[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}"));
+	private final @Nonnull String prefix = get("prefix", String.class, defaultValue("*"), matchesRegex("\\w{1,10}"));
+	private Activity.ActivityType activityType = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.PLAYING));
+	private String activityName = get("activity_name", String.class, defaultValue(prefix));
+	private OnlineStatus onlineStatus = get("online_status", OnlineStatus.class, defaultValue(OnlineStatus.ONLINE));
 	/**
 	 * Currently unused, will get added by the slash command branch
 	 */
 	@SuppressWarnings("unused")
-	public static final String activity_url = get("activity_url", String.class, matchesRegex(Activity.STREAMING_URL));
-	public static final String discordapp_client_secret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("^[a-z\\d=_\\-]{32}$", Pattern.CASE_INSENSITIVE)));
-	public static final String discordapp_client_id = get("discordapp_client_id", String.class, matchesRegex("\\d{17,19}"));
-	public static final String discordapp_redirect_url = get("discordapp_redirect_url", String.class, matchesRegex("https?://.+"));
-	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb(\\+srv)?:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
-	@Nullable
-	public static final String influx_database_url = get("influx_database_url", String.class);
-	@Nullable
-	public static final String influx_token = get("influx_token", String.class);
-	@Nullable
-	public static final String influx_org = get("influx_org", String.class);
-	public static final String openweatherapikey = get("openweathermap_api_key", String.class, matchesRegex("[a-z\\d]{32}"));
+	private String activityUrl = get("activity_url", String.class, matchesRegex(Activity.STREAMING_URL));
+	private final String discordappClientSecret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("^[a-z\\d=_\\-]{32}$", Pattern.CASE_INSENSITIVE)));
+	private final String discordappClientId = get("discordapp_client_id", String.class, matchesRegex("\\d{17,19}"));
+	private final String discordappRedirectUrl = get("discordapp_redirect_url", String.class, matchesRegex("https?://.+"));
+	private final String mongoConnectionString = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
+	private final String openWeatherMapApiKey = get("openweathermap_api_key", String.class, matchesRegex("[a-z\\d]{32}"));
 	@Nonnull
-	public static final RunMode run_mode = get("run_mode", RunMode.class, defaultValue(RunMode.DEV));
+	private final RunMode runMode = get("run_mode", RunMode.class, defaultValue(RunMode.DEV));
 	@Nullable
-	public static final String topgg_auth = get("topgg_auth", String.class);
+	private final String topggAuth = get("topgg_auth", String.class);
 
 	@Nullable
-	public static final String content_moderator_token = get("content_moderator_token", String.class);
+	private final String contentModeratorToken = get("content_moderator_token", String.class);
 	@Nullable
-	public static final String spotify_client_id = get("spotify_client_id", String.class, matchesRegex("[\\w\\d]{32}"));
+	private final String spotifyClientId = get("spotify_client_id", String.class, matchesRegex("[\\w\\d]{32}"));
 	@Nullable
-	public static final String spotify_client_secret = get("spotify_client_secret", String.class, matchesRegex("[\\w\\d]{32}"));
-	public static final int api_port = get("api_port", Integer.class, defaultValue(187), range(0, 65535));
-	public static final long vote_channel = get("vote_channel", Long.class, defaultValue(-1L));
-	public static final long dev_guild = get("dev_guild", Long.class, defaultValue(-1L));
-	public static final int prometheus_port = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
-	public static final BotMetadata metadata = ConfigManager.metadata;
+	private final String spotifyClientSecret = get("spotify_client_secret", String.class, matchesRegex("[\\w\\d]{32}"));
+	private final int apiPort = get("api_port", Integer.class, defaultValue(187), range(0, 65535));
+	private final long voteChannel = get("vote_channel", Long.class, defaultValue(-1L));
+	private final long devGuild = get("dev_guild", Long.class, defaultValue(-1L));
+	private final int prometheusPort = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
+	private static final BotMetadata metadata = ConfigManager.metadata;
+
+	//region Getters and Setters
+	public String getToken() {
+		return token;
+	}
+
+	@Nonnull
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public Activity.ActivityType getActivityType() {
+		return activityType;
+	}
+
+	public void setActivityType(Activity.ActivityType activityType) {
+		this.activityType = activityType;
+	}
+
+	public String getActivityName() {
+		return activityName;
+	}
+
+	public void setActivityName(String activityName) {
+		this.activityName = activityName;
+	}
+
+	public OnlineStatus getOnlineStatus() {
+		return onlineStatus;
+	}
+
+	public void setOnlineStatus(OnlineStatus onlineStatus) {
+		this.onlineStatus = onlineStatus;
+	}
+
+	public String getActivityUrl() {
+		return activityUrl;
+	}
+
+	public void setActivityUrl(String activityUrl) {
+		this.activityUrl = activityUrl;
+	}
+
+	public String getDiscordappClientSecret() {
+		return discordappClientSecret;
+	}
+
+	public String getDiscordappClientId() {
+		return discordappClientId;
+	}
+
+	public String getDiscordappRedirectUrl() {
+		return discordappRedirectUrl;
+	}
+
+	public String getMongoConnectionString() {
+		return mongoConnectionString;
+	}
+
+	public String getOpenWeatherMapApiKey() {
+		return openWeatherMapApiKey;
+	}
+
+	@Nonnull
+	public RunMode getRunMode() {
+		return runMode;
+	}
+
+	@Nullable
+	public String getTopggAuth() {
+		return topggAuth;
+	}
+
+	@Nullable
+	public String getContentModeratorToken() {
+		return contentModeratorToken;
+	}
+
+	@Nullable
+	public String getSpotifyClientId() {
+		return spotifyClientId;
+	}
+
+	@Nullable
+	public String getSpotifyClientSecret() {
+		return spotifyClientSecret;
+	}
+
+	public int getApiPort() {
+		return apiPort;
+	}
+
+	public long getVoteChannel() {
+		return voteChannel;
+	}
+
+	public long getDevGuild() {
+		return devGuild;
+	}
+
+	public int getPrometheusPort() {
+		return prometheusPort;
+	}
+
+	public BotMetadata getMetadata() {
+		return metadata;
+	}
+	//endregion
 
 	@SuppressWarnings("SameParameterValue")
-	private static <T> T get(String name, Class<T> clazz) {
+	public static <T> T get(String name, Class<T> clazz) {
 		return get(name, clazz, new IFlag[0]);
 	}
 
 	@SuppressWarnings("unchecked")
-	static <T> T get(String name, Class<T> clazz, IFlag... flagsArr) {
+	public static <T> T get(String name, Class<T> clazz, IFlag... flagsArr) {
 		name = name.toUpperCase(Locale.ROOT);
 		final String value = System.getenv().containsKey(name) ? System.getenv(name) : System.getProperty(name);
 		List<IFlag> flags = List.of(flagsArr);
@@ -93,12 +206,10 @@ public class Config {
 				if (!flag.regex().matcher(value).matches()) {
 					throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex());
 				}
-			} else if (f instanceof Flags.Range flag) {
-				if (result instanceof Number) {
-					if (((Number) result).doubleValue() < flag.min() || ((Number) result).doubleValue() > flag.max()) {
-						throw new IllegalArgumentException("Config value " + name + " is out of range " + flag.min() + " to " + flag.max());
-					}
-				}
+			} else if (f instanceof Flags.Range flag
+					&& result instanceof Number num
+					&& (num.doubleValue() < flag.min() || num.doubleValue() > flag.max())) {
+				throw new IllegalArgumentException("Config value " + name + " is out of range " + flag.min() + " to " + flag.max());
 			}
 		}
 		return result;

@@ -44,12 +44,12 @@ public class PlayerManager {
 	}
 
 	public static void init() {
-		if (Config.spotify_client_id == null || Config.spotify_client_secret == null) {
+		if (Config.getInstance().getSpotifyClientId() == null || Config.getInstance().getSpotifyClientSecret() == null) {
 			LoggerFactory.getLogger(PlayerManager.class).warn("Spotify client ID or secret is null, disabling Spotify integration");
 			return;
 		}
 
-		spotifyApi = new SpotifyApi.Builder().setClientId(Config.spotify_client_id).setClientSecret(Config.spotify_client_secret).build();
+		spotifyApi = new SpotifyApi.Builder().setClientId(Config.getInstance().getSpotifyClientId()).setClientSecret(Config.getInstance().getSpotifyClientSecret()).build();
 
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override

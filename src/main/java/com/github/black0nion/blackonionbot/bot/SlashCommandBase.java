@@ -163,14 +163,14 @@ public class SlashCommandBase extends ListenerAdapter {
 	}
 
 	public static void updateCommandsDev(JDA jda) {
-		if (Config.dev_guild != -1) {
-			Guild guild = Objects.requireNonNull(jda.getGuildById(Config.dev_guild));
-			guild.updateCommands()
-				.addCommands(
-					commandInstances.values().stream()
-						.map(SlashCommand::getData)
-						.toList()
-				).queue();
+		if (Config.getInstance().getDevGuild() != -1) {
+			Objects.requireNonNull(jda.getGuildById(Config.getInstance().getDevGuild()))
+				.updateCommands()
+				.addCommands(commands.values().stream()
+					.map(Pair::getValue)
+					.map(SlashCommand::getData)
+					.toList())
+				.queue();
 		}
 	}
 
@@ -202,7 +202,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
-		if (Config.run_mode == RunMode.DEV) {
+		if (Config.getInstance().getRunMode() == RunMode.DEV) {
 			if (locked) logger.warn(log);
 			else logger.info(log);
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);

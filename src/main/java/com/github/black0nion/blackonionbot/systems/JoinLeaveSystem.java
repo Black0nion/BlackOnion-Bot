@@ -109,7 +109,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 					e.printStackTrace();
 				}
 
-				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
+				if (Config.getInstance().getRunMode() == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
 					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());

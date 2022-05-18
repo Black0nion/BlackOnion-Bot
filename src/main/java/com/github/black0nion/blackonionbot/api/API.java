@@ -4,6 +4,8 @@ import com.beust.jcommander.internal.Lists;
 import com.github.black0nion.blackonionbot.api.impl.get.Paths;
 import com.github.black0nion.blackonionbot.api.routes.IHttpRoute;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
+import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.RestSession;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.stats.JettyCollector;
@@ -50,7 +52,7 @@ public class API {
 				server.setHandler(statisticsHandler);
 				return server;
 			});
-		}).start(Config.api_port > 0 ? Config.api_port : 187);
+		}).start(Config.getInstance().getApiPort() > 0 ? Config.getInstance().getApiPort() : 187);
 
 		final Reflections reflections = new Reflections(API.class.getPackage().getName());
 
@@ -153,16 +155,16 @@ public class API {
 				//endregion
 
 				//region Session
-				BlackSession session = null;
+				RestSession session = null;
 				if (req.requiresLogin()) {
 					final String sessionId = ctx.header("sessionid");
-					if (sessionId == null) throw new UnauthorizedResponse("No SessionID provided");
-					if (!sessionId.matches(BlackSession.SESSIONID_REGEX)) throw new UnauthorizedResponse("Invalid SessionID");
+					if (sessionId == null) throw new BadRequestResponse("No SessionID provided");
+					if (!sessionId.matches(GenericSession.SESSIONID_REGEX)) throw new BadRequestResponse("Invalid SessionID");
 					try {
-						session = new BlackSession(sessionId);
+						session = new RestSession(sessionId);
 					} catch (Exception e) {
 						if (e instanceof InputMismatchException) {
-							throw new UnauthorizedResponse("Invalid Session");
+							throw new UnauthorizedResponse("Unknown Session");
 						} else if (e instanceof NullPointerException) {
 							logger.error("Session ID is null, shouldn't happen because of the filter before!");
 						}

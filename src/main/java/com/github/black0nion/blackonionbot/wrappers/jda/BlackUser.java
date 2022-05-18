@@ -152,7 +152,7 @@ public class BlackUser extends UserImpl {
 		return new Document("userid", this.user.getIdLong());
 	}
 
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.DATABASE);
+	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.getInstance().getDatabase());
 
 	@Override
 	protected MongoCollection<Document> getCollection() {

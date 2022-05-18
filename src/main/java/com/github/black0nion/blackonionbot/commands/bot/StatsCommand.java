@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 
 import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
-import static com.github.black0nion.blackonionbot.utils.config.Config.metadata;
 
 public class StatsCommand extends SlashCommand {
 

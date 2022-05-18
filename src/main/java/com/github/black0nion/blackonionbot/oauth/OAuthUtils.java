@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.api.BlackSession;
+import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -23,9 +23,9 @@ public class OAuthUtils {
 	private static final String TOKEN_REVOKE_URL = BASE_URL + "/revoke";
 	private static final String[] SCOPES = { "identify", "guilds" };
 	private static final String GRANT_TYPE = "authorization_code";
-	private static final String REDIRECT_URI = Config.discordapp_redirect_url;
-	private static final String CLIENT_ID = Config.discordapp_client_id;
-	private static final String CLIENT_SECRET = Config.discordapp_client_secret;
+	private static final String REDIRECT_URI = Config.getInstance().getDiscordappRedirectUrl();
+	private static final String CLIENT_ID = Config.getInstance().getDiscordappClientId();
+	private static final String CLIENT_SECRET = Config.getInstance().getDiscordappClientSecret();
 
 	public static final DiscordOAuth OAUTH_HANDLER = new DiscordOAuth(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, SCOPES);
 
@@ -55,28 +55,30 @@ public class OAuthUtils {
 	}
 
 	/**
-	 * call once to generate token from code and save that shit, only on first login
+	 * call once to generate the tokens from the code and save it, only on first login
 	 * with discord, on reconnect on the same PC (session) use
-	 * {@link BlackSession#loginToSession(String)}!
+	 * {@link GenericSession#loginToSession(String)}!
 	 *
 	 * @param code the code discord gave you
 	 * @return The session ID used to authenticate with the bot, or null if the login failed
 	 */
 	@Nullable
 	public static String loginWithDiscord(final String code) throws IOException, InputMismatchException {
-		if (!TOKEN_PATTERN.matcher(code).matches()) throw new InputMismatchException("The code is not a valid token!");
+		if (code == null || !TOKEN_PATTERN.matcher(code).matches()) throw new InputMismatchException("Invalid code");
 
+		return impl.loginWithDiscord(code);
+	}
+
+	private static ILoginWithCode impl = code -> {
 		final TokensResponse response = OAUTH_HANDLER.getTokens(code);
 		if (response == null) return null;
-		else {
-			final String accessToken = response.getAccessToken();
-			final String refreshToken = response.getRefreshToken();
-			final int expiresIn = response.getExpiresIn();
-			final Document find = BlackSession.collection.find(Filters.and(Filters.eq("access_token", accessToken), Filters.eq("refresh_token", refreshToken), Filters.exists("sessionid"))).first();
-			if (find != null) return find.getString("sessionid");
-			final String newSessionId = BlackSession.generateSessionId();
-			BlackSession.collection.insertOne(new Document().append("sessionid", newSessionId).append("access_token", accessToken).append("refresh_token", refreshToken).append("expires_in", expiresIn));
-			return newSessionId;
-		}
+		else return GenericSession.getLogin().createSession(response.getAccessToken(), response.getRefreshToken(), response.getExpiresIn());
+	};
+	public static void setLoginWithCodeImplementation(ILoginWithCode impl) {
+		OAuthUtils.impl = impl;
+	}
+
+	public interface ILoginWithCode {
+		String loginWithDiscord(String code) throws IOException, InputMismatchException;
 	}
 }

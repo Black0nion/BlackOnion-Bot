@@ -15,10 +15,13 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Get the version
         id: get_version
         run: |
+          REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           VERSION=$(echo $GITHUB_REF | cut -d / -f 3)
+          echo ::set-output name=REPO::$REPO
           echo ::set-output name=VERSION::$VERSION
           if [[ $VERSION =~ ^v[0-9]+.[0-9]+.[0-9]+$ ]]; then
             TAG="latest"
@@ -29,24 +32,41 @@ jobs:
           fi
           echo ::set-output name=TAG::$TAG
           echo "Version: $VERSION | Tag: $TAG"
+
       - name: Build docker image
         env:
+          REPO: ${{ steps.get_version.outputs.REPO }}
           VERSION: ${{ steps.get_version.outputs.VERSION }}
           TAG: ${{ steps.get_version.outputs.TAG }}
         run: |
-          REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           docker build \
             -t ghcr.io/$REPO:$VERSION \
             -t ghcr.io/$REPO:$TAG .
+
+      - name: Extract test report
+        uses: shrink/actions-docker-extract@v1
+        env:
+          REPO: ${{ steps.get_version.outputs.REPO }}
+          TAG: ${{ steps.get_version.outputs.TAG }}
+        with:
+          image: ghcr.io/$REPO:$TAG
+          path: "/tmp/test-report/."
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          path: /tmp/test-report/
+          name: Test Report
+          retention-days: 7
 
       - name: Push docker image
         id: push-image
         if: steps.get_version.outputs.TAG != 'latest-dev'
         env:
+          REPO: ${{ steps.get_version.outputs.REPO }}
           VERSION: ${{ steps.get_version.outputs.VERSION }}
           TAG: ${{ steps.get_version.outputs.TAG }}
         run: |
-          REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           docker push ghcr.io/$REPO:$VERSION
           docker push ghcr.io/$REPO:$TAG
 

@@ -58,8 +58,8 @@ public class WeatherCommand extends SlashCommand {
 		}
 	}
 
-	public static @NotNull JSONObject getWeather(final String query) throws IOException {
-		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=metric&appid=" + Config.openweatherapikey);
+	public static JSONObject getWeather(final String query) throws IOException {
+		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=metric&appid=" + Config.getInstance().getOpenWeatherMapApiKey());
 		final HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

@@ -5,6 +5,20 @@ import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.mongodb.client.MongoDatabase;
 
 public class MongoDB {
-	public static final MongoDatabase DATABASE = MongoManager.getDatabase("BlackOnion-Bot" + (Config.run_mode != RunMode.RELEASE ? "_" + Config.run_mode.name() : ""));
-	public static final MongoDatabase generalDatabase = MongoManager.getDatabase("General");
+
+	private static MongoDB instance;
+
+	public static MongoDB getInstance() {
+		return instance;
+	}
+
+	public MongoDB() {
+		instance = this;
+	}
+
+	private final MongoDatabase database = MongoManager.getDatabase("BlackOnion-Bot" + (Config.getInstance().getRunMode() != RunMode.RELEASE ? "_" + Config.getInstance().getRunMode().name() : ""));
+
+	public MongoDatabase getDatabase() {
+		return database;
+	}
 }

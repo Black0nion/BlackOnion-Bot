@@ -4,7 +4,9 @@ COPY --chown=gradle:gradle . /bot
 
 WORKDIR /bot
 
-RUN gradle build downloadDependencies --no-daemon
+RUN gradle build test downloadDependencies --no-daemon
+
+COPY build/reports/tests/test /tmp/test-report
 
 FROM eclipse-temurin:17-jre-alpine AS run
 

@@ -22,6 +22,8 @@ import static com.github.black0nion.blackonionbot.misc.Warn.loadWarns;
 
 public class BlackMember extends MemberImpl {
 
+	private static final MongoCollection<Document> warnsCollection = MongoDB.getInstance().getDatabase().getCollection("warns");
+
 	private static final LoadingCache<Member, BlackMember> members = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Nonnull
 		@Override
@@ -110,7 +112,7 @@ public class BlackMember extends MemberImpl {
 		return new Document().append("guildid", this.blackGuild.getIdLong()).append("userid", this.member.getIdLong());
 	}
 
-	private static final MongoCollection<Document> configs = MongoDB.DATABASE.getCollection("membersettings");
+	private static final MongoCollection<Document> configs = MongoDB.getInstance().getDatabase().getCollection("membersettings");
 
 	@Override
 	protected MongoCollection<Document> getCollection() {

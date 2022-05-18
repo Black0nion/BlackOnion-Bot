@@ -16,7 +16,7 @@ public class Prometheus {
 	public static void init() {
 		try {
 			new HTTPServer.Builder()
-				.withPort(Config.prometheus_port)
+				.withPort(Config.getInstance().getPrometheusPort())
 				.build();
 		} catch (IOException ex) {
 			LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);

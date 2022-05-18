@@ -97,7 +97,7 @@ public class BlackGuild extends GuildImpl {
 			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
 			final Language langNonNull = language != null ? language : LanguageSystem.getDefaultLanguage();
 			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-			this.prefix = Utils.gOD(config.getString("prefix"), Config.prefix);
+			this.prefix = Utils.gOD(config.getString("prefix"), Config.getInstance().getPrefix());
 			this.antiSpoilerType = Utils.gOD(AntiSpoilerSystem.AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerSystem.AntiSpoilerType.OFF);
 			this.joinMessage = Utils.gOD(config.getString("joinmessage"), langNonNull.getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
@@ -424,7 +424,7 @@ public class BlackGuild extends GuildImpl {
 		return new Document("guildid", this.guild.getIdLong());
 	}
 
-	public static final MongoCollection<Document> configs = MongoDB.DATABASE.getCollection("guildsettings");
+	public static final MongoCollection<Document> configs = MongoDB.getInstance().getDatabase().getCollection("guildsettings");
 
 	@Override
 	protected MongoCollection<Document> getCollection() {
