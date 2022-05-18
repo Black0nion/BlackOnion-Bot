@@ -74,8 +74,12 @@ jobs:
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            build/reports/tests/test/
-            build/reports/jacoco/test/html/
-          name: Test & Coverage Report
-          retention-days: 7
+          path: build/reports/tests/test/
+          name: Test Report
+          retention-days: 14
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/reports/jacoco/test/
+          name: Coverage Report
+          retention-days: 14
