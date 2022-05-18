@@ -44,8 +44,6 @@ jobs:
             -t ghcr.io/$REPO:$VERSION \
             -t ghcr.io/$REPO:$TAG .
 
-          docker tag $(docker images --filter 'label=build=true' -q | head -n 1) bob-build
-
       - name: Push docker image
         id: push-image
         if: steps.get_version.outputs.TAG != 'latest-dev'
@@ -56,22 +54,6 @@ jobs:
         run: |
           docker push ghcr.io/$REPO:$VERSION
           docker push ghcr.io/$REPO:$TAG
-
-      - name: notify-server
-        if: steps.push-image.outcome == 'success'
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-          API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
-        run: |
-          answer=$(curl --location --request POST 'https://www.black-onion.com'"${API_ENDPOINT}"'' --header 't0k3n: '"${API_KEY}"'' -A "BlackOnion Action Client (yes actually a real one)" )
-          if [[ $answer == *"200-success |"* ]];
-          then
-            echo Successfully connected and started the script!
-            exit 0
-          else
-            echo Could not connect!
-            exit 1
-          fi
 
   coverage:
     runs-on: ubuntu-latest
@@ -92,6 +74,8 @@ jobs:
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
-          path: build/reports/tests/test/
-          name: Test Report
+          path: |
+            build/reports/tests/test/
+            build/reports/jacoco/test/html/
+          name: Test & Coverage Report
           retention-days: 7
