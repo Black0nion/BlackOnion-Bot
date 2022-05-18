@@ -32,6 +32,8 @@ repositories {
     mavenCentral()
 }
 
+apply plugin: "jacoco"
+
 compileJava.options.encoding = "UTF-8"
 
 sourceCompatibility = 17
@@ -85,6 +87,13 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
 }
 
 configurations.all {

@@ -38,6 +38,8 @@ gradle-app.setting
 
 **/build/
 
+!gradle-wrapper.jar
+
 ### IntelliJ IDEA ###
 # compiler output of IntelliJ
 /out
