@@ -44,7 +44,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 					.addOption(OptionType.NUMBER, CREATE_REACTION_EMOTE,
 						"The emoji id to create the reaction role with.")
 					.addOption(OptionType.ROLE, CREATE_REACTION_ROLE,
-						"The role to give to the user when they react."),
+						"The role to give to the userid when they react."),
 				new SubcommandData(REMOVE_REACTION, "Used to remove a reaction role.")
 					.addOption(OptionType.CHANNEL, REMOVE_REACTION_CHANNEL,
 						"The channel to remove the reaction role from.")
@@ -53,7 +53,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 					.addOption(OptionType.NUMBER, REMOVE_REACTION_EMOTE,
 						"The emoji id to remove the reaction role with.")
 					.addOption(OptionType.ROLE, REMOVE_REACTION_ROLE,
-						"The role to remove from the user when they react.")))
+						"The role to remove from the userid when they react.")))
 			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MANAGE_ROLES,
 				Permission.MESSAGE_ADD_REACTION));

@@ -3,15 +3,30 @@ package com.github.black0nion.blackonionbot.utils;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.await.AwaitDone;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.ygimenez.model.InteractPage;
+import com.github.ygimenez.model.Page;
+import com.google.common.collect.Lists;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -185,13 +200,18 @@ public class Utils {
 	}
 
 	/**
+	 * Pass null as the channel argument to check self permissions.
+	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, final Permission... permissions) {
+	public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
-			channel.sendMessageEmbeds(Utils.noRights(guild, author, permissions)).queue();
+			(callback != null
+				? callback.replyEmbeds(noRights(guild, author, permissions))
+				: channel.sendMessageEmbeds(noRights(guild, author, permissions))
+			).queue();
 			return true;
 		}
 		return false;
@@ -328,6 +348,7 @@ public class Utils {
 				sb.append("s");
 			}
 			sb.append(" ");
+			duration = duration.minusDays(duration.toDays());
 		}
 		if (duration.toHours() > 0) {
 			sb.append(duration.toHours()).append(" hour");
@@ -335,6 +356,7 @@ public class Utils {
 				sb.append("s");
 			}
 			sb.append(" ");
+			duration = duration.minusHours(duration.toHours());
 		}
 		if (duration.toMinutes() > 0) {
 			sb.append(duration.toMinutes()).append(" minute");
@@ -343,5 +365,78 @@ public class Utils {
 			}
 		}
 		return sb.toString();
+	}
+
+	private static final int MAX_TIMEOUT_DURATION_MIN = 28 * 24 * 60; // 28 days
+	private static final int MAX_TIMEOUT_DURATION_HOUR = 672; // 28 days
+	private static final int MAX_TIMEOUT_DURATION_DAY = 28; // 28 days
+	private static final int MAX_TIMEOUT_DURATION_WEEK = 4; // 28 days
+
+	// Units
+	private static final String MINUTES = "minutes";
+	private static final String HOURS = "hours";
+	private static final String DAYS = "days";
+	private static final String WEEKS = "weeks";
+	public static OptionData[] getDurationOptions(String message) {
+		String description = "The time of the " + message + " in ";
+		return new OptionData[] {
+			new OptionData(OptionType.INTEGER, MINUTES, description + MINUTES, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_MIN),
+			new OptionData(OptionType.INTEGER, HOURS, description + HOURS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_HOUR),
+			new OptionData(OptionType.INTEGER, DAYS, description + DAYS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY),
+			new OptionData(OptionType.INTEGER, WEEKS, description + WEEKS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)
+		};
+	}
+
+	public static Duration parseDuration(SlashCommandInteractionEvent e) throws TooLongException {
+		var min = e.getOption(MINUTES, OptionMapping::getAsLong);
+		var hour = e.getOption(HOURS, OptionMapping::getAsLong);
+		var day = e.getOption(DAYS, OptionMapping::getAsLong);
+		var week = e.getOption(WEEKS, OptionMapping::getAsLong);
+
+		Duration dur = Duration.ofMinutes(
+			(min != null ? min : 0) +
+			(hour != null ? hour * 60 : 0) +
+			(day != null ? day * 60 * 24 : 0) +
+			(week != null ? week * 60 * 24 * 7 : 0)
+		);
+		if (dur.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
+			throw TooLongException.INSTANCE;
+		}
+		if (dur.toMinutes() <= 0) {
+			throw new IllegalArgumentException("Duration must be greater than 0");
+		}
+		return dur;
+	}
+
+	public static class TooLongException extends Exception {
+		static final TooLongException INSTANCE = new TooLongException();
+
+		public TooLongException() {
+			super();
+		}
+	}
+
+	public static ErrorHandler getCantSendHandler(AwaitDone<InteractionHook> await, String message, SlashCommandEvent event) {
+		return getCantSendHandler(await, message, event.getLanguage());
+	}
+
+	public static ErrorHandler getCantSendHandler(AwaitDone<InteractionHook> await, String message, Language lang) {
+		return new ErrorHandler()
+			.handle(ErrorResponse.CANNOT_SEND_TO_USER, err ->
+				await.setOnDone(hook -> hook.editOriginal(message + "\n" + lang.getTranslation("usernotnotified")).queue()));
+	}
+
+	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields) {
+		return getPages(baseEmbed, fields, 10);
+	}
+
+	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields, int perPage) {
+		return Lists.partition(fields, perPage).stream()
+			// DON'T switch to method references or only one copy will get created!
+			.map(t -> new TranslatedEmbed(baseEmbed).addFields(t))
+			.map(EmbedBuilder::build)
+			.map(InteractPage::new)
+			.map(Page.class::cast)
+			.toList();
 	}
 }

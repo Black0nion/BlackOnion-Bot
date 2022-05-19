@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
@@ -17,9 +14,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author _SIM_
- */
 public class PauseCommand extends SlashCommand {
 
     public PauseCommand() {

@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.github.black0nion.blackonionbot.commands.music;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;

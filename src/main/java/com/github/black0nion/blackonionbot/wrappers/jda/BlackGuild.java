@@ -3,10 +3,7 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.misc.ConfigGetter;
-import com.github.black0nion.blackonionbot.misc.ConfigSetter;
-import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.misc.*;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
@@ -14,7 +11,6 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
@@ -84,6 +80,7 @@ public class BlackGuild extends GuildImpl {
 	private List<Long> autoRoles;
 	private boolean loop;
 	private HashMap<String, CustomCommand> customCommands;
+	private final List<Warn> warns = new ArrayList<>();
 
 	private BlackGuild(@NotNull final Guild guild) {
 		super(guild);
@@ -115,9 +112,35 @@ public class BlackGuild extends GuildImpl {
 			final List<String> disabledCommandsString = config.getList("disabledcommands", String.class);
 			if (disabledCommandsString != null)
 				setDisabledCommands(disabledCommandsString.toArray(String[]::new));
+
+			Warn.loadWarns(this.warns, this.getIdentifier());
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void addWarn(Warn w) {
+		this.warns.add(w);
+		// don't save the list here, already done by the BlackMember class
+	}
+
+	public void removeWarn(Warn w) {
+		this.warns.remove(w);
+	}
+
+	void deleteUserWarns(long userId) {
+		this.warns.removeIf(w -> w.userid() == userId);
+	}
+
+	public Warn getWarn(long id) {
+		return this.warns.stream().filter(w -> w.id() == id).findFirst().orElse(null);
+	}
+
+	/**
+	 * @return an unmodifiable list of all warns
+	 */
+	public List<Warn> getWarns() {
+		return Collections.unmodifiableList(this.warns);
 	}
 
 	@Nullable
@@ -375,7 +398,7 @@ public class BlackGuild extends GuildImpl {
 	/**
 	 * @return the customCommands
 	 */
-	public HashMap<String, CustomCommand> getCustomCommands() {
+	public Map<String, CustomCommand> getCustomCommands() {
 		return this.customCommands;
 	}
 

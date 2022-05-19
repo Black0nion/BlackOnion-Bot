@@ -43,7 +43,6 @@ public class ClearCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
-		System.out.println("LOL: " + e.getChannel().getLatestMessageId());
 		switch (e.getSubcommandName()) {
 			case "count" -> deleteCount(cmde, e, channel);
 			case "until" -> deleteUntil(cmde, e, channel);

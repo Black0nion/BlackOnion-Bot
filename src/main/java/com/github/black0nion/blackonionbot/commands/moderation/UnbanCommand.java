@@ -2,15 +2,18 @@ package com.github.black0nion.blackonionbot.commands.moderation;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -20,9 +23,9 @@ public class UnbanCommand extends SlashCommand {
 	private static final String REASON = "reason";
 
 	public UnbanCommand() {
-		super(builder(Commands.slash("unban", "Used to unban a user")
+		super(builder(Commands.slash("unban", "Used to unban an user")
 			.addOption(OptionType.USER, USER, "The user to unban", true)
-			.addOption(OptionType.STRING, REASON, "The reason for the unban", true))
+			.addOption(OptionType.STRING, REASON, "The reason for the unban", false))
 			.setRequiredPermissions(Permission.BAN_MEMBERS)
 			.setRequiredBotPermissions(Permission.BAN_MEMBERS));
 	}
@@ -32,15 +35,19 @@ public class UnbanCommand extends SlashCommand {
 		var user = e.getOption(USER, OptionMapping::getAsUser);
 		var reason = e.getOption(REASON, OptionMapping::getAsString);
 
-		if (reason.length() > 512) {
+		if (reason != null && reason.length() > 512) {
 			cmde.send("reasonoption");
 			return;
 		}
 
-		guild.retrieveBan(Objects.requireNonNull(user))
-			.queue(success -> guild.unban(user).reason(reason).queue(
-					v -> e.reply("I have unbanned the user " + user.getAsMention() + " for " + reason).queue(),
-					fail -> e.reply("I could not unban the user" + " " + user.getAsMention()).queue()),
-				fail -> e.reply("I could not find the user " + user.getAsMention() + " to unban").queue());
+		guild.retrieveBan(Objects.requireNonNull(user)).queue(
+			success -> guild.unban(user).reason("[" + author.getId() + "]" + (reason != null ? " " + reason : "")).queue(
+				v -> cmde.send(reason != null ? "userunbanned" : "userunbannednoreason", new Placeholder("user", user.getAsMention()), new Placeholder("reason", reason)),
+				cmde::exception),
+			fail ->
+				new ErrorHandler()
+					.handle(ErrorResponse.UNKNOWN_BAN, err -> cmde.send("bannotfound"))
+					.handle(Throwable.class, cmde::exception).accept(fail)
+		);
 	}
 }

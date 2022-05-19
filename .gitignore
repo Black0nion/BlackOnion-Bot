@@ -49,3 +49,4 @@ gradle-app.setting
 /files/
 # plugins for the bot
 /plugins
+/libraries

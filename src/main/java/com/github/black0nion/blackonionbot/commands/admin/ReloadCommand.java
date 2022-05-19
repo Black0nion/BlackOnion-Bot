@@ -104,7 +104,8 @@ public class ReloadCommand extends SlashCommand {
 				if (method == null) throw new NullPointerException("Invalid method.");
 				try {
 					method.invoke(method.getClass());
-					cmde.send("configreload", new Placeholder("config", option));
+					// DON'T use cmde.send() here because that'll invoke "reply" which will error because of the deferred reply (for some reason)
+					e.getHook().sendMessage(cmde.getTranslation("configreloaded", new Placeholder("config", option))).queue();
 				} catch (IllegalAccessException | InvocationTargetException ex) {
 					cmde.exception(ex);
 				}

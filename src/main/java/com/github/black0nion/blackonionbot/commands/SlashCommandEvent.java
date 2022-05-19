@@ -17,8 +17,10 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -59,7 +61,7 @@ public class SlashCommandEvent {
 	}
 
 	/**
-	 * @return the language, user -> guild -> default
+	 * @return the language, userid -> guildid -> default
 	 */
 	public Language getLanguage() {
 		return this.language;
@@ -143,7 +145,7 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null && !(t instanceof DummyException)) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
+		if (t != null && !(t instanceof DummyException)) this.logError(t);
 		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof DummyException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
 	}
 
@@ -176,6 +178,10 @@ public class SlashCommandEvent {
 	}
 	//endregion
 
+	public void send(final Object obj) {
+		this.send(obj != null ? obj.toString() : null);
+	}
+
 	public void send(final String message) {
 		this.send(message, new Placeholder[0]);
 	}
@@ -193,7 +199,7 @@ public class SlashCommandEvent {
 	}
 
 	public void send(final Message message, final Consumer<InteractionHook> result) {
-		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, System.err::println);
+		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, this::logError);
 	}
 
 	private String getPleaseUse() {
@@ -250,7 +256,7 @@ public class SlashCommandEvent {
 		return this.member;
 	}
 
-	@Nullable
+	@Nonnull
 	public SlashCommandInteractionEvent getEvent() {
 		return this.event;
 	}
@@ -263,4 +269,8 @@ public class SlashCommandEvent {
 		this.command = cmd;
 	}
 	//endregion
+
+	private void logError(final Throwable e) {
+		LoggerFactory.getLogger(this.command != null ? this.command.getClass() : this.getClass()).error("Exception in command", e);
+	}
 }

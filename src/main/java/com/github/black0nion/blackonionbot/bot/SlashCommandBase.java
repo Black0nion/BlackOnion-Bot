@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
@@ -151,6 +152,11 @@ public class SlashCommandBase extends ListenerAdapter {
 		return commands.get(name).getValue();
 	}
 
+	@Reloadable("dev commands")
+	public static void updateCommandsDev() {
+		updateCommandsDev(Bot.getInstance().getJda());
+	}
+
 	public static void updateCommandsDev(JDA jda) {
 		if (Config.dev_guild != -1) {
 			Guild guild = Objects.requireNonNull(jda.getGuildById(Config.dev_guild));
@@ -177,7 +183,8 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommandInteraction(final SlashCommandInteractionEvent event) {
-		if (event.getUser().isBot()) return;
+		if (event.getUser().isBot() || (event.getGuild() != null && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY)))
+			return;
 
 		final BlackUser author = BlackUser.from(event.getUser());
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
@@ -202,12 +209,10 @@ public class SlashCommandBase extends ListenerAdapter {
 			return;
 		}
 
-		final SlashCommandEvent cmde = new SlashCommandEvent(event, guild, member, author);
-
-		if (Utils.handleRights(guild, author, channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
+		if (Utils.handleRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
 			final SlashCommand cmd = commands.get(event.getName()).getValue();
-			cmde.setCommand(cmd);
+			final SlashCommandEvent cmde = new SlashCommandEvent(cmd, event, guild, member, author);
 			final boolean disabled = !guild.isCommandActivated(cmd);
 			if (disabled) {
 				cmde.send("commanddisabled", new Placeholder("cmd", "/" + cmd.getName()));
@@ -224,13 +229,13 @@ public class SlashCommandBase extends ListenerAdapter {
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
-			if (Utils.handleRights(guild, author, channel, requiredBotPermissions)) return;
+			if (Utils.handleRights(guild, author, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
 				if (cmd.isHidden(author)) return;
 				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
 				return;
-			} else if (Utils.handleRights(guild, author, channel, requiredBotPermissions))
+			} else if (Utils.handleRights(guild, author, channel, event, requiredBotPermissions))
 				return;
 			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();

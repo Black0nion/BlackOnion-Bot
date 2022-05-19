@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.temporal.TemporalAccessor;
+import java.util.List;
 
 public class TranslatedEmbed extends EmbedBuilder {
 
@@ -82,6 +83,12 @@ public class TranslatedEmbed extends EmbedBuilder {
 		if (translatedName != null) name = translatedName;
 		if (translatedValue != null) value = translatedValue;
 		super.addField(name, value, inline);
+		return this;
+	}
+
+	@Nonnull
+	public TranslatedEmbed addFields(final @Nonnull List<Field> fields) {
+		this.getFields().addAll(fields);
 		return this;
 	}
 

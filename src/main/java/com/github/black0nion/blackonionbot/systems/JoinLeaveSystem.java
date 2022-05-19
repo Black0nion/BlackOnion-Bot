@@ -66,7 +66,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			channel.sendMessage(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName())).addFile(file, "welcome.png").queue();
+			channel.sendMessage(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFile(file, "welcome.png").queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -82,14 +82,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
-			channel.sendMessage(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName())).addFile(file, "goodbye.png").queue();
+			channel.sendMessage(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFile(file, "goodbye.png").queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Called when the bot gets added to a new guild
+	 * Called when the bot gets added to a new guildid
 	 */
 	@Override
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
@@ -100,7 +100,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			guild.retrieveOwner().queue(user -> {
 				final BlackUser author = BlackUser.from(user.getUser());
 
-				logger.info("I got added to the guild {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
+				logger.info("I got added to the guildid {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
 
 				try {
 					final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
@@ -112,7 +112,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
-					logger.error("{} (G: {}) added me but is not a beta guild!", guild.getName(), guild.getId());
+					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());
 					return;
 				}
 
@@ -126,11 +126,11 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildLeave(final GuildLeaveEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
 			final Guild guild = event.getGuild();
-			logger.info("I got removed from the guild {} (G: {})", guild.getName(), guild.getId());
+			logger.info("I got removed from the guildid {} (G: {})", guild.getName(), guild.getId());
 
 			try {
 				final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
-				guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", Utils.escapeMarkdown(guild.getName()) + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

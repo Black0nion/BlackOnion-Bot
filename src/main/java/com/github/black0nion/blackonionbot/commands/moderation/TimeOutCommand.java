@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.utils.await.AwaitDone;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -11,50 +12,39 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+
+import static com.github.black0nion.blackonionbot.utils.Utils.parseDuration;
 
 /**
  * This command was taken from <a href="https://github.com/YusufsDiscordbot">Yusuf's Discord Bot</a>
  */
 public class TimeOutCommand extends SlashCommand {
-	private static final String USER_OPTION = "user";
+	private static final String USER_OPTION = "userid";
 	private static final String REASON_OPTION = "reason";
-	private static final String TIME_OUT_NAME = "time_out";
+	private static final String TIME_OUT_NAME = "timeout";
 
-	// Units
-	private static final String MINUTES = "minutes";
-	private static final String HOURS = "hours";
-	private static final String DAYS = "days";
-	private static final String WEEKS = "weeks";
 	// max time
 	private static final int MAX_TIMEOUT_DURATION_MIN = 40320; // 28 days
-	private static final int MAX_TIMEOUT_DURATION_HOUR = 672; // 28 days
-	private static final int MAX_TIMEOUT_DURATION_DAY = 28; // 28 days
-	private static final int MAX_TIMEOUT_DURATION_WEEK = 4; // 28 days
 
 	public TimeOutCommand() {
-		super(builder(Commands.slash(TIME_OUT_NAME, "Used to timeout a user")
+		super(builder(Commands.slash(TIME_OUT_NAME, "Used to timeout a userid")
 			.addSubcommands(
-				new SubcommandData("add", "Used to add a timeout to a user")
+				new SubcommandData("add", "Used to add a timeout to a userid")
 					.addOption(OptionType.USER, USER_OPTION, "The user who you want to time out", true)
-					.addOption(OptionType.STRING, REASON_OPTION, "Why the user should be timed out", true)
-					.addOptions(
-						new OptionData(OptionType.INTEGER, MINUTES, "The length of the time out in minutes", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_MIN))
-					.addOptions(
-						new OptionData(OptionType.INTEGER, HOURS, "The length of the time out in hours", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_HOUR))
-					.addOptions(
-						new OptionData(OptionType.INTEGER, DAYS, "The length of the time out in days", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY))
-					.addOptions(
-						new OptionData(OptionType.INTEGER, WEEKS, "The length of the time out in weeks", false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)),
-				new SubcommandData("remove", "Used to remove a timeout from a user")
-					.addOption(OptionType.USER, USER_OPTION, "The user who you want to remove the timeout from", true))
+					.addOption(OptionType.STRING, REASON_OPTION, "Why the user should be timed out", false)
+					.addOptions(Utils.getDurationOptions("time out")),
+				new SubcommandData("remove", "Used to remove a timeout from an user")
+					.addOption(OptionType.USER, USER_OPTION, "The user you want to remove the timeout from", true)
+					.addOption(OptionType.STRING, REASON_OPTION, "Why the timeout should be removed from the user", false))
 			)
 			.setRequiredPermissions(Permission.MODERATE_MEMBERS));
 	}
@@ -74,75 +64,52 @@ public class TimeOutCommand extends SlashCommand {
 			cmde.send("notamember");
 			return;
 		}
+		@Nullable
 		var reason = e.getOption(REASON_OPTION, OptionMapping::getAsString);
-		var min = e.getOption(MINUTES, OptionMapping::getAsLong);
-		var hour = e.getOption(HOURS, OptionMapping::getAsLong);
-		var day = e.getOption(DAYS, OptionMapping::getAsLong);
-		var week = e.getOption(WEEKS, OptionMapping::getAsLong);
 
 		if (timeOutMember.isTimedOut()) {
 			cmde.send("istimedout");
 			return;
 		}
 
-		final var error = cmde.getTranslation("toolongduration", new Placeholder("duration", MAX_TIMEOUT_DURATION_MIN));
-
-		if (min != null && hour != null && day != null && week != null) {
-			var hourToMin = hour * 60;
-			var dayToMin = day * 24 * 60;
-			var weekToMin = week * 7 * 24 * 60;
-			var totalDuration = Duration.ofMinutes(hourToMin + dayToMin + weekToMin + min);
-			if (totalDuration.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-				cmde.send(error);
-			} else {
-				doTimeout(timeOutMember, totalDuration, reason, cmde);
-			}
-		} else if (min != null && hour != null && day != null && week == null) {
-			var hourToMin = hour * 60;
-			var dayToMin = day * 24 * 60;
-			var totalDuration = Duration.ofMinutes(hourToMin + dayToMin + min);
-			if (totalDuration.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-				cmde.send(error);
-			} else {
-				doTimeout(timeOutMember, totalDuration, reason, cmde);
-			}
-		} else if (min != null && hour != null && day == null && week == null) {
-			var hourToMin = hour * 60;
-			var totalDuration = Duration.ofMinutes(hourToMin + min);
-			if (totalDuration.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-				cmde.send(error);
-			} else {
-				doTimeout(timeOutMember, totalDuration, reason, cmde);
-			}
-		} else if (min != null && hour == null && day == null && week == null) {
-			var totalDuration = Duration.ofMinutes(min);
-			if (totalDuration.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-				cmde.send(error);
-			} else {
-				doTimeout(timeOutMember, totalDuration, reason, cmde);
-			}
-		} else if (min == null && hour != null && day == null && week == null) {
-			var totalDuration = Duration.ofMinutes(1440);
-			doTimeout(timeOutMember, totalDuration, reason, cmde);
+		try {
+			Duration duration = parseDuration(e);
+			doTimeout(cmde, timeOutMember, duration, reason);
+		} catch (Utils.TooLongException ignored) {
+			cmde.send("toolongduration", new Placeholder("duration", MAX_TIMEOUT_DURATION_MIN));
 		}
 	}
 
-	private static void doTimeout(Member timeOutMember, Duration totalDuration, String reason, SlashCommandEvent cmde) {
-		timeOutMember.timeoutFor(totalDuration).reason(reason).queue();
-		cmde.send("timedout",
-			new Placeholder("member", timeOutMember.getUser().getAsMention()),
-			new Placeholder("duration", Utils.formatDuration(totalDuration)),
-			new Placeholder(REASON_OPTION, reason));
+	private static void doTimeout(SlashCommandEvent cmde, Member timeOutMember, Duration totalDuration, String reason) {
+		timeOutMember.timeoutFor(totalDuration).reason("[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : "")).queue(ignored -> {
+			final AwaitDone<InteractionHook> await = new AwaitDone<>();
+			final String message = cmde.getTranslation(reason != null ? "timedout" : "timedoutnoreason",
+				new Placeholder("member", timeOutMember.getUser().getAsMention()),
+				new Placeholder("duration", Utils.formatDuration(totalDuration)),
+				new Placeholder("reason", reason));
+
+			cmde.send(message, await::done);
+			timeOutMember.getUser().openPrivateChannel()
+				.flatMap(channel -> channel.sendMessage(cmde.getTranslation("timedoutu", new Placeholder("guild", cmde.getGuild().getEscapedName()), new Placeholder("reason", reason))))
+				.queue(null, Utils.getCantSendHandler(await, message, cmde));
+		}, cmde::exception);
 	}
 
 	private static void removeTimeout(SlashCommandEvent cmde, SlashCommandInteractionEvent e) {
 		var timeOutMember = e.getOption(USER_OPTION, OptionMapping::getAsMember);
+		@Nullable String reason = e.getOption(REASON_OPTION, OptionMapping::getAsString);
+
+		if (timeOutMember == null) {
+			cmde.send("notamember");
+			return;
+		}
+
 		if(!timeOutMember.isTimedOut()) {
 			cmde.send("isnottimedout");
 			return;
 		}
 
-		timeOutMember.removeTimeout().queue();
+		timeOutMember.removeTimeout().reason("[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : "")).queue();
 		cmde.send("timedoutremoved");
 	}
 }

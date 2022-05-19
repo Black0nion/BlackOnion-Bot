@@ -40,8 +40,8 @@ public class SkipCommand extends SlashCommand {
                 musicManager.scheduler.nextTrack();
                 final AudioTrackInfo newTrack = musicManager.scheduler.player.getPlayingTrack().getInfo();
                 cmde.success("songskipped", "songgotskipped",
-                        new Placeholder("oldsong", Utils.escapeMarkdown(previousTrack.author + " - " + previousTrack.title)),
-                        new Placeholder("newsong", Utils.escapeMarkdown(newTrack.author + " - " + newTrack.title)));
+                        new Placeholder("oldsong", previousTrack.author + " - " + previousTrack.title),
+                        new Placeholder("newsong", newTrack.author + " - " + newTrack.title));
             } else {
                 musicManager.audioPlayer.stopTrack();
                 guild.getAudioManager().closeAudioConnection();

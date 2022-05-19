@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
- * Logs out a user from a session (deletes their session id from the database
+ * Logs out an user from a session (deletes their session id from the database
  * and revoke token)
  */
 public class Logout implements IPostRoute {
