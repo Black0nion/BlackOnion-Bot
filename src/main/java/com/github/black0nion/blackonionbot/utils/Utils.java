@@ -57,8 +57,6 @@ public class Utils {
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
-	public static final Permission[] EMPTY_PERMISSIONS = new Permission[0];
-
 	public static String getStringWithNLength(final String text, final int length) {
 		return text.repeat(length);
 	}

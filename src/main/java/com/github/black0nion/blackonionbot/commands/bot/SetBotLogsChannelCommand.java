@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.bot.BotInformation;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -15,7 +14,7 @@ public class SetBotLogsChannelCommand extends SlashCommand {
 
 	public SetBotLogsChannelCommand() {
 		super(builder("setbotlogschannel", "Used to set the channel where bot logs are sent.")
-			.setRequiredCustomPermissions(CustomPermission.ADMIN));
+			.setAdminGuild());
 	}
 
 	@Override

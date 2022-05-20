@@ -1,14 +1,14 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -27,7 +26,16 @@ import java.util.stream.Collectors;
 
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.*;
 
-@SuppressWarnings("unused")
+/**
+ * An util class that contains various objects related to command executions.
+ *
+ * Removes a lot of boilerplate handling slash command events, like responding, passing loads of JDA objects, etc.
+ * Can often times be used instead of splitting it up into multiple parameters for methods.
+ *
+ * @see SlashCommandEvent#send(String)
+ * @see SlashCommandEvent#reply(EmbedBuilder)
+ * @see SlashCommandEvent#exception()
+ */
 public class SlashCommandEvent {
 
 	private SlashCommand command;
@@ -38,7 +46,6 @@ public class SlashCommandEvent {
 	private final BlackMember member;
 	private final BlackUser user;
 	private final TranslatedEmbed successEmbed;
-	private final TranslatedEmbed loadingEmbed;
 	private final TranslatedEmbed errorEmbed;
 	private Language language;
 
@@ -55,7 +62,6 @@ public class SlashCommandEvent {
 		this.member = member;
 		this.user = user;
 		this.successEmbed = getSuccessEmbed(this.user, this.guild);
-		this.loadingEmbed = getLoadingEmbed(this.user, this.guild);
 		this.errorEmbed = getErrorEmbed(this.user, this.guild);
 		this.language = LanguageSystem.getLanguage(user, guild);
 	}
@@ -99,10 +105,6 @@ public class SlashCommandEvent {
 
 	public void success(String title, String name, String value, final Placeholder... placeholders) {
 		this.doReply(this.success(), title, name, value, placeholders);
-	}
-
-	public TranslatedEmbed loading() {
-		return new TranslatedEmbed(this.loadingEmbed);
 	}
 
 	public TranslatedEmbed error() {

@@ -35,6 +35,8 @@ public class GiveawayCommand extends SlashCommand {
 	private static final String YEARS = "years";
 	private static final int MAX_TIMEOUT = Integer.MAX_VALUE;
 
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
+
 	private static final String MESSAGE_ID = "message_id";
 
 	public GiveawayCommand() {
@@ -42,7 +44,7 @@ public class GiveawayCommand extends SlashCommand {
 			.addSubcommands(
 				new SubcommandData("create", "Create a giveaway").addOptions(
 					new OptionData(OptionType.STRING, ITEM_TO_GIVE, "The item to give away", true),
-					new OptionData(OptionType.INTEGER, WINNERS, "The number of winners to give away", true).setRequiredRange(1, 100),
+					new OptionData(OptionType.INTEGER, WINNERS, "The count of giveaway winners", true).setRequiredRange(1, 100),
 					new OptionData(OptionType.INTEGER, MINUTES, "The giveaway duration in minutes", false).setMinValue(1),
 					new OptionData(OptionType.INTEGER, HOURS, "The giveaway duration in hours", false).setRequiredRange(1, MAX_TIMEOUT),
 					new OptionData(OptionType.INTEGER, DAYS, "The giveaway duration in days", false).setRequiredRange(1, MAX_TIMEOUT),
@@ -53,8 +55,6 @@ public class GiveawayCommand extends SlashCommand {
 			))
 		);
 	}
-
-	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
@@ -90,7 +90,7 @@ public class GiveawayCommand extends SlashCommand {
 				.setDescription(cmde.getTranslation("giveawaydesc",
 					new Placeholder("item", item),
 					new Placeholder("winners", String.valueOf(winners)),
-					new Placeholder("end", SIMPLE_DATE_FORMAT.format(data).replace("_", " ")),
+					new Placeholder("end", DATE_FORMAT.format(data).replace("_", " ")),
 					new Placeholder("user", author.getAsMention())));
 			cmde.reply(giveawayMessage, msg -> msg.retrieveOriginal().queue(
 				message -> {

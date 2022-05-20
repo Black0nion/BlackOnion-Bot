@@ -21,6 +21,27 @@ import java.util.*;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
+/**
+ * This class represents a SlashCommand that can be executed by users.
+ * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, BlackMember, BlackUser, BlackGuild, TextChannel) execute} method.
+ * <p>
+ * Implement a command by doing this:
+ * <pre>{@code
+ * public class MyCommand extends SlashCommand {
+ * 	public MyCommand() {
+ * 		super(builder(Commands.slash("mycommand", "My command description")
+ * 				.addOption(OptionType.STRING, "name", "The name of the person to greet", true))
+ * 			.setCategory(Category.MISC)
+ * 			.permissions(CustomPermission.MY_PERMISSION)
+ * 		);
+ *        }
+ *
+ *    @Override
+ *    public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+ * 		cmde.send("hello", new Placeholder("name", e.getOption("name", OptionMapping::getAsString)));
+ *    }
+ * }</pre>
+ */
 @SuppressWarnings("unused")
 public abstract class SlashCommand {
 	private final SlashCommandData data;
@@ -39,6 +60,9 @@ public abstract class SlashCommand {
 	 */
 	private final Map<String, StartsWithArrayList> autoCompletes = new HashMap<>();
 
+	/**
+	 * Creates a new SlashCommand with an empty builder that only has the required {@link SlashCommandData}.
+	 */
 	protected SlashCommand(String name, String description) {
 		this(builder(Commands.slash(name, description)));
 	}
@@ -135,22 +159,38 @@ public abstract class SlashCommand {
 	}
 	//endregion
 
+	/**
+	 * @return if the user doesn't have the required {@link SlashCommand#requiredCustomPermissions}. REQUIRES ALL PERMISSIONS!
+	 */
 	public boolean isHidden(final BlackUser user) {
 		return !user.hasPermission(this.requiredCustomPermissions);
 	}
 
 	@Nonnull
 	protected static SlashCommandBuilder builder(@Nonnull SlashCommandData data) {
-		return SlashCommandBuilder.builder(data);
+		return new SlashCommandBuilder(data);
 	}
 
 	@Nonnull
 	protected static SlashCommandBuilder builder(@Nonnull String name, @Nonnull String description) {
-		return SlashCommandBuilder.builder(Commands.slash(name, description));
+		return new SlashCommandBuilder(Commands.slash(name, description));
 	}
 
 	@Override
 	public String toString() {
-		return "SlashCommand [data=" + this.data + ", category=" + this.category + ", progress=" + this.progress + ", requiredPermissions=" + Arrays.toString(this.requiredPermissions) + ", requiredBotPermissions=" + Arrays.toString(this.requiredBotPermissions) + ", requiredCustomPermissions=" + Arrays.toString(this.requiredCustomPermissions) + ", isToggleable=" + this.isToggleable + ", shouldAutoRegister=" + this.shouldAutoRegister + ", isPremium=" + this.isPremium + "]";
+		return "SlashCommand{" +
+			"data=" + data +
+			", category=" + category +
+			", progress=" + progress +
+			", requiredPermissions=" + Arrays.toString(requiredPermissions) +
+			", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) +
+			", requiredCustomPermissions=" + Arrays.toString(requiredCustomPermissions) +
+			", isToggleable=" + isToggleable +
+			", shouldAutoRegister=" + shouldAutoRegister +
+			", isPremium=" + isPremium +
+			", isEphemeral=" + isEphemeral +
+			", isAdminGuild=" + isAdminGuild +
+			", autoCompletes=" + autoCompletes +
+			'}';
 	}
 }

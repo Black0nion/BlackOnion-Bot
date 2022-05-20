@@ -42,6 +42,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+/**
+ * This class contains the main logic behind the commands of the bot.
+ *
+ * It'll handle things like permissions, command auto-complete, executing commands, etc.
+ */
 public class SlashCommandBase extends ListenerAdapter {
 
 	private static final Map<Category, List<SlashCommand>> commandsInCategory = new EnumMap<>(Category.class);

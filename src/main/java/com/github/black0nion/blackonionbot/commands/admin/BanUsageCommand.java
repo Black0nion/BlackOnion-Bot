@@ -36,8 +36,8 @@ public class BanUsageCommand extends SlashCommand {
 				.addSubcommandGroups(
 					new SubcommandGroupData("ban", "Ban a user or a guild from using commands.").addSubcommands(data),
 					new SubcommandGroupData("unban", "Unban a user or a guild from using commands.").addSubcommands(data)))
-			.setHidden()
-			.setRequiredCustomPermissions(CustomPermission.BAN_USAGE)
+			.setAdminGuild()
+			.permissions(CustomPermission.BAN_USAGE)
 		);
 	}
 
