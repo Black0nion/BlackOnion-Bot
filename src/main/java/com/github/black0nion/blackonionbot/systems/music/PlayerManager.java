@@ -116,7 +116,7 @@ public class PlayerManager {
 					final List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
 					for (int i = 0; i < trackz.size(); i++) {
 						final AudioTrack track = trackz.get(i);
-						builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
+						builder.addField(Utils.EMOJIS[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
 					}
 					channel.sendMessageEmbeds(builder.build()).queue(msg -> {
 						for (int i = 0; i < trackz.size(); i++) {
