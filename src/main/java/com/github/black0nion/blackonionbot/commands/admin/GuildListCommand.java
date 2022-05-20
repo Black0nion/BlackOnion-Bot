@@ -1,17 +1,23 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.DummyException;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -20,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class GuildListCommand extends SlashCommand {
+	private static final Logger logger = LoggerFactory.getLogger(GuildListCommand.class);
 
 	public GuildListCommand() {
 		super(builder("guilds", "List all guilds").setAdminGuild());
@@ -35,14 +42,15 @@ public class GuildListCommand extends SlashCommand {
 		boolean found = false;
 		for (Guild guild : e.getJDA().getGuilds()) {
 			found = true;
-			System.out.println(guild.getOwner());
+			logger.info("'{}'", guild.getOwner());
 			@Nullable BlackUser owner = Optional.ofNullable(guild.getOwner())
 				.map(Member::getUser)
 				.map(BlackUser::from)
 				.orElse(null);
 			String text = "- " + Utils.escapeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
 			try {
-				if (currentEmbed.getDescriptionBuilder().length() + text.length() + 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH) throw new Exception();
+				if (currentEmbed.getDescriptionBuilder().length() + text.length() + 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH)
+					throw new DummyException();
 				currentEmbed.appendDescription("\n" + text + " (Owner: " + (owner == null ? cmde.getTranslation("empty") : owner.getEscapedEffectiveName()) + ")");
 			} catch (Exception ignored) {
 				pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));

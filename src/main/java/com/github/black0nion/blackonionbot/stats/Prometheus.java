@@ -21,5 +21,6 @@ public class Prometheus {
 		} catch (IOException ex) {
 			LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);
 		}
+		LOGGER.info("Prometheus HTTP Server started on port {}", Config.prometheus_port);
 	}
 }

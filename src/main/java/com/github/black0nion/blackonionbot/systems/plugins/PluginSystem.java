@@ -25,7 +25,7 @@ public class PluginSystem {
 	private static final Logger logger = LoggerFactory.getLogger(PluginSystem.class);
 
 	private static void loadPlugin(final File jarFile) {
-		System.out.println("Loading " + jarFile);
+		logger.info("Loading '{}'", jarFile);
 		final String jarName = jarFile.getName();
 		final ScanResult scanResult = new ClassGraph().enableAnnotationInfo().overrideClasspath(jarFile.getAbsolutePath()).scan();
 

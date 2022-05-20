@@ -1,14 +1,11 @@
-package com.github.black0nion.blackonionbot.commands.bot;
+package com.github.black0nion.blackonionbot.commands.information;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.Progress;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Pair;
@@ -29,12 +26,15 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class HelpCommand extends SlashCommand {
+	private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
 	private static final String COMMAND_OR_CATEGORY = "command_or_category";
 
 	public HelpCommand() {
@@ -45,7 +45,7 @@ public class HelpCommand extends SlashCommand {
 
 	public void updateAutoComplete() {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
-		List<String> result = SlashCommandBase.commands.entrySet().stream()
+		List<String> result = SlashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
 				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
@@ -61,9 +61,9 @@ public class HelpCommand extends SlashCommand {
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, @NotNull BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
 		if (command != null) {
-			for (final Pair<Long, SlashCommand> entry : SlashCommandBase.commands.values()) {
+			for (final Pair<Long, SlashCommand> entry : SlashCommandBase.getCommands().values()) {
 				final SlashCommand cmd = entry.getValue();
-				if (cmd.getName().equalsIgnoreCase(command) && !cmd.isHidden(author)) {
+				if (!cmd.isHidden(author) && cmd.getName().equalsIgnoreCase(command)) {
 					cmde.success("help", SlashCommandEvent.getCommandHelp(cmd), cmde.getTranslationOrEmpty("help" + cmd.getName().toLowerCase()));
 					return;
 				}
@@ -71,8 +71,8 @@ public class HelpCommand extends SlashCommand {
 			final Category category = Category.parse(command);
 			if (category != null) {
 				final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
-				for (final SlashCommand c : SlashCommandBase.commandsInCategory.get(category)) {
-					builder.addField(c.getName(), cmde.getTranslationOrEmpty("help" + c.getName()), false);
+				for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+					builder.addField(SlashCommandEvent.getCommandHelp(c), cmde.getTranslationOrEmpty("help" + c.getName()), false);
 				}
 				cmde.reply(builder);
 			} else {
@@ -89,13 +89,13 @@ public class HelpCommand extends SlashCommand {
 					commandsInCategory = new StringBuilder(", " + cmde.getTranslation("helpmodules"));
 				} else {
 					category = cats[i - 1];
-					if (CommandBase.commandsInCategory.containsKey(category)) {
-						for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
-							if (c.isVisible(author)) {
-								commandsInCategory.append(", ").append(c.getCommand()[0]);
+					if (SlashCommandBase.getCommandsInCategory().containsKey(category)) {
+						for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+							if (!c.isHidden(author)) {
+								commandsInCategory.append(", ").append(c.getName());
 							}
 						}
-					} else System.out.println("wtf:  " + category);
+					} else logger.error("Category without commands: '{}'", category);
 				}
 				if (commandsInCategory.length() <= 2) {
 					continue;
@@ -139,9 +139,9 @@ public class HelpCommand extends SlashCommand {
 						commandsInCategory = new StringBuilder(", " + cmde.getTranslationOrEmpty("helpmodules"));
 					} else {
 						category = cats[i - 1];
-						for (final TextCommand c : CommandBase.commandsInCategory.get(category)) {
-							if (c.isVisible(user)) {
-								commandsInCategory.append(", ").append(c.getCommand()[0]);
+						for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+							if (!c.isHidden(user)) {
+								commandsInCategory.append(", ").append(c.getName());
 							}
 						}
 					}
@@ -157,28 +157,34 @@ public class HelpCommand extends SlashCommand {
 			} else {
 				final Category category = Category.valueOf(button.getId());
 				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
-				for (final Map.Entry<String[], TextCommand> entry : CommandBase.commandsArray.entrySet())
-					if (entry.getValue().isVisible(user) && (entry.getValue().getCategory() == category))
-						if (entry.getValue().getProgress() == Progress.DONE) {
-							builder.addField(CommandEvent.getCommandHelp(guild, entry.getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getCommand()[0]), false);
+				for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.getCommands().entrySet()) {
+					var command = entry.getValue().getValue();
+					if (!command.isHidden(user) && (command.getCategory() == category)) {
+						if (command.getProgress() != Progress.DONE) {
+							continue;
 						}
+						builder.addField(SlashCommandEvent.getCommandHelp(command), cmde.getTranslationOrEmpty("help" + command.getName()), false);
+					}
+				}
+
 
 				for (final Progress pr : Progress.values()) {
 					if (pr == Progress.DONE) {
 						continue;
 					}
-					for (final Map.Entry<String[], TextCommand> entry : CommandBase.commandsArray.entrySet()) {
-						final TextCommand command = entry.getValue();
-						if (command.isVisible(user) && (command.getCategory() == category) && command.getProgress() == pr) {
-							final String commandHelp = cmde.getTranslation("help" + entry.getValue().getCommand()[0].toLowerCase());
+					for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.getCommands().entrySet()) {
+						var command = entry.getValue().getValue();
+						if (!command.isHidden(user) && (command.getCategory() == category) && command.getProgress() == pr) {
+							final String commandHelp = cmde.getTranslation("help" + command.getName().toLowerCase());
 							if (commandHelp == null) {
-								System.out.println("Help for " + entry.getKey()[0] + " not set!");
+								logger.error("Help for '{}' not set!", entry.getKey());
 							}
-							builder.addField(pr.name().toUpperCase() + ": " + CommandEvent.getCommandHelp(guild, entry.getValue()), cmde.getTranslationOrEmpty("help" + entry.getValue().getCommand()[0]), false);
+							builder.addField(pr.name().toUpperCase() + ": " + SlashCommandEvent.getCommandHelp(command), cmde.getTranslationOrEmpty("help" + command.getName()), false);
 						}
 					}
 				}
 			}
+
 
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);

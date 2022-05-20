@@ -20,12 +20,16 @@ import java.util.List;
 import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
 
 public class BotInformation {
+	private BotInformation() {}
 
-	private static final String datePattern = "dd.MM.yyyy HH:mm";
-	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat(datePattern);
-	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
+	private static final String PATTERN = "dd.MM.yyyy HH:mm";
 
-	public static OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
+	@SuppressWarnings("java:S2885")
+	public static final SimpleDateFormat datePattern = new SimpleDateFormat(PATTERN);
+
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
+
+	public static final OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
 	public static final OperatingSystem OPERATING_SYSTEM;
 	public static final String OS_NAME;
 
@@ -33,10 +37,12 @@ public class BotInformation {
 	public static final String CPU_MHZ;
 
 	public static long logsChannel;
+
 	public static final long SUPPORT_SERVER;
 
 	static {
-		long supportServer = -1, logsChannel = -1;
+		long supportServer = -1;
+		long logsChannel = -1;
 		try {
 			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
 			if (doc != null && doc.containsKey("guildid") && doc.containsKey("botlogschannel")) {
@@ -49,7 +55,9 @@ public class BotInformation {
 		SUPPORT_SERVER = supportServer;
 		BotInformation.logsChannel = logsChannel;
 
-		String osName = "Unknown", cpuName = "N/A", cpuMhz = "N/A";
+		String osName = "Unknown";
+		String cpuName = "N/A";
+		String cpuMhz = "N/A";
 		OperatingSystem operatingSystem = UNKNOWN;
 		try {
 			if (OS_BEAN.getName().toLowerCase().contains("windows")) {

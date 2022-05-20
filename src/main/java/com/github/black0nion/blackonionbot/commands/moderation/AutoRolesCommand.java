@@ -26,11 +26,11 @@ public class AutoRolesCommand extends SlashCommand {
 
 	public AutoRolesCommand() {
 		super(builder(Commands.slash("autoroles", "Used to manage the auto roles of the server.").addSubcommands(
-				new SubcommandData(CREATE_COMMAND, "Used to create a new auto role.").addOption(OptionType.ROLE,
-						CREATE_ROLE, "The role to add.", true),
-				new SubcommandData(REMOVE_COMMAND, "Used to remove an auto role.").addOption(OptionType.ROLE,
-						REMOVE_ROLE, "The role to remove.", true))).setRequiredPermissions(Permission.MANAGE_ROLES)
-								.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
+			new SubcommandData(CREATE_COMMAND, "Used to create a new auto role.").addOption(OptionType.ROLE,
+				CREATE_ROLE, "The role to add.", true),
+			new SubcommandData(REMOVE_COMMAND, "Used to remove an auto role.").addOption(OptionType.ROLE,
+				REMOVE_ROLE, "The role to remove.", true))).setRequiredPermissions(Permission.MANAGE_ROLES)
+			.setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
 	}
 
 	@Override

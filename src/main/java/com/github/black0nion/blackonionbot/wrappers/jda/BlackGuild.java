@@ -1,13 +1,9 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.CommandBase;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.GenericCommand;
-import com.github.black0nion.blackonionbot.misc.ConfigGetter;
-import com.github.black0nion.blackonionbot.misc.ConfigSetter;
-import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.misc.*;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
@@ -15,7 +11,6 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
@@ -47,7 +42,6 @@ public class BlackGuild extends GuildImpl {
 		}
 	});
 
-	@Deprecated
 	@Reloadable("guildcache")
 	public static void clearCache() {
 		guilds.invalidateAll();
@@ -81,11 +75,12 @@ public class BlackGuild extends GuildImpl {
 	private String leaveMessage;
 	private long leaveChannel;
 	@Nullable
-	private List<GenericCommand> disabledCommands;
+	private List<SlashCommand> disabledCommands;
 	private long suggestionsChannel;
 	private List<Long> autoRoles;
 	private boolean loop;
 	private HashMap<String, CustomCommand> customCommands;
+	private final List<Warn> warns = new ArrayList<>();
 
 	private BlackGuild(@NotNull final Guild guild) {
 		super(guild);
@@ -117,9 +112,35 @@ public class BlackGuild extends GuildImpl {
 			final List<String> disabledCommandsString = config.getList("disabledcommands", String.class);
 			if (disabledCommandsString != null)
 				setDisabledCommands(disabledCommandsString.toArray(String[]::new));
+
+			Warn.loadWarns(this.warns, this.getIdentifier());
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void addWarn(Warn w) {
+		this.warns.add(w);
+		// don't save the list here, already done by the BlackMember class
+	}
+
+	public void removeWarn(Warn w) {
+		this.warns.remove(w);
+	}
+
+	void deleteUserWarns(long userId) {
+		this.warns.removeIf(w -> w.userid() == userId);
+	}
+
+	public Warn getWarn(long id) {
+		return this.warns.stream().filter(w -> w.id() == id).findFirst().orElse(null);
+	}
+
+	/**
+	 * @return an unmodifiable list of all warns
+	 */
+	public List<Warn> getWarns() {
+		return Collections.unmodifiableList(this.warns);
 	}
 
 	@Nullable
@@ -244,38 +265,30 @@ public class BlackGuild extends GuildImpl {
 		}
 	}
 
-	public @Nullable List<GenericCommand> getDisabledCommands() {
+	public @Nullable List<SlashCommand> getDisabledCommands() {
 		return this.disabledCommands;
 	}
 
 	public void setDisabledCommands(final String[] disabledCommands) {
 		this.setDisabledCommands(Arrays.stream(disabledCommands)
-			.map(cmd ->
-				Optional.ofNullable((GenericCommand) CommandBase.commands.get(cmd))
-					.orElse(
-						Optional.ofNullable(SlashCommandBase.commands.get(cmd))
-							.map(Pair::getValue)
-							.orElse(null)
-					)
-			)
+			.map(SlashCommandBase::getCommand)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList()));
 	}
 
-	public void setDisabledCommands(final List<GenericCommand> disabledCommands) {
+	public void setDisabledCommands(final List<SlashCommand> disabledCommands) {
 		this.disabledCommands = disabledCommands;
 		if (disabledCommands == null)
 			this.clear("disabledcommands");
 		else
-			this.saveList("disabledcommands", disabledCommands.stream().map(GenericCommand::getName).collect(Collectors.toList()));
+			this.saveList("disabledcommands", disabledCommands.stream().map(SlashCommand::getName).collect(Collectors.toList()));
 	}
 
-	public boolean isCommandActivated(final GenericCommand cmd) {
+	public boolean isCommandActivated(final SlashCommand cmd) {
 		return this.disabledCommands == null || !this.disabledCommands.contains(cmd);
 	}
 
-	public boolean setCommandActivated(final GenericCommand cmd, final boolean activated) {
-		System.out.println(cmd.getName() + " | " + cmd.isToggleable());
+	public boolean setCommandActivated(final SlashCommand cmd, final boolean activated) {
 		if (!cmd.isToggleable()) return false;
 		if (this.disabledCommands == null) {
 			if (activated) return true;
@@ -385,7 +398,7 @@ public class BlackGuild extends GuildImpl {
 	/**
 	 * @return the customCommands
 	 */
-	public HashMap<String, CustomCommand> getCustomCommands() {
+	public Map<String, CustomCommand> getCustomCommands() {
 		return this.customCommands;
 	}
 

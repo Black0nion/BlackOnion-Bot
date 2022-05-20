@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.github.black0nion.blackonionbot.commands.moderation;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
@@ -21,13 +18,12 @@ public class SuggestCommand extends SlashCommand {
 	private static final String SUGGESTION = "suggestion";
 
 	public SuggestCommand() {
-		super(builder(Commands.slash("suggest", "Used to send a suggestion.").addOption(OptionType.STRING, SUGGESTION,
-				"The suggestion to send", true)));
+		super(builder(Commands.slash("suggest", "Used to send a suggestion.")
+			.addOption(OptionType.STRING, SUGGESTION, "The suggestion to send", true)));
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-			BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		var suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
 		final long suggestionsChannelId = guild.getSuggestionsChannel();
 
@@ -38,17 +34,16 @@ public class SuggestCommand extends SlashCommand {
 			if (suggestionsChannel == null) {
 				cmde.send("invalidsuggestionschannel");
 			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
-					Permission.MESSAGE_ADD_REACTION))) {
+				Permission.MESSAGE_ADD_REACTION))) {
 				e.replyEmbeds(Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_SEND,
-						Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
+					Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
 			} else {
 				// all good, we can send the suggestion
-				suggestionsChannel.sendMessageEmbeds(
-						cmde.success().setTitle("suggestion").setDescription(String.join(" ", suggestion)).build())
-						.queue(msg -> {
-							msg.addReaction("U+1F44D").queue();
-							msg.addReaction("U+1F44E").queue();
-						});
+				suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle(SUGGESTION).setDescription(String.join(" ", suggestion)).build())
+					.queue(msg -> {
+						msg.addReaction("U+1F44D").queue();
+						msg.addReaction("U+1F44E").queue();
+					});
 				cmde.send("suggestionsucess");
 			}
 		}

@@ -69,6 +69,7 @@ public class Bot extends ListenerAdapter {
 	public static Bot getInstance() {
 		return instance;
 	}
+
 	private JDA jda;
 
 	public JDA getJda() {
@@ -85,6 +86,7 @@ public class Bot extends ListenerAdapter {
 	private final HttpClient httpClient = HttpClient.newBuilder()
 		.executor(Executors.newCachedThreadPool(new ThreadFactory() {
 			private final ThreadGroup group = new ThreadGroup("HttpClient");
+
 			@Override
 			public Thread newThread(@NotNull Runnable r) {
 				return new Thread(group, r);
@@ -128,7 +130,7 @@ public class Bot extends ListenerAdapter {
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 		ConfigManager.loadConfig();
 		DockerManager.init();
-		logger.info("Starting BlackOnion-Bot in " + Config.run_mode + " mode...");
+		logger.info("Starting BlackOnion-Bot in '{}' mode...", Config.run_mode);
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
@@ -140,12 +142,11 @@ public class Bot extends ListenerAdapter {
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(new CommandBase(), new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
+			.addEventListeners(new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
 		ReloadCommand.initReloadableMethods();
-		CommandBase.addCommands();
 		SlashCommandBase.addCommands();
 		builder.setStatus(StatusCommand.getStatusFromConfig());
 		builder.setActivity(ActivityCommand.getActivity());
@@ -193,7 +194,7 @@ public class Bot extends ListenerAdapter {
 	public void onReady(final ReadyEvent e) {
 		final JDA jda = e.getJDA();
 		selfUserId = jda.getSelfUser().getIdLong();
-		logger.info("Connected to " + jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator() + " in " + (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) + "ms.");
+		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity());
 
@@ -202,14 +203,13 @@ public class Bot extends ListenerAdapter {
 
 	@Reloadable("commands")
 	public static void updateCommands() {
-		CommandBase.addCommands();
 		SlashCommandBase.addCommands();
 	}
 
 	@Override
 	public void onDisconnect(final DisconnectEvent event) {
 		final CloseCode closeCode = event.getCloseCode();
-		logger.error("Disconnected from Discord! Code: " + (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
+		logger.error("Disconnected from Discord! Code: {}", (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
 	}
 
 	@Override

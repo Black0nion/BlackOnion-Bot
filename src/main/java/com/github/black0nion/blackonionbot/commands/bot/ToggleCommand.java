@@ -21,21 +21,23 @@ import java.util.Map;
 
 public class ToggleCommand extends SlashCommand {
 
+	public static final String COMMAND = "command";
+
 	public ToggleCommand() {
 		super(builder(Commands.slash("toggle", "Toggle commands")
-			.addOptions(
-				new OptionData(OptionType.STRING, "command", "Command to toggle", true, true),
-				new OptionData(OptionType.BOOLEAN, "on", "The new status", false)
+				.addOptions(
+					new OptionData(OptionType.STRING, COMMAND, "Command to toggle", true, true),
+					new OptionData(OptionType.BOOLEAN, "on", "The new status", false))
 			)
-		)
-		.autocomplete("command", SlashCommandBase.commands.keySet())
-		.setRequiredPermissions(Permission.MANAGE_SERVER)
-		.notToggleable());
+			.autocomplete(COMMAND, SlashCommandBase.getCommands().keySet())
+			.setRequiredPermissions(Permission.MANAGE_SERVER)
+			.notToggleable()
+		);
 	}
 
 	public void updateAutoComplete() {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
-		this.updateAutoComplete("command", SlashCommandBase.commands.entrySet().stream()
+		this.updateAutoComplete(COMMAND, SlashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
 				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
@@ -46,7 +48,7 @@ public class ToggleCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		final SlashCommand command = SlashCommandBase.commands.get(e.getOption("command", OptionMapping::getAsString)).getValue();
+		final SlashCommand command = SlashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
 		if (command == null || command.isHidden(author)) {
 			cmde.send("commandnotfound");
 			return;
@@ -63,7 +65,7 @@ public class ToggleCommand extends SlashCommand {
 		} else {
 			if (guild.setCommandActivated(command, newStatus)) {
 				final String commandName = command.getName().toUpperCase();
-				cmde.success("commandtoggled", "commandisnow", new Placeholder("command", commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
+				cmde.success("commandtoggled", "commandisnow", new Placeholder(COMMAND, commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
 			}
 		}
 	}

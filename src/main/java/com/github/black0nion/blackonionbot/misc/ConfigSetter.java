@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.Permission;
  * Annotate a Method with this annotation and it will automatically get
  * registered as a valid config setter for the
  * {@link com.github.black0nion.blackonionbot.commands.bot.ConfigCommand}!
- *
- * @author _SIM_
  */
 public @interface ConfigSetter {
     String key();

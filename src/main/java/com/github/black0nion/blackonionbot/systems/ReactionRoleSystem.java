@@ -7,11 +7,14 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
 // TODO: extract common part
 public class ReactionRoleSystem extends ListenerAdapter {
+	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
 	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("reactionroles");
 
@@ -34,7 +37,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 
 				e.getGuild().addRoleToMember(Objects.requireNonNull(e.getMember()), Objects.requireNonNull(e.getGuild().getRoleById(doc.getLong("roleid")))).queue();
 			} catch (final IllegalStateException ex1) {
-				System.out.println("Emoji nicht erkannt: " + e.getReactionEmote().getName());
+				logger.error("Unknown Emoji: '{}'", e.getReactionEmote().getName());
 			}
 		}
 	}
@@ -58,7 +61,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 
 				e.getGuild().removeRoleFromMember(Objects.requireNonNull(e.getMember()), Objects.requireNonNull(e.getGuild().getRoleById(doc.getLong("roleid")))).queue();
 			} catch (final IllegalStateException ex1) {
-				System.out.println("Emoji nicht erkannt: " + e.getReactionEmote().getName());
+				logger.error("Unknown Emoji: '{}'", e.getReactionEmote().getName());
 			}
 		}
 	}

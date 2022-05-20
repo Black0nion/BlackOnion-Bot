@@ -29,7 +29,7 @@ public class WeatherCommand extends SlashCommand {
 
 	public WeatherCommand() {
 		super(builder(Commands.slash("weather", "Used to get weather information for a city.")
-				.addOption(OptionType.STRING, CITY_NAME, "The city to get weather information for.", true)));
+			.addOption(OptionType.STRING, CITY_NAME, "The city to get weather information for.", true)));
 	}
 
 	@Override
@@ -44,16 +44,17 @@ public class WeatherCommand extends SlashCommand {
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 			sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 			final JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
-			cmde.reply(cmde.success().setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-					.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
-					.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
-					.addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
-					.addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
-					.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
-					.addField("sunrise", sdf.format(sunrise), false)
-					.addField("sunset", sdf.format(sunset), false));
+			cmde.reply(cmde.success()
+				.setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
+				.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
+				.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+				.addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
+				.addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
+				.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)
+				.addField("sunrise", sdf.format(sunrise), false)
+				.addField("sunset", sdf.format(sunset), false));
 		} catch (final IOException ex) {
-			cmde.error("unknowncity", city);
+			cmde.send("unknowncity");
 		}
 	}
 

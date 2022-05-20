@@ -11,7 +11,7 @@ public class NotImplementedException extends RuntimeException {
 	}
 
 	/**
-	 * @param name The name of the method that was not implemented.
+	 * @param name The name of the method that was not implemented. Sets the message to "Not implemented: {@code name}"
 	 */
 	public NotImplementedException(String name) {
 		super("Not implemented: " + name);

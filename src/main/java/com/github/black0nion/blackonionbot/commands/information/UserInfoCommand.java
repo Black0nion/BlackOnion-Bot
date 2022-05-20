@@ -27,29 +27,31 @@ public class UserInfoCommand extends SlashCommand {
 	public UserInfoCommand() {
 
 		super(builder(Commands.slash("userinfo", "Used to get information about a member.")
-				.addOption(OptionType.USER,USER, "The member to get information about.", false)));
+			.addOption(OptionType.USER, USER, "The member to get information about.", false)));
 	}
 
 	static @NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final @Nullable Member member) {
 		var statsUser = BlackUser.from(user);
 		var statsMember = member != null ? BlackMember.from(member) : null;
-		final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
 
-		final TranslatedEmbed builder = cmde.success();
-		builder.setTitle("userinfo");
 		final String avatarUrl = statsUser.getAvatarUrl();
-		builder.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl());
-		builder.addField("name", statsUser.getEscapedName(), true);
-		builder.addField("discriminator", statsUser.getDiscriminator(), true);
-		builder.addField("userid", statsUser.getId(), true);
-		builder.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false);
-		builder.addField("language", statsUser.getLanguage() != null ? statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")" : "nopreference", true);
-		builder.addField("created", statsUser.getTimeCreated().format(pattern), true);
+		final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
+		final TranslatedEmbed builder = cmde.success()
+			.setTitle("userinfo")
+			.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl())
+			.addField("name", statsUser.getEscapedName(), true)
+			.addField("discriminator", statsUser.getDiscriminator(), true)
+			.addField("userid", statsUser.getId(), true)
+			.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false)
+			.addField("language", statsUser.getLanguage() != null ? statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")" : "nopreference", true)
+			.addField("created", statsUser.getTimeCreated().format(pattern), true);
+
 		if (statsMember != null) {
 			builder.addField("joined", statsMember.getTimeJoined().format(pattern), true);
 			if (statsMember.getTimeBoosted() != null)
 				builder.addField("boosted", statsMember.getTimeBoosted().format(pattern), true);
 		}
+
 		return builder;
 	}
 

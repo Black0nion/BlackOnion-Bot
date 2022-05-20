@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EmbedUtils {
 
+	private EmbedUtils() {}
+
 	public static final Color BLACK_ONION_COLOR = Color.getHSBColor(0.8F, 1, 0.5F);
 	private static final Color premiumColor = new Color(245, 189, 2);
 
@@ -28,7 +30,7 @@ public class EmbedUtils {
 	}
 
 	public static TranslatedEmbed getSuccessEmbed(final BlackUser author, final BlackGuild guild) {
-		final TranslatedEmbed builder = new TranslatedEmbed(LanguageSystem.getLanguage(author, guild)).setTitle("success").setColor(BLACK_ONION_COLOR).setTimestamp(Instant.now());
+		final TranslatedEmbed builder = new TranslatedEmbed(LanguageSystem.getLanguage(author, guild)).setColor(BLACK_ONION_COLOR).setTimestamp(Instant.now());
 		if (author != null) {
 			builder.setFooter(author.getFullName(), author.getEffectiveAvatarUrl());
 		}
@@ -36,7 +38,7 @@ public class EmbedUtils {
 	}
 
 	public static TranslatedEmbed getSuccessEmbed() {
-		return new TranslatedEmbed().setTitle("success").setColor(BLACK_ONION_COLOR).setTimestamp(Instant.now());
+		return new TranslatedEmbed().setColor(BLACK_ONION_COLOR).setTimestamp(Instant.now());
 	}
 
 	public static TranslatedEmbed getLoadingEmbed(final BlackUser author, final BlackGuild guild) {

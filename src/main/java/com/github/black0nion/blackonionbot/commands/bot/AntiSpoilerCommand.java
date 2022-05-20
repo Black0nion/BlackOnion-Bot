@@ -37,13 +37,13 @@ public class AntiSpoilerCommand extends SlashCommand {
 		if (status != null) {
 			if (parsedType != null) {
 				guild.setAntiSpoilerType(parsedType);
-				cmde.success("antispoilerstatuschanged", "antispoileris", new Placeholder("status", parsedType.name()));
+				cmde.success("antispoilerstatuschanged", "antispoileris", new Placeholder(STATUS, parsedType.name()));
 			} else {
 				cmde.sendPleaseUse();
 			}
 		} else {
 			cmde.success("antispoilerstatus", "howtoantispoilertoggle",
-				new Placeholder("status", guild.getAntiSpoilerType().name()),
+				new Placeholder(STATUS, guild.getAntiSpoilerType().name()),
 				new Placeholder("command", "`" + SlashCommandEvent.getCommandHelp(this) + "`"));
 		}
 	}

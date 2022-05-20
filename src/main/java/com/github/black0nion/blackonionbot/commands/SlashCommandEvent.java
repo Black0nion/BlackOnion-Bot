@@ -1,14 +1,14 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.DummyException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -19,13 +19,23 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.*;
 
-@SuppressWarnings("unused")
+/**
+ * An util class that contains various objects related to command executions.
+ *
+ * Removes a lot of boilerplate handling slash command events, like responding, passing loads of JDA objects, etc.
+ * Can often times be used instead of splitting it up into multiple parameters for methods.
+ *
+ * @see SlashCommandEvent#send(String)
+ * @see SlashCommandEvent#reply(EmbedBuilder)
+ * @see SlashCommandEvent#exception()
+ */
 public class SlashCommandEvent {
 
 	private SlashCommand command;
@@ -36,7 +46,6 @@ public class SlashCommandEvent {
 	private final BlackMember member;
 	private final BlackUser user;
 	private final TranslatedEmbed successEmbed;
-	private final TranslatedEmbed loadingEmbed;
 	private final TranslatedEmbed errorEmbed;
 	private Language language;
 
@@ -53,13 +62,12 @@ public class SlashCommandEvent {
 		this.member = member;
 		this.user = user;
 		this.successEmbed = getSuccessEmbed(this.user, this.guild);
-		this.loadingEmbed = getLoadingEmbed(this.user, this.guild);
 		this.errorEmbed = getErrorEmbed(this.user, this.guild);
 		this.language = LanguageSystem.getLanguage(user, guild);
 	}
 
 	/**
-	 * @return the language, user -> guild -> default
+	 * @return the language, userid -> guildid -> default
 	 */
 	public Language getLanguage() {
 		return this.language;
@@ -97,10 +105,6 @@ public class SlashCommandEvent {
 
 	public void success(String title, String name, String value, final Placeholder... placeholders) {
 		this.doReply(this.success(), title, name, value, placeholders);
-	}
-
-	public TranslatedEmbed loading() {
-		return new TranslatedEmbed(this.loadingEmbed);
 	}
 
 	public TranslatedEmbed error() {
@@ -143,7 +147,7 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null && !(t instanceof DummyException)) LoggerFactory.getLogger(this.getClass()).error("Exception in command", t);
+		if (t != null && !(t instanceof DummyException)) this.logError(t);
 		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof DummyException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
 	}
 
@@ -176,6 +180,10 @@ public class SlashCommandEvent {
 	}
 	//endregion
 
+	public void send(final Object obj) {
+		this.send(obj != null ? obj.toString() : null);
+	}
+
 	public void send(final String message) {
 		this.send(message, new Placeholder[0]);
 	}
@@ -193,7 +201,7 @@ public class SlashCommandEvent {
 	}
 
 	public void send(final Message message, final Consumer<InteractionHook> result) {
-		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, System.err::println);
+		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, this::logError);
 	}
 
 	private String getPleaseUse() {
@@ -250,7 +258,7 @@ public class SlashCommandEvent {
 		return this.member;
 	}
 
-	@Nullable
+	@Nonnull
 	public SlashCommandInteractionEvent getEvent() {
 		return this.event;
 	}
@@ -263,4 +271,8 @@ public class SlashCommandEvent {
 		this.command = cmd;
 	}
 	//endregion
+
+	private void logError(final Throwable e) {
+		LoggerFactory.getLogger(this.command != null ? this.command.getClass() : this.getClass()).error("Exception in command", e);
+	}
 }

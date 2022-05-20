@@ -18,27 +18,28 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayCommand extends SlashCommand {
-	private static final String URL_OR_NAME = "url_or_name";
-	public PlayCommand() {
-		super(builder(Commands.slash("play", "Used to play a song from a url or a search query.")
-				.addOption(OptionType.STRING, URL_OR_NAME, "The url or search query to play.", true))
-				.setRequiredBotPermissions(Permission.VOICE_SPEAK));
-	}
+    private static final String URL_OR_NAME = "url_or_name";
 
-	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		var urlOrName = e.getOption(URL_OR_NAME, OptionMapping::getAsString);
-		final GuildVoiceState state = member.getVoiceState();
-		if (state != null && state.getChannel() != null) {
-			if (!urlOrName.startsWith("http"))
-				urlOrName = "ytsearch:" + urlOrName;
-			final AudioManager audioManager = e.getGuild().getAudioManager();
-			final AudioChannel memberChannel = member.getVoiceState().getChannel();
+    public PlayCommand() {
+        super(builder(Commands.slash("play", "Used to play a song from a url or a search query.")
+                .addOption(OptionType.STRING, URL_OR_NAME, "The url or search query to play.", true))
+                .setRequiredBotPermissions(Permission.VOICE_SPEAK));
+    }
 
-			audioManager.openAudioConnection(memberChannel);
+    @Override
+    public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+        var urlOrName = e.getOption(URL_OR_NAME, OptionMapping::getAsString);
+        final GuildVoiceState state = member.getVoiceState();
+        if (state != null && state.getChannel() != null) {
+            if (!urlOrName.startsWith("http"))
+                urlOrName = "ytsearch:" + urlOrName;
+            final AudioManager audioManager = e.getGuild().getAudioManager();
+            final AudioChannel memberChannel = member.getVoiceState().getChannel();
 
-			PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), urlOrName, audioManager, memberChannel);
-		} else
-			cmde.error("notinvc", "goinvc");
-	}
+            audioManager.openAudioConnection(memberChannel);
+
+            PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), urlOrName, audioManager, memberChannel);
+        } else
+            cmde.error("notinvc", "goinvc");
+    }
 }

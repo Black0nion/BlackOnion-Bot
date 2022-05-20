@@ -39,9 +39,10 @@ public class CatBreedsCommand extends SlashCommand {
 				.header("Content-Type", "application/json")
 				.timeout(Duration.ofSeconds(2))
 				.build();
+
 			final JSONArray responseAsJSONArray = new JSONArray(Bot.getInstance().getHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body());
 
-			final EmbedBuilder baseEmbed = cmde.success().setTitle("Cato :3");
+			final EmbedBuilder baseEmbed = cmde.success().setTitle("Cat");
 			EmbedBuilder currentEmbed = new EmbedBuilder(baseEmbed);
 
 			final List<Page> pages = new ArrayList<>();
@@ -55,7 +56,7 @@ public class CatBreedsCommand extends SlashCommand {
 					currentEmbed = new EmbedBuilder(baseEmbed);
 				}
 			}
-			if (currentEmbed.getFields().size() > 0) {
+			if (!currentEmbed.getFields().isEmpty()) {
 				pages.add(new InteractPage(currentEmbed.build()));
 			}
 			if (!found) {

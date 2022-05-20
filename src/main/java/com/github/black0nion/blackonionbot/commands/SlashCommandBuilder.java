@@ -1,26 +1,32 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
-import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
+/**
+ * A builder class for creating a {@link SlashCommand}.<br>
+ * Handles the creation of the command and its properties like required permissions, if the command is toggleable or the required {@link com.github.black0nion.blackonionbot.misc.GuildType GuildType}.
+ */
 @SuppressWarnings("unused")
 public class SlashCommandBuilder {
 
 	private final SlashCommandData data;
 	private Category category = Category.OTHER;
 	private Progress progress = Progress.DONE;
-	private Permission[] requiredPermissions = Utils.EMPTY_PERMISSIONS;
-	private Permission[] requiredBotPermissions = Utils.EMPTY_PERMISSIONS;
+	private Permission[] requiredPermissions = Permission.EMPTY_PERMISSIONS;
+	private Permission[] requiredBotPermissions = Permission.EMPTY_PERMISSIONS;
 	private CustomPermission[] requiredCustomPermissions = {};
 	private boolean isToggleable = true;
 	private boolean shouldAutoRegister = true;
@@ -39,11 +45,6 @@ public class SlashCommandBuilder {
 
 	public SlashCommandBuilder(final SlashCommandData data) {
 		this.data = Objects.requireNonNull(data);
-	}
-
-	@Nonnull
-	public static SlashCommandBuilder builder(@Nonnull SlashCommandData data) {
-		return new SlashCommandBuilder(data);
 	}
 
 	public SlashCommandData getData() {
@@ -72,6 +73,9 @@ public class SlashCommandBuilder {
 		return user.hasPermission(this.requiredCustomPermissions);
 	}
 
+	/**
+	 * Sets the required permissions for this command to {@link CustomPermission#ADMIN} and {@link SlashCommandBuilder#isEphemeral} to true.
+	 */
 	public SlashCommandBuilder setHidden() {
 		this.requiredCustomPermissions = new CustomPermission[] { CustomPermission.ADMIN };
 		this.setEphemeral(true);
@@ -82,10 +86,12 @@ public class SlashCommandBuilder {
 		return adminGuild;
 	}
 
+	/**
+	 * Only registers the command in the admins' guild and sets it hidden.
+	 */
 	public SlashCommandBuilder setAdminGuild() {
-		this.setHidden();
 		this.adminGuild = true;
-		return this;
+		return this.setHidden();
 	}
 
 	public Permission[] getRequiredPermissions() {
@@ -93,7 +99,7 @@ public class SlashCommandBuilder {
 	}
 
 	public SlashCommandBuilder setRequiredPermissions(final Permission... requiredPermissions) {
-		this.requiredPermissions = Objects.requireNonNullElseGet(requiredPermissions, () -> new Permission[] {});
+		this.requiredPermissions = Objects.requireNonNullElse(requiredPermissions, Permission.EMPTY_PERMISSIONS);
 		return this;
 	}
 
@@ -102,7 +108,7 @@ public class SlashCommandBuilder {
 	}
 
 	public SlashCommandBuilder setRequiredBotPermissions(final Permission... requiredBotPermissions) {
-		this.requiredBotPermissions = Objects.requireNonNullElseGet(requiredBotPermissions, () -> new Permission[] {});
+		this.requiredBotPermissions = Objects.requireNonNullElse(requiredBotPermissions, Permission.EMPTY_PERMISSIONS);
 		return this;
 	}
 
@@ -111,13 +117,8 @@ public class SlashCommandBuilder {
 		return this;
 	}
 
-	public SlashCommandBuilder setRequiredCustomPermissions(final CustomPermission... permissions) {
-		this.requiredCustomPermissions = permissions;
-		return this;
-	}
-
 	public SlashCommandBuilder addCustomPermissions(final CustomPermission... permissions) {
-		this.requiredCustomPermissions = (CustomPermission[]) ArrayUtils.addAll(this.requiredCustomPermissions, permissions);
+		this.requiredCustomPermissions = ArrayUtils.addAll(this.requiredCustomPermissions, permissions);
 		return this;
 	}
 
@@ -171,7 +172,7 @@ public class SlashCommandBuilder {
 		return this.isEphemeral;
 	}
 
-	public HashMap<String, StartsWithArrayList> getAutoComplete() {
+	public Map<String, StartsWithArrayList> getAutoComplete() {
 		return autoComplete;
 	}
 }

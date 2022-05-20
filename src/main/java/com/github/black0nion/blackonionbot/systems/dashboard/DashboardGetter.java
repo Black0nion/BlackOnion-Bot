@@ -32,7 +32,7 @@ public abstract @interface DashboardGetter {
     public String value();
 
     /**
-     * The guild type required to get a information, will return unauthorized when
+     * The guildid type required to get a information, will return unauthorized when
      * not allowed to
      */
     public GuildType guildTypeRequired() default GuildType.NORMAL;

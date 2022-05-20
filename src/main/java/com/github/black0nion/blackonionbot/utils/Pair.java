@@ -1,17 +1,5 @@
-/**
- * Author: _SIM_
- * Date: 26.05.2021
- * Copyright 2021 BlackOnion
- * File: Pair.java
- */
 package com.github.black0nion.blackonionbot.utils;
 
-/**
- * @author _SIM_
- * Date: 26.05.2021
- * Copyright 2021 BlackOnion
- * Class Name: Pair
- */
 public class Pair<K, V> {
 
 	private K key;

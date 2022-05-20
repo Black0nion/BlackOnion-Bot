@@ -1,19 +1,20 @@
 package com.github.black0nion.blackonionbot.commands.fun;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.commands.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.systems.language.Language;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.TextCommand;
-import com.github.black0nion.blackonionbot.commands.CommandEvent;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,17 +23,14 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author _SIM_
- */
-public class HangmanCommand extends TextCommand {
+public class HangmanCommand extends SlashCommand {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 
-	public static final List<Long> ingamePlayers = new ArrayList<>();
+	private static final List<Long> ingamePlayers = new ArrayList<>();
 
 	public HangmanCommand() {
-		this.setCommand("hangman");
+		super("hangman", "Used to play hangman");
 		for (final Language language : LanguageSystem.getLanguages().values()) {
 			final String translation = language.getTranslation("hangmanwords");
 			if (translation != null) {
@@ -42,7 +40,7 @@ public class HangmanCommand extends TextCommand {
 	}
 
 	@Override
-	public void execute(final String[] args, final CommandEvent cmde, final MessageReceivedEvent e, final Message message, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (ingamePlayers.contains(author.getIdLong())) {
 			cmde.error("alreadyingame", "nomultitasking");
 			return;
@@ -52,43 +50,42 @@ public class HangmanCommand extends TextCommand {
 		final String solution = wordsInThisLang.get(ThreadLocalRandom.current().nextInt(wordsInThisLang.size()));
 		cmde.reply(cmde.success().setTitle("hangman"), msg -> {
 			ingamePlayers.add(author.getIdLong());
-			rerun(msg, cmde, solution, new ArrayList<>());
+			rerun(e, cmde, solution, new ArrayList<>());
 		});
 	}
 
-	private static void rerun(final Message msg, final CommandEvent cmde, final String solution, final List<Character> alreadyGuessed) {
+	private static void rerun(SlashCommandInteractionEvent e, final SlashCommandEvent cmde, final String solution, final List<Character> alreadyGuessed) {
 		final String failedAttempts = getFailedAttempts(solution, alreadyGuessed);
 		final int failedAttemptsCount = failedAttempts.equalsIgnoreCase("") ? 0 : failedAttempts.split(", ").length;
 
 		if (failedAttemptsCount >= 7) {
-			msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue();
+			e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue());
 			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
 
 		final EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
 		if (won(solution, alreadyGuessed)) {
-			msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
+			e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue());
 			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
-
-		msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
+		e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
 			MessageReceivedEvent.class,
 			event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
 			event -> {
 				if (event.getMessage().getContentRaw().equalsIgnoreCase(solution)) {
-					msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue();
+					cmde.reply(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false));
 					ingamePlayers.remove(cmde.getUser().getIdLong());
 					return;
 				}
 				alreadyGuessed.add(event.getMessage().getContentRaw().toLowerCase().charAt(0));
-				rerun(msg, cmde, solution, alreadyGuessed);
+				rerun(e, cmde, solution, alreadyGuessed);
 			}, 1, TimeUnit.MINUTES, () -> {
-				msg.editMessageEmbeds(cmde.success().addField("timeout", "tooktoolong", false).build()).queue();
+				cmde.reply(cmde.success().addField("timeout", "tooktoolong", false));
 				ingamePlayers.remove(cmde.getUser().getIdLong());
 			}
-		));
+		)));
 	}
 
 	private static String getDrawing(final int tries) {
@@ -120,19 +117,21 @@ public class HangmanCommand extends TextCommand {
 	private static String getSpacesString(final String solution, final List<Character> tries) {
 		StringBuilder s = new StringBuilder("Word: ");
 
-		for (final Character c : solution.toCharArray()) if (tries.contains(c)) {
-			s.append(c).append(" ");
-		} else {
-			s.append("_ ");
-		}
+		for (final Character c : solution.toCharArray())
+			if (tries.contains(c)) {
+				s.append(c).append(" ");
+			} else {
+				s.append("_ ");
+			}
 		return s.toString();
 	}
 
 	private static String getFailedAttempts(final String solution, final List<Character> tries) {
 		StringBuilder failedAttempts = new StringBuilder();
-		for (final Character c : tries) if (!solution.contains(String.valueOf(c))) {
-			failedAttempts.append(", ").append(c);
-		}
+		for (final Character c : tries)
+			if (!solution.contains(String.valueOf(c))) {
+				failedAttempts.append(", ").append(c);
+			}
 		return failedAttempts.toString().equalsIgnoreCase("") ? "" : failedAttempts.substring(1);
 	}
 

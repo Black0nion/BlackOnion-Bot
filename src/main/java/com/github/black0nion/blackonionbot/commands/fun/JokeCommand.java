@@ -25,10 +25,12 @@ public class JokeCommand extends SlashCommand {
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		final Language lang = cmde.getLanguage();
+
 		String langParam = null;
 		if (Utils.equalsOneIgnoreCase(lang.getLanguageCode(), "de", "en", "cs", "es", "fr", "pt"))
 			langParam = "&lang=" + lang.getLanguageCode().toLowerCase();
-		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langParam != null ?  langParam : ""))).build(), HttpResponse.BodyHandlers.ofString())
+
+		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist&type=twopart" + (langParam != null ? langParam : ""))).build(), HttpResponse.BodyHandlers.ofString())
 			.thenApply(HttpResponse::body).thenAccept(response -> {
 				final JSONObject object = new JSONObject(response);
 				cmde.success("Joke", "https://jokeapi.dev", object.getString("setup"), object.getString("delivery"));

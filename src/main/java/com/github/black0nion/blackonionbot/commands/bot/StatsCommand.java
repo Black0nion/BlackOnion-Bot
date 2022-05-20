@@ -26,33 +26,29 @@ public class StatsCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		try {
-			final long diff = System.currentTimeMillis() - StatisticsManager.STARTUP_TIME;
+		final long diff = System.currentTimeMillis() - StatisticsManager.STARTUP_TIME;
 
-			cmde.reply(cmde
-				.success()
-				.setTitle("Bot Stats")
-				.addField("prefix", "/", true)
-				.addField("runmode", Config.run_mode.name().toUpperCase(), true)
-				.addField("os", OS_NAME, true)
-				.addField("cpuname", CPU_NAME, true)
-				.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
-				.addField("cpuspeed", CPU_MHZ, true)
-				.addField("lines", metadata.lines_of_code(), true)
-				.addField("files", metadata.files(), true)
-				.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
-				.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
-				.addField("commands", SlashCommandBase.commands.size(), true)
-				.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
-				.addField("usercount", StatisticsManager.getUserCount(), true)
-				.addField("guildcount", StatisticsManager.getGuildCount(), true)
-				.addField("uptime", Utils.parseDate(diff), true)
-				.addField("version", Config.metadata.version(), true)
-				.setThumbnail(e.getJDA().getSelfUser().getAvatarUrl() + "?size=512")
-				.setTimestamp(Instant.now())
-			);
-		} catch (final Exception ex) {
-			cmde.exception(ex);
-		}
+		cmde.reply(cmde
+			.success()
+			.setTitle("Bot Stats")
+			.addField("prefix", "`" + "/" + "`", true)
+			.addField("runmode", Config.run_mode.name().toUpperCase(), true)
+			.addField("os", OS_NAME, true)
+			.addField("cpuname", CPU_NAME, true)
+			.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
+			.addField("cpuspeed", CPU_MHZ, true)
+			.addField("lines", metadata.lines_of_code(), true)
+			.addField("files", metadata.files(), true)
+			.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
+			.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
+			.addField("commands", SlashCommandBase.getCommandCount(), true)
+			.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
+			.addField("usercount", StatisticsManager.getUserCount(), true)
+			.addField("guildcount", StatisticsManager.getGuildCount(), true)
+			.addField("uptime", Utils.parseDate(diff), true)
+			.addField("version", Config.metadata.version(), true)
+			.setThumbnail(e.getJDA().getSelfUser().getAvatarUrl() + "?size=512")
+			.setTimestamp(Instant.now())
+		);
 	}
 }
