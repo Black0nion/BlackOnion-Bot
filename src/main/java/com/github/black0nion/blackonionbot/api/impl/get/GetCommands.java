@@ -11,6 +11,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 
+/**
+ * Returns the registered slash commands in a JSON format, ready to be displayed by the website
+ *
+ * Example JSON:
+ * <code>[{"permissions":[],"subcommand_groups":[],"name":"weather","options":[{"name":"city_name","description":"The city to get weather information for.","type":"STRING","required":true}],"description":"Used to get weather information for a city.","subcommands":{}}]</code>
+ */
 public class GetCommands implements IGetRoute {
 	@Override
 	public Object handle(Context ctx, JSONObject body, Map<String, String> headers, @Nullable BlackSession session, DiscordUser user) throws Exception {
