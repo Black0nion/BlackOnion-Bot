@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 public class ConfigManager {
 
+	private ConfigManager() {}
+
 	private static final File ENV_FILE = new File("files/.env");
 	static BotMetadata metadata;
 
@@ -34,7 +36,7 @@ public class ConfigManager {
 				.filter(Matcher::matches)
 				.peek(count::increment)
 				.forEach(split -> set(split.group(1), split.group(2)));
-			logger.info("Loaded " + count.getCount() + " environment variables from the .env file");
+			logger.info("Loaded {} environment variables from the .env file", count.getCount());
 		} else {
 			logger.info("No .env file found, skipping loading environment variables");
 		}
@@ -45,7 +47,7 @@ public class ConfigManager {
 			assert in != null;
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 				// Use resource
-				metadata = Bot.getInstance().getGson().fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
+				metadata = Bot.GSON.fromJson(reader.lines().collect(Collectors.joining("\n")), BotMetadata.class);
 				logger.info("Loaded metadata!");
 			} catch (Exception e) {
 				logger.error("Failed to load metadata", e);

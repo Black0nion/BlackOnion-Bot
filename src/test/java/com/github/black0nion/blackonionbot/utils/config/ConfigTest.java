@@ -27,7 +27,7 @@ class ConfigTest {
 	@Order(2)
 	@Test
 	void test_config_construction() {
-		new Config();
+		// Config.getInstance() creates a new config object if it doesn't exist
 		assertNotNull(Config.getInstance());
 	}
 

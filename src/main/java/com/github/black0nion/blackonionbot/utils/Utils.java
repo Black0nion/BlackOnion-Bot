@@ -30,8 +30,6 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -196,10 +194,11 @@ public class Utils {
 
 	/**
 	 * Pass null as the channel argument to check self permissions.
+	 * USED FOR SELF PERMISSIONS!
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
+	public static boolean handleSelfRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
@@ -216,6 +215,13 @@ public class Utils {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
+	/**
+	 * Returned format:
+	 * <pre>{@code
+	 *     - DO_THINGS
+	 *     - DO_OTHER_THINGS
+	 * }</pre>
+	 */
 	public static String getPermissionString(final Permission... permissions) {
 		StringBuilder output = new StringBuilder("```");
 		for (int i = 0; i < permissions.length; i++) {

@@ -9,6 +9,10 @@ import java.net.InetSocketAddress;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A wrapper for server-side WebSocket Sessions.
+ * Handles things like logins to the dashboard, heartbeats and possibly more.
+ */
 public non-sealed class WebSocketSession extends GenericSession implements Session {
 
 	public WebSocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {

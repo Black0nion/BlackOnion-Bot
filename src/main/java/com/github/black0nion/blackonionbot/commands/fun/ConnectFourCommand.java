@@ -61,7 +61,7 @@ public class ConnectFourCommand extends SlashCommand {
 					isDeclined(e, guild, event, answerUser, getTranslation("declined", answerUser, guild), getTranslation("challengedeclined", answerUser, guild), getTranslation("arentyoubraveenough", answerUser, guild), getTranslation("answerwithyes", answerUser, guild));
 				}
 			}
-		}, 1, TimeUnit.MINUTES, () -> e.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
+		}, 1, TimeUnit.MINUTES, () -> e.getHook().sendMessageEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
 	}
 
 	static void isDeclined(SlashCommandInteractionEvent e, BlackGuild guild, @NotNull MessageReceivedEvent event, BlackUser answerUser, String declined, String challengedeclined, String arentyoubraveenough, String answerwithyes) {

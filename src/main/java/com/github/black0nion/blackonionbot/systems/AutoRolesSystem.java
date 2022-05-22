@@ -21,7 +21,7 @@ public class AutoRolesSystem extends ListenerAdapter {
 		final List<Long> autoroles = guild.getAutoRoles();
 		final List<Long> removedRoles = new ArrayList<>();
 
-		if (Utils.handleRights(guild, user, null, null, Permission.MANAGE_ROLES)) return;
+		if (Utils.handleSelfRights(guild, user, null, null, Permission.MANAGE_ROLES)) return;
 
 		for (final long roleid : autoroles) {
 			final Role role = guild.getRoleById(roleid);

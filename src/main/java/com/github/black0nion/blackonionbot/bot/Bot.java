@@ -79,7 +79,7 @@ public class Bot extends ListenerAdapter {
 	private final Logger logger = LoggerFactory.getLogger(Bot.class);
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-	private final Gson gson = new GsonBuilder()
+	public static final Gson GSON = new GsonBuilder()
 		.registerTypeAdapterFactory(RecordTypeAdapterFactory.DEFAULT)
 		.create();
 	private final EventWaiter eventWaiter = new EventWaiter();
@@ -106,9 +106,6 @@ public class Bot extends ListenerAdapter {
 		return scheduledExecutor;
 	}
 
-	public Gson getGson() {
-		return gson;
-	}
 
 	public EventWaiter getEventWaiter() {
 		return eventWaiter;

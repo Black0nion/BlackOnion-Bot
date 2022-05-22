@@ -12,12 +12,14 @@ import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Pair;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -42,7 +44,7 @@ public class TicTacToeCommand extends SlashCommand {
 
 	public TicTacToeCommand() {
 		super(builder(Commands.slash("tictactoe", "Used to play TicTacToe with the someone.")
-			.addOption(OptionType.USER, USER, "The user to play with.")).setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
+			.addOption(OptionType.USER, USER, "The user to play with.")));
 	}
 
 	public void rerun(final TicTacToe game, final TextChannel channel) {
@@ -55,7 +57,8 @@ public class TicTacToeCommand extends SlashCommand {
 
 			final Message message = game.getMessage();
 			if (id.equalsIgnoreCase("leave")) {
-				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention())).setActionRows().queue();
+				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention()))
+					.setActionRows(game.getRows().stream().map(row -> row.getButtons().stream().map(Button::asDisabled).toList()).map(ActionRow::of).toList()).queue();
 				TicTacToeGameManager.deleteGame(game);
 				return;
 			} else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
@@ -154,13 +157,14 @@ public class TicTacToeCommand extends SlashCommand {
 		if (challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
 			this.rerun(TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel().asTextChannel());
 			return;
-		} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
-			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
+		} else if (option.isBot() || option.getIdLong() == author.getIdLong()) {
+			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (option.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
 			return;
-		} else if (TicTacToeGameManager.isIngame(author.getId()) || TicTacToeGameManager.isIngame(challenged.getId())) {
+		} else if (TicTacToeGameManager.isIngame(author.getId()) || TicTacToeGameManager.isIngame(option.getId())) {
 			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("alreadyingame", author, guild), getTranslation("nomultitasking", author, guild), false).build()).queue();
 			return;
 		}
+		var challenged = BlackUser.from(option);
 		e.reply(getTranslation("ttt_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
 		Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
 			if (event.getAuthor().isBot()) return;
@@ -168,7 +172,7 @@ public class TicTacToeCommand extends SlashCommand {
 			if (eventAuthor.getId().equals(challenged.getId()))
 				if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 
-					e.replyEmbeds(EmbedUtils.getSuccessEmbed(eventAuthor, guild).addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
+					e.getHook().sendMessageEmbeds(cmde.success().addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 
 					// Accepted
 					final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));

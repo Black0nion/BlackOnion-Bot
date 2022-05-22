@@ -5,11 +5,10 @@ import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.mongodb.client.MongoDatabase;
 
 public class MongoDB {
-
 	private static MongoDB instance;
 
 	public static MongoDB getInstance() {
-		return instance;
+		return instance != null ? instance : new MongoDB();
 	}
 
 	public MongoDB() {

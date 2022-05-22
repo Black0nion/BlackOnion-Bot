@@ -26,10 +26,31 @@
         </rollingPolicy>
     </appender>
 
+    <define name="lokiURL" class="com.github.black0nion.blackonionbot.utils.config.LokiConfig"/>
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <verbose>true</verbose>
+        <http>
+            <url>${lokiURL}</url>
+        </http>
+        <format>
+            <label>
+                <pattern>level=%level</pattern>
+            </label>
+            <message>
+                <pattern>l=%level l=%logger t=%thread | %msg %ex</pattern>
+            </message>
+        </format>
+    </appender>
+
     <logger name="com.github.black0nion.blackonionbot" level="${LOG_LEVEL:-INFO}" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
         <appender-ref ref="METRICS"/>
+        <if condition='!"${lokiURL}".isEmpty()'>
+            <then>
+                <appender-ref ref="LOKI"/>
+            </then>
+        </if>
     </logger>
 
     <root level="${ROOT_LOG_LEVEL:-WARN}">

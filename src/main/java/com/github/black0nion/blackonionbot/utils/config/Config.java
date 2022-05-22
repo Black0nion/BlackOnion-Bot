@@ -4,10 +4,10 @@ import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.google.gson.internal.Primitives;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -19,12 +19,23 @@ import static com.github.black0nion.blackonionbot.utils.config.Flags.*;
 @SuppressWarnings("ConstantConditions")
 public class Config {
 	private static Config instance;
-	public Config() {
+	private Config() {
 		instance = this;
 	}
 
-	@Contract(pure = true)
+	/**
+	 * Creates a new config object if {@link Config#instance} is null.
+	 */
 	public static Config getInstance() {
+		// enable logback to preload the config
+		if (instance == null) {
+			try {
+				ConfigManager.loadConfig();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			new Config();
+		}
 		return instance;
 	}
 
@@ -49,8 +60,6 @@ public class Config {
 	private final String topggAuth = get("topgg_auth", String.class);
 
 	@Nullable
-	private final String contentModeratorToken = get("content_moderator_token", String.class);
-	@Nullable
 	private final String spotifyClientId = get("spotify_client_id", String.class, matchesRegex("[\\w\\d]{32}"));
 	@Nullable
 	private final String spotifyClientSecret = get("spotify_client_secret", String.class, matchesRegex("[\\w\\d]{32}"));
@@ -59,6 +68,8 @@ public class Config {
 	private final long devGuild = get("dev_guild", Long.class, defaultValue(-1L));
 	private final int prometheusPort = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
 	private static final BotMetadata metadata = ConfigManager.metadata;
+	@Nullable
+	private final String lokiUrl = get("loki_url", String.class);
 
 	//region Getters and Setters
 	public String getToken() {
@@ -133,11 +144,6 @@ public class Config {
 	}
 
 	@Nullable
-	public String getContentModeratorToken() {
-		return contentModeratorToken;
-	}
-
-	@Nullable
 	public String getSpotifyClientId() {
 		return spotifyClientId;
 	}
@@ -161,6 +167,11 @@ public class Config {
 
 	public int getPrometheusPort() {
 		return prometheusPort;
+	}
+
+	@Nullable
+	public String getLokiUrl() {
+		return lokiUrl;
 	}
 
 	public BotMetadata getMetadata() {
@@ -202,10 +213,8 @@ public class Config {
 			result = Primitives.wrap(clazz).cast(value);
 		}
 		for (IFlag f : flags) {
-			if (f instanceof Flags.MatchesRegex flag) {
-				if (!flag.regex().matcher(value).matches()) {
-					throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex());
-				}
+			if (f instanceof Flags.MatchesRegex flag && !flag.regex().matcher(value).matches()) {
+				throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex());
 			} else if (f instanceof Flags.Range flag
 					&& result instanceof Number num
 					&& (num.doubleValue() < flag.min() || num.doubleValue() > flag.max())) {

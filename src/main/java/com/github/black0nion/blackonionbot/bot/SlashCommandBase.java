@@ -20,7 +20,6 @@ import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -214,7 +213,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			return;
 		}
 
-		if (Utils.handleRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
+		if (Utils.handleSelfRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
 			final SlashCommand cmd = commands.get(event.getName()).getValue();
 			final SlashCommandEvent cmde = new SlashCommandEvent(cmd, event, guild, member, author);
@@ -223,24 +222,25 @@ public class SlashCommandBase extends ListenerAdapter {
 				cmde.send("commanddisabled", new Placeholder("cmd", "/" + cmd.getName()));
 				return;
 			}
+
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
-				cmde.error("missingpermissions", cmde.getTranslation("requiredcustompermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredCustomPermissions()));
+				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredCustomPermissions())));
 				return;
 			}
 
 			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getCommandPath(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
-			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : new Permission[] {};
-			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : new Permission[] {};
-			if (Utils.handleRights(guild, author, channel, event, requiredBotPermissions)) return;
+			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : Permission.EMPTY_PERMISSIONS;
+			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : Permission.EMPTY_PERMISSIONS;
+			if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions)) return;
 
-			if (!member.hasPermission(Utils.concatenate(requiredPermissions, requiredBotPermissions))) {
+			if (!member.hasPermission(requiredPermissions)) {
 				if (cmd.isHidden(author)) return;
-				cmde.error("missingpermissions", cmde.getTranslation("requiredpermissions") + "\n" + Utils.getPermissionString(cmd.getRequiredPermissions()));
+				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredPermissions())));
 				return;
-			} else if (Utils.handleRights(guild, author, channel, event, requiredBotPermissions))
+			} else if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions))
 				return;
 			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();

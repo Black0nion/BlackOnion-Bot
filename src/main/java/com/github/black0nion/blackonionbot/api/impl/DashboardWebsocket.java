@@ -245,7 +245,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 		if (response == null) {
 			response = new JSONObject();
 		} else if (!(response instanceof JSONObject) && !(response instanceof JSONArray)) {
-			response = Bot.getInstance().getGson().toJson(response);
+			response = Bot.GSON.toJson(response);
 		}
 
 		if (request != null && request.has("id")) {
