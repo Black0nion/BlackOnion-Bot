@@ -11,7 +11,7 @@ public class Main {
 		try {
 			new Bot(args);
 		} catch (final Throwable ex) {
-			logger.error("Uncaught error occured", ex);
+			logger.error("Uncaught error occurred", ex);
 		}
 	}
 }

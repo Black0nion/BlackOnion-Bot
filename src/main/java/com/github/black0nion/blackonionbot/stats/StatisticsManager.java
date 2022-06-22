@@ -10,6 +10,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -159,7 +160,7 @@ public class StatisticsManager extends ListenerAdapter {
 	}
 
 	public static long getGatewayPing() {
-		// JDA's method returns a long
+		// JDA's method returns a double
 		return (long) PING.get();
 	}
 
@@ -192,5 +193,11 @@ public class StatisticsManager extends ListenerAdapter {
 			guildName = guildEvent.getGuild().getName();
 		}
 		EVENTS.labels(event.getClass().getSimpleName(), guildId, guildName).inc();
+	}
+
+	@Override
+	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+		MESSAGES_SENT.labels(event.getGuild().getId(), event.getGuild().getName(), event.getChannel().getId(), event.getChannel().getName());
+		TOTAL_MESSAGES_SENT.inc();
 	}
 }
