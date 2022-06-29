@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.api;
 
-import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.api.sessions.LoginFactory;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
@@ -13,7 +13,7 @@ import java.util.InputMismatchException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Order(21)
-public class GenericSessionTest {
+public class AbstractSessionTest {
 	public static final String EXAMPLE_SESSION_ID = "qUJf7fE7WooHAQUHZzsmk8lLl1HRWHTfn6lQPgDQtdSNrFHvZAf8WoEuqU7KuK72qeyi3";
 	public static final String VALID_UNKNOWN_SESSION_ID = "qUJf7fE7WooHAQUHZzsmk8lLl1HRWHTfn6lQPgDQtdSNrFHvZAf8WoEuqU7KuK72qeyi4";
 	public static final String EXAMPLE_CODE = "so3oshW4GldevEQ0cY6a6PRzG0JFIa";
@@ -55,7 +55,7 @@ public class GenericSessionTest {
 	@DisplayName("test id generation")
 	void test_id_generation(RepetitionInfo info) {
 		for (int i = 0; i < info.getTotalRepetitions(); i++) {
-			assertTrue(assertDoesNotThrow(GenericSession::generateSessionId).matches(GenericSession.SESSIONID_REGEX));
+			assertTrue(assertDoesNotThrow(AbstractSession::generateSessionId).matches(AbstractSession.SESSIONID_REGEX));
 		}
 	}
 

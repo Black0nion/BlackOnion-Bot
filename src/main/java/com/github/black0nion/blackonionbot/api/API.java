@@ -4,7 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.github.black0nion.blackonionbot.api.impl.get.Paths;
 import com.github.black0nion.blackonionbot.api.routes.IHttpRoute;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
-import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.api.sessions.RestSession;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.DummyException;
@@ -163,7 +163,7 @@ public class API {
 				if (req.requiresLogin()) {
 					final String sessionId = ctx.header("sessionid");
 					if (sessionId == null) throw new BadRequestResponse("No SessionID provided");
-					if (!sessionId.matches(GenericSession.SESSIONID_REGEX)) throw new BadRequestResponse("Invalid SessionID");
+					if (!sessionId.matches(AbstractSession.SESSIONID_REGEX)) throw new BadRequestResponse("Invalid SessionID");
 					try {
 						session = new RestSession(sessionId);
 					} catch (InputMismatchException e) {

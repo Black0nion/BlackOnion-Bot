@@ -5,9 +5,9 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * A wrapper for server-side REST Sessions.
- * Handles authentication through {@link GenericSession}
+ * Handles authentication through {@link AbstractSession}
  */
-public non-sealed class RestSession extends GenericSession {
+public non-sealed class RestSession extends AbstractSession {
 
 	public RestSession(String sessionId) throws ExecutionException, InputMismatchException {
 		super(sessionId);

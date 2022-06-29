@@ -56,7 +56,7 @@ class LoginTest {
 	@Test
 	void test_create_session_id() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(getBaseBuilder()
-			.addHeader("code", GenericSessionTest.EXAMPLE_CODE)
+			.addHeader("code", AbstractSessionTest.EXAMPLE_CODE)
 			.build())::execute);
 
 		assertNotNull(response);
@@ -64,6 +64,6 @@ class LoginTest {
 		assertEquals(200, response.code(), responseBody);
 		log.info("Response Body: " + responseBody);
 		assertNotNull(responseBody);
-		assertTrue(responseBody.equalsIgnoreCase(GenericSessionTest.EXAMPLE_SESSION_ID));
+		assertTrue(responseBody.equalsIgnoreCase(AbstractSessionTest.EXAMPLE_SESSION_ID));
 	}
 }

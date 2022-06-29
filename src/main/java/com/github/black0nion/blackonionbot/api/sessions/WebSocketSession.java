@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
  * A wrapper for server-side WebSocket Sessions.
  * Handles things like logins to the dashboard, heartbeats and possibly more.
  */
-public non-sealed class WebSocketSession extends GenericSession implements Session {
+public non-sealed class WebSocketSession extends AbstractSession implements Session {
 
 	public WebSocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {
 		super(sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol"));

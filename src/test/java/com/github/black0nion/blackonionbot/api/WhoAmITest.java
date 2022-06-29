@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.api;
 
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
@@ -42,7 +41,7 @@ class WhoAmITest {
 	void test_valid_session_id_not_found() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.url(URL)
-			.addHeader("sessionid", GenericSessionTest.VALID_UNKNOWN_SESSION_ID)
+			.addHeader("sessionid", AbstractSessionTest.VALID_UNKNOWN_SESSION_ID)
 			.build())::execute);
 		JSONObject responseBody = assertDoesNotThrow(() -> new JSONObject(assertDoesNotThrow(response.body()::string)));
 		assertEquals(401, response.code(), responseBody.toString());
@@ -54,12 +53,12 @@ class WhoAmITest {
 	void test_user_created() {
 		Response response = assertDoesNotThrow(HTTP_CLIENT.newCall(new Request.Builder()
 			.url(URL)
-			.addHeader("sessionid", GenericSessionTest.EXAMPLE_SESSION_ID)
+			.addHeader("sessionid", AbstractSessionTest.EXAMPLE_SESSION_ID)
 			.build())::execute);
 		JSONObject responseBody = assertDoesNotThrow(() -> new JSONObject(assertDoesNotThrow(response.body()::string)));
 		assertEquals(200, response.code(), responseBody.toString());
 		log.info("Response Body: " + responseBody);
 		// unfortunately, org.json.JSONObject doesn't override the equals method, so we have to do this
-		assertEquals(DiscordUser.userToJson(GenericSessionTest.EXAMPLE_USER).toMap(), responseBody.toMap());
+		assertEquals(DiscordUser.userToJson(AbstractSessionTest.EXAMPLE_USER).toMap(), responseBody.toMap());
 	}
 }

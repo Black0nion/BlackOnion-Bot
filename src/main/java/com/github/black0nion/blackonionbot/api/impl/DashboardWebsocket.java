@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.api.impl;
 
-import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.api.sessions.WebSocketSession;
 import com.github.black0nion.blackonionbot.api.routes.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.bot.Bot;
@@ -10,9 +10,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.Permission;
-import org.bson.Document;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -59,7 +57,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	public void onConnect(Session sessionRaw) {
 		try {
 			final String sessionId = sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
-			if (sessionId == null || !sessionId.matches(GenericSession.generateSessionId())) {
+			if (sessionId == null || !sessionId.matches(AbstractSession.generateSessionId())) {
 				sessionRaw.close(4401, "Unauthorized");
 				return;
 			}

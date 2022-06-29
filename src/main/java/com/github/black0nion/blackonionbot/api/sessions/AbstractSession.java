@@ -1,26 +1,20 @@
 package com.github.black0nion.blackonionbot.api.sessions;
 
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import com.github.black0nion.blackonionbot.oauth.OAuthUtils;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import javax.annotation.Nullable;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract sealed class GenericSession permits RestSession, WebSocketSession {
+public abstract sealed class AbstractSession permits RestSession, WebSocketSession {
 
 	public static final String SESSIONID_REGEX = "[a-zA-Z\\d]{69}";
 	@Nullable
 	protected String sessionId;
 	protected DiscordUser user;
 
-	protected GenericSession(final String sessionId) throws InputMismatchException {
+	protected AbstractSession(final String sessionId) throws InputMismatchException {
 		this.loginToSession(sessionId);
 	}
 
@@ -38,7 +32,7 @@ public abstract sealed class GenericSession permits RestSession, WebSocketSessio
 		try {
 			this.user = login.loginToSession(sessionId);
 		} catch (ExecutionException e) {
-			throw e.getCause() instanceof RuntimeException ? (RuntimeException) e.getCause() : new RuntimeException(e.getCause());
+			throw e.getCause() instanceof RuntimeException ex ? ex : new RuntimeException(e.getCause());
 		}
 	}
 

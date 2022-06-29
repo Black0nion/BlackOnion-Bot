@@ -92,7 +92,7 @@ public final class LoginFactory {
 		public String createSession(String accessToken, String refreshToken, int expiresIn) {
 			final Document find = getCollection().find(Filters.and(Filters.eq("access_token", accessToken), Filters.eq("refresh_token", refreshToken), Filters.exists("sessionid"))).first();
 			if (find != null) return find.getString(SESSIONID);
-			final String newSessionId = GenericSession.generateSessionId();
+			final String newSessionId = AbstractSession.generateSessionId();
 			getCollection().insertOne(new Document()
 					.append(SESSIONID, newSessionId)
 					.append("access_token", accessToken)

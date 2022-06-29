@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.api.sessions.GenericSession;
+import com.github.black0nion.blackonionbot.api.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.api.sessions.LoginFactory;
 import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.google.common.cache.Cache;
@@ -56,7 +56,7 @@ public class OAuthUtils {
 	/**
 	 * call once to generate the tokens from the code and save it, only on first login
 	 * with discord, on reconnect on the same PC (session) use
-	 * {@link GenericSession#loginToSession(String)}!
+	 * {@link AbstractSession#loginToSession(String)}!
 	 *
 	 * @param code the code discord gave you
 	 * @return The session ID used to authenticate with the bot, or null if the login failed
