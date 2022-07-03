@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -94,7 +95,7 @@ public class GiveawayCommand extends SlashCommand {
 					new Placeholder("user", author.getAsMention())));
 			cmde.reply(giveawayMessage, msg -> msg.retrieveOriginal().queue(
 				message -> {
-					message.addReaction("U+1F389").queue();
+					message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
 					message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
 					GiveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
 				}

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.bson.Document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -93,7 +94,7 @@ public class GiveawaySystem {
 
 	public static void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
-			msg.retrieveReactionUsers("\uD83C\uDF89").queue(users -> {
+			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJda().getSelfUser();
 				if (users.size() == 0 || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();

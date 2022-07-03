@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import net.dv8tion.jda.api.utils.ImageProxy;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -17,7 +19,6 @@ import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.Formatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +40,60 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	@Nonnull
 	public Guild getGuild() {
 		return this.member.getGuild();
+	}
+
+	@Nonnull
+	@Override
+	public EnumSet<Permission> getPermissions() {
+		return this.member.getPermissions();
+	}
+
+	@Nonnull
+	@Override
+	public EnumSet<Permission> getPermissions(@Nonnull GuildChannel channel) {
+		return this.member.getPermissions(channel);
+	}
+
+	@Nonnull
+	@Override
+	public EnumSet<Permission> getPermissionsExplicit() {
+		return this.member.getPermissionsExplicit();
+	}
+
+	@Nonnull
+	@Override
+	public EnumSet<Permission> getPermissionsExplicit(@Nonnull GuildChannel channel) {
+		return this.member.getPermissionsExplicit(channel);
+	}
+
+	@Override
+	public boolean hasPermission(@Nonnull Permission... permissions) {
+		return this.member.hasPermission(permissions);
+	}
+
+	@Override
+	public boolean hasPermission(@Nonnull Collection<Permission> permissions) {
+		return this.member.hasPermission(permissions);
+	}
+
+	@Override
+	public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Permission... permissions) {
+		return this.member.hasPermission(channel, permissions);
+	}
+
+	@Override
+	public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Collection<Permission> permissions) {
+		return this.member.hasPermission(channel, permissions);
+	}
+
+	@Override
+	public boolean canSync(@Nonnull IPermissionContainer targetChannel, @Nonnull IPermissionContainer syncSource) {
+		return this.member.canSync(targetChannel, syncSource);
+	}
+
+	@Override
+	public boolean canSync(@Nonnull IPermissionContainer channel) {
+		return this.member.canSync(channel);
 	}
 
 	@Override
@@ -135,9 +190,21 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	}
 
 	@Override
+	@Nullable
+	public ImageProxy getAvatar() {
+		return this.member.getAvatar();
+	}
+
+	@Override
 	@Nonnull
 	public String getEffectiveAvatarUrl() {
 		return this.member.getEffectiveAvatarUrl();
+	}
+
+	@Override
+	@Nonnull
+	public ImageProxy getEffectiveAvatar() {
+		return this.member.getEffectiveAvatar();
 	}
 
 	@Override
@@ -168,8 +235,8 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	}
 
 	@Override
-	public boolean canInteract(@Nonnull Emote emote) {
-		return this.member.canInteract(emote);
+	public boolean canInteract(@Nonnull RichCustomEmoji emoji) {
+		return this.member.canInteract(emoji);
 	}
 
 	@Override
@@ -266,90 +333,14 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 		return this.member.modifyNickname(nickname);
 	}
 
-	@Override
 	@Nonnull
+	@Override
 	public String getAsMention() {
 		return this.member.getAsMention();
 	}
 
 	@Override
-	public void formatTo(Formatter formatter, int flags, int width, int precision) {
-		this.member.formatTo(formatter, flags, width, precision);
-	}
-
-	@Override
-	@Nonnull
-	public String getId() {
-		return this.member.getId();
-	}
-
-	@Override
 	public long getIdLong() {
 		return this.member.getIdLong();
-	}
-
-	@Override
-	@Nonnull
-	public OffsetDateTime getTimeCreated() {
-		return this.member.getTimeCreated();
-	}
-
-	@Override
-	@Nonnull
-	public EnumSet<Permission> getPermissions() {
-		return this.member.getPermissions();
-	}
-
-	@Override
-	@Nonnull
-	public EnumSet<Permission> getPermissions(@Nonnull GuildChannel channel) {
-		return this.member.getPermissions(channel);
-	}
-
-	@Override
-	@Nonnull
-	public EnumSet<Permission> getPermissionsExplicit() {
-		return this.member.getPermissionsExplicit();
-	}
-
-	@Override
-	@Nonnull
-	public EnumSet<Permission> getPermissionsExplicit(@Nonnull GuildChannel channel) {
-		return this.member.getPermissionsExplicit(channel);
-	}
-
-	@Override
-	public boolean hasPermission(@Nonnull Permission... permissions) {
-		return this.member.hasPermission(permissions);
-	}
-
-	@Override
-	public boolean hasPermission(@Nonnull Collection<Permission> permissions) {
-		return this.member.hasPermission(permissions);
-	}
-
-	@Override
-	public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Permission... permissions) {
-		return this.member.hasPermission(channel, permissions);
-	}
-
-	@Override
-	public boolean hasPermission(@Nonnull GuildChannel channel, @Nonnull Collection<Permission> permissions) {
-		return this.member.hasPermission(channel, permissions);
-	}
-
-	@Override
-	public boolean hasAccess(@Nonnull GuildChannel channel) {
-		return this.member.hasAccess(channel);
-	}
-
-	@Override
-	public boolean canSync(@Nonnull IPermissionContainer targetChannel, @Nonnull IPermissionContainer syncSource) {
-		return this.member.canSync(targetChannel, syncSource);
-	}
-
-	@Override
-	public boolean canSync(@Nonnull IPermissionContainer channel) {
-		return this.member.canSync(channel);
 	}
 }
