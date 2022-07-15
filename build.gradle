@@ -57,7 +57,7 @@ dependencies {
 
     implementation "org.mongodb:mongo-java-driver:3.12.11"
 
-    implementation "club.minnced:discord-webhooks:0.8.0"
+    implementation "club.minnced:discord-webhooks:0.8.2"
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:7.1.0'
 
