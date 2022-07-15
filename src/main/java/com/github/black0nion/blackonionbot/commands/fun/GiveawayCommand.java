@@ -75,32 +75,35 @@ public class GiveawayCommand extends SlashCommand {
 		Integer years = e.getOption(YEARS, OptionMapping::getAsInt);
 		if (min == null && hours == null && days == null && weeks == null && months == null && years == null) {
 			cmde.send("timenotspecfied");
-		} else {
-			long time = 0;
-			if (min != null) time += min * 60 * 1000;
-			if (hours != null) time += hours * 60 * 60 * 1000;
-			if (days != null) time += days * 24 * 60 * 60 * 1000;
-			if (weeks != null) time += (long) weeks * 7 * 24 * 60 * 60 * 1000;
-			if (months != null) time += (long) months * 30 * 24 * 60 * 60 * 1000;
-			if (years != null) time += (long) years * 365 * 24 * 60 * 60 * 1000;
-			var data = Date.from(Instant.now().plusMillis(time));
-			var item = e.getOption(ITEM_TO_GIVE, OptionMapping::getAsString);
-			var winners = e.getOption(WINNERS, OptionMapping::getAsInt);
-			final EmbedBuilder giveawayMessage = cmde.success()
-				.setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item)))
-				.setDescription(cmde.getTranslation("giveawaydesc",
-					new Placeholder("item", item),
-					new Placeholder("winners", String.valueOf(winners)),
-					new Placeholder("end", DATE_FORMAT.format(data).replace("_", " ")),
-					new Placeholder("user", author.getAsMention())));
-			cmde.reply(giveawayMessage, msg -> msg.retrieveOriginal().queue(
-				message -> {
-					message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
-					message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
-					GiveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
-				}
-			));
+			return;
 		}
+
+		long time = 0;
+		if (min != null) time += min * 60 * 1000;
+		if (hours != null) time += hours * 60 * 60 * 1000;
+		if (days != null) time += days * 24 * 60 * 60 * 1000;
+		if (weeks != null) time += (long) weeks * 7 * 24 * 60 * 60 * 1000;
+		if (months != null) time += (long) months * 30 * 24 * 60 * 60 * 1000;
+		if (years != null) time += (long) years * 365 * 24 * 60 * 60 * 1000;
+
+		var data = Date.from(Instant.now().plusMillis(time));
+		var item = e.getOption(ITEM_TO_GIVE, OptionMapping::getAsString);
+		var winners = e.getOption(WINNERS, OptionMapping::getAsInt);
+		final EmbedBuilder giveawayMessage = cmde.success()
+			.setTitle(cmde.getTranslation("giveawayfor", new Placeholder("item", item)))
+			.setDescription(cmde.getTranslation("giveawaydesc",
+				new Placeholder("item", item),
+				new Placeholder("winners", String.valueOf(winners)),
+				new Placeholder("end", DATE_FORMAT.format(data).replace("_", " ")),
+				new Placeholder("user", author.getAsMention())));
+
+		cmde.reply(giveawayMessage, msg -> msg.retrieveOriginal().queue(
+			message -> {
+				message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
+				message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
+				GiveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
+			}
+		));
 	}
 
 	private static void endGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
