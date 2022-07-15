@@ -73,7 +73,7 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:1.2.11"
     implementation "uk.org.lidalia:sysout-over-slf4j:1.0.2"
 
-    implementation "io.github.classgraph:classgraph:4.8.147"
+    implementation "io.github.classgraph:classgraph:4.8.149"
 
     implementation "io.prometheus:simpleclient:0.15.0"
     implementation "io.prometheus:simpleclient_hotspot:0.15.0"
