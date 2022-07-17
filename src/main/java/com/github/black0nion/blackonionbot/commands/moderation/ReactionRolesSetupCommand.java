@@ -60,8 +60,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member,
-						BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		switch (Objects.requireNonNull(e.getSubcommandName())) {
 			case CREATE_REACTION -> setCreateReaction(cmde, e, guild);
 			case REMOVE_REACTION -> setRemoveReaction(cmde, e, guild);
@@ -74,7 +73,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		var messageId = e.getOption(CREATE_REACTION_MESSAGE_ID, OptionMapping::getAsLong);
 		var emoteId = e.getOption(CREATE_REACTION_EMOTE, OptionMapping::getAsLong);
 
-		if (guild.getEmoteById(emoteId) == null) {
+		if (guild.getEmojiById(emoteId) == null) {
 			cmde.send("emotenotfound");
 		}
 
@@ -83,10 +82,13 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		if (Objects.requireNonNull(createReactionChannel).isMessage()) {
 			var textChannel = e.getOption(CREATE_REACTION_CHANNEL, OptionMapping::getAsTextChannel);
 			textChannel.retrieveMessageById(messageId)
-				.queue(success -> guild.retrieveEmoteById(emoteId).queue(successEmote -> {
-					textChannel.addReactionById(messageId, successEmote).queue(null,
-						fail -> cmde.error("wrongargument", "emotenotfound"));
-				}, fail -> cmde.error("wrongargument", "emotenotfound")));
+				.queue(success -> guild.retrieveEmojiById(emoteId).queue(
+					successEmote -> textChannel.addReactionById(messageId, successEmote).queue(
+						null,
+						fail -> cmde.error("wrongargument", "emotenotfound")
+					),
+					fail -> cmde.error("wrongargument", "emotenotfound"))
+				);
 
 			var doc = appendDoc(e, textChannel, messageId, emoteId, role.getIdLong());
 
@@ -98,7 +100,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			ReactionRoleSystem.collection.insertOne(doc);
 
 			cmde.success("reactionrolecreated", "reactionrolecreatedinfo",
-				new Placeholder("emote", e.getGuild().getEmoteById(emoteId).getAsMention()),
+				new Placeholder("emote", e.getGuild().getEmojiById(emoteId).getAsMention()),
 				new Placeholder("role", role.getAsMention()));
 		} else {
 			cmde.send("nottextchannel");
@@ -111,17 +113,17 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		var messageId = e.getOption(REMOVE_REACTION_MESSAGE_ID, OptionMapping::getAsLong);
 		var emoteId = e.getOption(REMOVE_REACTION_EMOTE, OptionMapping::getAsLong);
 
-		if (guild.getEmoteById(emoteId) == null) {
+		if (guild.getEmojiById(emoteId) == null) {
 			cmde.send("emotenotfound");
 		}
 
-		var emote = guild.getEmoteById(emoteId);
+		var emote = guild.getEmojiById(emoteId);
 		var role = e.getOption(REMOVE_REACTION_ROLE, OptionMapping::getAsRole);
 
 		if (Objects.requireNonNull(removeReactionChannel).isMessage()) {
 			var textChannel = e.getOption(CREATE_REACTION_CHANNEL, OptionMapping::getAsTextChannel);
 			Objects.requireNonNull(textChannel).retrieveMessageById(messageId)
-				.queue(success -> guild.retrieveEmoteById(emoteId).queue(successEmote -> {
+				.queue(success -> guild.retrieveEmojiById(emoteId).queue(successEmote -> {
 					textChannel.addReactionById(messageId, successEmote).queue(null,
 						fail -> cmde.error("wrongargument", "emotenotfound"));
 				}, fail -> cmde.error("wrongargument", "emotenotfound")));
@@ -136,14 +138,9 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			if (ReactionRoleSystem.collection.find(doc).first() != null) {
 				ReactionRoleSystem.collection.deleteOne(doc);
 
-				final String finalEmote = emote.getAsMention();
 				textChannel.retrieveMessageById(messageId).queue(
-					msg -> guild.retrieveEmoteById(finalEmote.split(":")[2].replace(">", "")).queue(customEmote -> {
-						if (customEmote != null) {
-							msg.clearReactions(customEmote).queue();
-						} else {
-							msg.clearReactions(finalEmote).queue();
-						}
+					msg -> guild.retrieveEmojiById(emote.getId()).queue(customEmote -> {
+						msg.clearReactions(Objects.requireNonNullElse(customEmote, emote)).queue();
 						cmde.success("entrydeleted", "reactionroledeleted");
 					}));
 			} else {
@@ -155,10 +152,9 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		}
 	}
 
-	private Document appendDoc(@NotNull SlashCommandInteraction e, @NotNull TextChannel channel, long messageId,
-							   long emoteId, long roleId) {
+	private Document appendDoc(@NotNull SlashCommandInteraction e, @NotNull TextChannel channel, long messageId, long emoteId, long roleId) {
 		return new Document().append("guildid", e.getGuild().getIdLong()).append("channelid", channel.getIdLong())
-			.append("messageid", messageId).append("emote", e.getGuild().getEmoteById(emoteId))
+			.append("messageid", messageId).append("emote", e.getGuild().getEmojiById(emoteId))
 			.append("roleid", roleId);
 	}
 }

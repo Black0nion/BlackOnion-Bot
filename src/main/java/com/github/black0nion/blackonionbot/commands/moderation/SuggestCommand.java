@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -41,8 +42,8 @@ public class SuggestCommand extends SlashCommand {
 				// all good, we can send the suggestion
 				suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle(SUGGESTION).setDescription(String.join(" ", suggestion)).build())
 					.queue(msg -> {
-						msg.addReaction("U+1F44D").queue();
-						msg.addReaction("U+1F44E").queue();
+						msg.addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+						msg.addReaction(Emoji.fromUnicode("U+1F44E")).queue();
 					});
 				cmde.send("suggestionsucess");
 			}

@@ -4,12 +4,18 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.entities.sticker.GuildSticker;
+import net.dv8tion.jda.api.entities.sticker.StickerSnowflake;
 import net.dv8tion.jda.api.entities.templates.Template;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.PrivilegeConfig;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.dv8tion.jda.api.interactions.commands.privileges.IntegrationPrivilege;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.managers.GuildManager;
+import net.dv8tion.jda.api.managers.GuildStickerManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.*;
 import net.dv8tion.jda.api.requests.restaction.order.CategoryOrderAction;
@@ -17,6 +23,8 @@ import net.dv8tion.jda.api.requests.restaction.order.ChannelOrderAction;
 import net.dv8tion.jda.api.requests.restaction.order.RoleOrderAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.BanPaginationAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.ImageProxy;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
@@ -26,6 +34,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -113,57 +122,22 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(@Nonnull String commandId) {
-		return this.guild.retrieveCommandPrivilegesById(commandId);
+	public RestAction<List<IntegrationPrivilege>> retrieveIntegrationPrivilegesById(@Nonnull String targetId) {
+		return this.guild.retrieveIntegrationPrivilegesById(targetId);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<CommandPrivilege>> retrieveCommandPrivilegesById(long commandId) {
-		return this.guild.retrieveCommandPrivilegesById(commandId);
+	public RestAction<List<IntegrationPrivilege>> retrieveIntegrationPrivilegesById(long targetId) {
+		return this.guild.retrieveIntegrationPrivilegesById(targetId);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<Map<String, List<CommandPrivilege>>> retrieveCommandPrivileges() {
+	public RestAction<PrivilegeConfig> retrieveCommandPrivileges() {
 		return this.guild.retrieveCommandPrivileges();
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@Nonnull String id, @Nonnull Collection<? extends CommandPrivilege> privileges) {
-		return this.guild.updateCommandPrivilegesById(id, privileges);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(@Nonnull String id, @Nonnull CommandPrivilege... privileges) {
-		return this.guild.updateCommandPrivilegesById(id, privileges);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @Nonnull Collection<? extends CommandPrivilege> privileges) {
-		return this.guild.updateCommandPrivilegesById(id, privileges);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<List<CommandPrivilege>> updateCommandPrivilegesById(long id, @Nonnull CommandPrivilege... privileges) {
-		return this.guild.updateCommandPrivilegesById(id, privileges);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<Map<String, List<CommandPrivilege>>> updateCommandPrivileges(@Nonnull Map<String, ? extends Collection<CommandPrivilege>> privileges) {
-		return this.guild.updateCommandPrivileges(privileges);
 	}
 
 	@Override
@@ -226,6 +200,12 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
+	@Nullable
+	public ImageProxy getIcon() {
+		return this.guild.getIcon();
+	}
+
+	@Override
 	@Nonnull
 	public Set<String> getFeatures() {
 		return this.guild.getFeatures();
@@ -241,6 +221,12 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Nullable
 	public String getSplashUrl() {
 		return this.guild.getSplashUrl();
+	}
+
+	@Override
+	@Nullable
+	public ImageProxy getSplash() {
+		return this.guild.getSplash();
 	}
 
 	@Override
@@ -287,6 +273,12 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
+	@Nullable
+	public ImageProxy getBanner() {
+		return this.guild.getBanner();
+	}
+
+	@Override
 	@Nonnull
 	public BoostTier getBoostTier() {
 		return this.guild.getBoostTier();
@@ -314,8 +306,8 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
-	public int getMaxEmotes() {
-		return this.guild.getMaxEmotes();
+	public int getMaxEmojis() {
+		return this.guild.getMaxEmojis();
 	}
 
 	@Override
@@ -581,60 +573,111 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public Emote getEmoteById(@Nonnull String id) {
-		return this.guild.getEmoteById(id);
+	public RichCustomEmoji getEmojiById(@Nonnull String id) {
+		return this.guild.getEmojiById(id);
 	}
 
 	@Override
 	@Nullable
-	public Emote getEmoteById(long id) {
-		return this.guild.getEmoteById(id);
+	public RichCustomEmoji getEmojiById(long id) {
+		return this.guild.getEmojiById(id);
 	}
 
 	@Override
 	@Nonnull
-	public List<Emote> getEmotes() {
-		return this.guild.getEmotes();
+	public List<RichCustomEmoji> getEmojis() {
+		return this.guild.getEmojis();
 	}
 
 	@Override
 	@Nonnull
-	public List<Emote> getEmotesByName(@Nonnull String name, boolean ignoreCase) {
-		return this.guild.getEmotesByName(name, ignoreCase);
+	public List<RichCustomEmoji> getEmojisByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getEmojisByName(name, ignoreCase);
 	}
 
 	@Override
 	@Nonnull
-	public SnowflakeCacheView<Emote> getEmoteCache() {
-		return this.guild.getEmoteCache();
+	public SnowflakeCacheView<RichCustomEmoji> getEmojiCache() {
+		return this.guild.getEmojiCache();
+	}
+
+	@Override
+	@Nullable
+	public GuildSticker getStickerById(@Nonnull String id) {
+		return this.guild.getStickerById(id);
+	}
+
+	@Override
+	@Nullable
+	public GuildSticker getStickerById(long id) {
+		return this.guild.getStickerById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<GuildSticker> getStickers() {
+		return this.guild.getStickers();
+	}
+
+	@Override
+	@Nonnull
+	public List<GuildSticker> getStickersByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getStickersByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nonnull
+	public SnowflakeCacheView<GuildSticker> getStickerCache() {
+		return this.guild.getStickerCache();
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<List<ListedEmote>> retrieveEmotes() {
-		return this.guild.retrieveEmotes();
+	public RestAction<List<RichCustomEmoji>> retrieveEmojis() {
+		return this.guild.retrieveEmojis();
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<ListedEmote> retrieveEmoteById(@Nonnull String id) {
-		return this.guild.retrieveEmoteById(id);
+	public RestAction<RichCustomEmoji> retrieveEmojiById(@Nonnull String id) {
+		return this.guild.retrieveEmojiById(id);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<ListedEmote> retrieveEmoteById(long id) {
-		return this.guild.retrieveEmoteById(id);
+	public RestAction<RichCustomEmoji> retrieveEmojiById(long id) {
+		return this.guild.retrieveEmojiById(id);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public RestAction<ListedEmote> retrieveEmote(@Nonnull Emote emote) {
-		return this.guild.retrieveEmote(emote);
+	public RestAction<RichCustomEmoji> retrieveEmoji(@Nonnull CustomEmoji emoji) {
+		return this.guild.retrieveEmoji(emoji);
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public RestAction<List<GuildSticker>> retrieveStickers() {
+		return this.guild.retrieveStickers();
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public RestAction<GuildSticker> retrieveSticker(@Nonnull StickerSnowflake sticker) {
+		return this.guild.retrieveSticker(sticker);
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public GuildStickerManager editSticker(@Nonnull StickerSnowflake sticker) {
+		return this.guild.editSticker(sticker);
 	}
 
 	@Override
@@ -1183,8 +1226,29 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Emote> createEmote(@Nonnull String name, @Nonnull Icon icon, @Nonnull Role... roles) {
-		return this.guild.createEmote(name, icon, roles);
+	public AuditableRestAction<RichCustomEmoji> createEmoji(@Nonnull String name, @Nonnull Icon icon, @Nonnull Role... roles) {
+		return this.guild.createEmoji(name, icon, roles);
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public AuditableRestAction<GuildSticker> createSticker(@Nonnull String name, @Nonnull String description, @Nonnull FileUpload file, @Nonnull Collection<String> tags) {
+		return this.guild.createSticker(name, description, file, tags);
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public AuditableRestAction<GuildSticker> createSticker(@Nonnull String name, @Nonnull String description, @Nonnull FileUpload file, @Nonnull String tag, @Nonnull String... tags) {
+		return this.guild.createSticker(name, description, file, tag, tags);
+	}
+
+	@Override
+	@CheckReturnValue
+	@Nonnull
+	public AuditableRestAction<Void> deleteSticker(@Nonnull StickerSnowflake id) {
+		return this.guild.deleteSticker(id);
 	}
 
 	@Override
@@ -1237,7 +1301,199 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
+	@Nullable
+	public <T extends Channel> T getChannelById(@Nonnull Class<T> type, @Nonnull String id) {
+		return this.guild.getChannelById(type, id);
+	}
+
+	@Override
+	@Nullable
+	public <T extends Channel> T getChannelById(@Nonnull Class<T> type, long id) {
+		return this.guild.getChannelById(type, id);
+	}
+
+	@Override
+	@Nullable
+	public GuildChannel getGuildChannelById(@Nonnull String id) {
+		return this.guild.getGuildChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public GuildChannel getGuildChannelById(long id) {
+		return this.guild.getGuildChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public GuildChannel getGuildChannelById(@Nonnull ChannelType type, @Nonnull String id) {
+		return this.guild.getGuildChannelById(type, id);
+	}
+
+	@Override
+	@Nullable
+	public GuildChannel getGuildChannelById(@Nonnull ChannelType type, long id) {
+		return this.guild.getGuildChannelById(type, id);
+	}
+
+	@Override
+	@Nonnull
+	public List<StageChannel> getStageChannelsByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getStageChannelsByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public StageChannel getStageChannelById(@Nonnull String id) {
+		return this.guild.getStageChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public StageChannel getStageChannelById(long id) {
+		return this.guild.getStageChannelById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<StageChannel> getStageChannels() {
+		return this.guild.getStageChannels();
+	}
+
+	@Override
+	@Nonnull
+	public List<ThreadChannel> getThreadChannelsByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getThreadChannelsByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public ThreadChannel getThreadChannelById(@Nonnull String id) {
+		return this.guild.getThreadChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public ThreadChannel getThreadChannelById(long id) {
+		return this.guild.getThreadChannelById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<ThreadChannel> getThreadChannels() {
+		return this.guild.getThreadChannels();
+	}
+
+	@Override
+	@Nonnull
+	public List<Category> getCategoriesByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getCategoriesByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public Category getCategoryById(@Nonnull String id) {
+		return this.guild.getCategoryById(id);
+	}
+
+	@Override
+	@Nullable
+	public Category getCategoryById(long id) {
+		return this.guild.getCategoryById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<Category> getCategories() {
+		return this.guild.getCategories();
+	}
+
+	@Override
+	@Nonnull
+	public List<TextChannel> getTextChannelsByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getTextChannelsByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public TextChannel getTextChannelById(@Nonnull String id) {
+		return this.guild.getTextChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public TextChannel getTextChannelById(long id) {
+		return this.guild.getTextChannelById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<TextChannel> getTextChannels() {
+		return this.guild.getTextChannels();
+	}
+
+	@Override
+	@Nonnull
+	public List<NewsChannel> getNewsChannelsByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getNewsChannelsByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public NewsChannel getNewsChannelById(@Nonnull String id) {
+		return this.guild.getNewsChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public NewsChannel getNewsChannelById(long id) {
+		return this.guild.getNewsChannelById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<NewsChannel> getNewsChannels() {
+		return this.guild.getNewsChannels();
+	}
+
+	@Override
+	@Nonnull
+	public List<VoiceChannel> getVoiceChannelsByName(@Nonnull String name, boolean ignoreCase) {
+		return this.guild.getVoiceChannelsByName(name, ignoreCase);
+	}
+
+	@Override
+	@Nullable
+	public VoiceChannel getVoiceChannelById(@Nonnull String id) {
+		return this.guild.getVoiceChannelById(id);
+	}
+
+	@Override
+	@Nullable
+	public VoiceChannel getVoiceChannelById(long id) {
+		return this.guild.getVoiceChannelById(id);
+	}
+
+	@Override
+	@Nonnull
+	public List<VoiceChannel> getVoiceChannels() {
+		return this.guild.getVoiceChannels();
+	}
+
+	@Override
+	@Nonnull
+	public String getId() {
+		return this.guild.getId();
+	}
+
+	@Override
 	public long getIdLong() {
 		return this.guild.getIdLong();
+	}
+
+	@Override
+	@Nonnull
+	public OffsetDateTime getTimeCreated() {
+		return this.guild.getTimeCreated();
 	}
 }
