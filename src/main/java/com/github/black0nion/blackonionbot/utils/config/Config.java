@@ -30,7 +30,8 @@ public class Config {
 	public static final String discordapp_client_secret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("^[a-z\\d=_\\-]{32}$", Pattern.CASE_INSENSITIVE)));
 	public static final String discordapp_client_id = get("discordapp_client_id", String.class, matchesRegex("\\d{17,19}"));
 	public static final String discordapp_redirect_url = get("discordapp_redirect_url", String.class, matchesRegex("https?://.+"));
-	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb(\\+srv)?:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));	@Nullable
+	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb(\\+srv)?:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
+	@Nullable
 	public static final String influx_database_url = get("influx_database_url", String.class);
 	@Nullable
 	public static final String influx_token = get("influx_token", String.class);
