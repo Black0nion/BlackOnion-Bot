@@ -27,7 +27,7 @@ public class SkipCommand extends SlashCommand {
     public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
         final GuildVoiceState state = guild.getSelfMember().getVoiceState();
         if (state != null && state.getChannel() != null) {
-            final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel().asTextChannel());
+            final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
             final AudioPlayer player = musicManager.audioPlayer;
 
             if (player.getPlayingTrack() == null) {

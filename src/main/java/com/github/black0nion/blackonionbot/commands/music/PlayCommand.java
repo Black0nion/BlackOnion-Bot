@@ -38,7 +38,7 @@ public class PlayCommand extends SlashCommand {
 
             audioManager.openAudioConnection(memberChannel);
 
-            PlayerManager.getInstance().loadAndPlay(author, e.getChannel().asTextChannel(), urlOrName, audioManager, memberChannel);
+            PlayerManager.getInstance().loadAndPlay(author, e.getTextChannel(), urlOrName, audioManager, memberChannel);
         } else
             cmde.error("notinvc", "goinvc");
     }

@@ -42,7 +42,7 @@ public class VolumeCommand extends SlashCommand {
             final AudioChannel memberChannel = member.getVoiceState().getChannel();
 
             if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel().asTextChannel());
+                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
                 musicManager.scheduler.player.setVolume(volume);
                 cmde.success("volumechanged", "volumesetto", new Placeholder("volume", volume));
             } else {

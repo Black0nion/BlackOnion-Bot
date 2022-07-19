@@ -4,7 +4,6 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.annotations.Incubating;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
@@ -253,7 +252,7 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 
 	@Override
 	@Nullable
-	public DefaultGuildChannelUnion getDefaultChannel() {
+	public BaseGuildMessageChannel getDefaultChannel() {
 		return this.member.getDefaultChannel();
 	}
 

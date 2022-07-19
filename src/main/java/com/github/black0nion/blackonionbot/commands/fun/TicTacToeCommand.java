@@ -152,7 +152,7 @@ public class TicTacToeCommand extends SlashCommand {
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		var challenged = BlackUser.from(Objects.requireNonNull(e.getOption(USER, OptionMapping::getAsUser)));
 		if (challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
-			this.rerun(TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel().asTextChannel());
+			this.rerun(TicTacToeGameManager.createGame(e.getTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getTextChannel());
 			return;
 		} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
 			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
@@ -171,8 +171,8 @@ public class TicTacToeCommand extends SlashCommand {
 					e.replyEmbeds(EmbedUtils.getSuccessEmbed(eventAuthor, guild).addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 
 					// Accepted
-					final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
-					this.rerun(game, e.getChannel().asTextChannel());
+					final TicTacToe game = TicTacToeGameManager.createGame(e.getTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
+					this.rerun(game, e.getTextChannel());
 				} else
 					ConnectFourCommand.isDeclined(e, guild, event, author, getTranslation("declined", eventAuthor, guild), getTranslation("challengedeclined", eventAuthor, guild), getTranslation("arentyoubraveenough", eventAuthor, guild), getTranslation("answerwithyes", eventAuthor, guild));
 		}, 1, TimeUnit.MINUTES, () -> e.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());

@@ -27,7 +27,7 @@ public class PauseCommand extends SlashCommand {
             //noinspection ConstantConditions - intent is enabled, so it shouldn't be null
             final AudioChannel memberChannel = member.getVoiceState().getChannel();
             if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel().asTextChannel());
+                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
                 musicManager.scheduler.player.setPaused(true);
 
                 cmde.success("musicpaused", "useresume", new Placeholder("command", SlashCommandEvent.getCommandHelp(this)));

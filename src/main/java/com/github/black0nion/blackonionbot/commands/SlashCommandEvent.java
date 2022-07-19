@@ -58,7 +58,7 @@ public class SlashCommandEvent {
 		this.event = e;
 		this.jda = e.getJDA();
 		this.guild = guild;
-		this.channel = e.getChannel().asTextChannel();
+		this.channel = e.getTextChannel();
 		this.member = member;
 		this.user = user;
 		this.successEmbed = getSuccessEmbed(this.user, this.guild);
