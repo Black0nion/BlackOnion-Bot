@@ -43,10 +43,8 @@ dependencies {
     implementation "com.google.code.gson:gson:2.9.0"
     implementation "com.github.Marcono1234:gson-record-type-adapter-factory:v0.2.0"
 
-    implementation "net.dv8tion:JDA:5.0.0-alpha.13"
-    // TODO: use the 3.1.0 version when https://github.com/jitpack/jitpack.io/issues/5149 is resolved
-    // de2683d138 is the 3.1.0 version
-    implementation "com.github.black0nion:Pagination-Utils:de2683d138"
+    implementation "net.dv8tion:JDA:5.0.0-alpha.16"
+    implementation "com.github.black0nion:Pagination-Utils:3.2.0"
     implementation "pw.chew:jda-chewtils:1.24.1"
 
     implementation "com.github.Mokulu:discord-oauth2-api:1.0.2"

@@ -17,7 +17,7 @@ import static com.github.black0nion.blackonionbot.utils.config.Flags.*;
 @SuppressWarnings("ConstantConditions")
 public class Config {
 
-	public static final String token = get("token", String.class, NonNull, matchesRegex("[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}"));
+	public static final String token = get("token", String.class, NonNull, matchesRegex("^[A-Za-z\\d]{24}.[\\w-]{6}.[\\w-]{26,40}$"));
 	public static final @Nonnull String prefix = get("prefix", String.class, defaultValue("*"), matchesRegex("\\w{1,10}"));
 	public static Activity.ActivityType activity_type = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.PLAYING));
 	public static String activity_name = get("activity_name", String.class, defaultValue(prefix));
@@ -30,7 +30,7 @@ public class Config {
 	public static final String discordapp_client_secret = get("discordapp_client_secret", String.class, matchesRegex(Pattern.compile("^[a-z\\d=_\\-]{32}$", Pattern.CASE_INSENSITIVE)));
 	public static final String discordapp_client_id = get("discordapp_client_id", String.class, matchesRegex("\\d{17,19}"));
 	public static final String discordapp_redirect_url = get("discordapp_redirect_url", String.class, matchesRegex("https?://.+"));
-	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
+	public static final String mongo_connection_string = get("mongo_connection_string", String.class, Flags.NonNull, matchesRegex("^mongodb(\\+srv)?:\\/\\/(?:(?:(\\w+)?:(\\w+)?@)|:?@?)((?:[\\w.-])+)(?::(\\d+))?(?:\\/([\\w-]+)?)?(?:\\?([\\w-]+=[\\w-]+(?:&[\\w-]+=[\\w-]+)*)?)?$"));
 	@Nullable
 	public static final String influx_database_url = get("influx_database_url", String.class);
 	@Nullable

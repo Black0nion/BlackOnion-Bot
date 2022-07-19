@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -65,7 +66,7 @@ public abstract class UserImpl extends BlackWrapper implements User {
 
 	@NotNull
 	@Override
-	public RestAction<Profile> retrieveProfile() {
+	public CacheRestAction<Profile> retrieveProfile() {
 		return this.user.retrieveProfile();
 	}
 
@@ -82,7 +83,7 @@ public abstract class UserImpl extends BlackWrapper implements User {
 
 	@Override
 	@NotNull
-	public RestAction<PrivateChannel> openPrivateChannel() {
+	public CacheRestAction<PrivateChannel> openPrivateChannel() {
 		return this.user.openPrivateChannel();
 	}
 
