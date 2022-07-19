@@ -25,9 +25,11 @@ import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationActi
 import net.dv8tion.jda.api.requests.restaction.pagination.BanPaginationAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.ImageProxy;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 
 import javax.annotation.CheckReturnValue;
@@ -56,6 +58,13 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 		return this.guild.retrieveCommands();
 	}
 
+	@Override
+	@CheckReturnValue
+	@Nonnull
+    public RestAction<List<Command>> retrieveCommands(boolean withLocalizations) {
+		return this.guild.retrieveCommands(withLocalizations);
+	}
+	
 	@Override
 	@CheckReturnValue
 	@Nonnull
@@ -256,7 +265,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public Locale getLocale() {
+	public DiscordLocale getLocale() {
 		return this.guild.getLocale();
 	}
 
@@ -709,7 +718,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nullable
-	public BaseGuildMessageChannel getDefaultChannel() {
+	public DefaultGuildChannelUnion getDefaultChannel() {
 		return this.guild.getDefaultChannel();
 	}
 
@@ -870,50 +879,26 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMember(@Nonnull UserSnowflake user) {
+	public CacheRestAction<Member> retrieveMember(@Nonnull UserSnowflake user) {
 		return this.guild.retrieveMember(user);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMemberById(@Nonnull String id) {
+	public CacheRestAction<Member> retrieveMemberById(@Nonnull String id) {
 		return this.guild.retrieveMemberById(id);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveMemberById(long id) {
+	public CacheRestAction<Member> retrieveMemberById(long id) {
 		return this.guild.retrieveMemberById(id);
 	}
 
 	@Override
 	@Nonnull
-	public RestAction<Member> retrieveOwner() {
+	public CacheRestAction<Member> retrieveOwner() {
 		return this.guild.retrieveOwner();
-	}
-
-	@Override
-	@Nonnull
-	public RestAction<Member> retrieveMember(@Nonnull User user, boolean update) {
-		return this.guild.retrieveMember(user, update);
-	}
-
-	@Override
-	@Nonnull
-	public RestAction<Member> retrieveMemberById(@Nonnull String id, boolean update) {
-		return this.guild.retrieveMemberById(id, update);
-	}
-
-	@Override
-	@Nonnull
-	public RestAction<Member> retrieveMemberById(long id, boolean update) {
-		return this.guild.retrieveMemberById(id, update);
-	}
-
-	@Override
-	@Nonnull
-	public RestAction<Member> retrieveOwner(boolean update) {
-		return this.guild.retrieveOwner(update);
 	}
 
 	@Override

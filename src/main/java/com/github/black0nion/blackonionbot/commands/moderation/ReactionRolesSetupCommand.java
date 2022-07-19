@@ -80,7 +80,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		var role = e.getOption(CREATE_REACTION_ROLE, OptionMapping::getAsRole);
 
 		if (Objects.requireNonNull(createReactionChannel).isMessage()) {
-			var textChannel = e.getOption(CREATE_REACTION_CHANNEL, OptionMapping::getAsTextChannel);
+			var textChannel = e.getOption(CREATE_REACTION_CHANNEL).getAsChannel().asTextChannel();
 			textChannel.retrieveMessageById(messageId)
 				.queue(success -> guild.retrieveEmojiById(emoteId).queue(
 					successEmote -> textChannel.addReactionById(messageId, successEmote).queue(
@@ -121,7 +121,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		var role = e.getOption(REMOVE_REACTION_ROLE, OptionMapping::getAsRole);
 
 		if (Objects.requireNonNull(removeReactionChannel).isMessage()) {
-			var textChannel = e.getOption(CREATE_REACTION_CHANNEL, OptionMapping::getAsTextChannel);
+			var textChannel = e.getOption(CREATE_REACTION_CHANNEL).getAsChannel().asTextChannel();
 			Objects.requireNonNull(textChannel).retrieveMessageById(messageId)
 				.queue(success -> guild.retrieveEmojiById(emoteId).queue(successEmote -> {
 					textChannel.addReactionById(messageId, successEmote).queue(null,
