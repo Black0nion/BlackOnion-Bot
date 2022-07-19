@@ -122,7 +122,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 	}
 
 	private void addChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var addChannel = e.getOption(ADD_CHANNEL).getAsChannel().asTextChannel();
+		var addChannel = e.getOption(ADD_CHANNEL, OptionMapping::getAsChannel).asTextChannel();
 
 		final List<String> mentionedStuff = new ArrayList<>();
 		mentionedStuff.add(addChannel.getAsMention());
@@ -139,7 +139,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 	}
 
 	private void removeChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		var removeChannel = e.getOption(REMOVE_CHANNEL).getAsChannel().asTextChannel();
+		var removeChannel = e.getOption(REMOVE_CHANNEL, OptionMapping::getAsChannel).asTextChannel();
 
 		final List<String> mentionedStuff = new ArrayList<>();
 		mentionedStuff.add(removeChannel.getAsMention());
