@@ -59,18 +59,18 @@ public class HangmanCommand extends SlashCommand {
 		final int failedAttemptsCount = failedAttempts.equalsIgnoreCase("") ? 0 : failedAttempts.split(", ").length;
 
 		if (failedAttemptsCount >= 7) {
-			e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue());
+			e.getMessageChannel().retrieveMessageById(e.getChannel().asTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.error().setTitle("hangman").addField("urded", "notbigsurprise", false).build()).queue());
 			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
 
 		final EmbedBuilder builder = cmde.success().setTitle("hangman").setDescription("```\n" + getSpacesString(solution, alreadyGuessed) + "\nFailed Attempts: " + failedAttempts + "\n" + getDrawing(failedAttemptsCount) + "```");
 		if (won(solution, alreadyGuessed)) {
-			e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue());
+			e.getMessageChannel().retrieveMessageById(e.getChannel().asTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(cmde.success().setTitle("hangman").addField("uwon", "bigsurprise", false).build()).queue());
 			ingamePlayers.remove(cmde.getUser().getIdLong());
 			return;
 		}
-		e.getMessageChannel().retrieveMessageById(e.getTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
+		e.getMessageChannel().retrieveMessageById(e.getChannel().asTextChannel().getLatestMessageId()).queue(msg -> msg.editMessageEmbeds(builder.build()).queue(message -> Bot.getInstance().getEventWaiter().waitForEvent(
 			MessageReceivedEvent.class,
 			event -> event.getChannelType() == ChannelType.TEXT && event.getGuild().getIdLong() == cmde.getGuild().getIdLong() && event.getAuthor().getIdLong() == cmde.getUser().getIdLong() && !event.getMessage().getContentRaw().toLowerCase().startsWith("!") && !alreadyGuessed.contains(event.getMessage().getContentRaw().toLowerCase().charAt(0)),
 			event -> {

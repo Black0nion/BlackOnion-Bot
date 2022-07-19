@@ -26,7 +26,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         final Message msg = event != null ? event.getMessage() : event1.getMessage();
         final String message = msg.getContentRaw();
         final BlackUser author = BlackUser.from(event != null ? event.getAuthor() : event1.getAuthor());
-        final TextChannel channel = event != null ? event.getTextChannel() : event1.getTextChannel();
+        final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
         final BlackGuild guild = BlackGuild.from(event != null ? event.getGuild() : event1.getGuild());
         String newMessage = message;
         final AntiSpoilerType type = guild.getAntiSpoilerType();

@@ -26,7 +26,7 @@ public class StopCommand extends SlashCommand {
             //noinspection ConstantConditions - intent is enabled, so it shouldn't be null
             final AudioChannel memberChannel = member.getVoiceState().getChannel();
             if (memberChannel != null && memberChannel.getIdLong() == state.getChannel().getIdLong()) {
-                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getTextChannel());
+                final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getChannel().asTextChannel());
                 musicManager.scheduler.player.stopTrack();
                 musicManager.scheduler.queue.clear();
                 guild.getAudioManager().closeAudioConnection();
