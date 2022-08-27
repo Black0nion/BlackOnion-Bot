@@ -1,14 +1,19 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.api.API;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.inject.DefaultInjector;
+import com.github.black0nion.blackonionbot.inject.Injector;
+import com.github.black0nion.blackonionbot.inject.InjectorMap;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoManager;
-import com.github.black0nion.blackonionbot.stats.Prometheus;
-import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.stats.StatsJob;
+import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
+import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
+import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
+import com.github.black0nion.blackonionbot.rest.API;
+import com.github.black0nion.blackonionbot.rest.sessions.MongoLogin;
+import com.github.black0nion.blackonionbot.stats.*;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
@@ -18,12 +23,15 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.impl.ConfigImpl;
+import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Paginator;
 import com.github.ygimenez.model.PaginatorBuilder;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -62,7 +70,6 @@ public class Bot extends ListenerAdapter {
 		}
 	}
 
-	public static final List<String> launchArguments = new ArrayList<>();
 
 	private static Bot instance;
 
@@ -96,6 +103,8 @@ public class Bot extends ListenerAdapter {
 		.build();
 
 	private long selfUserId = -1;
+	private final SlashCommandBase slashCommandBase;
+	private final Config config;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -118,35 +127,53 @@ public class Bot extends ListenerAdapter {
 	public long getSelfUserId() {
 		return selfUserId;
 	}
+
+	public Config getConfig() {
+		return config;
+	}
+
 	//endregion
 
-	public Bot(String[] args) throws IOException {
+	public Bot() throws IOException {
 		instance = this;
-		launchArguments.addAll(Arrays.asList(args));
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
+
 		ConfigManager.loadConfig();
+		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
+
 		DockerManager.init();
-		logger.info("Starting BlackOnion-Bot in '{}' mode...", Config.getInstance().getRunMode());
+		logger.info("Starting BlackOnion-Bot in '{}' mode...", config.getRunMode());
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
-		MongoManager.connect(Config.getInstance().getMongoConnectionString());
+		MongoManager.connect(config.getMongoConnectionString(), config);
 
-		final JDABuilder builder = JDABuilder.createDefault(Config.getInstance().getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
+		InjectorMap injectorMap = new InjectorMap();
+		SessionHandler sessionHandler = injectorMap.add(new MongoLogin());
+		injectorMap.add(new OAuthHandler(
+			sessionHandler,
+			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
+		);
+
+		Injector injector = new DefaultInjector(config, injectorMap);
+
+		slashCommandBase = new SlashCommandBase(config, injector);
+		injectorMap.add(slashCommandBase);
+
+		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER))
 			.enableCache(CacheFlag.VOICE_STATE)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(new SlashCommandBase(), this, new ReactionRoleSystem(), new JoinLeaveSystem(), new AutoRolesSystem(), new StatisticsManager(), eventWaiter);
+			.addEventListeners(slashCommandBase, this, new ReactionRoleSystem(), new JoinLeaveSystem(config), new AutoRolesSystem(), new StatisticsManager(config), eventWaiter);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
 		ReloadCommand.initReloadableMethods();
-		SlashCommandBase.addCommands();
-		builder.setStatus(StatusCommand.getStatusFromConfig());
-		builder.setActivity(ActivityCommand.getActivity());
+		builder.setStatus(StatusCommand.getStatusFromConfig(config));
+		builder.setActivity(ActivityCommand.getActivity(config));
 
 		try {
 			this.jda = builder.build();
@@ -157,6 +184,9 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 			return;
 		}
+
+		slashCommandBase.addCommands();
+		slashCommandBase.updateCommandsDev(jda);
 
 		try {
 			Paginator paginator = PaginatorBuilder.createPaginator()
@@ -171,16 +201,29 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 		}
 
+		PlayerManager playerManager = new PlayerManager(config);
+
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
 			.addAndGetSelf(GiveawaySystem::init)
-			.addAndGetSelf(PlayerManager::init)
-			.addAndGetSelf(API::init)
+			.addAndGetSelf(playerManager::init)
+			.addAndGetSelf(() -> new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize)))
 			.addAndGetSelf(PluginSystem::loadPlugins)
 			.addAndGetSelf(ConsoleCommands::run)
-			.addAndGetSelf(Prometheus::init);
-		ExecutorService asyncStartup = Executors.newFixedThreadPool(runnables.size());
-		runnables.forEach(asyncStartup::submit);
+			.addAndGetSelf(() -> new Prometheus(config));
+
+		ExecutorService asyncStartup = Executors.newFixedThreadPool(
+			runnables.size(),
+			new ThreadFactoryBuilder().setNameFormat("async-startup-#%d").build()
+		);
+
+		runnables.forEach(r -> asyncStartup.submit(() -> {
+			try {
+				r.run();
+			} catch (Exception e) {
+				LoggerFactory.getLogger(r.getClass()).error("Error while starting up", e);
+			}
+		}));
 
 		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, 15, TimeUnit.SECONDS);
 
@@ -193,14 +236,14 @@ public class Bot extends ListenerAdapter {
 		selfUserId = jda.getSelfUser().getIdLong();
 		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
-		jda.getPresence().setActivity(ActivityCommand.getActivity());
+		jda.getPresence().setActivity(ActivityCommand.getActivity(config));
 
-		SlashCommandBase.updateCommandsDev(jda);
+		instance.slashCommandBase.updateCommandsDev(jda);
 	}
 
 	@Reloadable("commands")
 	public static void updateCommands() {
-		SlashCommandBase.addCommands();
+		instance.slashCommandBase.addCommands();
 	}
 
 	@Override

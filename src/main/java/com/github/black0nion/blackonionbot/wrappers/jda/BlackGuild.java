@@ -12,7 +12,6 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -97,7 +96,7 @@ public class BlackGuild extends GuildImpl {
 			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
 			final Language langNonNull = language != null ? language : LanguageSystem.getDefaultLanguage();
 			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-			this.prefix = Utils.gOD(config.getString("prefix"), Config.getInstance().getPrefix());
+			this.prefix = Utils.gOD(config.getString("prefix"), "/");
 			this.antiSpoilerType = Utils.gOD(AntiSpoilerSystem.AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerSystem.AntiSpoilerType.OFF);
 			this.joinMessage = Utils.gOD(config.getString("joinmessage"), langNonNull.getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);

@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.api.API;
+import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -37,7 +37,7 @@ public class ConsoleCommands {
 					logger.warn("Shutting down...");
 					Bot.getInstance().getJDA().shutdown();
 					PluginSystem.disablePlugins();
-					API.getApp().close();
+					API.getInstance().getApp().close();
 					logger.warn("Successfully disconnected!");
 					System.exit(0);
 				} else {

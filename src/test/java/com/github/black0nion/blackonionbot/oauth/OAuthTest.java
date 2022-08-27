@@ -1,30 +1,27 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.api.sessions.LoginFactory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import org.junit.jupiter.api.Test;
 
 import java.util.InputMismatchException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
-@Order(2)
 class OAuthTest {
+
 	@Test
-	@BeforeAll
-	static void test_oauth_api_exists() {
-		OAuthUtils.setLoginWithCodeImplementation((code) -> LoginFactory.getImpl().createSession(code, new StringBuilder(code).reverse().toString(), -1));
-		assertNotNull(OAuthUtils.OAUTH_HANDLER);
+	void test_oauth_api_exists() {
+		assertNotNull(new OAuthAPI(mock(Config.class)).getOAuthApi());
 	}
 
 	@Test
 	void test_invalid_tokens() {
-		assertThrows(InputMismatchException.class, () -> OAuthUtils.getUserWithToken("dummy", ""));
-		assertThrows(InputMismatchException.class, () -> OAuthUtils.getUserWithToken(null, ""));
-		assertThrows(InputMismatchException.class, () -> OAuthUtils.getUserWithToken("", null));
-		assertThrows(InputMismatchException.class, () -> OAuthUtils.getUserWithToken("hi"));
-		assertThrows(InputMismatchException.class, () -> OAuthUtils.getUserWithToken(null));
+		assertThrows(InputMismatchException.class, () -> OAuthHandler.getUserWithToken("dummy", ""));
+		assertThrows(InputMismatchException.class, () -> OAuthHandler.getUserWithToken(null, ""));
+		assertThrows(InputMismatchException.class, () -> OAuthHandler.getUserWithToken("", null));
+		assertThrows(InputMismatchException.class, () -> OAuthHandler.getUserWithToken("hi"));
+		assertThrows(InputMismatchException.class, () -> OAuthHandler.getUserWithToken(null));
 	}
 }

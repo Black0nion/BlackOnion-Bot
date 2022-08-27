@@ -3,8 +3,8 @@ package com.github.black0nion.blackonionbot.commands.admin;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.ConfigManager;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 public class ActivityCommand extends SlashCommand {
 
-	public ActivityCommand() {
+	public ActivityCommand(Config config) {
 		super(builder(Commands.slash("activity", "Set the activity of the bot")
 			.addSubcommands(
 				new SubcommandData("set", "Set the activity of the bot").addOptions(
@@ -35,7 +35,7 @@ public class ActivityCommand extends SlashCommand {
 						),
 					new OptionData(OptionType.STRING, "text", "The text of the activity", true)
 				), new SubcommandData("clear", "Clear the activity of the bot")))
-			.setAdminGuild());
+			.setAdminGuild(), config);
 	}
 
 	@Override
@@ -50,14 +50,14 @@ public class ActivityCommand extends SlashCommand {
 			if (type != null) {
 				Activity newActivity = getActivity(type, text);
 				e.getJDA().getPresence().setActivity(newActivity);
-				Config.getInstance().setActivityType(type);
-				Config.getInstance().setActivityName(text);
+				config.setActivityType(type);
+				config.setActivityName(text);
 				ConfigManager.saveConfig();
 				cmde.send("newactivity", new Placeholder("newactivity", newActivity.getName()));
 			} else cmde.send("invalidactivitytype");
 		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
-			Config.getInstance().setActivityType(null);
-			Config.getInstance().setActivityName(null);
+			config.setActivityType(null);
+			config.setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);
 			ConfigManager.saveConfig();
 			cmde.send("activitycleared");
@@ -74,8 +74,8 @@ public class ActivityCommand extends SlashCommand {
 	}
 
 	@Nullable
-	public static Activity getActivity() {
-		return getActivity(Config.getInstance().getActivityType(), Config.getInstance().getActivityName());
+	public static Activity getActivity(Config config) {
+		return getActivity(config.getActivityType(), config.getActivityName());
 	}
 
 	@Nullable

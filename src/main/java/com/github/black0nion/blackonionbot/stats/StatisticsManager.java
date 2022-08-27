@@ -2,8 +2,8 @@ package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.BotMetadata;
-import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.config.BotMetadata;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -22,6 +22,11 @@ import java.lang.management.ManagementFactory;
 
 public class StatisticsManager extends ListenerAdapter {
 
+	private static final String GUILD_ID = "guild_id";
+	private static final String GUILD = "guild";
+	private static final String CHANNEL_ID = "channel_id";
+	private static final String CHANNEL = "channel";
+
 	static {
 		// JVM Stats, collected by Prometheus
 		DefaultExports.initialize();
@@ -30,8 +35,8 @@ public class StatisticsManager extends ListenerAdapter {
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	private static final String NAMESPACE = "blackonionbot";
 
-	static {
-		final BotMetadata metadata = Config.getInstance().getMetadata();
+	public StatisticsManager(Config config) {
+		final BotMetadata metadata = config.getMetadata();
 		Gauge.build()
 			.name("info")
 			.help("Build information")
@@ -39,7 +44,7 @@ public class StatisticsManager extends ListenerAdapter {
 			.labelNames("run_mode", "version", "lines_of_code", "files")
 			.register()
 			.labels(
-				Config.getInstance().getRunMode().name(),
+				config.getRunMode().name(),
 				metadata.version(),
 				String.valueOf(metadata.lines_of_code()),
 				String.valueOf(metadata.files()))
@@ -57,7 +62,7 @@ public class StatisticsManager extends ListenerAdapter {
 		.name("commands_executed")
 		.help("Total number of commands executed")
 		.namespace(NAMESPACE)
-		.labelNames("type", "command", "guild_id", "guild", "channel_id", "channel")
+		.labelNames("type", "command", GUILD_ID, GUILD, CHANNEL_ID, CHANNEL)
 		.register();
 
 	public static final Counter TOTAL_COMMANDS_EXECUTED = Counter.build()
@@ -70,7 +75,7 @@ public class StatisticsManager extends ListenerAdapter {
 		.name("messages_sent")
 		.help("Total number of messages sent")
 		.namespace(NAMESPACE)
-		.labelNames("guild_id", "guild", "channel_id", "channel")
+		.labelNames(GUILD_ID, GUILD, CHANNEL_ID, CHANNEL)
 		.register();
 
 	/**
@@ -81,13 +86,6 @@ public class StatisticsManager extends ListenerAdapter {
 		.help("Total number of messages sent")
 		.namespace(NAMESPACE)
 		.create();
-
-	public static final Counter PROFANITY_FILTERED = Counter.build()
-		.name("profanity_filtered")
-		.help("Total number of profanity filtered")
-		.namespace(NAMESPACE)
-		.labelNames("guild_id", "guild", "channel_id", "channel")
-		.register();
 
 	static final Gauge RAM_LOAD = Gauge.build()
 		.name("ram_load")
@@ -108,7 +106,7 @@ public class StatisticsManager extends ListenerAdapter {
 		.name("events")
 		.help("Events received")
 		.namespace(NAMESPACE)
-		.labelNames("type", "guild_id", "guild")
+		.labelNames("type", GUILD_ID, GUILD)
 		.register();
 
 	static final Gauge GUILD_COUNT = Gauge.build()
@@ -187,7 +185,8 @@ public class StatisticsManager extends ListenerAdapter {
 
 	@Override
 	public void onGenericEvent(@NotNull GenericEvent event) {
-		String guildId = "none", guildName = "none";
+		String guildId = "none";
+		String guildName = "none";
 		if (event instanceof GenericGuildEvent guildEvent) {
 			guildId = guildEvent.getGuild().getId();
 			guildName = guildEvent.getGuild().getName();

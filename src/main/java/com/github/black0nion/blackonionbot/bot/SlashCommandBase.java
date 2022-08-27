@@ -5,6 +5,8 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
@@ -12,7 +14,6 @@ import com.github.black0nion.blackonionbot.misc.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.*;
-import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -48,43 +49,57 @@ import java.util.stream.Collectors;
  */
 public class SlashCommandBase extends ListenerAdapter {
 
-	private static final Map<Category, List<SlashCommand>> commandsInCategory = new EnumMap<>(Category.class);
+	private final Map<Category, List<SlashCommand>> commandsInCategory = new EnumMap<>(Category.class);
 
-	public static Map<Category, List<SlashCommand>> getCommandsInCategory() {
+	public Map<Category, List<SlashCommand>> getCommandsInCategory() {
 		return commandsInCategory;
 	}
 
-	private static final Map<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
+	private final Map<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
 
-	public static Map<String, Pair<Long, SlashCommand>> getCommands() {
+	public Map<String, Pair<Long, SlashCommand>> getCommands() {
 		return commands;
 	}
 
-	private static final Map<Class<? extends SlashCommand>, SlashCommand> commandInstances = new HashMap<>();
+	private final Map<Class<? extends SlashCommand>, SlashCommand> commandInstances = new HashMap<>();
 
-	private static JSONObject commandsJson;
+	private JSONObject commandsJson;
 
-	public static JSONObject getCommandsJson() {
+	public JSONObject getCommandsJson() {
 		return commandsJson;
 	}
 
-	private static final ExecutorService commandPool = Executors.newCachedThreadPool();
+	private final ExecutorService commandPool = Executors.newCachedThreadPool();
 
 	private static final Logger logger = LoggerFactory.getLogger(SlashCommandBase.class);
+	private static SlashCommandBase instance;
 
-	public static void addCommands() {
+	public static SlashCommandBase getInstance() {
+		return instance;
+	}
+
+	private final Config config;
+	private final Injector injector;
+
+	public SlashCommandBase(Config config, Injector injector) {
+		instance = this;
+		this.config = config;
+		this.injector = injector;
+	}
+
+	public void addCommands() {
 		commandCount = 0;
 		commands.clear();
 		commandsInCategory.clear();
 		commandInstances.clear();
 		commandsJson = new JSONObject();
-		final JSONArray commands = new JSONArray();
+		final JSONArray commandsArr = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
 		final Set<Class<? extends SlashCommand>> annotated = reflections.getSubTypesOf(SlashCommand.class);
 
 		for (final Class<?> command : annotated) {
 			try {
-				final SlashCommand newInstance = (SlashCommand) command.getConstructor().newInstance();
+				final SlashCommand newInstance = injector.createInstance(command, SlashCommand.class);
 				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
@@ -125,7 +140,7 @@ public class SlashCommandBase extends ListenerAdapter {
 					}
 					commandJSON.put("subcommands", subcommandJson);
 
-					commands.put(commandJSON);
+					commandsArr.put(commandJSON);
 				}
 
 				addCommand(newInstance);
@@ -135,8 +150,8 @@ public class SlashCommandBase extends ListenerAdapter {
 				System.exit(-1);
 			}
 		}
-		commandsJson.put("commands", commands);
-		logger.info("Generated Commands JSON: {}", commands);
+		commandsJson.put("commands", commandsArr);
+		logger.info("Generated Commands JSON: {}", commandsArr);
 		// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
@@ -147,29 +162,29 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends SlashCommand> T getCommand(Class<T> clazz) {
-		return (T) commandInstances.get(clazz);
+		return (T) getInstance().commandInstances.get(clazz);
 	}
 
 	@Nullable
 	public static SlashCommand getCommand(String name) {
 		if (name == null) return null;
-		return commands.get(name).getValue();
+		return Utils.tryGet(() -> getInstance().commands.get(name).getValue());
 	}
 
 	@Reloadable("dev commands")
 	public static void updateCommandsDev() {
-		updateCommandsDev(Bot.getInstance().getJda());
+		getInstance().updateCommandsDev(Bot.getInstance().getJDA());
 	}
 
-	public static void updateCommandsDev(JDA jda) {
-		if (Config.getInstance().getDevGuild() != -1) {
-			Objects.requireNonNull(jda.getGuildById(Config.getInstance().getDevGuild()))
-				.updateCommands()
-				.addCommands(commands.values().stream()
-					.map(Pair::getValue)
-					.map(SlashCommand::getData)
-					.toList())
-				.queue();
+	public void updateCommandsDev(JDA jda) {
+		if (config.getDevGuild() != -1) {
+			Optional.ofNullable(jda.getGuildById(config.getDevGuild()))
+				.ifPresent(guild -> guild.updateCommands()
+					.addCommands(commands.values().stream()
+						.map(Pair::getValue)
+						.map(SlashCommand::getData)
+						.toList())
+					.queue());
 		}
 	}
 
@@ -201,7 +216,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
-		if (Config.getInstance().getRunMode() == RunMode.DEV) {
+		if (config.getRunMode() == RunMode.DEV) {
 			if (locked) logger.warn(log);
 			else logger.info(log);
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
@@ -258,23 +273,23 @@ public class SlashCommandBase extends ListenerAdapter {
 		}
 	}
 
-	private static int commandCount = 0;
+	private int commandCount = 0;
 
 	public static int getCommandCount() {
-		return commandCount;
+		return getInstance().commandCount;
 	}
 
 	public static void addCommand(final SlashCommand c) {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
-		commands.computeIfAbsent(c.getData().getName(), s -> {
+		getInstance().commands.computeIfAbsent(c.getData().getName(), s -> {
 			final Category category = c.getCategory();
-			final List<SlashCommand> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
+			final List<SlashCommand> commandsInCat = Optional.ofNullable(getInstance().commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
-			commandsInCategory.put(category, commandsInCat);
-			commandInstances.put(c.getClass(), c);
-			commandCount++;
+			getInstance().commandsInCategory.put(category, commandsInCat);
+			getInstance().commandInstances.put(c.getClass(), c);
+			getInstance().commandCount++;
 			return new Pair<>(null, c);
 		});
 	}

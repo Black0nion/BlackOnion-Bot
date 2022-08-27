@@ -9,7 +9,7 @@ public class Main {
 
 	public static void main(final String[] args) {
 		try {
-			new Bot(args);
+			new Bot();
 		} catch (final Throwable ex) {
 			logger.error("Uncaught error occurred", ex);
 		}

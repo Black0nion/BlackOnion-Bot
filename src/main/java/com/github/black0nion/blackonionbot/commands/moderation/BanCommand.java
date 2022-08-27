@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.await.AwaitDone;
+import com.github.black0nion.blackonionbot.utils.AwaitDone;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -32,7 +32,8 @@ public class BanCommand extends SlashCommand {
 		super(builder(Commands.slash("ban", "Used to ban an user from the server.")
 				.addOption(OptionType.USER, USER, "The user to ban.", true)
 				.addOption(OptionType.STRING, REASON, "The reason for the ban.", false)
-				.addOptions(new OptionData(OptionType.INTEGER, DEL_DAYS, "The amount of days to delete messages of the user.", false).addChoices(deletionDays))
+				.addOptions(new OptionData(OptionType.INTEGER, DEL_DAYS, "The amount of days to delete messages of the user.", false)
+					.addChoices(DELETION_DAYS))
 				.addOptions(Utils.getDurationOptions("ban"))
 			)
 			.setRequiredPermissions(Permission.BAN_MEMBERS)
@@ -40,7 +41,7 @@ public class BanCommand extends SlashCommand {
 	}
 
 	//region Deletion Days
-	private static final Command.Choice[] deletionDays = {
+	private static final Command.Choice[] DELETION_DAYS = {
 		new Command.Choice("None", 0),
 		new Command.Choice("One Day", 1),
 		new Command.Choice("Two Days", 2),

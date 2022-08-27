@@ -1,26 +1,23 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.bson.Document;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.bson.Document;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 public class GiveawaySystem {
 	private static final List<Giveaway> giveaways = new ArrayList<>();
@@ -95,8 +92,8 @@ public class GiveawaySystem {
 	public static void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
-				final SelfUser selfUser = Bot.getInstance().getJda().getSelfUser();
-				if (users.size() == 0 || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
+				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
+				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
 					deleteGiveaway(giveaway);
 					return;
