@@ -59,6 +59,4 @@ public interface Config {
 
 	@Nullable
 	String getLokiUrl();
-
-	BotMetadata getMetadata();
 }

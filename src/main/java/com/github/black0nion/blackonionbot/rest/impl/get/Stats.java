@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.rest.impl.get;
 
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
+import com.github.black0nion.blackonionbot.config.ConfigManager;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
@@ -27,8 +28,8 @@ public class Stats implements IGetRoute {
 		return new JSONObject()
 			.put("commands", SlashCommandBase.getCommandCount())
 			.put("code_stats", new JSONObject()
-				.put("line_count", config.getMetadata().lines_of_code())
-				.put("file_count", config.getMetadata().files()))
+				.put("line_count", ConfigManager.getMetadata().lines_of_code())
+				.put("file_count", ConfigManager.getMetadata().files()))
 			.put("messages_sent", StatisticsManager.TOTAL_MESSAGES_SENT.get())
 			.put("commands_executed", StatisticsManager.TOTAL_COMMANDS_EXECUTED.get())
 			.put("cpu", new JSONObject()
@@ -40,7 +41,7 @@ public class Stats implements IGetRoute {
 			.put("prefix", "/")
 			.put("os", OS_NAME)
 			.put("uptime", System.currentTimeMillis() - StatisticsManager.STARTUP_TIME)
-			.put("version", config.getMetadata().version())
+			.put("version", ConfigManager.getMetadata().version())
 			.put("run_mode", config.getRunMode().name().toUpperCase())
 			.put("ping", StatisticsManager.getGatewayPing());
 	}

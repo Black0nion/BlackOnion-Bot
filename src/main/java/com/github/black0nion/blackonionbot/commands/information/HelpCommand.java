@@ -192,6 +192,6 @@ public class HelpCommand extends SlashCommand {
 
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);
-		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getName()))).setEmbeds().setActionRows().queue());
+		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", "/" + this.getName()))).setEmbeds().setActionRows().queue());
 	}
 }

@@ -90,7 +90,6 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
-			final String prefix = guild.getPrefix();
 
 			guild.retrieveOwner().queue(user -> {
 				final BlackUser author = BlackUser.from(user.getUser());
@@ -112,7 +111,13 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				}
 
 				author.openPrivateChannel().queue(channel ->
-					channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue());
+					channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
+						.setTitle("thankyouforadding")
+						.addField(
+							LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", "/help"),
+							LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
+						.build()
+					).queue());
 			});
 		});
 	}

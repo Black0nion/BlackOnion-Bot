@@ -23,7 +23,7 @@ public class ConsoleCommands {
 				final String[] args = input.split(" ");
 				if (input.equalsIgnoreCase("reload") || input.equalsIgnoreCase("rl")) {
 					logger.info("Reloading...");
-					ReloadCommand.reload();
+					ReloadCommand.reloadAll();
 					logger.info("Reloading done.");
 				} else if (input.equalsIgnoreCase("guildlist")) {
 					// parse boolean in args[1]

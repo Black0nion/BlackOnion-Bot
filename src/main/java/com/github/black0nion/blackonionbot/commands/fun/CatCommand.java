@@ -56,7 +56,7 @@ public class CatCommand extends SlashCommand {
 		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://api.thecatapi.com/v1/images/search" + (breed != null ? "?breed_ids=" + breed : ""))).build(), HttpResponse.BodyHandlers.ofString())
 			.thenApply(HttpResponse::body).thenAccept(response -> {
 				if (response == null || response.isEmpty() || response.equalsIgnoreCase("[]")) {
-					cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", guild.getPrefix() + SlashCommandBase.getCommand(CatBreedsCommand.class).getName()));
+					cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", SlashCommandBase.getCommand(CatBreedsCommand.class).getName()));
 				} else {
 					final JSONArray responseAsJSONArray = new JSONArray(response);
 					final JSONObject responseAsJSON = responseAsJSONArray.getJSONObject(0);

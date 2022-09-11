@@ -19,7 +19,8 @@ public class MongoManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(MongoManager.class);
 
-	public static void connect(final String connectionStringRaw, Config config) {
+	public static void connect(Config config) {
+		final String connectionStringRaw = config.getMongoConnectionString();
 		logger.info("Connecting to {}...", connectionStringRaw);
 		final long start = System.currentTimeMillis();
 		ConnectionString connectionString = new ConnectionString(connectionStringRaw);

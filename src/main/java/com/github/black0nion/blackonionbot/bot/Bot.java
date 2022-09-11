@@ -3,6 +3,10 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.impl.ConfigImpl;
+import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
@@ -23,10 +27,6 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
-import com.github.black0nion.blackonionbot.config.api.Config;
-import com.github.black0nion.blackonionbot.config.impl.ConfigImpl;
-import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Paginator;
@@ -55,10 +55,13 @@ import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
+
+	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
 	public static final Icon BLACKONION_ICON;
 
@@ -69,7 +72,6 @@ public class Bot extends ListenerAdapter {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	private static Bot instance;
 
@@ -83,7 +85,6 @@ public class Bot extends ListenerAdapter {
 		return jda;
 	}
 
-	private final Logger logger = LoggerFactory.getLogger(Bot.class);
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 	public static final Gson GSON = new GsonBuilder()
@@ -147,7 +148,7 @@ public class Bot extends ListenerAdapter {
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
-		MongoManager.connect(config.getMongoConnectionString(), config);
+		MongoManager.connect(config);
 
 		InjectorMap injectorMap = new InjectorMap();
 		SessionHandler sessionHandler = injectorMap.add(new MongoLogin());
@@ -175,6 +176,7 @@ public class Bot extends ListenerAdapter {
 		builder.setStatus(StatusCommand.getStatusFromConfig(config));
 		builder.setActivity(ActivityCommand.getActivity(config));
 
+		logger.info("Starting JDA...");
 		try {
 			this.jda = builder.build();
 		} catch (final Exception e) {
@@ -184,6 +186,7 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 			return;
 		}
+		logger.info("JDA started successfully!");
 
 		slashCommandBase.addCommands();
 		slashCommandBase.updateCommandsDev(jda);
@@ -214,7 +217,7 @@ public class Bot extends ListenerAdapter {
 
 		ExecutorService asyncStartup = Executors.newFixedThreadPool(
 			runnables.size(),
-			new ThreadFactoryBuilder().setNameFormat("async-startup-#%d").build()
+			new ThreadFactoryBuilder().setNameFormat("async-startup-%d").build()
 		);
 
 		runnables.forEach(r -> asyncStartup.submit(() -> {

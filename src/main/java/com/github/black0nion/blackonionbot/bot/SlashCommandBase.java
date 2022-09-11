@@ -172,20 +172,21 @@ public class SlashCommandBase extends ListenerAdapter {
 	}
 
 	@Reloadable("dev commands")
-	public static void updateCommandsDev() {
+	private static void updateCommandsDev() {
 		getInstance().updateCommandsDev(Bot.getInstance().getJDA());
 	}
 
 	public void updateCommandsDev(JDA jda) {
 		if (config.getDevGuild() != -1) {
+			logger.info("Updating dev commands...");
 			Optional.ofNullable(jda.getGuildById(config.getDevGuild()))
-				.ifPresent(guild -> guild.updateCommands()
+				.ifPresentOrElse(guild -> guild.updateCommands()
 					.addCommands(commands.values().stream()
 						.map(Pair::getValue)
 						.map(SlashCommand::getData)
 						.toList())
-					.queue());
-		}
+					.queue(), () -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
+		} else logger.warn("Failed to update dev commands: dev guild not set");
 	}
 
 	@Override
@@ -234,7 +235,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			final SlashCommandEvent cmde = new SlashCommandEvent(cmd, event, guild, member, author);
 			final boolean disabled = !guild.isCommandActivated(cmd);
 			if (disabled) {
-				cmde.send("commanddisabled", new Placeholder("cmd", "/" + cmd.getName()));
+				cmde.send("commanddisabled", new Placeholder("cmd", cmd.getName()));
 				return;
 			}
 
@@ -273,13 +274,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		}
 	}
 
-	private int commandCount = 0;
-
-	public static int getCommandCount() {
-		return getInstance().commandCount;
-	}
-
-	public static void addCommand(final SlashCommand c) {
+	private void addCommand(final SlashCommand c) {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
@@ -292,5 +287,11 @@ public class SlashCommandBase extends ListenerAdapter {
 			getInstance().commandCount++;
 			return new Pair<>(null, c);
 		});
+	}
+
+	private int commandCount = 0;
+
+	public static int getCommandCount() {
+		return getInstance().commandCount;
 	}
 }
