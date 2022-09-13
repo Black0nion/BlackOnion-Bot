@@ -79,7 +79,7 @@ dependencies {
     implementation "io.prometheus:simpleclient_hotspot:0.15.0"
     implementation "io.prometheus:simpleclient_httpserver:0.15.0"
 
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.0"
     testImplementation "com.github.erosb:everit-json-schema:1.14.1"
 }
 
