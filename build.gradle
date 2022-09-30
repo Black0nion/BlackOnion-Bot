@@ -111,7 +111,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    systemProperty("inUnitTests", "true")
 }
 
 task testIntegration(type: Test) {
@@ -125,10 +124,9 @@ task testIntegration(type: Test) {
 
 testIntegration {
     useJUnitPlatform()
-    systemProperty("inUnitTests", "true")
 }
 
-check.dependsOn testIntegration
+test.dependsOn testIntegration
 
 jacocoTestReport {
     reports {

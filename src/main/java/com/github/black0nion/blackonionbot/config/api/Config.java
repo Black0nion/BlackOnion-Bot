@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.config.api;
 
-import com.github.black0nion.blackonionbot.config.BotMetadata;
 import com.github.black0nion.blackonionbot.misc.RunMode;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -56,7 +55,4 @@ public interface Config {
 	long getDevGuild();
 
 	int getPrometheusPort();
-
-	@Nullable
-	String getLokiUrl();
 }

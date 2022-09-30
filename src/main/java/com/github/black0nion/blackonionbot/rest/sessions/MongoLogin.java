@@ -14,9 +14,11 @@ import java.util.concurrent.ExecutionException;
 
 public class MongoLogin implements SessionHandler {
 
-		/**
-		 * Lazy init to allow the unit tests to set the impl before trying to get the collection
-		 */
+	public static final String ACCESS_TOKEN = "access_token";
+	public static final String REFRESH_TOKEN = "refresh_token";
+	/**
+	 * Lazy init to allow the unit tests to set the impl before trying to get the collection
+	 */
 	private MongoCollection<Document> collection;
 
 	public MongoCollection<Document> getCollection() {
@@ -29,7 +31,7 @@ public class MongoLogin implements SessionHandler {
 
 		if (doc == null) throw new NullPointerException("Session id not found");
 
-		return OAuthHandler.getUserWithToken(doc.getString("access_token"), doc.getString("refresh_token"));
+		return OAuthHandler.getUserWithToken(doc.getString(ACCESS_TOKEN), doc.getString(REFRESH_TOKEN));
 	}
 
 	@Override
@@ -46,13 +48,13 @@ public class MongoLogin implements SessionHandler {
 
 	@Override
 	public String createSession(String accessToken, String refreshToken, int expiresIn) {
-		final Document find = getCollection().find(Filters.and(Filters.eq("access_token", accessToken), Filters.eq("refresh_token", refreshToken), Filters.exists("sessionid"))).first();
+		final Document find = getCollection().find(Filters.and(Filters.eq(ACCESS_TOKEN, accessToken), Filters.eq(REFRESH_TOKEN, refreshToken), Filters.exists("sessionid"))).first();
 		if (find != null) return find.getString(SESSIONID);
 		final String newSessionId = AbstractSession.generateSessionId();
 		getCollection().insertOne(new Document()
 				.append(SESSIONID, newSessionId)
-				.append("access_token", accessToken)
-				.append("refresh_token", refreshToken)
+				.append(ACCESS_TOKEN, accessToken)
+				.append(REFRESH_TOKEN, refreshToken)
 				.append("expires_in", expiresIn));
 		return newSessionId;
 	}

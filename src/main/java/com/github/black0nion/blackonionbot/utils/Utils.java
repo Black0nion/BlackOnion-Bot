@@ -73,10 +73,6 @@ public class Utils {
 			.replace("(\\*|_|`|~|\\)", "\\$1");
 	}
 
-	public static String[] removeFirstArg(final String[] input) {
-		return Arrays.copyOfRange(input, 1, input.length);
-	}
-
 	public static double roundToDouble(final String decimal, final double number) {
 		final DecimalFormat df = new DecimalFormat(decimal);
 		df.setRoundingMode(RoundingMode.CEILING);
@@ -93,10 +89,6 @@ public class Utils {
 		final WritableRaster raster = bufferedImage.copyData(bufferedImage.getRaster().createCompatibleWritableRaster());
 
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
-
-	public static <T> T[] subArray(final T[] array, final int beg) {
-		return subArray(array, beg, array.length - 1);
 	}
 
 	public static <T> T[] subArray(final T[] array, final int beg, final int end) {
@@ -466,6 +458,24 @@ public class Utils {
 					throw new RuntimeException(ex);
 				}
 			}
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
+	}
+
+	public static <T> T uncheckedSupplier(ThrowableSupplier<T> supplier) {
+		requireNonNull(supplier, "supplier");
+		try {
+			return supplier.get();
+		} catch (Throwable e) {
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
+	}
+
+	public static void uncheckedSupplier(ThrowableVoidSupplier supplier) {
+		requireNonNull(supplier, "supplier");
+		try {
+			supplier.get();
+		} catch (Throwable e) {
 			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
 	}

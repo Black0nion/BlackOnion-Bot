@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.rest;
 
-import com.github.black0nion.blackonionbot.inject.SingletonManager;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthAPI;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
@@ -54,7 +53,7 @@ class AbstractSessionTest {
 
 	@BeforeEach
 	void setup() {
-		SingletonManager.bind(SessionHandler.class).to(new MockedLogin());
+		AbstractSession.setSessionHandler(new MockedLogin());
 	}
 
 	@RepeatedTest(50)

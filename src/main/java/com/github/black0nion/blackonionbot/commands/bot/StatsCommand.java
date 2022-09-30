@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -37,8 +37,8 @@ public class StatsCommand extends SlashCommand {
 			.addField("cpuname", CPU_NAME, true)
 			.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
 			.addField("cpuspeed", CPU_MHZ, true)
-			.addField("lines", ConfigManager.getMetadata().lines_of_code(), true)
-			.addField("files", ConfigManager.getMetadata().files(), true)
+			.addField("lines", ConfigFileLoader.getMetadata().lines_of_code(), true)
+			.addField("files", ConfigFileLoader.getMetadata().files(), true)
 			.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
 			.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
 			.addField("commands", SlashCommandBase.getCommandCount(), true)
@@ -46,7 +46,7 @@ public class StatsCommand extends SlashCommand {
 			.addField("usercount", StatisticsManager.getUserCount(), true)
 			.addField("guildcount", StatisticsManager.getGuildCount(), true)
 			.addField("uptime", Utils.parseDate(diff), true)
-			.addField("version", ConfigManager.getMetadata().version(), true)
+			.addField("version", ConfigFileLoader.getMetadata().version(), true)
 			.setThumbnail(e.getJDA().getSelfUser().getAvatarUrl() + "?size=512")
 			.setTimestamp(Instant.now())
 		);

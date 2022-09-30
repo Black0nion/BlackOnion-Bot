@@ -2,9 +2,9 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.config.api.Config;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -52,14 +52,14 @@ public class ActivityCommand extends SlashCommand {
 				e.getJDA().getPresence().setActivity(newActivity);
 				config.setActivityType(type);
 				config.setActivityName(text);
-				ConfigManager.saveConfig();
+				ConfigFileLoader.saveConfig();
 				cmde.send("newactivity", new Placeholder("newactivity", newActivity.getName()));
 			} else cmde.send("invalidactivitytype");
 		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
 			config.setActivityType(null);
 			config.setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);
-			ConfigManager.saveConfig();
+			ConfigFileLoader.saveConfig();
 			cmde.send("activitycleared");
 		}
 	}

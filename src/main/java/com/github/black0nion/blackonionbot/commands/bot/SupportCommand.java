@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -19,7 +19,7 @@ public class SupportCommand extends SlashCommand {
 		super("support", "Used to get support.");
 	}
 
-	private static final String BOT_DEVELOPERS = ConfigManager.getMetadata()
+	private static final String BOT_DEVELOPERS = ConfigFileLoader.getMetadata()
 		// username:link
 		.authors()
 		.entrySet()
@@ -27,7 +27,7 @@ public class SupportCommand extends SlashCommand {
 		.map(entry -> "[" + entry.getKey() + "](" + entry.getValue() + ")")
 		.collect(Collectors.joining(", "));
 
-	private static final String BLACKONION_AUTHORS = ConfigManager.getMetadata()
+	private static final String BLACKONION_AUTHORS = ConfigFileLoader.getMetadata()
 		// username:link
 		.blackonion_authors()
 		.entrySet()

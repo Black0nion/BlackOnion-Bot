@@ -6,6 +6,7 @@ import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 
 public interface SessionHandler {
+
 	String SESSIONID = "sessionid";
 
 	DiscordUser loginToSession(String sessionId) throws ExecutionException, InputMismatchException, NullPointerException;

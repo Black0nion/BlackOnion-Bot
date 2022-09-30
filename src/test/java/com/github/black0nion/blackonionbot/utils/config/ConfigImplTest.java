@@ -1,15 +1,13 @@
 package com.github.black0nion.blackonionbot.utils.config;
 
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import static com.github.black0nion.blackonionbot.config.Flags.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Order(1)
 // TODO: add unit tests for flags
 class ConfigImplTest {
 
@@ -21,15 +19,14 @@ class ConfigImplTest {
 		System.setProperty("SKIP_LOADING_ENV_FILE", "true");
 	}
 
-	@Order(1)
 	@Test
 	void test_set_properties() {
 		// don't worry, this is a generated dummy token
-		ConfigManager.set("token", DUMMY_TOKEN);
+		ConfigFileLoader.set("token", DUMMY_TOKEN);
 		assertEquals(DUMMY_TOKEN, System.getProperty("TOKEN"));
-		ConfigManager.set("mongo_connection_string", "mongodb://localhost:27017");
+		ConfigFileLoader.set("mongo_connection_string", "mongodb://localhost:27017");
 		assertEquals("mongodb://localhost:27017", System.getProperty("MONGO_CONNECTION_STRING"));
-		ConfigManager.set("test_number", "100");
+		ConfigFileLoader.set("test_number", "100");
 	}
 
 	@Test
@@ -52,6 +49,6 @@ class ConfigImplTest {
 
 	@Test
 	void test_config_loading() {
-		assertDoesNotThrow(ConfigManager::loadConfig);
+		assertDoesNotThrow(ConfigFileLoader::loadConfig);
 	}
 }

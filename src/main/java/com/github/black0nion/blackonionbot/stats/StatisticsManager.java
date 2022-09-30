@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.config.BotMetadata;
 import com.github.black0nion.blackonionbot.config.api.Config;
@@ -37,7 +37,7 @@ public class StatisticsManager extends ListenerAdapter {
 	private static final String NAMESPACE = "blackonionbot";
 
 	public StatisticsManager(Config config) {
-		final BotMetadata metadata = ConfigManager.getMetadata();
+		final BotMetadata metadata = ConfigFileLoader.getMetadata();
 		Gauge.build()
 			.name("info")
 			.help("Build information")

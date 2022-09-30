@@ -47,8 +47,6 @@ public class ConfigImpl extends ConfigWithConfigLoader implements Config {
 	private final long voteChannel = get("vote_channel", Long.class, defaultValue(-1L));
 	private final long devGuild = get("dev_guild", Long.class, defaultValue(-1L));
 	private final int prometheusPort = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
-	@Nullable
-	private final String lokiUrl = get("loki_url", String.class);
 
 	//region Getters and Setters
 	public String getToken() {
@@ -141,11 +139,6 @@ public class ConfigImpl extends ConfigWithConfigLoader implements Config {
 
 	public int getPrometheusPort() {
 		return prometheusPort;
-	}
-
-	@Nullable
-	public String getLokiUrl() {
-		return lokiUrl;
 	}
 
 	//endregion

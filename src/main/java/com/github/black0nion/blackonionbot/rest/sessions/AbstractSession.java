@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.rest.sessions;
 
-import com.github.black0nion.blackonionbot.inject.SingletonManager;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 
@@ -11,7 +10,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract sealed class AbstractSession permits RestSession, WebSocketSession {
 
-	private static final SessionHandler LOGIN = SingletonManager.getSingleton(SessionHandler.class);
+	private static SessionHandler sessionHandler;
+
+	/**
+	 * Setter injection to prevent
+	 * 1) a central point of declaration in an unrelated class and
+	 * 2) having to inject the session handler into every new instance
+	 */
+	public static void setSessionHandler(SessionHandler sessionHandler) {
+		AbstractSession.sessionHandler = sessionHandler;
+	}
 
 	public static final String SESSIONID_REGEX = "[a-zA-Z\\d]{69}";
 	@Nullable
@@ -34,14 +42,14 @@ public abstract sealed class AbstractSession permits RestSession, WebSocketSessi
 
 	public final void loginToSession(final String sessionId) throws InputMismatchException, NullPointerException {
 		try {
-			this.user = LOGIN.loginToSession(sessionId);
+			this.user = sessionHandler.loginToSession(sessionId);
 		} catch (ExecutionException e) {
 			throw e.getCause() instanceof RuntimeException ex ? ex : new RuntimeException(e.getCause());
 		}
 	}
 
 	public final void logout() throws InputMismatchException, NullPointerException {
-		LOGIN.logoutFromSession(this.sessionId);
+		sessionHandler.logoutFromSession(this.sessionId);
 		this.sessionId = null;
 		this.user = null;
 	}
@@ -63,7 +71,7 @@ public abstract sealed class AbstractSession permits RestSession, WebSocketSessi
 			.toString();
 
 		// check if the database contains an entry for this session id, very unlikely
-		if (LOGIN.isIdOccupied(generatedId)) return generateSessionId();
+		if (sessionHandler.isIdOccupied(generatedId)) return generateSessionId();
 
 		return generatedId;
 	}

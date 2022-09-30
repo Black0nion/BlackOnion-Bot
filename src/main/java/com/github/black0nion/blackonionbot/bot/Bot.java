@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.config.impl.ConfigImpl;
 import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
@@ -16,6 +16,7 @@ import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
 import com.github.black0nion.blackonionbot.rest.API;
+import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.rest.sessions.MongoLogin;
 import com.github.black0nion.blackonionbot.stats.*;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
@@ -50,6 +51,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
 import java.io.File;
@@ -140,8 +142,10 @@ public class Bot extends ListenerAdapter {
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
-		ConfigManager.loadConfig();
+		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
+		// slf4j MDC; used to set the run mode in the logs sent to loki
+		MDC.put("run_mode", config.getRunMode().name());
 
 		DockerManager.init();
 		logger.info("Starting BlackOnion-Bot in '{}' mode...", config.getRunMode());
@@ -152,6 +156,7 @@ public class Bot extends ListenerAdapter {
 
 		InjectorMap injectorMap = new InjectorMap();
 		SessionHandler sessionHandler = injectorMap.add(new MongoLogin());
+		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
 			sessionHandler,
 			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
@@ -245,7 +250,7 @@ public class Bot extends ListenerAdapter {
 	}
 
 	@Reloadable("commands")
-	public static void updateCommands() {
+	private static void updateCommands() {
 		instance.slashCommandBase.addCommands();
 	}
 

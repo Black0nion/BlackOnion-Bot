@@ -13,6 +13,8 @@ public class ConfigLoaderImpl implements ConfigLoader {
 
 	public static final ConfigLoaderImpl INSTANCE = new ConfigLoaderImpl();
 
+	private ConfigLoaderImpl() {}
+
 	@Override
 	public <T> T get(String name, Class<T> clazz, ConfigFlag... flagsArr) {
 		return getImpl(name, clazz, flagsArr);

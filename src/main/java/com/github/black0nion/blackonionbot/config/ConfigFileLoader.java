@@ -13,9 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ConfigManager {
+public class ConfigFileLoader {
 
-	private ConfigManager() {}
+	private ConfigFileLoader() {}
 
 	private static final File ENV_FILE = new File("files/.env");
 	private static BotMetadata metadata;
@@ -26,10 +26,16 @@ public class ConfigManager {
 
 	private static final Pattern ENV_FILE_PATTERN = Pattern.compile("^(\\w+)=(.*)$");
 
-	private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConfigFileLoader.class);
+
+	private static boolean didLoad = false;
 
 	public static void loadConfig() throws IOException {
-		if ("true".equals(System.getProperty("SKIP_LOADING_ENV_FILE"))) return;
+		if ("true".equals(System.getProperty("SKIP_LOADING_ENV_FILE"))
+			|| didLoad) return;
+
+		didLoad = true;
+
 		// Load .env vars from the .env file
 		if (ENV_FILE.exists()) {
 			logger.info("Loading environment variables from the .env file...");
@@ -48,7 +54,7 @@ public class ConfigManager {
 
 		// Load Metadata
 		logger.info("Loading metadata...");
-		try (InputStream in = ConfigManager.class.getResourceAsStream("/bot.metadata.json")) {
+		try (InputStream in = ConfigFileLoader.class.getResourceAsStream("/bot.metadata.json")) {
 			assert in != null;
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 				// Use resource

@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.config.api.Config;
-import com.github.black0nion.blackonionbot.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -40,7 +40,7 @@ public class StatusCommand extends SlashCommand {
 			return;
 		}
 		config.setOnlineStatus(status);
-		ConfigManager.saveConfig();
+		ConfigFileLoader.saveConfig();
 		cmde.send("newstatus", new Placeholder(STATUS, status.name()));
 
 		e.getJDA().getPresence().setStatus(status);
