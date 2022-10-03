@@ -4,6 +4,11 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.*;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.GuildSticker;
@@ -31,6 +36,7 @@ import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.utils.concurrent.Task;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -64,7 +70,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
     public RestAction<List<Command>> retrieveCommands(boolean withLocalizations) {
 		return this.guild.retrieveCommands(withLocalizations);
 	}
-	
+
 	@Override
 	@CheckReturnValue
 	@Nonnull
@@ -971,10 +977,9 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 		return this.guild.retrieveActiveThreads();
 	}
 
+	@NotNull
 	@Override
-	@CheckReturnValue
-	@Nonnull
-	public RestAction<Void> moveVoiceMember(@Nonnull Member member, @Nullable AudioChannel audioChannel) {
+	public RestAction<Void> moveVoiceMember(@NotNull Member member, @Nullable AudioChannel audioChannel) {
 		return this.guild.moveVoiceMember(member, audioChannel);
 	}
 
@@ -1009,6 +1014,7 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Override
 	@CheckReturnValue
 	@Nonnull
+	@Deprecated
 	public AuditableRestAction<Void> kick(@Nonnull UserSnowflake user, @Nullable String reason) {
 		return this.guild.kick(user, reason);
 	}
@@ -1020,18 +1026,10 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 		return this.guild.kick(user);
 	}
 
+	@NotNull
 	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@Nonnull UserSnowflake user, int delDays, @Nullable String reason) {
-		return this.guild.ban(user, delDays, reason);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(@Nonnull UserSnowflake user, int delDays) {
-		return this.guild.ban(user, delDays);
+	public AuditableRestAction<Void> ban(@NotNull UserSnowflake user, int deletionTimeframe, @NotNull TimeUnit unit) {
+		return this.guild.ban(user, deletionTimeframe, unit);
 	}
 
 	@Override
@@ -1180,18 +1178,17 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 		return this.guild.createStageChannel(name, parent);
 	}
 
+	@NotNull
 	@Override
-	@CheckReturnValue
-	@Nonnull
-	public ChannelAction<Category> createCategory(@Nonnull String name) {
-		return this.guild.createCategory(name);
+	public ChannelAction<ForumChannel> createForumChannel(@NotNull String name, @Nullable Category parent) {
+		return this.guild.createForumChannel(name, parent);
 	}
 
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public <T extends ICopyableChannel> ChannelAction<T> createCopyOfChannel(@Nonnull T channel) {
-		return this.guild.createCopyOfChannel(channel);
+	public ChannelAction<Category> createCategory(@Nonnull String name) {
+		return this.guild.createCategory(name);
 	}
 
 	@Override
@@ -1480,5 +1477,11 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	@Nonnull
 	public OffsetDateTime getTimeCreated() {
 		return this.guild.getTimeCreated();
+	}
+
+	@Override
+	@Nonnull
+	public SortedSnowflakeCacheView<ForumChannel> getForumChannelCache() {
+		return guild.getForumChannelCache();
 	}
 }

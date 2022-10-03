@@ -8,8 +8,8 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -107,8 +107,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		}
 	}
 
-	public void setRemoveReaction(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e,
-								  @NotNull BlackGuild guild) {
+	public void setRemoveReaction(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		ChannelType removeReactionChannel = e.getOption(REMOVE_REACTION_CHANNEL, OptionMapping::getChannelType);
 		var messageId = e.getOption(REMOVE_REACTION_MESSAGE_ID, OptionMapping::getAsLong);
 		var emoteId = e.getOption(REMOVE_REACTION_EMOTE, OptionMapping::getAsLong);

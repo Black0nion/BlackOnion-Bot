@@ -15,10 +15,10 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.AudioChannel;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -108,7 +108,7 @@ public class PlayerManager {
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(final AudioTrack track) {
-				musicManager.scheduler.queue(track, manager, vc);
+				musicManager.scheduler.queueTrack(track, manager, vc);
 				channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).addField("addedtoqueue", track.getInfo().title + " by " + track.getInfo().author, false).build()).queue();
 			}
 
@@ -137,13 +137,13 @@ public class PlayerManager {
 					if (tracks.size() <= 10) {
 						tracks.forEach(track -> {
 							builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
-							musicManager.scheduler.queue(track, manager, vc);
+							musicManager.scheduler.queueTrack(track, manager, vc);
 						});
 					} else {
 						builder.setDescription(LanguageSystem.getTranslation("thistracksplusadded", author, guild).replace("%tracks%", String.valueOf(tracks.size() - 10)));
 						for (int i = 0; i < tracks.size(); i++) {
 							final AudioTrack track = tracks.get(i);
-							musicManager.scheduler.queue(track, manager, vc);
+							musicManager.scheduler.queueTrack(track, manager, vc);
 							if (i < 10) {
 								builder.addField(track.getInfo().title, "By: " + track.getInfo().author, false);
 							}
@@ -175,7 +175,7 @@ public class PlayerManager {
 				return;
 			}
 			final AudioTrack track = tracks.get(Utils.NUMBERS_UNICODE.entrySet().stream().filter(entry -> entry.getValue().equals(event.getEmoji().getAsReactionCode())).findFirst().orElseThrow().getKey());
-			musicManager.scheduler.queue(track, manager, vc);
+			musicManager.scheduler.queueTrack(track, manager, vc);
 		}, 1, TimeUnit.MINUTES, () -> msg.editMessageEmbeds(EmbedUtils.getErrorEmbed(author, BlackGuild.from(msg.getGuild())).addField("timeout", "tooktoolong", false).build()).queue());
 	}
 }

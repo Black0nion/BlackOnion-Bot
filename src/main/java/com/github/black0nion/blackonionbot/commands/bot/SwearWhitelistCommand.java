@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -49,17 +49,17 @@ public class SwearWhitelistCommand extends SlashCommand {
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		switch (Objects.requireNonNull(e.getSubcommandName())) {
-			case ADD_ROLE -> addRole(cmde, e, member, author, guild, channel);
-			case REMOVE_ROLE -> removeRole(cmde, e, member, author, guild, channel);
-			case ADD_PERMISSION -> addPermission(cmde, e, member, author, guild, channel);
-			case REMOVE_PERMISSION -> removePermission(cmde, e, member, author, guild, channel);
-			case ADD_CHANNEL -> addChannel(cmde, e, member, author, guild, channel);
-			case REMOVE_CHANNEL -> removeChannel(cmde, e, member, author, guild, channel);
+			case ADD_ROLE -> addRole(cmde, e, guild);
+			case REMOVE_ROLE -> removeRole(cmde, e, guild);
+			case ADD_PERMISSION -> addPermission(cmde, e, guild);
+			case REMOVE_PERMISSION -> removePermission(cmde, e, guild);
+			case ADD_CHANNEL -> addChannel(cmde, e, guild);
+			case REMOVE_CHANNEL -> removeChannel(cmde, e, guild);
 			default -> cmde.sendPleaseUse();
 		}
 	}
 
-	private void addRole(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void addRole(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var addRole = e.getOption(ROLE, OptionMapping::getAsRole);
 
 		final List<String> mentionedStuff = new ArrayList<>();
@@ -76,7 +76,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 		cmde.success("whitelistupdated", cmde.getTranslation("addedtowhitelist", new Placeholder("add", mentionedStuff.toString())));
 	}
 
-	private void removeRole(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void removeRole(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var removeRole = e.getOption(ROLE, OptionMapping::getAsRole);
 
 		final List<String> mentionedStuff = new ArrayList<>();
@@ -90,7 +90,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 		cmde.success("whitelistupdated", cmde.getTranslation("removedfromwhitelist", new Placeholder("removed", mentionedStuff.toString())));
 	}
 
-	private void addPermission(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void addPermission(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var perm = e.getOption(ADD_PERMISSION, OptionMapping::getAsString);
 
 		final List<String> mentionedStuff = new ArrayList<>();
@@ -107,7 +107,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 		cmde.success("whitelistupdated", cmde.getTranslation("addedtowhitelist", new Placeholder("add", mentionedStuff.toString())));
 	}
 
-	private void removePermission(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void removePermission(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var perm = e.getOption(REMOVE_PERMISSION, OptionMapping::getAsString);
 
 		final List<String> mentionedStuff = new ArrayList<>();
@@ -121,7 +121,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 		cmde.success("whitelistupdated", cmde.getTranslation("removedfromwhitelist", new Placeholder("removed", mentionedStuff.toString())));
 	}
 
-	private void addChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void addChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var addChannel = e.getOption(ADD_CHANNEL, OptionMapping::getAsChannel).asTextChannel();
 
 		final List<String> mentionedStuff = new ArrayList<>();
@@ -138,7 +138,7 @@ public class SwearWhitelistCommand extends SlashCommand {
 		cmde.success("whitelistupdated", cmde.getTranslation("addedtowhitelist", new Placeholder("add", mentionedStuff.toString())));
 	}
 
-	private void removeChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	private void removeChannel(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild) {
 		var removeChannel = e.getOption(REMOVE_CHANNEL, OptionMapping::getAsChannel).asTextChannel();
 
 		final List<String> mentionedStuff = new ArrayList<>();

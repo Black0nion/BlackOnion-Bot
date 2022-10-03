@@ -13,12 +13,13 @@ import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			channel.sendMessage(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFile(file, "welcome.png").queue();
+			channel.sendMessage(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFiles(FileUpload.fromData(file, "welcome.png")).queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +78,8 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
-			channel.sendMessage(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFile(file, "goodbye.png").queue();
+			channel.sendMessage(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()))
+				.addFiles(FileUpload.fromData(file, "goodbye.png")).queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -98,7 +100,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 				try {
 					final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
-					guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
+					guildById.getTextChannelById(config.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -130,7 +132,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 			try {
 				final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
-				guildById.getTextChannelById(BotInformation.logsChannel).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				guildById.getTextChannelById(config.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

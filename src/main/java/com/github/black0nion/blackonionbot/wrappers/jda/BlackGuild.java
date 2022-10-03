@@ -19,7 +19,7 @@ import com.google.common.cache.LoadingCache;
 import com.mongodb.client.MongoCollection;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 

@@ -16,7 +16,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -55,7 +55,7 @@ public class TicTacToeCommand extends SlashCommand {
 			final Message message = game.getMessage();
 			if (id.equalsIgnoreCase("leave")) {
 				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention()))
-					.setActionRows(game.getRows().stream().map(row -> row.getButtons().stream().map(Button::asDisabled).toList()).map(ActionRow::of).toList()).queue();
+					.setComponents(game.getRows().stream().map(row -> row.getButtons().stream().map(Button::asDisabled).toList()).map(ActionRow::of).toList()).queue();
 				TicTacToeGameManager.deleteGame(game);
 				return;
 			} else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
@@ -88,7 +88,7 @@ public class TicTacToeCommand extends SlashCommand {
 				}).toList())).toList();
 			}
 			game.setRows(placeAt);
-			message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setActionRows(placeAt).queue();
+			message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAt).queue();
 			game.nextUser();
 
 			if (game.getPlayerY().isBot()) {
@@ -110,7 +110,7 @@ public class TicTacToeCommand extends SlashCommand {
 					else return b;
 				}).toList())).toList();
 				game.setRows(placeAtBot);
-				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setActionRows(placeAtBot).queue();
+				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAtBot).queue();
 				game.nextUser();
 				this.rerun(game, channel);
 			} else {
@@ -118,7 +118,7 @@ public class TicTacToeCommand extends SlashCommand {
 			}
 		}, 1, TimeUnit.MINUTES, () -> {
 			Language language = Optional.ofNullable(guild.getLanguage()).orElseGet(LanguageSystem::getDefaultLanguage);
-			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed().addField(language.getTranslationNonNull("timeout"), language.getTranslationNonNull("tooktoolong"), false).build()).setActionRows().queue();
+			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed().addField(language.getTranslationNonNull("timeout"), language.getTranslationNonNull("tooktoolong"), false).build()).setActionRow().queue();
 			TicTacToeGameManager.deleteGame(game);
 		});
 	}
@@ -139,9 +139,9 @@ public class TicTacToeCommand extends SlashCommand {
 			final List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);
 			placeAt.remove(3);
 			if (firstWinner == FieldType.EMPTY) {
-				game.getMessage().editMessage("WE HAVE NO WINNER!\nu both succ, nobody won, lul").setActionRows(placeAt).queue();
+				game.getMessage().editMessage("WE HAVE NO WINNER!\nu both succ, nobody won, lul").setComponents(placeAt).queue();
 			} else {
-				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + (firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention()) + "!").setActionRows(placeAt).queue();
+				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + (firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention()) + "!").setComponents(placeAt).queue();
 			}
 			TicTacToeGameManager.deleteGame(game);
 			return true;
@@ -173,8 +173,9 @@ public class TicTacToeCommand extends SlashCommand {
 					// Accepted
 					final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
 					this.rerun(game, e.getChannel().asTextChannel());
-				} else
+				} else {
 					ConnectFourCommand.isDeclined(e, guild, event, author, getTranslation("declined", eventAuthor, guild), getTranslation("challengedeclined", eventAuthor, guild), getTranslation("arentyoubraveenough", eventAuthor, guild), getTranslation("answerwithyes", eventAuthor, guild));
+				}
 		}, 1, TimeUnit.MINUTES, () -> e.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
 	}
 }
