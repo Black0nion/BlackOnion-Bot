@@ -75,7 +75,7 @@ dependencies {
 
     implementation "io.javalin:javalin:4.6.4"
 
-    implementation "org.json:json:20220320"
+    implementation "org.json:json:20220924"
 
     implementation "org.mongodb:mongo-java-driver:3.12.11"
 
