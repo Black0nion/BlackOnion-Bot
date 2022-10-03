@@ -1,4 +1,4 @@
-FROM gradle:7.5-jdk17-alpine AS build
+FROM gradle:7.5.1-jdk17-alpine AS build
 
 COPY --chown=gradle:gradle . /bot
 
