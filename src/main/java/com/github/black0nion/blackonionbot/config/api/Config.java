@@ -52,7 +52,10 @@ public interface Config {
 
 	long getVoteChannel();
 
+	int getPrometheusPort();
+
 	long getDevGuild();
 
-	int getPrometheusPort();
+	long getLogsChannel();
+	void setLogsChannel(long channel);
 }

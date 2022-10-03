@@ -36,8 +36,6 @@ public class BotInformation {
 	public static final String CPU_NAME;
 	public static final String CPU_MHZ;
 
-	public static long logsChannel;
-
 	public static final long SUPPORT_SERVER;
 
 	static {
@@ -53,7 +51,7 @@ public class BotInformation {
 			LoggerFactory.getLogger(BotInformation.class).warn("Could not load support server information from database");
 		}
 		SUPPORT_SERVER = supportServer;
-		BotInformation.logsChannel = logsChannel;
+		Bot.getInstance().getConfig().setLogsChannel(logsChannel);
 
 		String osName = "Unknown";
 		String cpuName = "N/A";

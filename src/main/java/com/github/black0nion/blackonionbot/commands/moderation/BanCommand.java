@@ -9,7 +9,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class BanCommand extends SlashCommand {
 	private static final String USER = "user";
@@ -68,7 +69,7 @@ public class BanCommand extends SlashCommand {
 
 		guild.retrieveBan(banUser).queue(
 			exists -> cmde.error("alreadybanned", "bannedfor", new Placeholder("user", banUser.getAsTag()), new Placeholder("reason", exists.getReason())),
-			doesntExist -> guild.ban(banMember != null ? banMember : banUser, delDays != null ? delDays : 0, "[" + author.getId() + "]" + (reason != null ? " " + reason : ""))
+			doesntExist -> guild.ban(banMember != null ? banMember : banUser, delDays != null ? delDays : 0, TimeUnit.DAYS).reason("[" + author.getId() + "]" + (reason != null ? " " + reason : ""))
 				.queue(success -> {
 					AwaitDone<InteractionHook> await = new AwaitDone<>();
 					cmde.send(reason != null ? "idid" : "ididnoreason", await::done, new Placeholder("user", banUser.getAsMention()), new Placeholder("reason", reason), ACTION);

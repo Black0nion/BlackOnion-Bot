@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -53,7 +53,7 @@ public class TicTacToe {
 
 		final BlackUser currentUser = BlackUser.from(Objects.requireNonNull(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser())));
 
-		channel.sendMessage(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setActionRows(this.rows).queue(success -> this.message = success);
+		channel.sendMessage(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setComponents(this.rows).queue(success -> this.message = success);
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;

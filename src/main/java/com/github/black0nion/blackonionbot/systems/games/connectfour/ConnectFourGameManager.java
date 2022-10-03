@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
-import java.util.ArrayList;
-
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+
+import java.util.ArrayList;
 
 public class ConnectFourGameManager {
 	private static final ArrayList<ConnectFour> games = new ArrayList<>();

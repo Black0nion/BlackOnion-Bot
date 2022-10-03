@@ -8,7 +8,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,9 +28,8 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         final BlackUser author = BlackUser.from(event != null ? event.getAuthor() : event1.getAuthor());
         final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
         final BlackGuild guild = BlackGuild.from(event != null ? event.getGuild() : event1.getGuild());
-        String newMessage = message;
         final AntiSpoilerType type = guild.getAntiSpoilerType();
-        return handleSystem(guild, msg, message, author, channel, newMessage, type);
+        return handleSystem(guild, msg, message, author, channel, message, type);
     }
 
     public static boolean handleSystem(BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type) {

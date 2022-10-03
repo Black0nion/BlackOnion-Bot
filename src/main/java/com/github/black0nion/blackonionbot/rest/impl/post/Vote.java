@@ -11,7 +11,7 @@ import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;

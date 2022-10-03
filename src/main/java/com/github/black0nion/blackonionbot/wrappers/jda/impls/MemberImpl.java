@@ -4,6 +4,8 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.annotations.Incubating;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.channel.attribute.IPermissionContainer;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -260,20 +262,6 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	@Override
 	@CheckReturnValue
 	@Nonnull
-	public AuditableRestAction<Void> ban(int delDays) {
-		return this.member.ban(delDays);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
-	public AuditableRestAction<Void> ban(int delDays, @Nullable String reason) {
-		return this.member.ban(delDays, reason);
-	}
-
-	@Override
-	@CheckReturnValue
-	@Nonnull
 	public AuditableRestAction<Void> kick() {
 		return this.member.kick();
 	}
@@ -281,6 +269,7 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	@Override
 	@CheckReturnValue
 	@Nonnull
+	@Deprecated
 	public AuditableRestAction<Void> kick(@Nullable String reason) {
 		return this.member.kick(reason);
 	}

@@ -18,7 +18,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.google.common.collect.Lists;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -115,7 +115,7 @@ public class HelpCommand extends SlashCommand {
 			}
 			buttons.add(Button.danger("close", cmde.getTranslation("close")));
 			channel.sendMessageEmbeds(builder.build())
-				.setActionRows(Lists.partition(buttons, 5)
+				.setComponents(Lists.partition(buttons, 5)
 					.stream()
 					.map(ActionRow::of)
 					.toList())
@@ -192,6 +192,6 @@ public class HelpCommand extends SlashCommand {
 
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);
-		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", "/" + this.getName()))).setEmbeds().setActionRows().queue());
+		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", "/" + this.getName()))).setEmbeds().setComponents().queue());
 	}
 }

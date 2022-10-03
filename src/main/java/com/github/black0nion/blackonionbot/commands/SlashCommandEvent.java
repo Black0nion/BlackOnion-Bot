@@ -12,11 +12,11 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,8 @@ import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.github.black0nion.blackonionbot.utils.EmbedUtils.*;
+import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getErrorEmbed;
+import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmbed;
 
 /**
  * An util class that contains various objects related to command executions.
@@ -200,8 +201,8 @@ public class SlashCommandEvent {
 		this.event.reply(getTranslation(message, placeholders)).setEphemeral(this.command.isEphemeral()).queue(result);
 	}
 
-	public void send(final Message message, final Consumer<InteractionHook> result) {
-		this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, this::logError);
+	public void send(final AudioManager message, final Consumer<InteractionHook> result) {
+		//this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, this::logError);
 	}
 
 	private String getPleaseUse() {

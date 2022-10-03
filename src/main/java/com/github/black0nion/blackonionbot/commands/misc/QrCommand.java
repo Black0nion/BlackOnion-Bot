@@ -12,13 +12,14 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,7 @@ public class QrCommand extends SlashCommand {
 		createQR(input, filePath);
 		final EmbedBuilder builder = cmde.success().setTitle("qrcode", "https://zxing.github.io/zxing").setImage("attachment://qr.png");
 		try {
-			e.replyFile(new FileInputStream(file), "qr.png").addEmbeds(builder.build()).queue();
+			e.replyFiles(FileUpload.fromData(new FileInputStream(file), "qr.png")).addEmbeds(builder.build()).queue();
 		} catch (FileNotFoundException ex) {
 			logger.error("Could not find file", ex);
 			cmde.send("somethingwentwrong");
