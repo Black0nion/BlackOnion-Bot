@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -37,15 +38,18 @@ public class HelpCommand extends SlashCommand {
 	private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
 	private static final String COMMAND_OR_CATEGORY = "command_or_category";
 
-	public HelpCommand() {
+	private final SlashCommandBase slashCommandBase;
+
+	public HelpCommand(Config config, SlashCommandBase slashCommandBase) {
 		super(builder(Commands.slash("help", "Used to get help on commands.")
 			.addOption(OptionType.STRING, COMMAND_OR_CATEGORY, "Used to retrieve help for a command / category", false, true))
-			.notToggleable());
+			.notToggleable(), config);
+		this.slashCommandBase = slashCommandBase;
 	}
 
 	public void updateAutoComplete() {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
-		List<String> result = SlashCommandBase.getCommands().entrySet().stream()
+		List<String> result = slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
 				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
@@ -61,7 +65,7 @@ public class HelpCommand extends SlashCommand {
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, @NotNull BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
 		var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
 		if (command != null) {
-			for (final Pair<Long, SlashCommand> entry : SlashCommandBase.getCommands().values()) {
+			for (final Pair<Long, SlashCommand> entry : slashCommandBase.getCommands().values()) {
 				final SlashCommand cmd = entry.getValue();
 				if (!cmd.isHidden(author) && cmd.getName().equalsIgnoreCase(command)) {
 					cmde.success("help", SlashCommandEvent.getCommandHelp(cmd), cmde.getTranslationOrEmpty("help" + cmd.getName().toLowerCase()));
@@ -71,7 +75,7 @@ public class HelpCommand extends SlashCommand {
 			final Category category = Category.parse(command);
 			if (category != null) {
 				final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
-				for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+				for (final SlashCommand c : slashCommandBase.getCommandsInCategory().get(category)) {
 					builder.addField(SlashCommandEvent.getCommandHelp(c), cmde.getTranslationOrEmpty("help" + c.getName()), false);
 				}
 				cmde.reply(builder);
@@ -89,8 +93,8 @@ public class HelpCommand extends SlashCommand {
 					commandsInCategory = new StringBuilder(", " + cmde.getTranslation("helpmodules"));
 				} else {
 					category = cats[i - 1];
-					if (SlashCommandBase.getCommandsInCategory().containsKey(category)) {
-						for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+					if (slashCommandBase.getCommandsInCategory().containsKey(category)) {
+						for (final SlashCommand c : slashCommandBase.getCommandsInCategory().get(category)) {
 							if (!c.isHidden(author)) {
 								commandsInCategory.append(", ").append(c.getName());
 							}
@@ -139,7 +143,7 @@ public class HelpCommand extends SlashCommand {
 						commandsInCategory = new StringBuilder(", " + cmde.getTranslationOrEmpty("helpmodules"));
 					} else {
 						category = cats[i - 1];
-						for (final SlashCommand c : SlashCommandBase.getCommandsInCategory().get(category)) {
+						for (final SlashCommand c : slashCommandBase.getCommandsInCategory().get(category)) {
 							if (!c.isHidden(user)) {
 								commandsInCategory.append(", ").append(c.getName());
 							}
@@ -157,7 +161,7 @@ public class HelpCommand extends SlashCommand {
 			} else {
 				final Category category = Category.valueOf(button.getId());
 				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
-				for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.getCommands().entrySet()) {
+				for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : slashCommandBase.getCommands().entrySet()) {
 					var command = entry.getValue().getValue();
 					if (!command.isHidden(user) && (command.getCategory() == category)) {
 						if (command.getProgress() != Progress.DONE) {
@@ -172,7 +176,7 @@ public class HelpCommand extends SlashCommand {
 					if (pr == Progress.DONE) {
 						continue;
 					}
-					for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : SlashCommandBase.getCommands().entrySet()) {
+					for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : slashCommandBase.getCommands().entrySet()) {
 						var command = entry.getValue().getValue();
 						if (!command.isHidden(user) && (command.getCategory() == category) && command.getProgress() == pr) {
 							final String commandHelp = cmde.getTranslation("help" + command.getName().toLowerCase());
@@ -188,6 +192,6 @@ public class HelpCommand extends SlashCommand {
 
 			event.editMessageEmbeds(builder.build()).queue();
 			this.waitForHelpCatSelection(msg, author, cmde);
-		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", cmde.getGuild().getPrefix() + this.getName()))).setEmbeds().setActionRows().queue());
+		}, 5, TimeUnit.MINUTES, () -> msg.editMessage(cmde.getTranslation("helpmenuexpired", new Placeholder("cmd", "/" + this.getName()))).setEmbeds().setActionRows().queue());
 	}
 }

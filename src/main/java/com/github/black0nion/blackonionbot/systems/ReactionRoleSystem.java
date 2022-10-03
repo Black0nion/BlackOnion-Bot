@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class ReactionRoleSystem extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
-	public static final MongoCollection<Document> collection = MongoDB.DATABASE.getCollection("reactionroles");
+	public static final MongoCollection<Document> collection = MongoDB.getInstance().getDatabase().getCollection("reactionroles");
 
 	@Override
 	public void onMessageReactionAdd(final MessageReactionAddEvent e) {

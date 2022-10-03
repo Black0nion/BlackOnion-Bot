@@ -38,12 +38,12 @@ public class AntiSpoilerSystem extends ListenerAdapter {
             long count = message.chars().filter(c -> c == '|').count();
             if (count < 4) return false;
 
-            if (Utils.handleRights(guild, author, channel, null, Permission.MESSAGE_MANAGE)) return false;
+            if (Utils.handleSelfRights(guild, author, channel, null, Permission.MESSAGE_MANAGE)) return false;
 
             msg.delete().queue();
             if (type == DELETE) return true;
 
-            if (Utils.handleRights(guild, author, channel, null, Permission.MANAGE_WEBHOOKS)) return true;
+            if (Utils.handleSelfRights(guild, author, channel, null, Permission.MANAGE_WEBHOOKS)) return true;
 
             while (count >= 4) {
                 newMessage = newMessage.replaceFirst("\\|\\|", "");

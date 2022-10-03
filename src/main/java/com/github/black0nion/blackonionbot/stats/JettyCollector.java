@@ -1,11 +1,12 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import io.prometheus.client.Collector;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
 
 /**
  * Taken from <a href="https://github.com/tipsy/javalin-prometheus-example/blob/667293485c83e20cb674f67fac83a8578b839cb5/src/main/java/StatisticsHandlerCollector.java">tipsy/javalin-prometheus-example</a>

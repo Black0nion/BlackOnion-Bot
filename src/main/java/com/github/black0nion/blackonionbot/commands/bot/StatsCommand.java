@@ -3,9 +3,10 @@ package com.github.black0nion.blackonionbot.commands.bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -16,12 +17,11 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 
 import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
-import static com.github.black0nion.blackonionbot.utils.config.Config.metadata;
 
 public class StatsCommand extends SlashCommand {
 
-	public StatsCommand() {
-		super("stats", "Shows statistics regarding the bot.");
+	public StatsCommand(Config config) {
+		super("stats", "Shows statistics regarding the bot.", config);
 	}
 
 	@Override
@@ -32,13 +32,13 @@ public class StatsCommand extends SlashCommand {
 			.success()
 			.setTitle("Bot Stats")
 			.addField("prefix", "`" + "/" + "`", true)
-			.addField("runmode", Config.run_mode.name().toUpperCase(), true)
+			.addField("runmode", config.getRunMode().name().toUpperCase(), true)
 			.addField("os", OS_NAME, true)
 			.addField("cpuname", CPU_NAME, true)
 			.addField("cpucores", OS_BEAN.getAvailableProcessors(), true)
 			.addField("cpuspeed", CPU_MHZ, true)
-			.addField("lines", metadata.lines_of_code(), true)
-			.addField("files", metadata.files(), true)
+			.addField("lines", ConfigFileLoader.getMetadata().lines_of_code(), true)
+			.addField("files", ConfigFileLoader.getMetadata().files(), true)
 			.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
 			.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
 			.addField("commands", SlashCommandBase.getCommandCount(), true)
@@ -46,7 +46,7 @@ public class StatsCommand extends SlashCommand {
 			.addField("usercount", StatisticsManager.getUserCount(), true)
 			.addField("guildcount", StatisticsManager.getGuildCount(), true)
 			.addField("uptime", Utils.parseDate(diff), true)
-			.addField("version", Config.metadata.version(), true)
+			.addField("version", ConfigFileLoader.getMetadata().version(), true)
 			.setThumbnail(e.getJDA().getSelfUser().getAvatarUrl() + "?size=512")
 			.setTimestamp(Instant.now())
 		);

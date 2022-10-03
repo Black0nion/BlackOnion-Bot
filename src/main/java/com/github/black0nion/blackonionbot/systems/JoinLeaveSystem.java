@@ -1,24 +1,5 @@
 package com.github.black0nion.blackonionbot.systems;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Objects;
-
-import javax.imageio.ImageIO;
-
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import org.jetbrains.annotations.NotNull;
-
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.misc.DrawType;
@@ -28,7 +9,9 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -36,8 +19,18 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Objects;
 
 @SuppressWarnings("all")
 // TODO: improve
@@ -46,14 +39,16 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	private static BufferedImage defaultBackGround;
 	private static final Logger logger = LoggerFactory.getLogger(JoinLeaveSystem.class);
 
-	public JoinLeaveSystem() {
+	private final Config config;
+
+	public JoinLeaveSystem(Config config) {
+		this.config = config;
 		try {
 			defaultBackGround = ImageIO.read(Objects.requireNonNull(this.getClass().getResource("/background.png")));
-			return;
 		} catch (final Exception e) {
 			e.printStackTrace();
+			defaultBackGround = null;
 		}
-		defaultBackGround = null;
 	}
 
 	@Override
@@ -95,7 +90,6 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
 			final BlackGuild guild = BlackGuild.from(event.getGuild());
-			final String prefix = guild.getPrefix();
 
 			guild.retrieveOwner().queue(user -> {
 				final BlackUser author = BlackUser.from(user.getUser());
@@ -109,7 +103,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 					e.printStackTrace();
 				}
 
-				if (Config.run_mode == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
+				if (config.getRunMode() == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
 					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());
@@ -117,7 +111,13 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				}
 
 				author.openPrivateChannel().queue(channel ->
-					channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild).setTitle("thankyouforadding").addField(LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", prefix + "help"), LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", prefix + "lang").replace("%guildcmd%", prefix + "guildlang"), false).build()).queue());
+					channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
+						.setTitle("thankyouforadding")
+						.addField(
+							LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", "/help"),
+							LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
+						.build()
+					).queue());
 			});
 		});
 	}

@@ -47,7 +47,7 @@ public record Warn(
 		return reason != null ? Utils.escapeMarkdown(reason) : null;
 	}
 
-	private static final MongoCollection<Document> warnsCollection = MongoDB.DATABASE.getCollection("warns");
+	private static final MongoCollection<Document> warnsCollection = MongoDB.getInstance().getDatabase().getCollection("warns");
 	public static void loadWarns(List<Warn> warns, Document identifier) {
 		ImmutableList.copyOf(warnsCollection.find(identifier)).stream().filter(Objects::nonNull).map(doc -> {
 			if (doc.containsKey(ISSUER) && doc.containsKey(USERID) && doc.containsKey(GUILDID) && doc.containsKey(ID))

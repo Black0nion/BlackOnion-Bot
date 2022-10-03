@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -27,9 +27,9 @@ import java.util.Date;
 public class WeatherCommand extends SlashCommand {
 	private static final String CITY_NAME = "city_name";
 
-	public WeatherCommand() {
+	public WeatherCommand(Config config) {
 		super(builder(Commands.slash("weather", "Used to get weather information for a city.")
-			.addOption(OptionType.STRING, CITY_NAME, "The city to get weather information for.", true)));
+			.addOption(OptionType.STRING, CITY_NAME, "The city to get weather information for.", true)), config);
 	}
 
 	@Override
@@ -58,8 +58,8 @@ public class WeatherCommand extends SlashCommand {
 		}
 	}
 
-	public static @NotNull JSONObject getWeather(final String query) throws IOException {
-		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=metric&appid=" + Config.openweatherapikey);
+	private JSONObject getWeather(final String query) throws IOException {
+		final URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=metric&appid=" + config.getOpenWeatherMapApiKey());
 		final HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

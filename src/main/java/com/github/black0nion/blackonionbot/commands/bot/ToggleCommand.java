@@ -5,6 +5,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -22,22 +23,24 @@ import java.util.Map;
 public class ToggleCommand extends SlashCommand {
 
 	public static final String COMMAND = "command";
+	private final SlashCommandBase slashCommandBase;
 
-	public ToggleCommand() {
+	public ToggleCommand(SlashCommandBase slashCommandBase, Config config) {
 		super(builder(Commands.slash("toggle", "Toggle commands")
 				.addOptions(
 					new OptionData(OptionType.STRING, COMMAND, "Command to toggle", true, true),
 					new OptionData(OptionType.BOOLEAN, "on", "The new status", false))
 			)
-			.autocomplete(COMMAND, SlashCommandBase.getCommands().keySet())
+			.autocomplete(COMMAND, slashCommandBase.getCommands().keySet())
 			.setRequiredPermissions(Permission.MANAGE_SERVER)
-			.notToggleable()
-		);
+			.notToggleable(),
+		config);
+		this.slashCommandBase = slashCommandBase;
 	}
 
 	public void updateAutoComplete() {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
-		this.updateAutoComplete(COMMAND, SlashCommandBase.getCommands().entrySet().stream()
+		this.updateAutoComplete(COMMAND, slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
 				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)

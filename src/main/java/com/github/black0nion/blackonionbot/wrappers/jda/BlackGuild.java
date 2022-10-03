@@ -12,7 +12,6 @@ import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -62,14 +61,13 @@ public class BlackGuild extends GuildImpl {
 	@Nullable
 	public static BlackGuild from(final long guildid) {
 		final Optional<Entry<Guild, BlackGuild>> first = guilds.asMap().entrySet().stream().filter(entry -> entry.getKey().getIdLong() == guildid).findFirst();
-		return first.isPresent() ? first.get().getValue() : from(Bot.getInstance().getJda().getGuildById(guildid));
+		return first.isPresent() ? first.get().getValue() : from(Bot.getInstance().getJDA().getGuildById(guildid));
 	}
 
 	private Language language;
 	private GuildType guildType;
 	private AntiSpoilerSystem.AntiSpoilerType antiSpoilerType;
 	private List<String> antiSwearWhitelist;
-	private String prefix;
 	private String joinMessage;
 	private long joinChannel;
 	private String leaveMessage;
@@ -97,7 +95,6 @@ public class BlackGuild extends GuildImpl {
 			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
 			final Language langNonNull = language != null ? language : LanguageSystem.getDefaultLanguage();
 			this.guildType = Utils.gOD(GuildType.parse(config.getString("guildtype")), GuildType.NORMAL);
-			this.prefix = Utils.gOD(config.getString("prefix"), Config.prefix);
 			this.antiSpoilerType = Utils.gOD(AntiSpoilerSystem.AntiSpoilerType.parse(config.getString("antispoiler")), AntiSpoilerSystem.AntiSpoilerType.OFF);
 			this.joinMessage = Utils.gOD(config.getString("joinmessage"), langNonNull.getTranslationNonNull("defaultjoinmessage"));
 			this.joinChannel = Utils.gOD(config.getLong("joinchannel"), -1L);
@@ -177,17 +174,6 @@ public class BlackGuild extends GuildImpl {
 
 	public boolean isPremium() {
 		return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
-	}
-
-	@DashboardGetter("general.prefix")
-	public String getPrefix() {
-		return this.prefix;
-	}
-
-	@DashboardSetter("general.prefix")
-	public void setPrefix(final String prefix) {
-		this.prefix = prefix;
-		this.save("prefix", prefix);
 	}
 
 	@DashboardGetter("utils.joinleave.join.message")
@@ -424,7 +410,7 @@ public class BlackGuild extends GuildImpl {
 		return new Document("guildid", this.guild.getIdLong());
 	}
 
-	public static final MongoCollection<Document> configs = MongoDB.DATABASE.getCollection("guildsettings");
+	public static final MongoCollection<Document> configs = MongoDB.getInstance().getDatabase().getCollection("guildsettings");
 
 	@Override
 	protected MongoCollection<Document> getCollection() {
@@ -439,7 +425,6 @@ public class BlackGuild extends GuildImpl {
 			", guildType=" + guildType +
 			", antiSpoilerType=" + antiSpoilerType +
 			", antiSwearWhitelist=" + antiSwearWhitelist +
-			", prefix='" + prefix + '\'' +
 			", joinMessage='" + joinMessage + '\'' +
 			", joinChannel=" + joinChannel +
 			", leaveMessage='" + leaveMessage + '\'' +

@@ -1,10 +1,27 @@
 package com.github.black0nion.blackonionbot.mongodb;
 
 import com.github.black0nion.blackonionbot.misc.RunMode;
-import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.mongodb.client.MongoDatabase;
 
+import javax.annotation.Nullable;
+
 public class MongoDB {
-	public static final MongoDatabase DATABASE = MongoManager.getDatabase("BlackOnion-Bot" + (Config.run_mode != RunMode.RELEASE ? "_" + Config.run_mode.name() : ""));
-	public static final MongoDatabase generalDatabase = MongoManager.getDatabase("General");
+	private static MongoDB instance;
+
+	@Nullable
+	public static MongoDB getInstance() {
+		return instance;
+	}
+
+	public MongoDB(Config config) {
+		instance = this;
+		database = MongoManager.getDatabase("BlackOnion-Bot" + (config.getRunMode() != RunMode.RELEASE ? "_" + config.getRunMode().name() : ""));
+	}
+
+	private final MongoDatabase database;
+
+	public MongoDatabase getDatabase() {
+		return database;
+	}
 }

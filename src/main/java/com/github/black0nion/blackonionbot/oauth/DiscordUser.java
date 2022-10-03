@@ -7,14 +7,13 @@ import io.mokulu.discord.oauth.model.TokensResponse;
 import io.mokulu.discord.oauth.model.User;
 import org.json.JSONObject;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import static com.github.black0nion.blackonionbot.oauth.OAuthUtils.OAUTH_HANDLER;
 
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class DiscordUser {
@@ -25,12 +24,14 @@ public class DiscordUser {
 	private String refreshToken;
 	private long expiresAt;
 	private DiscordAPI api;
-	private User user;
+	protected User user;
+
+	protected DiscordUser() {}
 
 	public DiscordUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
 		if (accessToken == null || api == null) {
 			throw new IllegalArgumentException("Invalid parameters!");
-		} else if (!OAuthUtils.TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !OAuthUtils.TOKEN_PATTERN.matcher(refreshToken).matches())) {
+		} else if (!OAuthAPI.TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !OAuthAPI.TOKEN_PATTERN.matcher(refreshToken).matches())) {
 			throw new IllegalArgumentException("Invalid tokens!");
 		}
 		this.accessToken = accessToken;
@@ -46,6 +47,10 @@ public class DiscordUser {
 	}
 
 	public JSONObject getUserAsJson() {
+		return user == null ? null : userToJson(user);
+	}
+
+	public static JSONObject userToJson(@Nonnull User user) {
 		return new JSONObject()
 			.put("id", user.getId())
 			.put("username", user.getUsername())
@@ -70,7 +75,7 @@ public class DiscordUser {
 	}
 
 	public DiscordUser refreshTokens() throws IOException {
-		TokensResponse tokensResponse = OAUTH_HANDLER.refreshTokens(this.refreshToken);
+		TokensResponse tokensResponse = OAuthAPI.getInstance().getOAuthApi().refreshTokens(this.refreshToken);
 		this.accessToken = tokensResponse.getAccessToken();
 		this.refreshToken = tokensResponse.getRefreshToken();
 		this.api = new DiscordAPI(this.accessToken);

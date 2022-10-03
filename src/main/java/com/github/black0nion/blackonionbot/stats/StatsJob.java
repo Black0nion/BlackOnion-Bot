@@ -10,6 +10,6 @@ public class StatsJob implements Runnable {
 		StatisticsManager.GUILD_COUNT.set(StatisticsManager.reloadGuildCount());
 		StatisticsManager.USER_COUNT.set(StatisticsManager.reloadUserCount());
 		StatisticsManager.UPTIME.set((System.currentTimeMillis() - StatisticsManager.STARTUP_TIME) / 1000F);
-		StatisticsManager.PING.set(Bot.getInstance().getJda().getGatewayPing());
+		StatisticsManager.PING.set(Bot.getInstance().getJDA().getGatewayPing());
 	}
 }

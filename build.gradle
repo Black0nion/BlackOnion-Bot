@@ -32,16 +32,38 @@ repositories {
     mavenCentral()
 }
 
+apply plugin: "jacoco"
+
 compileJava.options.encoding = "UTF-8"
 
 sourceCompatibility = 17
 targetCompatibility = 17
 
+sourceSets {
+    testShared {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    test {
+        compileClasspath += sourceSets.testShared.output
+        runtimeClasspath += sourceSets.testShared.output
+    }
+    testIntegration {
+        compileClasspath += sourceSets.testShared.output + sourceSets.main.output
+        runtimeClasspath += sourceSets.testShared.output + sourceSets.main.output
+    }
+}
+
 dependencies {
+    def testsImplementation = {
+        testImplementation it
+        testIntegrationImplementation it
+        testSharedImplementation it
+    }
     implementation "com.google.guava:guava:31.1-jre"
 
     implementation "com.google.code.gson:gson:2.9.1"
-    implementation "com.github.Marcono1234:gson-record-type-adapter-factory:v0.2.0"
+    implementation "com.github.Marcono1234:gson-record-type-adapter-factory:0.2.0"
 
     implementation "net.dv8tion:JDA:5.0.0-alpha.17"
     implementation "com.github.black0nion:Pagination-Utils:3.2.0"
@@ -72,6 +94,9 @@ dependencies {
 
     implementation "ch.qos.logback:logback-classic:1.4.0"
     implementation "uk.org.lidalia:sysout-over-slf4j:1.0.2"
+    implementation "io.prometheus:simpleclient_logback:0.15.0"
+    implementation "com.github.loki4j:loki-logback-appender:1.3.2"
+    implementation "org.codehaus.janino:janino:3.1.7"
 
     implementation "io.github.classgraph:classgraph:4.8.149"
 
@@ -79,18 +104,49 @@ dependencies {
     implementation "io.prometheus:simpleclient_hotspot:0.15.0"
     implementation "io.prometheus:simpleclient_httpserver:0.15.0"
 
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
-    testImplementation "com.github.erosb:everit-json-schema:1.14.1"
+    testsImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+    testsImplementation "com.github.erosb:everit-json-schema:1.14.1"
+    testsImplementation "org.mockito:mockito-core:4.7.0"
 }
 
 test {
     useJUnitPlatform()
 }
 
+task testIntegration(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.testIntegration.output.classesDirs
+    classpath = sourceSets.testIntegration.runtimeClasspath
+    shouldRunAfter test
+}
+
+testIntegration {
+    useJUnitPlatform()
+}
+
+test.dependsOn testIntegration
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
 configurations.all {
     //noinspection GrUnresolvedAccess
     // ez vulnerability fix
     exclude group: "org.slf4j", module: "slf4j-log4j12"
+}
+
+configurations {
+    testIntegrationImplementation.extendsFrom implementation
+    testIntegrationRuntimeOnly.extendsFrom runtimeOnly
+
+    testSharedImplementation.extendsFrom implementation
+    testSharedRuntimeOnly.extendsFrom runtimeOnly
 }
 
 mainClassName = "com.github.black0nion.blackonionbot.Main"
@@ -119,24 +175,28 @@ jar {
  */
 task downloadDependencies {
     doLast {
-        logger.info("Cleaning up...")
+        logger.info("===== Downloading dependencies =====")
+        logger.info("  ---       Cleaning up...     ---")
         // delete superseded library jars
-        List<String> newFiles = sourceSets.main.runtimeClasspath.getFiles().stream().map(File::getName).toList()
-        for (File file : new File("libraries").listFiles()) {
-            if (!file.getName().endsWith(".jar") || !newFiles.contains(file.getName())) {
-                // why do i have to cast this to string? hello intellij? or gradle? or idk
-                System.out.println((String) ("Deleting unnecessary file " + file.getName()))
-                file.delete()
-            }
-        }
-        logger.info("Copying dependencies...")
+        Set<String> newFiles = sourceSets.main.runtimeClasspath.getFiles().stream().map(File::getName).toList()
+        fileTree("libraries").files.stream().filter(file -> !newFiles.contains(file.getName())).forEach(file -> {
+            logger.info("  -> Deleting leftover file: ${file.getName()}...")
+            file.delete()
+        })
+        logger.info("  ---     Cleanup complete.    ---")
+
+        logger.info("\n  ---  Copying dependencies... ---")
         copy {
             from(sourceSets.main.runtimeClasspath) {
                 include "*.jar"
             }
             into 'libraries/'
+            eachFile {
+                logger.info("  -> Copying ${it.name}...")
+            }
         }
-        logger.info("Successfully copied dependencies into libraries folder!")
+        logger.info("  ---    Dependencies copied.  ---")
+        logger.info("===== Dependencies downloaded ======")
     }
 }
 

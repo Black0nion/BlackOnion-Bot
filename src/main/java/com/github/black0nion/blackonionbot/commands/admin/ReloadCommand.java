@@ -56,10 +56,14 @@ public class ReloadCommand extends SlashCommand {
 		reloadableMethods = new HashMap<>();
 		new Reflections(Main.class.getPackage().getName(), Scanners.MethodsAnnotated)
 			.getMethodsAnnotatedWith(Reloadable.class)
+			.stream()
+			// we don't care at what point the peek will be executed so the SonarLint warning can be ignored
+			// also, in this case, I'm accessing my own code with reflections, so I know what I'm doing (I think)
+			.peek(m -> m.setAccessible(true))
 			.forEach(method -> reloadableMethods.put(method.getAnnotation(Reloadable.class).value(), method));
 	}
 
-	public static void reload() {
+	public static void reloadAll() {
 		if (reloadableMethods == null) {
 			initReloadableMethods();
 		}
@@ -97,7 +101,7 @@ public class ReloadCommand extends SlashCommand {
 		} else if (e.getSubcommandName().equals(METHOD)) {
 			String option = e.getOption(METHOD, "all", OptionMapping::getAsString);
 			if (option.equalsIgnoreCase("all")) {
-				reload();
+				reloadAll();
 				cmde.send("configsreload");
 			} else {
 				final @Nullable Method method = reloadableMethods.get(option);

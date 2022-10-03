@@ -100,9 +100,9 @@ public class Dashboard {
 				} else if (parameterType == TextChannel.class) {
 					final Object arg = args[i];
 					if (arg instanceof String) {
-						parsed[i] = Bot.getInstance().getJda().getTextChannelById((String) arg);
+						parsed[i] = Bot.getInstance().getJDA().getTextChannelById((String) arg);
 					} else if (arg instanceof Long) {
-						parsed[i] = Bot.getInstance().getJda().getTextChannelById((Long) arg);
+						parsed[i] = Bot.getInstance().getJDA().getTextChannelById((Long) arg);
 					} else {
 						args[i] = null;
 					}

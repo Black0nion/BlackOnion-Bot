@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Progress;
+import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -59,15 +60,24 @@ public abstract class SlashCommand {
 	 * option name : choices
 	 */
 	private final Map<String, StartsWithArrayList> autoCompletes = new HashMap<>();
+	protected final Config config;
+
+	protected SlashCommand(String name, String description) {
+		this(name, description, null);
+	}
 
 	/**
 	 * Creates a new SlashCommand with an empty builder that only has the required {@link SlashCommandData}.
 	 */
-	protected SlashCommand(String name, String description) {
-		this(builder(Commands.slash(name, description)));
+	protected SlashCommand(String name, String description, Config config) {
+		this(builder(Commands.slash(name, description)), config);
 	}
 
 	protected SlashCommand(SlashCommandBuilder builder) {
+		this(builder, null);
+	}
+
+	protected SlashCommand(SlashCommandBuilder builder, Config config) {
 		this.data = builder.getData();
 		this.category = gOD(builder.getCategory(), Category.OTHER);
 		this.progress = gOD(builder.getProgress(), Progress.DONE);
@@ -79,6 +89,7 @@ public abstract class SlashCommand {
 		this.isPremium = builder.isPremium();
 		this.isEphemeral = builder.isEphemeral();
 		this.isAdminGuild = builder.isAdminGuild();
+		this.config = config;
 		if (!builder.getAutoComplete().isEmpty()) {
 			builder.getAutoComplete().entrySet().forEach(this::updateAutoComplete);
 		}

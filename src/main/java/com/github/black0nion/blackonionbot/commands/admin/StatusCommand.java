@@ -4,8 +4,8 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
-import com.github.black0nion.blackonionbot.utils.config.ConfigManager;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -25,11 +25,11 @@ public class StatusCommand extends SlashCommand {
 
 	private static final String STATUS = "status";
 
-	public StatusCommand() {
+	public StatusCommand(Config config) {
 		super(builder(Commands.slash("status", "Set the status of the bot").addOptions(
 			new OptionData(OptionType.STRING, STATUS, "The OnlineStatus of the bot", true)
 				.addChoices(Arrays.stream(OnlineStatus.values()).map(m -> new Command.Choice(m.name(), m.name())).toList())
-		)).setAdminGuild());
+		)).setAdminGuild(), config);
 	}
 
 	@Override
@@ -39,14 +39,14 @@ public class StatusCommand extends SlashCommand {
 			cmde.send("invalidrole");
 			return;
 		}
-		Config.online_status = status;
-		ConfigManager.saveConfig();
+		config.setOnlineStatus(status);
+		ConfigFileLoader.saveConfig();
 		cmde.send("newstatus", new Placeholder(STATUS, status.name()));
 
 		e.getJDA().getPresence().setStatus(status);
 	}
 
-	public static OnlineStatus getStatusFromConfig() {
-		return Optional.ofNullable(Config.online_status).orElse(OnlineStatus.ONLINE);
+	public static OnlineStatus getStatusFromConfig(Config config) {
+		return Optional.ofNullable(config.getOnlineStatus()).orElse(OnlineStatus.ONLINE);
 	}
 }

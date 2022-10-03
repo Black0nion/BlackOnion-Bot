@@ -2,12 +2,12 @@ package com.github.black0nion.blackonionbot.utils;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
+import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.await.AwaitDone;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -40,47 +39,38 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 public class Utils {
 	private Utils() {}
-	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
-
-	public static String getStringWithNLength(final String text, final int length) {
-		return text.repeat(length);
-	}
 
 	public static float map(final float value, final float minInput, final float maxInput, final float minMapped, final float maxMapped) {
 		return (value - minInput) / (maxInput - minInput) * (maxMapped - minMapped) + minMapped;
 	}
 
 	public static String getDuration(final long time) {
-	    String result = "";
-	    if (time / 3600 != 0) {
-		result = String.format("%d:", time / 3600);
-	    }
-	    return result + String.format("%02d:%02d", (time % 3600) / 60, time % 60);
+		String result = "";
+		if (time / 3600 != 0) {
+			result = String.format("%d:", time / 3600);
+		}
+		return result + String.format("%02d:%02d", (time % 3600) / 60, time % 60);
 	}
 
 	public static String escapeMarkdown(final String text) {
 		return text
-          .replace("\\(\\*|_|`|~|\\)", "$1")
-          .replace("(\\*|_|`|~|\\)", "\\$1");
-	}
-
-	public static String[] removeFirstArg(final String[] input) {
-		return Arrays.copyOfRange(input, 1, input.length);
+			.replace("\\(\\*|_|`|~|\\)", "$1")
+			.replace("(\\*|_|`|~|\\)", "\\$1");
 	}
 
 	public static double roundToDouble(final String decimal, final double number) {
@@ -90,7 +80,7 @@ public class Utils {
 	}
 
 	public static String getCountryFromCode(final String code) {
-		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(Objects.requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining()))).getString(code);
+		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining()))).getString(code);
 	}
 
 	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {
@@ -99,10 +89,6 @@ public class Utils {
 		final WritableRaster raster = bufferedImage.copyData(bufferedImage.getRaster().createCompatibleWritableRaster());
 
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
-
-	public static <T> T[] subArray(final T[] array, final int beg) {
-		return subArray(array, beg, array.length - 1);
 	}
 
 	public static <T> T[] subArray(final T[] array, final int beg, final int end) {
@@ -154,10 +140,10 @@ public class Utils {
 		try {
 			//noinspection ResultOfMethodCallIgnored
 			Boolean.parseBoolean(((String) input).trim());
-            return true;
-        } catch (final Exception ignored) {
-            return false;
-        }
+			return true;
+		} catch (final Exception ignored) {
+			return false;
+		}
 	}
 
 	/**
@@ -171,7 +157,7 @@ public class Utils {
 
 	/**
 	 * @return if the given String equals to one of the other given Strings
-	 *         (ignoring case)
+	 * (ignoring case)
 	 */
 	public static boolean equalsOneIgnoreCase(final String input, final String... comparison) {
 		return input.matches("(?i)" + String.join("|", comparison));
@@ -180,29 +166,31 @@ public class Utils {
 	/**
 	 * WARNING: ONLY UNTIL 10 (inclusive)
 	 */
-	public static final HashMap<Integer, String> numbersUnicode = new HashMap<>();
-	public static final String[] emojis = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
+	public static final Map<Integer, String> NUMBERS_UNICODE = new HashMap<>();
+	public static final String[] EMOJIS = new String[] { ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:" };
 
 	static {
-		numbersUnicode.put(0, "U+30U+fe0fU+20e3");
-		numbersUnicode.put(1, "U+31U+fe0fU+20e3");
-		numbersUnicode.put(2, "U+32U+fe0fU+20e3");
-		numbersUnicode.put(3, "U+33U+fe0fU+20e3");
-		numbersUnicode.put(4, "U+34U+fe0fU+20e3");
-		numbersUnicode.put(5, "U+35U+fe0fU+20e3");
-		numbersUnicode.put(6, "U+36U+fe0fU+20e3");
-		numbersUnicode.put(7, "U+37U+fe0fU+20e3");
-		numbersUnicode.put(8, "U+38U+fe0fU+20e3");
-		numbersUnicode.put(9, "U+39U+fe0fU+20e3");
-		numbersUnicode.put(10, "U+1F51F");
+		NUMBERS_UNICODE.put(0, "U+30U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(1, "U+31U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(2, "U+32U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(3, "U+33U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(4, "U+34U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(5, "U+35U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(6, "U+36U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(7, "U+37U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(8, "U+38U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(9, "U+39U+fe0fU+20e3");
+		NUMBERS_UNICODE.put(10, "U+1F51F");
 	}
 
 	/**
 	 * Pass null as the channel argument to check self permissions.
+	 * USED FOR SELF PERMISSIONS!
+	 *
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
+	public static boolean handleSelfRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
@@ -219,6 +207,13 @@ public class Utils {
 		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
+	/**
+	 * Returned format:
+	 * <pre>{@code
+	 *     - DO_THINGS
+	 *     - DO_OTHER_THINGS
+	 * }</pre>
+	 */
 	public static String getPermissionString(final Permission... permissions) {
 		StringBuilder output = new StringBuilder("```");
 		for (int i = 0; i < permissions.length; i++) {
@@ -248,20 +243,9 @@ public class Utils {
 		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 
-	public static <T> T[] concatenate(final T[] a, final T[] b) {
-		final int aLen = a.length;
-		final int bLen = b.length;
-
-		@SuppressWarnings("unchecked")
-		final T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
-		System.arraycopy(a, 0, c, 0, aLen);
-		System.arraycopy(b, 0, c, aLen, bLen);
-
-		return c;
-	}
-
 	public static void printLogo() {
-		System.out.println("""
+		LoggerFactory.getLogger(Main.class).info("""
+
 			   ___  __         __   ____       _                  ___       __
 			  / _ )/ /__  ____/ /__/ __ \\___  (_)__  ___   ____  / _ )___  / /_
 			 / _  / / . |/ __/  '_/ /_/ / _ \\/ / _ \\/ _ \\ /___/ / _  / _ \\/ __/
@@ -269,6 +253,9 @@ public class Utils {
 			""");
 	}
 
+	/**
+	 * Short for "get or default"
+	 */
 	@Nonnull
 	public static <T> T gOD(final @Nullable T value, final @Nonnull T defaultValue) {
 		return value != null ? value : defaultValue;
@@ -375,6 +362,7 @@ public class Utils {
 	private static final String HOURS = "hours";
 	private static final String DAYS = "days";
 	private static final String WEEKS = "weeks";
+
 	public static OptionData[] getDurationOptions(String message) {
 		String description = "The time of the " + message + " in ";
 		return new OptionData[] {
@@ -393,9 +381,9 @@ public class Utils {
 
 		Duration dur = Duration.ofMinutes(
 			(min != null ? min : 0) +
-			(hour != null ? hour * 60 : 0) +
-			(day != null ? day * 60 * 24 : 0) +
-			(week != null ? week * 60 * 24 * 7 : 0)
+				(hour != null ? hour * 60 : 0) +
+				(day != null ? day * 60 * 24 : 0) +
+				(week != null ? week * 60 * 24 * 7 : 0)
 		);
 		if (dur.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
 			throw TooLongException.INSTANCE;
@@ -404,6 +392,18 @@ public class Utils {
 			throw new IllegalArgumentException("Duration must be greater than 0");
 		}
 		return dur;
+	}
+
+	/**
+	 * @return the value of the supplier or null if the supplier throws an exception
+	 */
+	@Nullable
+	public static <T> T tryGet(Supplier<T> getter) {
+		try {
+			return getter.get();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static class TooLongException extends Exception {
@@ -436,5 +436,47 @@ public class Utils {
 			.map(InteractPage::new)
 			.map(Page.class::cast)
 			.toList();
+	}
+
+	/**
+	 * If the {@code supplier} throws an exception, the exception is caught.<br>
+	 * If this exception is of type {@code toReplace}, it instead throws {@code replacement}<br>
+	 * Else, it'll just throw the existing exception.<br>
+	 * If no exception is thrown, the result of the supplier is returned.
+	 */
+	public static <T> T replaceException(ThrowableSupplier<T> supplier, @Nullable Class<? extends Exception> toReplace, Class<? extends RuntimeException> replacement) {
+		requireNonNull(supplier, "supplier");
+		requireNonNull(toReplace, "toReplace");
+		requireNonNull(replacement, "replacement");
+		try {
+			return supplier.get();
+		} catch (Throwable e) {
+			if (toReplace != replacement && e.getClass() == toReplace) {
+				try {
+					throw replacement.getDeclaredConstructor(String.class).newInstance(e.getMessage());
+				} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
+	}
+
+	public static <T> T uncheckedSupplier(ThrowableSupplier<T> supplier) {
+		requireNonNull(supplier, "supplier");
+		try {
+			return supplier.get();
+		} catch (Throwable e) {
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
+	}
+
+	public static void uncheckedSupplier(ThrowableVoidSupplier supplier) {
+		requireNonNull(supplier, "supplier");
+		try {
+			supplier.get();
+		} catch (Throwable e) {
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
+		}
 	}
 }

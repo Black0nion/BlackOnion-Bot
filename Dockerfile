@@ -11,9 +11,9 @@ FROM eclipse-temurin:17-jre-alpine AS run
 WORKDIR /blackonionbot
 
 # Copy the libraries to the container
-COPY --from=build /bot/libraries/* ./
+COPY --link --from=build /bot/libraries/* ./
 
 # Copy the built application to the container
-COPY --from=build /bot/build/libs/BlackOnion-Bot.jar ./bot.jar
+COPY --link --from=build /bot/build/libs/BlackOnion-Bot.jar ./bot.jar
 
 ENTRYPOINT [ "java", "-cp", "*", "com.github.black0nion.blackonionbot.Main" ]

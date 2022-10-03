@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <conversionRule conversionWord="highlight" converterClass="com.github.black0nion.blackonionbot.systems.logging.ColorConversion"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>%cyan(%d{yyyy/mm/dd HH:mm:ss}) %green({%thread}) [%highlight(%level)] %magenta(%replace(%logger){'.*\.blackonionbot\.', ''}): %highlight(%msg) %n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>build/reports/tests/test/out.log</file>
+        <encoder>
+            <pattern>%d{yyyy/mm/dd HH:mm:ss} {%thread} [%level] %logger: %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- Clear log file on startup -->
+        <param name="Append" value="false"/>
+    </appender>
+
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

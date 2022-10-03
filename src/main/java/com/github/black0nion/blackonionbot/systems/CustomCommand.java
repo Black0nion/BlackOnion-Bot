@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.bson.Document;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.time.Instant;
@@ -69,7 +70,7 @@ public class CustomCommand {
 		} else if (doc.containsKey("answer")) {
 			this.answer = doc.getString("answer");
 		} else {
-			System.err.println("CustomCommand " + this.getCommand() + " in Guild " + this.getGuild().getName() + " has no handler set!");
+			LoggerFactory.getLogger(CustomCommand.class).warn("CustomCommand {} in Guild {} has no handler set!", this.getCommand(), this.getGuild().getName());
 		}
 		this.reply = doc.getBoolean("reply", true);
 	}
@@ -126,7 +127,7 @@ public class CustomCommand {
 				embedDoc.put("url", this.embed.getUrl());
 			}
 			final List<Field> fields = this.embed.getFields();
-			if (fields.size() != 0) {
+			if (!fields.isEmpty()) {
 				final List<Document> fieldsDoc = new ArrayList<>();
 				fields.forEach(field -> fieldsDoc.add(new Document().append("name", field.getName()).append("value", field.getValue())));
 				embedDoc.put("fields", fieldsDoc);
@@ -138,7 +139,7 @@ public class CustomCommand {
 		} else if (this.answer != null) {
 			doc.put("answer", this.answer);
 		} else {
-			System.err.println("CustomCommand " + this.getCommand() + " in Guild " + this.getGuild().getName() + " has no handler set!");
+			LoggerFactory.getLogger(CustomCommand.class).warn("CustomCommand {} in Guild {} has no handler set!", this.getCommand(), this.getGuild().getName());
 			return null;
 		}
 		return doc;

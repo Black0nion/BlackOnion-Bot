@@ -1,12 +1,12 @@
 package com.github.black0nion.blackonionbot.systems.music;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.config.Config;
+import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -15,7 +15,10 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -26,50 +29,52 @@ import se.michaelthelin.spotify.requests.authorization.client_credentials.Client
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerManager {
 	private static PlayerManager instance;
-	private static SpotifyApi spotifyApi;
+	private SpotifyApi spotifyApi;
 	private final Map<Long, GuildMusicManager> musicManagers;
 	private final AudioPlayerManager audioPlayerManager;
+	private final Config config;
 
-	public PlayerManager() {
+	public PlayerManager(Config config) {
+		instance = this;
 		this.musicManagers = new HashMap<>();
 		this.audioPlayerManager = new DefaultAudioPlayerManager();
+		this.config = config;
 
 		AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
 		AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
 	}
 
-	public static void init() {
-		if (Config.spotify_client_id == null || Config.spotify_client_secret == null) {
+	public void init() {
+		if (config.getSpotifyClientId() == null || config.getSpotifyClientSecret() == null) {
 			LoggerFactory.getLogger(PlayerManager.class).warn("Spotify client ID or secret is null, disabling Spotify integration");
 			return;
 		}
 
-		spotifyApi = new SpotifyApi.Builder().setClientId(Config.spotify_client_id).setClientSecret(Config.spotify_client_secret).build();
+		spotifyApi = new SpotifyApi.Builder().setClientId(config.getSpotifyClientId()).setClientSecret(config.getSpotifyClientSecret()).build();
 
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					final ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
-					final ClientCredentials credentials = clientCredentialsRequest.execute();
-					spotifyApi.setAccessToken(credentials.getAccessToken());
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+			try {
+				final ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
+				final ClientCredentials credentials = clientCredentialsRequest.execute();
+				spotifyApi.setAccessToken(credentials.getAccessToken());
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
-		}, 0, 3500000);
+		}, 0, 58, TimeUnit.MINUTES);
 	}
 
+	@Nullable
 	public static PlayerManager getInstance() {
-		if (instance == null) {
-			instance = new PlayerManager();
-		}
-
 		return instance;
 	}
 
@@ -116,11 +121,11 @@ public class PlayerManager {
 					final List<AudioTrack> trackz = playlist.getTracks().subList(0, (playlist.getTracks().size() > 10 ? 9 : playlist.getTracks().size()));
 					for (int i = 0; i < trackz.size(); i++) {
 						final AudioTrack track = trackz.get(i);
-						builder.addField(Utils.emojis[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
+						builder.addField(Utils.EMOJIS[i] + " " + track.getInfo().title, "By: " + track.getInfo().author, false);
 					}
 					channel.sendMessageEmbeds(builder.build()).queue(msg -> {
 						for (int i = 0; i < trackz.size(); i++) {
-							msg.addReaction(Emoji.fromUnicode(Utils.numbersUnicode.get(i))).queue();
+							msg.addReaction(Emoji.fromUnicode(Utils.NUMBERS_UNICODE.get(i))).queue();
 						}
 						PlayerManager.this.wait(author, msg, trackz, musicManager, manager, vc);
 					});
@@ -165,11 +170,11 @@ public class PlayerManager {
 	private void wait(final BlackUser author, final Message msg, final List<AudioTrack> tracks, final GuildMusicManager musicManager, final AudioManager manager, final AudioChannel vc) {
 		Bot.getInstance().getEventWaiter().waitForEvent(MessageReactionAddEvent.class, event -> event.getChannelType() == ChannelType.TEXT && msg.getIdLong() == event.getMessageIdLong() && !Objects.requireNonNull(event.getUser()).isBot(), event -> {
 			event.getReaction().removeReaction(Objects.requireNonNull(event.getUser())).queue();
-			if (event.getEmoji().getType() != Emoji.Type.UNICODE || !Utils.numbersUnicode.containsValue(event.getEmoji().getAsReactionCode()) || tracks.size() < Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getEmoji().getAsReactionCode())).findFirst().orElseThrow().getKey()) {
+			if (event.getEmoji().getType() != Emoji.Type.UNICODE || !Utils.NUMBERS_UNICODE.containsValue(event.getEmoji().getAsReactionCode()) || tracks.size() < Utils.NUMBERS_UNICODE.entrySet().stream().filter(entry -> entry.getValue().equals(event.getEmoji().getAsReactionCode())).findFirst().orElseThrow().getKey()) {
 				this.wait(author, msg, tracks, musicManager, manager, vc);
 				return;
 			}
-			final AudioTrack track = tracks.get(Utils.numbersUnicode.entrySet().stream().filter(entry -> entry.getValue().equals(event.getEmoji().getAsReactionCode())).findFirst().orElseThrow().getKey());
+			final AudioTrack track = tracks.get(Utils.NUMBERS_UNICODE.entrySet().stream().filter(entry -> entry.getValue().equals(event.getEmoji().getAsReactionCode())).findFirst().orElseThrow().getKey());
 			musicManager.scheduler.queue(track, manager, vc);
 		}, 1, TimeUnit.MINUTES, () -> msg.editMessageEmbeds(EmbedUtils.getErrorEmbed(author, BlackGuild.from(msg.getGuild())).addField("timeout", "tooktoolong", false).build()).queue());
 	}

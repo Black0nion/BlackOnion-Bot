@@ -48,7 +48,7 @@ public class CustomCommandsCommand extends SlashCommand {
 				e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(),
 				e -> {
 					final String contentRaw = e.getMessage().getContentRaw();
-					if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+					if (contentRaw.startsWith("/") || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 						cmde.send("aborting");
 						return;
 					}
@@ -62,7 +62,7 @@ public class CustomCommandsCommand extends SlashCommand {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
-			if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+			if (contentRaw.startsWith("/") || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 				cmde.send("aborting");
 				return;
 			}
@@ -79,7 +79,7 @@ public class CustomCommandsCommand extends SlashCommand {
 
 			customCommand.setReply(reply);
 			cmde.getGuild().addCustomCommand(customCommand);
-			cmde.success("commandadded", "executetutorial", new Placeholder("%cmd%", cmde.getGuild().getPrefix() + customCommand.getCommand()));
+			cmde.success("commandadded", "executetutorial", new Placeholder("%cmd%", "/" + customCommand.getCommand()));
 		}));
 	}
 
@@ -132,7 +132,7 @@ public class CustomCommandsCommand extends SlashCommand {
 	private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
-			if (contentRaw.startsWith(cmde.getGuild().getPrefix()) || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
+			if (contentRaw.startsWith("/") || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
 				cmde.error("aborting", "byeeee");
 				return;
 			}

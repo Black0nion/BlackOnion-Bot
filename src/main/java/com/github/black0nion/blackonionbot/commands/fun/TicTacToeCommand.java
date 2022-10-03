@@ -15,7 +15,6 @@ import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -42,7 +41,7 @@ public class TicTacToeCommand extends SlashCommand {
 
 	public TicTacToeCommand() {
 		super(builder(Commands.slash("tictactoe", "Used to play TicTacToe with the someone.")
-			.addOption(OptionType.USER, USER, "The user to play with.")).setRequiredBotPermissions(Permission.MESSAGE_MANAGE));
+			.addOption(OptionType.USER, USER, "The user to play with.")));
 	}
 
 	public void rerun(final TicTacToe game, final TextChannel channel) {
@@ -55,7 +54,8 @@ public class TicTacToeCommand extends SlashCommand {
 
 			final Message message = game.getMessage();
 			if (id.equalsIgnoreCase("leave")) {
-				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention())).setActionRows().queue();
+				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention()))
+					.setActionRows(game.getRows().stream().map(row -> row.getButtons().stream().map(Button::asDisabled).toList()).map(ActionRow::of).toList()).queue();
 				TicTacToeGameManager.deleteGame(game);
 				return;
 			} else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
@@ -168,7 +168,7 @@ public class TicTacToeCommand extends SlashCommand {
 			if (eventAuthor.getId().equals(challenged.getId()))
 				if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 
-					e.replyEmbeds(EmbedUtils.getSuccessEmbed(eventAuthor, guild).addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
+					e.getHook().sendMessageEmbeds(cmde.success().addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
 
 					// Accepted
 					final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));

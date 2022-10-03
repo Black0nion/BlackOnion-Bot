@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.systems.dashboard;
 
+import com.github.black0nion.blackonionbot.rest.sessions.WebSocketSession;
 import org.json.JSONObject;
 
-import com.github.black0nion.blackonionbot.api.BlackWebsocketSession;
-import com.github.black0nion.blackonionbot.api.impl.DashboardWebsocket;
+import com.github.black0nion.blackonionbot.rest.impl.DashboardWebsocket;
 
 public enum ResponseCode {
 
@@ -50,11 +50,11 @@ public enum ResponseCode {
 		return this.json;
 	}
 
-	public void send(final BlackWebsocketSession session) {
+	public void send(final WebSocketSession session) {
 		send(session, null);
 	}
 
-	public void send(final BlackWebsocketSession session, final JSONObject request) {
+	public void send(final WebSocketSession session, final JSONObject request) {
 		DashboardWebsocket.reply(session, request, this.getJson());
 	}
 }
