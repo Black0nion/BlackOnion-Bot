@@ -1,15 +1,15 @@
 package com.github.black0nion.blackonionbot.rest.impl.get;
 
-import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
-import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
+import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.Javalin;
-import io.javalin.core.event.HandlerMetaInfo;
-import io.javalin.core.event.WsHandlerMetaInfo;
-import io.javalin.core.plugin.Plugin;
+import io.javalin.event.HandlerMetaInfo;
+import io.javalin.event.WsHandlerMetaInfo;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
+import io.javalin.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -52,7 +52,7 @@ public class Paths implements IGetRoute {
 
 	/**
 	 * A listener that listens for all the paths that are registered to the Javalin instance.
-	 * Taken from {@link io.javalin.core.util.RouteOverviewConfig RouteOverviewConfig} and {@link io.javalin.core.util.RouteOverviewUtil RouteOverviewUtil}
+	 * Taken from {@link io.javalin.plugin.bundled.RouteOverviewPlugin RouteOverviewPlugin} and {@link io.javalin.plugin.bundled.RouteOverviewUtil RouteOverviewUtil}
 	 * @author tipsy, SIMULATAN
 	 */
 	public static class PathListener implements Plugin {

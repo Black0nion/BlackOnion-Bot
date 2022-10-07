@@ -12,8 +12,10 @@ import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.javalin.http.ExceptionHandler;
 import io.javalin.http.HttpResponseException;
+import io.javalin.http.HttpStatus;
 import io.javalin.http.util.JsonEscapeUtil;
 import io.javalin.jetty.JettyUtil;
+import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.reflections.Reflections;
@@ -50,40 +52,40 @@ public class API {
 	private final StatsCollectorFactory statsCollectorFactory;
 
 	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
+		API prevInstance = instance;
 		instance = this;
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;
-		start();
+		start(prevInstance);
 	}
 
-	private static final StatisticsHandler STATISTICS_HANDLER = new StatisticsHandler();
+	private final StatisticsHandler statisticsHandler = new StatisticsHandler();
 
 	/**
 	 * Initializes the stats collector
 	 * Will only actually init the underlying collector once per application start
 	 */
 	private void initStats() {
-		statsCollectorFactory.init(STATISTICS_HANDLER);
+		statsCollectorFactory.init(statisticsHandler);
 	}
 
-	private void start() {
-		if (app != null) {
-			app.close();
-		}
+	private void start(API prevInstance) {
+		if (app != null) app.close();
+		if (prevInstance != null && prevInstance.getApp() != null) prevInstance.getApp().close();
 
 		initStats();
 
 		app = Javalin.create(cfg -> {
-			cfg.registerPlugin(new Paths.PathListener());
-			cfg.enableCorsForAllOrigins();
-			cfg.server(() -> {
+			cfg.jetty.server(() -> {
 				// forcefully get default server (the same as Javalin.create() does)
 				Server server = JettyUtil.getOrDefault(null);
-				server.setHandler(STATISTICS_HANDLER);
+				server.setHandler(statisticsHandler);
 				return server;
 			});
-		}).start(config.getApiPort() > 0 ? config.getApiPort() : 8080);
+			cfg.plugins.register(new Paths.PathListener());
+			cfg.plugins.enableCors(c -> c.add(CorsPluginConfig::anyHost));
+		});
 
 		final Reflections reflections = new Reflections(API.class.getPackage().getName());
 
@@ -137,7 +139,7 @@ public class API {
 				"\n   \"status\": " + (http != null ? http.getStatus() : 500) +
 				"\n}").contentType(ContentType.APPLICATION_JSON);
 
-			if (ctx.status() == 429) {
+			if (ctx.status() == HttpStatus.TOO_MANY_REQUESTS) {
 				logger.warn("IP {} exceeded rate limit for {} which is {}", ctx.ip(), ctx.path(),
 					// oh my god why am I introducing such code
 					http != null && http.getMessage() != null ? http.getMessage().replaceFirst("Rate limit exceeded - Server allows ", "").replace(".", "") : "unknown"
@@ -157,6 +159,14 @@ public class API {
 
 			app.addHandler(req.type(), url, new RestHandler(req));
 		}
+		logger.info("Mapped {} routes", httpRoutes.size());
+		startServer();
+	}
+
+	protected void startServer() {
+		final int port = config.getApiPort() > 0 ? config.getApiPort() : 8080;
+		logger.info("Starting API server on port {}", port);
+		app.start(port);
 		logger.info("Started API server!");
 	}
 

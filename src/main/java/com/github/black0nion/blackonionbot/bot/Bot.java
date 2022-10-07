@@ -94,14 +94,9 @@ public class Bot extends ListenerAdapter {
 		.create();
 	private final EventWaiter eventWaiter = new EventWaiter();
 	private final HttpClient httpClient = HttpClient.newBuilder()
-		.executor(Executors.newCachedThreadPool(new ThreadFactory() {
-			private final ThreadGroup group = new ThreadGroup("HttpClient");
-
-			@Override
-			public Thread newThread(@NotNull Runnable r) {
-				return new Thread(group, r);
-			}
-		}))
+		.executor((Executors.newCachedThreadPool(
+			new ThreadFactoryBuilder().setNameFormat("http-client-%d").build()
+		)))
 		.followRedirects(HttpClient.Redirect.ALWAYS)
 		.build();
 
@@ -194,7 +189,6 @@ public class Bot extends ListenerAdapter {
 		logger.info("JDA started successfully!");
 
 		slashCommandBase.addCommands();
-		slashCommandBase.updateCommandsDev(jda);
 
 		try {
 			Paginator paginator = PaginatorBuilder.createPaginator()
@@ -246,7 +240,7 @@ public class Bot extends ListenerAdapter {
 
 		jda.getPresence().setActivity(ActivityCommand.getActivity(config));
 
-		instance.slashCommandBase.updateCommandsDev(jda);
+		slashCommandBase.updateCommandsDev(jda);
 	}
 
 	@Reloadable("commands")

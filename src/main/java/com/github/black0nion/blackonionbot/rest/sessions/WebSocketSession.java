@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.time.Duration;
 import java.util.InputMismatchException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A wrapper for server-side WebSocket Sessions.
@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
  */
 public non-sealed class WebSocketSession extends AbstractSession implements Session {
 
-	public WebSocketSession(final Session sessionRaw) throws InputMismatchException, ExecutionException {
+	public WebSocketSession(final Session sessionRaw) throws InputMismatchException {
 		super(sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol"));
 		this.session = sessionRaw;
 	}
@@ -39,23 +39,18 @@ public non-sealed class WebSocketSession extends AbstractSession implements Sess
 
 	@Override
 	public void close(final int statusCode, final String reason) {
-		logger.info("IP {} will get closed with code {} and reason {}", this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), statusCode, reason);
+		logger.info("IP {} will get closed with code {} and reason {}", this.getIp(), statusCode, reason);
 		this.session.close(statusCode, reason);
 	}
 
 	@Override
-	public void disconnect() throws IOException {
-		logger.info("IP {} disconnected", this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress());
+	public void disconnect() {
+		logger.info("IP {} disconnected", this.getIp());
 		this.session.disconnect();
 	}
 
 	@Override
-	public long getIdleTimeout() {
-		return this.session.getIdleTimeout();
-	}
-
-	@Override
-	public InetSocketAddress getLocalAddress() {
+	public SocketAddress getLocalAddress() {
 		return this.session.getLocalAddress();
 	}
 
@@ -75,7 +70,7 @@ public non-sealed class WebSocketSession extends AbstractSession implements Sess
 	}
 
 	@Override
-	public InetSocketAddress getRemoteAddress() {
+	public SocketAddress getRemoteAddress() {
 		return this.session.getRemoteAddress();
 	}
 
@@ -97,11 +92,6 @@ public non-sealed class WebSocketSession extends AbstractSession implements Sess
 	@Override
 	public boolean isSecure() {
 		return this.session.isSecure();
-	}
-
-	@Override
-	public void setIdleTimeout(final long ms) {
-		this.session.setIdleTimeout(ms);
 	}
 
 	@Override
@@ -131,6 +121,86 @@ public non-sealed class WebSocketSession extends AbstractSession implements Sess
 	}
 
 	public String getIp() {
-		return this.session.getRemote().getInetSocketAddress().getAddress().getHostAddress();
+		return this.session.getRemoteAddress().toString();
+	}
+
+	@Override
+	public void close(int statusCode, String reason, WriteCallback callback) {
+		this.session.close(statusCode, reason, callback);
+	}
+
+	@Override
+	public WebSocketBehavior getBehavior() {
+		return this.session.getBehavior();
+	}
+
+	@Override
+	public Duration getIdleTimeout() {
+		return null;
+	}
+
+	@Override
+	public int getInputBufferSize() {
+		return this.session.getInputBufferSize();
+	}
+
+	@Override
+	public int getOutputBufferSize() {
+		return this.session.getOutputBufferSize();
+	}
+
+	@Override
+	public long getMaxBinaryMessageSize() {
+		return this.session.getMaxBinaryMessageSize();
+	}
+
+	@Override
+	public long getMaxTextMessageSize() {
+		return this.session.getMaxTextMessageSize();
+	}
+
+	@Override
+	public long getMaxFrameSize() {
+		return this.session.getMaxFrameSize();
+	}
+
+	@Override
+	public boolean isAutoFragment() {
+		return this.session.isAutoFragment();
+	}
+
+	@Override
+	public void setIdleTimeout(Duration duration) {
+		this.session.setIdleTimeout(duration);
+	}
+
+	@Override
+	public void setInputBufferSize(int size) {
+		this.session.setInputBufferSize(size);
+	}
+
+	@Override
+	public void setOutputBufferSize(int size) {
+		this.session.setOutputBufferSize(size);
+	}
+
+	@Override
+	public void setMaxBinaryMessageSize(long size) {
+		this.session.setMaxBinaryMessageSize(size);
+	}
+
+	@Override
+	public void setMaxTextMessageSize(long size) {
+		this.session.setMaxTextMessageSize(size);
+	}
+
+	@Override
+	public void setMaxFrameSize(long maxFrameSize) {
+		this.session.setMaxFrameSize(maxFrameSize);
+	}
+
+	@Override
+	public void setAutoFragment(boolean autoFragment) {
+		this.session.setAutoFragment(autoFragment);
 	}
 }

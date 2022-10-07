@@ -47,7 +47,7 @@ public class ConfigImpl extends ConfigWithConfigLoader implements Config {
 	private final long voteChannel = get("vote_channel", Long.class, defaultValue(-1L));
 	private final long devGuild = get("dev_guild", Long.class, defaultValue(-1L));
 	private final int prometheusPort = get("prometheus_port", Integer.class, defaultValue(9090), range(0, 65535));
-	private long logsChannel = get("logs_channel", Long.class, defaultValue(-1), range(0, Long.MAX_VALUE));
+	private long logsChannel = get("logs_channel", Long.class, defaultValue(-1L), range(0, Long.MAX_VALUE));
 
 	//region Getters and Setters
 	public String getToken() {
