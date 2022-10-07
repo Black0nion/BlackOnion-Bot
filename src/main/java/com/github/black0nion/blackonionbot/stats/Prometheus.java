@@ -16,20 +16,27 @@ public class Prometheus {
 
 	private static Prometheus instance;
 
+	private HTTPServer server;
+
 	public Prometheus(Config config) {
+		if (instance != null) instance.server.close();
 		instance = this;
 		this.config = config;
 		start();
 	}
 
 	@Reloadable("prometheus")
-	private static void start() {
+	private static void restart() {
+		new Prometheus(instance.config);
+	}
+
+	private void start() {
 		LOGGER.info("Initializing Prometheus...");
 		try {
-			new HTTPServer.Builder()
-				.withPort(instance.config.getPrometheusPort())
+			server = new HTTPServer.Builder()
+				.withPort(config.getPrometheusPort())
 				.build();
-			LOGGER.info("Prometheus HTTP Server started on port {}", instance.config.getPrometheusPort());
+			LOGGER.info("Prometheus HTTP Server started on port {}", config.getPrometheusPort());
 		} catch (IOException ex) {
 			LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);
 		}

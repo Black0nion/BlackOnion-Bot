@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class contains the main logic behind the commands of the bot.
- *
+ *<br>
  * It'll handle things like permissions, command auto-complete, executing commands, etc.
  */
 public class SlashCommandBase extends ListenerAdapter {
@@ -152,7 +152,6 @@ public class SlashCommandBase extends ListenerAdapter {
 		}
 		commandsJson.put("commands", commandsArr);
 		logger.info("Generated Commands JSON: {}", commandsArr);
-		// Bot.jda.updateCommands().addCommands(commands.values().stream().map(Pair::getValue).map(SlashCommand::getData).collect(Collectors.toList())).queue();
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
 		Optional.ofNullable(getCommand(HelpCommand.class)).ifPresent(HelpCommand::updateAutoComplete);
@@ -185,7 +184,8 @@ public class SlashCommandBase extends ListenerAdapter {
 						.map(Pair::getValue)
 						.map(SlashCommand::getData)
 						.toList())
-					.queue(), () -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
+					.queue(cmds -> logger.info("Successfully updated {} dev commands!", cmds.size())),
+					() -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
 		} else logger.warn("Failed to update dev commands: dev guild not set");
 	}
 

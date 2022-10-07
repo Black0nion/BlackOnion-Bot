@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +45,8 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	private static final LoadingCache<Session, WebSocketSession> blackWebsocketSessions = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
-		public @NotNull WebSocketSession load(final @NotNull Session key) throws IllegalArgumentException, ExecutionException {
-		return new WebSocketSession(key);
+		public @NotNull WebSocketSession load(final @NotNull Session key) throws IllegalArgumentException {
+			return new WebSocketSession(key);
 		}
 	});
 
@@ -55,9 +56,11 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	@Override
 	public void onConnect(Session sessionRaw) {
+		logger.info("IP {} tried to connect to the dashboard websocket", sessionRaw.getRemoteAddress());
 		try {
 			final String sessionId = sessionRaw.getUpgradeRequest().getHeader("Sec-WebSocket-Protocol");
 			if (sessionId == null || !sessionId.matches(AbstractSession.generateSessionId())) {
+				logger.debug("IP {} tried to connect to the dashboard websocket with an invalid session id", sessionRaw.getRemoteAddress());
 				sessionRaw.close(4401, "Unauthorized");
 				return;
 			}
@@ -100,7 +103,7 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	@Override
 	public void onMessage(final Session sessionUnchecked, final String messageRaw) {
 		final WebSocketSession session = blackWebsocketSessions.getUnchecked(sessionUnchecked);
-		logger.info("IP {}: received {}", session.getRemote().getInetSocketAddress().getAddress().getHostAddress(), messageRaw.replace("\n", "\\n"));
+		logger.info("IP {}: received {}", session.getIp(), messageRaw.replace("\n", "\\n"));
 		if (messageRaw.charAt(0) == 'r') {
 			try {
 				final String[] args = messageRaw.split(" ");
@@ -207,10 +210,10 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 	private BlackGuild getGuild(WebSocketSession session, JSONObject request) throws IllegalArgumentException {
 		final Object guildid = request.get("guildid");
 		BlackGuild guild;
-		if (guildid instanceof String) {
-			guild = BlackGuild.from(Long.parseLong((String) guildid));
-		} else if (guildid instanceof Long) {
-			guild = BlackGuild.from((Long) guildid);
+		if (guildid instanceof String string) {
+			guild = BlackGuild.from(Long.parseLong(string));
+		} else if (guildid instanceof Long input) {
+			guild = BlackGuild.from(input);
 		} else {
 			NO_GUILD.send(session, request);
 			throw new IllegalArgumentException("Invalid type of Input");
@@ -224,11 +227,12 @@ public class DashboardWebsocket implements IWebSocketEndpoint {
 
 	@Override
 	public void onError(final Session session, final Throwable error) {
-		error.printStackTrace();
+		logger.error("Error on session {}: {}", session.getRemoteAddress(), error.fillInStackTrace());
 		try {
 			session.getRemote().sendString("Some error happened :/");
 		} catch (final IOException e) {
-			e.printStackTrace();
+			if (e instanceof ClosedChannelException || e.getCause() instanceof ClosedChannelException) return;
+			logger.error("Error while sending error message to client", e);
 		}
 	}
 

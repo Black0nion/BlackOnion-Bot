@@ -1,7 +1,5 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
-import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.wrappers.jda.impls.UserImpl;
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.mongodb.MongoDB;
@@ -9,6 +7,7 @@ import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.jda.impls.UserImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -97,7 +96,7 @@ public class BlackUser extends UserImpl {
 
 	public boolean hasPermission(final CustomPermission... permissions) {
 		if (permissions == null || permissions.length == 0) return true;
-		if (this.permissions == null || this.permissions.size() == 0) return false;
+		if (this.permissions == null || this.permissions.isEmpty()) return false;
 		for (final CustomPermission requiredPerm : permissions) {
 			if (!this.hasPermission(requiredPerm)) return false;
 		}
