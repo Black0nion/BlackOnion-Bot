@@ -49,9 +49,9 @@ import marcono1234.gson.recordadapter.RecordTypeAdapterFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Icon;
-import net.dv8tion.jda.api.events.DisconnectEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.ReconnectedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
+import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -314,13 +314,13 @@ public class Bot extends ListenerAdapter {
 	}
 
 	@Override
-	public void onDisconnect(final DisconnectEvent event) {
+	public void onSessionDisconnect(final SessionDisconnectEvent event) {
 		final CloseCode closeCode = event.getCloseCode();
 		logger.error("Disconnected from Discord! Code: {}", (closeCode != null ? closeCode.name() + " = " + closeCode.getMeaning() : "NONE"));
 	}
 
 	@Override
-	public void onReconnected(final @NotNull ReconnectedEvent event) {
+	public void onSessionRecreate(final @NotNull SessionRecreateEvent event) {
 		logger.info("Reconnected to Discord.");
 	}
 }
