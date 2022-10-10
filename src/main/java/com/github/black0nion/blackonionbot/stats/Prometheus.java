@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.stats;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.config.api.Config;
 import io.prometheus.client.exporter.HTTPServer;
+import io.prometheus.client.hotspot.DefaultExports;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,8 @@ public class Prometheus {
 	private void start() {
 		LOGGER.info("Initializing Prometheus...");
 		try {
+			// expose built in metrics for the hotspot JVM
+			DefaultExports.initialize();
 			server = new HTTPServer.Builder()
 				.withPort(config.getPrometheusPort())
 				.build();

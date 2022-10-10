@@ -8,16 +8,35 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("checkstyle:OverloadMethodsDeclarationOrder")
 public class InjectorMap extends HashMap<Class<?>, Object> implements Map<Class<?>, Object> {
 
+	/**
+	 * Puts the instance into the map.<br>
+	 *<br>
+	 * Algorithm used to get the class:<br>
+	 * <pre>
+	 * check interfaces
+	 * 	if exactly one interface is implemented, use that
+	 * 	else, use the class of the passed instance
+	 * </pre>
+	 */
 	public <T> T add(T instance) {
-		requireNonNull(instance, "instance");
 		put(instance);
 		return instance;
 	}
 
-	public Object put(Object value) {
-		requireNonNull(value, "value");
-		Class<?>[] interfaces = value.getClass().getInterfaces();
-		return put(interfaces.length == 1 ? interfaces[0] : value.getClass(), value);
+	/**
+	 * Puts the instance into the map.<br>
+	 *<br>
+	 * Algorithm used to get the class:<br>
+	 * <pre>
+	 * check interfaces
+	 * 	if exactly one interface is implemented, use that
+	 * 	else, use the class of the passed instance
+	 * </pre>
+	 */
+	public Object put(Object instance) {
+		requireNonNull(instance, "instance");
+		Class<?>[] interfaces = instance.getClass().getInterfaces();
+		return put(interfaces.length == 1 ? interfaces[0] : instance.getClass(), instance);
 	}
 
 	public <T> T add(Class<?> key, T instance) {

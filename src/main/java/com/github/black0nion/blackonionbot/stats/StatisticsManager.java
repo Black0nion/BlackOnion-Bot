@@ -1,13 +1,12 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.config.BotMetadata;
+import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
-import io.prometheus.client.hotspot.DefaultExports;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
@@ -20,6 +19,8 @@ import javax.management.AttributeList;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class StatisticsManager extends ListenerAdapter {
 
@@ -28,13 +29,10 @@ public class StatisticsManager extends ListenerAdapter {
 	private static final String CHANNEL_ID = "channel_id";
 	private static final String CHANNEL = "channel";
 
-	static {
-		// JVM Stats, collected by Prometheus
-		DefaultExports.initialize();
-	}
-
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	private static final String NAMESPACE = "blackonionbot";
+	/** in seconds */
+	public static final int DELAY_BETWEEN_COLLECTION = 15;
 
 	public StatisticsManager(Config config) {
 		final BotMetadata metadata = ConfigFileLoader.getMetadata();
@@ -50,6 +48,10 @@ public class StatisticsManager extends ListenerAdapter {
 				String.valueOf(metadata.lines_of_code()),
 				String.valueOf(metadata.files()))
 			.set(1);
+	}
+
+	public void start() {
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
 	}
 
 	public static final Gauge UPTIME = Gauge.build()

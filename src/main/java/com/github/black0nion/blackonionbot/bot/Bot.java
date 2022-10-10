@@ -151,6 +151,7 @@ public class Bot extends ListenerAdapter {
 
 		InjectorMap injectorMap = new InjectorMap();
 		SessionHandler sessionHandler = injectorMap.add(new MongoLogin());
+		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config));
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
 			sessionHandler,
@@ -168,7 +169,7 @@ public class Bot extends ListenerAdapter {
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(slashCommandBase, this, new ReactionRoleSystem(), new JoinLeaveSystem(config), new AutoRolesSystem(), new StatisticsManager(config), eventWaiter);
+			.addEventListeners(slashCommandBase, this, new ReactionRoleSystem(), new JoinLeaveSystem(config), new AutoRolesSystem(), statisticsManager, eventWaiter);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
@@ -227,9 +228,9 @@ public class Bot extends ListenerAdapter {
 			}
 		}));
 
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, 15, TimeUnit.SECONDS);
-
 		Runtime.getRuntime().addShutdownHook(new Thread(MongoManager::disconnect));
+
+		statisticsManager.start();
 	}
 
 	@Override
