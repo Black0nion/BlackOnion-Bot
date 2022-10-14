@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.bot;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;

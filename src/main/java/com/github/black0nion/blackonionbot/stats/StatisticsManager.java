@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.BotMetadata;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.BotMetadata;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
@@ -143,7 +143,8 @@ public class StatisticsManager extends ListenerAdapter {
 	private static int guildCount = -1;
 
 	static int reloadGuildCount() {
-		return guildCount = (int) Bot.getInstance().getJDA().getGuildCache().size();
+		guildCount = (int) Bot.getInstance().getJDA().getGuildCache().size();
+		return guildCount;
 	}
 
 	public static int getGuildCount() {
@@ -153,7 +154,8 @@ public class StatisticsManager extends ListenerAdapter {
 	private static long userCount = -1;
 
 	static long reloadUserCount() {
-		return userCount = Bot.getInstance().getJDA().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		userCount = Bot.getInstance().getJDA().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		return userCount;
 	}
 
 	public static long getUserCount() {

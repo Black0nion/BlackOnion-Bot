@@ -1,18 +1,17 @@
 package com.github.black0nion.blackonionbot.rest.impl.post;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
@@ -47,7 +46,7 @@ public class Vote implements IPostRoute {
 			final TextChannel channel = Bot.getInstance().getJDA().getTextChannelById(channelId);
 			if (channel != null) {
 				final String userid = body.getString("user");
-				Objects.requireNonNull(Bot.getInstance().getJDA().getGuildById(BotInformation.SUPPORT_SERVER)).retrieveMemberById(userid).queue(member -> {
+				Objects.requireNonNull(Bot.getInstance().getJDA().getGuildById(config.getDevGuild())).retrieveMemberById(userid).queue(member -> {
 					final User user = member.getUser();
 					channel
 						.sendMessageEmbeds(new TranslatedEmbed()

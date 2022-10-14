@@ -2,30 +2,22 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.UserImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import org.bson.Document;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class BlackUser extends UserImpl {
 
@@ -59,22 +51,6 @@ public class BlackUser extends UserImpl {
 
 	private BlackUser(final User user) {
 		super(user);
-
-		this.save("name", user.getName());
-
-		try {
-			Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
-
-			if (config == null) {
-				config = new Document();
-			}
-
-			this.permissions = Utils.gOD(CustomPermission.parse(Utils.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
-
-			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Nullable
@@ -84,10 +60,6 @@ public class BlackUser extends UserImpl {
 
 	public void setLanguage(final @Nullable Language language) {
 		this.language = language;
-		if (language == null)
-			this.clear("language");
-		else
-			this.save("language", language.getLanguageCode());
 	}
 
 	public List<CustomPermission> getPermissions() {
@@ -135,7 +107,6 @@ public class BlackUser extends UserImpl {
 
 	public void setPermissions(final List<CustomPermission> permissions) {
 		this.permissions = permissions;
-		this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
 	}
 
 	public String getEscapedName() {
@@ -144,18 +115,6 @@ public class BlackUser extends UserImpl {
 
 	public String getEscapedEffectiveName() {
 		return this.getEscapedName() + "#" + this.getDiscriminator();
-	}
-
-	@Override
-	protected Document getIdentifier() {
-		return new Document("userid", this.user.getIdLong());
-	}
-
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.getInstance().getDatabase());
-
-	@Override
-	protected MongoCollection<Document> getCollection() {
-		return configs;
 	}
 
 	@Override

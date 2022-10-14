@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config;
+package com.github.black0nion.blackonionbot.config.immutable;
 
 import java.util.regex.Pattern;
 

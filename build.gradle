@@ -77,8 +77,6 @@ dependencies {
 
     implementation "org.json:json:20220924"
 
-    implementation "org.mongodb:mongo-java-driver:3.12.11"
-
     implementation "club.minnced:discord-webhooks:0.8.2"
 
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:7.2.1'
@@ -99,6 +97,9 @@ dependencies {
     implementation "org.codehaus.janino:janino:3.1.8"
 
     implementation "io.github.classgraph:classgraph:4.8.149"
+
+    implementation "org.postgresql:postgresql:42.5.0"
+    implementation "com.zaxxer:HikariCP:5.0.1"
 
     implementation "io.prometheus:simpleclient:0.15.0"
     implementation "io.prometheus:simpleclient_hotspot:0.15.0"

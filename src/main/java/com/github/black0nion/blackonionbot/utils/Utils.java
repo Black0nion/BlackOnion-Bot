@@ -14,6 +14,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import com.google.common.collect.Lists;
+import com.google.gson.internal.Primitives;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -91,10 +92,6 @@ public class Utils {
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
-	public static <T> T[] subArray(final T[] array, final int beg, final int end) {
-		return Arrays.copyOfRange(array, beg, end + 1);
-	}
-
 	public static boolean isLong(final String input) {
 		if (input == null) return false;
 		try {
@@ -119,15 +116,6 @@ public class Utils {
 			Integer.parseInt(input.trim());
 			return true;
 		} catch (final Exception e) {
-			return false;
-		}
-	}
-
-	public static boolean isInteger(final Object input) {
-		try {
-			Integer.parseInt(((String) input).trim());
-			return true;
-		} catch (final Exception ignored) {
 			return false;
 		}
 	}
@@ -406,6 +394,30 @@ public class Utils {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T parseToT(String value, Class<T> clazz) {
+		if (clazz.equals(String.class)) {
+			return (T) value;
+		} else if (clazz.equals(Integer.class)) {
+			return (T) Integer.valueOf(value);
+		} else if (clazz.equals(Long.class)) {
+			return (T) Long.valueOf(value);
+		} else if (clazz.equals(Boolean.class)) {
+			return (T) Boolean.valueOf(value);
+		} else if (clazz.equals(Double.class)) {
+			return (T) Double.valueOf(value);
+		} else if (clazz.equals(Float.class)) {
+			return (T) Float.valueOf(value);
+		} else {
+			return Primitives.wrap(clazz).cast(value);
+		}
+	}
+
+	public static <T extends List<?>> T jsonArrayToList(JSONArray jsonArray) {
+		//noinspection unchecked
+		return (T) jsonArray.toList();
+	}
+
 	public static class TooLongException extends Exception {
 		static final TooLongException INSTANCE = new TooLongException();
 
@@ -422,10 +434,6 @@ public class Utils {
 		return new ErrorHandler()
 			.handle(ErrorResponse.CANNOT_SEND_TO_USER, err ->
 				await.setOnDone(hook -> hook.editOriginal(message + "\n" + lang.getTranslation("usernotnotified")).queue()));
-	}
-
-	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields) {
-		return getPages(baseEmbed, fields, 10);
 	}
 
 	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields, int perPage) {

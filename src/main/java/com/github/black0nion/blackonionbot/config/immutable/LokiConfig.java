@@ -1,7 +1,7 @@
-package com.github.black0nion.blackonionbot.config;
+package com.github.black0nion.blackonionbot.config.immutable;
 
 import ch.qos.logback.core.PropertyDefinerBase;
-import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 public class LokiConfig extends PropertyDefinerBase {

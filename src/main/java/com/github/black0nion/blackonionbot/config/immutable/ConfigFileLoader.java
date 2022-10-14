@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config;
+package com.github.black0nion.blackonionbot.config.immutable;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.utils.Incrementer;
@@ -45,7 +45,7 @@ public class ConfigFileLoader {
 				.filter(line -> !line.startsWith("#"))
 				.map(ENV_FILE_PATTERN::matcher)
 				.filter(Matcher::matches)
-				.peek(count::increment)
+				.peek(count::increment) // NOSONAR
 				.forEach(split -> set(split.group(1), split.group(2)));
 			logger.info("Loaded {} environment variables from the .env file", count.getCount());
 		} else {

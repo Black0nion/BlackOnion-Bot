@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class Prometheus {
 
 	public Prometheus(Config config) {
 		if (instance != null) instance.server.close();
-		instance = this;
+		instance = this; // NOSONAR
 		this.config = config;
 		start();
 	}

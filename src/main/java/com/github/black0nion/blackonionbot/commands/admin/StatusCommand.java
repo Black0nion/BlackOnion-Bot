@@ -2,10 +2,10 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.config.api.Config;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -25,11 +25,14 @@ public class StatusCommand extends SlashCommand {
 
 	private static final String STATUS = "status";
 
-	public StatusCommand(Config config) {
+	private final Settings settings;
+
+	public StatusCommand(Settings settings) {
 		super(builder(Commands.slash("status", "Set the status of the bot").addOptions(
 			new OptionData(OptionType.STRING, STATUS, "The OnlineStatus of the bot", true)
 				.addChoices(Arrays.stream(OnlineStatus.values()).map(m -> new Command.Choice(m.name(), m.name())).toList())
-		)).setAdminGuild(), config);
+		)).setAdminGuild());
+		this.settings = settings;
 	}
 
 	@Override
@@ -39,14 +42,14 @@ public class StatusCommand extends SlashCommand {
 			cmde.send("invalidrole");
 			return;
 		}
-		config.setOnlineStatus(status);
+		settings.setOnlineStatus(status);
 		ConfigFileLoader.saveConfig();
 		cmde.send("newstatus", new Placeholder(STATUS, status.name()));
 
 		e.getJDA().getPresence().setStatus(status);
 	}
 
-	public static OnlineStatus getStatusFromConfig(Config config) {
-		return Optional.ofNullable(config.getOnlineStatus()).orElse(OnlineStatus.ONLINE);
+	public static OnlineStatus getStatusFromConfig(Settings settings) {
+		return Optional.ofNullable(settings.getOnlineStatus()).orElse(OnlineStatus.ONLINE);
 	}
 }

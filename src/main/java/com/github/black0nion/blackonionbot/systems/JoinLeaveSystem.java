@@ -1,7 +1,8 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.BotInformation;
+import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.misc.DrawType;
 import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.RunMode;
@@ -9,7 +10,6 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,9 +41,11 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(JoinLeaveSystem.class);
 
 	private final Config config;
+	private final Settings settings;
 
-	public JoinLeaveSystem(Config config) {
+	public JoinLeaveSystem(Config config, Settings settings) {
 		this.config = config;
+		this.settings = settings;
 		try {
 			defaultBackGround = ImageIO.read(Objects.requireNonNull(this.getClass().getResource("/background.png")));
 		} catch (final Exception e) {
@@ -99,8 +101,8 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				logger.info("I got added to the guildid {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
 
 				try {
-					final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
-					guildById.getTextChannelById(config.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
+					final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
+					guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -131,8 +133,8 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			logger.info("I got removed from the guildid {} (G: {})", guild.getName(), guild.getId());
 
 			try {
-				final Guild guildById = event.getJDA().getGuildById(BotInformation.SUPPORT_SERVER);
-				guildById.getTextChannelById(config.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
+				guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

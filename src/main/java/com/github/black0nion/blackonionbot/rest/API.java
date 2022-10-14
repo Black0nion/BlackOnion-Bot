@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.rest;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;

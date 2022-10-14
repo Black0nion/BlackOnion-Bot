@@ -2,17 +2,13 @@ package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.bson.Document;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -20,9 +16,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class GiveawaySystem {
-	private static final List<Giveaway> giveaways = new ArrayList<>();
 
-	private static MongoCollection<Document> collection;
+	private GiveawaySystem() {}
+
+	private static final List<Giveaway> giveaways = new ArrayList<>();
 
 	private static final Collection<String> giveawayKeys = new ArrayList<>();
 
@@ -37,19 +34,12 @@ public class GiveawaySystem {
 	}
 
 	public static void init() {
-		collection = MongoDB.getInstance().getDatabase().getCollection("giveaways");
-
 		Bot.getInstance().getExecutor().submit(() -> {
 			try {
 				Bot.getInstance().getJDA().awaitReady();
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-
-			for (final Document doc : collection.find())
-				if (doc.keySet().containsAll(giveawayKeys)) {
-					createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("createrId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
-				}
 		});
 	}
 
@@ -68,7 +58,7 @@ public class GiveawaySystem {
 			final HashMap<String, Object> values = mapper.readValue(mapper.writeValueAsString(giveaway), HashMap.class);
 			values.remove("endDate");
 			values.put("endDate", endDate);
-			collection.insertOne(new Document(values));
+			// TODO: Save to database
 			scheduleGiveaway(giveaway);
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -124,11 +114,7 @@ public class GiveawaySystem {
 	private static void deleteGiveaway(final Giveaway giveaway) {
 		try {
 			giveaways.remove(giveaway);
-			try {
-				collection.deleteOne(new BasicDBObject().append("messageId", giveaway.messageId()).append("guildId", giveaway.guildId()).append("channelId", giveaway.channelId()));
-			} catch (final Exception ex) {
-				ex.printStackTrace();
-			}
+			// TODO: delete from db
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

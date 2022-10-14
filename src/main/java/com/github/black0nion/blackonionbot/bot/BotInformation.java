@@ -1,11 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.misc.GuildType;
 import com.github.black0nion.blackonionbot.misc.OperatingSystem;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.io.Files;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -36,23 +32,7 @@ public class BotInformation {
 	public static final String CPU_NAME;
 	public static final String CPU_MHZ;
 
-	public static final long SUPPORT_SERVER;
-
 	static {
-		long supportServer = -1;
-		long logsChannel = -1;
-		try {
-			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
-			if (doc != null && doc.containsKey("guildid") && doc.containsKey("botlogschannel")) {
-				supportServer = doc.getLong("guildid");
-				logsChannel = doc.getLong("botlogschannel");
-			}
-		} catch (Exception ignored) {
-			LoggerFactory.getLogger(BotInformation.class).warn("Could not load support server information from database");
-		}
-		SUPPORT_SERVER = supportServer;
-		Bot.getInstance().getConfig().setLogsChannel(logsChannel);
-
 		String osName = "Unknown";
 		String cpuName = "N/A";
 		String cpuMhz = "N/A";

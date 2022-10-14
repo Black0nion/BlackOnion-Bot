@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.inject;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +41,7 @@ public class DefaultInjector implements Injector {
 		try {
 			return (T) constructor.newInstance(instances);
 		} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-			throw new RuntimeException(e);
+			throw new InjectorCreateInstanceException(e);
 		}
 	}
 }

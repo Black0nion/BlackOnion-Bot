@@ -1,11 +1,11 @@
 package com.github.black0nion.blackonionbot.utils.config;
 
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
-import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.github.black0nion.blackonionbot.config.Flags.*;
+import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 // TODO: add unit tests for flags
@@ -41,8 +41,11 @@ class ConfigImplTest {
 
 	@Test
 	void test_config_get_invalid() {
-		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.getImpl("token", String.class, matchesRegex("^\\d$")));
-		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.getImpl("test_number", Integer.class, range(0, 10)));
+		MatchesRegex matcher = assertDoesNotThrow(() -> matchesRegex("^\\d$"));
+		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.getImpl("token", String.class, matcher));
+
+		Range range = assertDoesNotThrow(() -> range(0, 10));
+		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.getImpl("test_number", Integer.class, range));
 		assertThrows(NumberFormatException.class, () -> ConfigLoaderImpl.getImpl("token", Integer.class));
 		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.getImpl("not_existing", String.class, NonNull));
 	}

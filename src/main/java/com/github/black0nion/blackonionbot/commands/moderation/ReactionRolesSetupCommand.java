@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.moderation;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -16,7 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -90,14 +88,14 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 					fail -> cmde.error("wrongargument", "emotenotfound"))
 				);
 
-			var doc = appendDoc(e, textChannel, messageId, emoteId, role.getIdLong());
+			appendDoc(e, textChannel, messageId, emoteId, role.getIdLong());
 
-			if (ReactionRoleSystem.collection.find(doc).first() != null) {
+			if ("object already exists" == "") {
 				cmde.error("alreadyexisting", "thisalreadyexisting");
 				return;
 			}
 
-			ReactionRoleSystem.collection.insertOne(doc);
+			// TODO: insert into database
 
 			cmde.success("reactionrolecreated", "reactionrolecreatedinfo",
 				new Placeholder("emote", e.getGuild().getEmojiById(emoteId).getAsMention()),
@@ -127,15 +125,15 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 						fail -> cmde.error("wrongargument", "emotenotfound"));
 				}, fail -> cmde.error("wrongargument", "emotenotfound")));
 
-			var doc = appendDoc(e, textChannel, messageId, emoteId, role.getIdLong());
+			appendDoc(e, textChannel, messageId, emoteId, role.getIdLong());
 
-			if (ReactionRoleSystem.collection.find(doc).first() != null) {
+			if ("already exists" == "") {
 				cmde.error("alreadyexisting", "thisalreadyexisting");
 				return;
 			}
 
-			if (ReactionRoleSystem.collection.find(doc).first() != null) {
-				ReactionRoleSystem.collection.deleteOne(doc);
+			if ("db contains" == "") {
+				// TODO: delete from database
 
 				textChannel.retrieveMessageById(messageId).queue(
 					msg -> guild.retrieveEmojiById(emote.getId()).queue(customEmote -> {
@@ -151,9 +149,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		}
 	}
 
-	private Document appendDoc(@NotNull SlashCommandInteraction e, @NotNull TextChannel channel, long messageId, long emoteId, long roleId) {
-		return new Document().append("guildid", e.getGuild().getIdLong()).append("channelid", channel.getIdLong())
-			.append("messageid", messageId).append("emote", e.getGuild().getEmojiById(emoteId))
-			.append("roleid", roleId);
+	private void appendDoc(@NotNull SlashCommandInteraction e, @NotNull TextChannel channel, long messageId, long emoteId, long roleId) {
+		// TODO: insert into DB
 	}
 }

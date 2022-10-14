@@ -26,7 +26,7 @@
         </rollingPolicy>
     </appender>
 
-    <define name="lokiURL" class="com.github.black0nion.blackonionbot.config.LokiConfig"/>
+    <define name="lokiURL" class="com.github.black0nion.blackonionbot.config.immutable.LokiConfig"/>
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <batchTimeoutMs>30000</batchTimeoutMs>
         <verbose>true</verbose>

@@ -2,9 +2,9 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.config.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -21,9 +21,12 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
+import static java.util.Objects.requireNonNull;
+
 public class ActivityCommand extends SlashCommand {
 
-	public ActivityCommand(Config config) {
+	private final Settings settings;
+	public ActivityCommand(Settings settings) {
 		super(builder(Commands.slash("activity", "Set the activity of the bot")
 			.addSubcommands(
 				new SubcommandData("set", "Set the activity of the bot").addOptions(
@@ -33,14 +36,17 @@ public class ActivityCommand extends SlashCommand {
 								.map(a -> new Command.Choice(a.name(), a.name().toLowerCase()))
 								.toList()
 						),
-					new OptionData(OptionType.STRING, "text", "The text of the activity", true)
+					new OptionData(OptionType.STRING, "text", "The text of the activity", true),
+					new OptionData(OptionType.STRING, "url", "The url of the activity (only for streaming)", false)
 				), new SubcommandData("clear", "Clear the activity of the bot")))
-			.setAdminGuild(), config);
+			.setAdminGuild());
+		this.settings = settings;
 	}
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		assert e.getSubcommandName() != null;
+		requireNonNull(e.getSubcommandName());
+
 		if (e.getSubcommandName().equalsIgnoreCase("set")) {
 			if (e.getOption("type") == null || e.getOption("text") == null) {
 				cmde.sendPleaseUse();
@@ -48,16 +54,17 @@ public class ActivityCommand extends SlashCommand {
 			final String text = e.getOption("text", OptionMapping::getAsString);
 			Activity.ActivityType type = parse(e.getOption("type", OptionMapping::getAsString));
 			if (type != null) {
-				Activity newActivity = getActivity(type, text);
+				Activity newActivity = getActivity(type, text, e.getOption("url", OptionMapping::getAsString));
 				e.getJDA().getPresence().setActivity(newActivity);
-				config.setActivityType(type);
-				config.setActivityName(text);
+				settings.setActivityType(type);
+				settings.setActivityName(text);
 				ConfigFileLoader.saveConfig();
-				cmde.send("newactivity", new Placeholder("newactivity", newActivity.getName()));
+				cmde.send("newactivity", new Placeholder("newactivity",
+					newActivity != null ? newActivity.getName() : cmde.getTranslation("empty")));
 			} else cmde.send("invalidactivitytype");
 		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
-			config.setActivityType(null);
-			config.setActivityName(null);
+			settings.setActivityType(null);
+			settings.setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);
 			ConfigFileLoader.saveConfig();
 			cmde.send("activitycleared");
@@ -74,14 +81,17 @@ public class ActivityCommand extends SlashCommand {
 	}
 
 	@Nullable
-	public static Activity getActivity(Config config) {
-		return getActivity(config.getActivityType(), config.getActivityName());
+	public static Activity getActivity(Settings settings) {
+		return getActivity(settings.getActivityType(), settings.getActivityName(), settings.getActivityUrl());
 	}
 
 	@Nullable
-	public static Activity getActivity(final Activity.ActivityType status, final String activity) {
+	public static Activity getActivity(final Activity.ActivityType status, final String activity, String url) {
 		if (status == null || activity == null) {
 			return null;
+		}
+		if (status == Activity.ActivityType.STREAMING) {
+			return Activity.streaming(activity, url);
 		}
 		return Activity.of(status, activity);
 	}

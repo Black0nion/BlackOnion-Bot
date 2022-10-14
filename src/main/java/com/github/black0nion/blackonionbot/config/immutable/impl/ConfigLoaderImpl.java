@@ -1,9 +1,10 @@
-package com.github.black0nion.blackonionbot.config.impl;
+package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.api.ConfigLoader;
-import com.github.black0nion.blackonionbot.config.Flags;
-import com.github.black0nion.blackonionbot.config.ConfigFlag;
-import com.google.gson.internal.Primitives;
+import com.github.black0nion.blackonionbot.config.generic.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
+import com.github.black0nion.blackonionbot.config.immutable.Flags;
+import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
+import com.github.black0nion.blackonionbot.utils.Utils;
 
 import java.util.List;
 import java.util.Locale;
@@ -27,27 +28,12 @@ public class ConfigLoaderImpl implements ConfigLoader {
 		List<ConfigFlag> flags = flagsArr == null ? List.of() : List.of(flagsArr);
 		if (value == null) {
 			if (flags.contains(Flags.NonNull)) {
-				throw new IllegalArgumentException("Missing required config value: " + name);
+				throw new ConfigLoadingException(new IllegalArgumentException("Missing required config value: " + name));
 			}
 			Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
 			return defaultFlag != null ? defaultFlag.defaultValue() : null;
 		}
-		T result;
-		if (clazz.equals(String.class)) {
-			result = (T) value;
-		} else if (clazz.equals(Integer.class)) {
-			result = (T) Integer.valueOf(value);
-		} else if (clazz.equals(Long.class)) {
-			result = (T) Long.valueOf(value);
-		} else if (clazz.equals(Boolean.class)) {
-			result = (T) Boolean.valueOf(value);
-		} else if (clazz.equals(Double.class)) {
-			result = (T) Double.valueOf(value);
-		} else if (clazz.equals(Float.class)) {
-			result = (T) Float.valueOf(value);
-		} else {
-			result = Primitives.wrap(clazz).cast(value);
-		}
+		T result = Utils.parseToT(value, clazz);
 		for (ConfigFlag f : flags) {
 			if (f instanceof Flags.MatchesRegex flag && !flag.regex().matcher(value).matches()) {
 				throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex());
@@ -60,7 +46,7 @@ public class ConfigLoaderImpl implements ConfigLoader {
 		return result;
 	}
 
-	private static <T extends ConfigFlag> T getFlag(List<ConfigFlag> flags, @SuppressWarnings("SameParameterValue") Class<T> clazz) {
+	public static <T extends ConfigFlag> T getFlag(List<ConfigFlag> flags, @SuppressWarnings("SameParameterValue") Class<T> clazz) {
 		return flags.stream()
 			.filter(Objects::nonNull)
 			.filter(f -> clazz.isAssignableFrom(f.getClass()))

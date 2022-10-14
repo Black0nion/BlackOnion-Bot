@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.misc.Category;
 import com.github.black0nion.blackonionbot.misc.GuildType;
@@ -17,7 +17,6 @@ import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.mongodb.client.model.Filters;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -82,7 +81,7 @@ public class SlashCommandBase extends ListenerAdapter {
 	private final Injector injector;
 
 	public SlashCommandBase(Config config, Injector injector) {
-		instance = this;
+		instance = this; // NOSONAR
 		this.config = config;
 		this.injector = injector;
 	}
@@ -214,7 +213,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		final TextChannel channel = event.getChannel().asTextChannel();
 
-		final boolean locked = BanUsageCommand.collection.find(Filters.or(Filters.eq("guildid", guild.getIdLong()), Filters.eq("userid", author.getIdLong()))).first() != null;
+		final boolean locked = BanUsageCommand.isBanned(guild.getIdLong(), author.getIdLong());
 		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
 		if (config.getRunMode() == RunMode.DEV) {

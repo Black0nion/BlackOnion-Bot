@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import io.mokulu.discord.oauth.DiscordOAuth;
 
 import java.util.regex.Pattern;
@@ -14,7 +14,7 @@ public class OAuthAPI {
 	private final String redirectUri;
 	private final String clientId;
 	private final String clientSecret;
-	private final DiscordOAuth oAuthApi;
+	private final DiscordOAuth discordOAuth;
 
 	private static OAuthAPI instance;
 
@@ -23,11 +23,11 @@ public class OAuthAPI {
 	}
 
 	public OAuthAPI(Config config) {
-		instance = this;
+		instance = this; // NOSONAR
 		this.redirectUri = config.getDiscordappRedirectUrl();
 		this.clientId = config.getDiscordappClientId();
 		this.clientSecret = config.getDiscordappClientSecret();
-		this.oAuthApi = new DiscordOAuth(clientId, clientSecret, redirectUri, SCOPES);
+		this.discordOAuth = new DiscordOAuth(clientId, clientSecret, redirectUri, SCOPES);
 	}
 
 	private static final String BASE_URL = "https://discord.com/api/oauth2";
@@ -39,7 +39,7 @@ public class OAuthAPI {
 	public static final Pattern TOKEN_PATTERN = Pattern.compile("[a-zA-Z\\d]{30,32}");
 
 	public String getAuthorizeURL() {
-		return oAuthApi.getAuthorizationURL(null);
+		return discordOAuth.getAuthorizationURL(null);
 	}
 
 	public String getTokenURL(String code) {
@@ -51,6 +51,6 @@ public class OAuthAPI {
 	}
 
 	public DiscordOAuth getOAuthApi() {
-		return oAuthApi;
+		return discordOAuth;
 	}
 }
