@@ -42,7 +42,7 @@ public class ToggleCommand extends SlashCommand {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
 		this.updateAutoComplete(COMMAND, slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
-				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
+				((currentCommand.setAndGet(e.getValue().getSecond())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
 					&& currentCommand.get().isToggleable())
 			.map(Map.Entry::getKey)

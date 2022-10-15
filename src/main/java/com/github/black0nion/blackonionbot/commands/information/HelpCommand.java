@@ -51,7 +51,7 @@ public class HelpCommand extends SlashCommand {
 		ChainableAtomicReference<SlashCommand> currentCommand = new ChainableAtomicReference<>();
 		List<String> result = slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
-				((currentCommand.setAndGet(e.getValue().getValue())).getRequiredCustomPermissions() == null
+				((currentCommand.setAndGet(e.getValue().getSecond())).getRequiredCustomPermissions() == null
 					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
 					&& currentCommand.get().isToggleable())
 			.map(Map.Entry::getKey)
@@ -66,7 +66,7 @@ public class HelpCommand extends SlashCommand {
 		var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
 		if (command != null) {
 			for (final Pair<Long, SlashCommand> entry : slashCommandBase.getCommands().values()) {
-				final SlashCommand cmd = entry.getValue();
+				final SlashCommand cmd = entry.getSecond();
 				if (!cmd.isHidden(author) && cmd.getName().equalsIgnoreCase(command)) {
 					cmde.success("help", SlashCommandEvent.getCommandHelp(cmd), cmde.getTranslationOrEmpty("help" + cmd.getName().toLowerCase()));
 					return;
@@ -162,7 +162,7 @@ public class HelpCommand extends SlashCommand {
 				final Category category = Category.valueOf(button.getId());
 				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
 				for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : slashCommandBase.getCommands().entrySet()) {
-					var command = entry.getValue().getValue();
+					var command = entry.getValue().getSecond();
 					if (!command.isHidden(user) && (command.getCategory() == category)) {
 						if (command.getProgress() != Progress.DONE) {
 							continue;
@@ -177,7 +177,7 @@ public class HelpCommand extends SlashCommand {
 						continue;
 					}
 					for (final Map.Entry<String, Pair<Long, SlashCommand>> entry : slashCommandBase.getCommands().entrySet()) {
-						var command = entry.getValue().getValue();
+						var command = entry.getValue().getSecond();
 						if (!command.isHidden(user) && (command.getCategory() == category) && command.getProgress() == pr) {
 							final String commandHelp = cmde.getTranslation("help" + command.getName().toLowerCase());
 							if (commandHelp == null) {

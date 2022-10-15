@@ -4,6 +4,10 @@ import java.util.concurrent.TimeUnit;
 
 public record Time(TimeUnit unit, int time) {
 
+	public Time {
+		if (time < 0) throw new IllegalArgumentException("Time must be positive!");
+	}
+
 	public static Time DAYS(final int time) {
 		return new Time(TimeUnit.DAYS, time);
 	}
@@ -30,5 +34,13 @@ public record Time(TimeUnit unit, int time) {
 
 	public static Time NANOSECONDS(final int time) {
 		return new Time(TimeUnit.NANOSECONDS, time);
+	}
+
+	@Override
+	public String toString() {
+		String unitName = unit.name()
+			.toLowerCase();
+		// remove trailing 's' if time is 1
+		return time + " " + (time != 1 ? unitName : unitName.replaceAll("s$", ""));
 	}
 }

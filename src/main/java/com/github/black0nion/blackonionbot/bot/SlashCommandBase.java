@@ -166,7 +166,7 @@ public class SlashCommandBase extends ListenerAdapter {
 	@Nullable
 	public static SlashCommand getCommand(String name) {
 		if (name == null) return null;
-		return Utils.tryGet(() -> getInstance().commands.get(name).getValue());
+		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
 	}
 
 	@Reloadable("dev commands")
@@ -180,7 +180,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			Optional.ofNullable(jda.getGuildById(config.getDevGuild()))
 				.ifPresentOrElse(guild -> guild.updateCommands()
 					.addCommands(commands.values().stream()
-						.map(Pair::getValue)
+						.map(Pair::getSecond)
 						.map(SlashCommand::getData)
 						.toList())
 					.queue(cmds -> logger.info("Successfully updated {} dev commands!", cmds.size())),
@@ -193,7 +193,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		String name = event.getName();
 		if (commands.containsKey(name)) {
 			try {
-				commands.get(name).getValue().handleAutoComplete(event);
+				commands.get(name).getSecond().handleAutoComplete(event);
 			} catch (Exception e) {
 				logger.error("An issue happened trying to handle AutoComplete", e);
 			}
@@ -230,7 +230,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		if (Utils.handleSelfRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
-			final SlashCommand cmd = commands.get(event.getName()).getValue();
+			final SlashCommand cmd = commands.get(event.getName()).getSecond();
 			final SlashCommandEvent cmde = new SlashCommandEvent(cmd, event, guild, member, author);
 			final boolean disabled = !guild.isCommandActivated(cmd);
 			if (disabled) {

@@ -37,7 +37,7 @@ public class Vote implements IPostRoute {
 	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser dcUser) throws Exception {
 		final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
 		assert ip != null;
-		if (!ip.equals("159.203.105.187") || !ctx.header("authorization").equals(config.getTopggAuth())) {
+		if (!ip.equals("159.203.105.187") || !config.getTopggAuth().equals(ctx.header("authorization"))) {
 			throw new UnauthorizedResponse();
 		}
 

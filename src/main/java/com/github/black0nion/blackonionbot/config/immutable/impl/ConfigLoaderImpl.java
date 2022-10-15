@@ -18,7 +18,11 @@ public class ConfigLoaderImpl implements ConfigLoader {
 
 	@Override
 	public <T> T get(String name, Class<T> clazz, ConfigFlag... flagsArr) {
-		return loadImpl(name, clazz, flagsArr);
+		try {
+			return loadImpl(name, clazz, flagsArr);
+		} catch (Exception e) {
+			throw new ConfigLoadingException("Failed to load config value for " + name, e);
+		}
 	}
 
 	public static <T> T loadImpl(String name, Class<T> clazz, ConfigFlag... flagsArr) {
@@ -31,7 +35,7 @@ public class ConfigLoaderImpl implements ConfigLoader {
 		List<ConfigFlag> flags = flagsArr == null ? List.of() : List.of(flagsArr);
 		if (value == null) {
 			if (flags.contains(Flags.NonNull)) {
-				throw new ConfigLoadingException(new IllegalArgumentException("Missing required config value: " + name));
+				throw new IllegalArgumentException("Missing required config value: " + name);
 			}
 			@SuppressWarnings("unchecked") Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
 			return defaultFlag != null ? defaultFlag.defaultValue() : null;

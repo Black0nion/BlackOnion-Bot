@@ -59,7 +59,7 @@ public class GuildListCommand extends SlashCommand {
 			}
 		}
 		pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
-		// TODO: Fix
+		// TODO: Fix or test
 		if (!found)
 			cmde.send("noguildsfound");
 		else {

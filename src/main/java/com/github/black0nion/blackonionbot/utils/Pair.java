@@ -1,31 +1,39 @@
 package com.github.black0nion.blackonionbot.utils;
 
-public class Pair<K, V> {
+public class Pair<A1, A2> {
 
-	private K key;
-	private V value;
+	private A1 first;
+	private A2 second;
 
-	public Pair(final K key, final V value) {
-		this.key = key;
-		this.value = value;
+	public Pair(final A1 first, final A2 second) {
+		this.first = first;
+		this.second = second;
 	}
 
-	public K getKey() {
-		return key;
+	public A1 getFirst() {
+		return first;
 	}
 
-	public void setKey(final K key) {
-		this.key = key;
+	public void setFirst(final A1 first) {
+		this.first = first;
 	}
 
 	/**
 	 * @return the value
 	 */
-	public V getValue() {
-		return value;
+	public A2 getSecond() {
+		return second;
 	}
 
-	public void setValue(final V value) {
-		this.value = value;
+	public void setSecond(final A2 second) {
+		this.second = second;
+	}
+
+	@Override
+	public String toString() {
+		return "Pair{" +
+			"first=" + first +
+			", second=" + second +
+			'}';
 	}
 }

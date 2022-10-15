@@ -52,12 +52,12 @@ public class API {
 	private final StatsCollectorFactory statsCollectorFactory;
 
 	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
-		API prevInstance = instance;
+		if (instance != null && instance.getApp() != null) instance.getApp().close();
 		instance = this;
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;
-		start(prevInstance);
+		start();
 	}
 
 	private final StatisticsHandler statisticsHandler = new StatisticsHandler();
@@ -70,10 +70,7 @@ public class API {
 		statsCollectorFactory.init(statisticsHandler);
 	}
 
-	private void start(API prevInstance) {
-		if (app != null) app.close();
-		if (prevInstance != null && prevInstance.getApp() != null) prevInstance.getApp().close();
-
+	private void start() {
 		initStats();
 
 		app = Javalin.create(cfg -> {

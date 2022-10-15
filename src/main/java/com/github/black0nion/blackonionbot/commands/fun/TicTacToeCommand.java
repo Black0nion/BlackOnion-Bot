@@ -69,13 +69,13 @@ public class TicTacToeCommand extends SlashCommand {
 
 			final TicTacToePlayer player = game.currentPlayer == FieldType.X ? game.getPlayerX() : game.getPlayerY();
 
-			if (temp[coords.getKey()][coords.getValue()] != FieldType.EMPTY) {
+			if (temp[coords.getFirst()][coords.getSecond()] != FieldType.EMPTY) {
 				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + player.getAsMention() + " | " + getTranslation("fieldoccupied", author, guild)).queue();
 				this.rerun(game, channel);
 				return;
 			}
 
-			temp[coords.getKey()][coords.getValue()] = game.currentPlayer;
+			temp[coords.getFirst()][coords.getSecond()] = game.currentPlayer;
 			game.setField(temp);
 
 			if (this.handleWin(game, coords)) return;
@@ -100,7 +100,7 @@ public class TicTacToeCommand extends SlashCommand {
 				}
 
 				coords = TicTacToeBot.move(game);
-				temp[coords.getKey()][coords.getValue()] = game.currentPlayer;
+				temp[coords.getFirst()][coords.getSecond()] = game.currentPlayer;
 				game.setField(temp);
 
 				if (this.handleWin(game, coords)) return;
@@ -125,15 +125,15 @@ public class TicTacToeCommand extends SlashCommand {
 
 	private static List<ActionRow> placeAt(final List<ActionRow> actionRowsRaw, final Pair<Integer, Integer> coords, final FieldType currentPlayer) {
 		final List<ActionRow> actionRows = new ArrayList<>(actionRowsRaw);
-		final List<Button> buttons = new ArrayList<>(actionRows.get(coords.getKey()).getButtons());
-		buttons.set(coords.getValue(), Button.of(currentPlayer == FieldType.X ? ButtonStyle.SUCCESS : ButtonStyle.PRIMARY, coords.getKey() + "" + coords.getValue(), currentPlayer.name()).asDisabled());
+		final List<Button> buttons = new ArrayList<>(actionRows.get(coords.getFirst()).getButtons());
+		buttons.set(coords.getSecond(), Button.of(currentPlayer == FieldType.X ? ButtonStyle.SUCCESS : ButtonStyle.PRIMARY, coords.getFirst() + "" + coords.getSecond(), currentPlayer.name()).asDisabled());
 		final ActionRow of = ActionRow.of(buttons);
-		actionRows.set(coords.getKey(), of);
+		actionRows.set(coords.getFirst(), of);
 		return actionRows;
 	}
 
 	private boolean handleWin(final TicTacToe game, final Pair<Integer, Integer> coords) {
-		final FieldType firstWinner = game.getWinner(coords.getKey(), coords.getValue());
+		final FieldType firstWinner = game.getWinner(coords.getFirst(), coords.getSecond());
 		if (firstWinner == null) return false;
 		else {
 			final List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);

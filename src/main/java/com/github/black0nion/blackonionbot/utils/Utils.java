@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -234,6 +233,7 @@ public class Utils {
 		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 
+	@SuppressWarnings("checkstyle:RegexpSinglelineJava")
 	public static void printLogo() {
 		LoggerFactory.getLogger(Main.class).info("""
 

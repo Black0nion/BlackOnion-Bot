@@ -1,13 +1,11 @@
 package com.github.black0nion.blackonionbot.config.immutable;
 
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: add unit tests for flags
 class ConfigLoaderImplTest {
 
 	// don't worry, this is a generated dummy token
@@ -35,6 +33,7 @@ class ConfigLoaderImplTest {
 
 		Range range = assertDoesNotThrow(() -> range(0, 10));
 		assertThrows(IllegalArgumentException.class, () -> ConfigLoaderImpl.parse("test_number", "20", Integer.class, range));
+
 		assertDoesNotThrow(() -> ConfigLoaderImpl.parse("test_number", "5", Integer.class, range));
 		assertDoesNotThrow(() -> ConfigLoaderImpl.parse("test_number", "0", Integer.class, range));
 		assertDoesNotThrow(() -> ConfigLoaderImpl.parse("test_number", "10", Integer.class, range));

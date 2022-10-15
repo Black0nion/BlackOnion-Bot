@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 public class BanUsageCommand extends SlashCommand {
 
-	private static final SubcommandData[] data = {
+	private static final SubcommandData[] DATA = {
 		new SubcommandData("user", "(un)ban a user").addOption(OptionType.USER, "targetuser", "user to (un)ban", true),
 		new SubcommandData("guild", "(un)ban a guild").addOption(OptionType.STRING, "targetguild", "guild to (un)ban", true),
 	};
@@ -34,8 +34,8 @@ public class BanUsageCommand extends SlashCommand {
 		super(builder(
 			Commands.slash("usage", "(un)ban a user or a guild from using commands.")
 				.addSubcommandGroups(
-					new SubcommandGroupData("ban", "Ban a user or a guild from using commands.").addSubcommands(data),
-					new SubcommandGroupData("unban", "Unban a user or a guild from using commands.").addSubcommands(data)))
+					new SubcommandGroupData("ban", "Ban a user or a guild from using commands.").addSubcommands(DATA),
+					new SubcommandGroupData("unban", "Unban a user or a guild from using commands.").addSubcommands(DATA)))
 			.setAdminGuild()
 			.permissions(CustomPermission.BAN_USAGE)
 		);
@@ -68,7 +68,6 @@ public class BanUsageCommand extends SlashCommand {
 				else
 					cmde.exception();
 			} else {
-				// TODO figure out how to filter out not banned users
 				if (new SQLHelper("DELETE FROM banned_entities WHERE id = ? AND type = 'user'").addParameter(user.getIdLong()).execute()) {
 					cmde.send("userunbannednoreason");
 				} else {
@@ -82,7 +81,7 @@ public class BanUsageCommand extends SlashCommand {
 
 		if (GUILD_ID_PATTERN.matcher(guildId).matches()) {
 			if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
-				// TODO test behaviour of ON CONFLICT DO NOTHING
+				// TODO: test behaviour of ON CONFLICT DO NOTHING
 				if (new SQLHelper("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING")
 						.addParameter(guildId)
 						.execute())
