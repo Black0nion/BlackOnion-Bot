@@ -21,8 +21,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
-import static java.util.Objects.requireNonNull;
-
 public class ActivityCommand extends SlashCommand {
 
 	private final Settings settings;
@@ -45,9 +43,7 @@ public class ActivityCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		requireNonNull(e.getSubcommandName());
-
-		if (e.getSubcommandName().equalsIgnoreCase("set")) {
+		if (cmde.getSubcommandName().equalsIgnoreCase("set")) {
 			if (e.getOption("type") == null || e.getOption("text") == null) {
 				cmde.sendPleaseUse();
 			}
@@ -62,7 +58,7 @@ public class ActivityCommand extends SlashCommand {
 				cmde.send("newactivity", new Placeholder("newactivity",
 					newActivity != null ? newActivity.getName() : cmde.getTranslation("empty")));
 			} else cmde.send("invalidactivitytype");
-		} else if (e.getSubcommandName().equalsIgnoreCase("clear")) {
+		} else if (cmde.getSubcommandName().equalsIgnoreCase("clear")) {
 			settings.setActivityType(null);
 			settings.setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);

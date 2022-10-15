@@ -58,6 +58,12 @@ public class SQLHelper {
 		return ps;
 	}
 
+	public boolean anyMatch() throws SQLException {
+		try (PreparedStatement ps = create()) {
+			return ps.executeQuery().next();
+		}
+	}
+
 	public boolean execute() throws SQLException {
 		Connection connection = this.connection != null ? this.connection : PostgresConnection.getConnection(); // NOSONAR
 		if (connection == null) throw new SQLException("Could not acquire connection instance!");
@@ -73,6 +79,12 @@ public class SQLHelper {
 			return statement.execute();
 		} finally {
 			if (closeConnection) connection.close();
+		}
+	}
+
+	public static void run(String sql) throws SQLException {
+		try (PreparedStatement statement = PostgresConnection.getConnection().prepareStatement(sql)) {
+			statement.execute();
 		}
 	}
 }

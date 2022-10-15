@@ -161,7 +161,7 @@ public class PlayerManager {
 
 			@Override
 			public void loadFailed(final FriendlyException exception) {
-				channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+				channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
 				exception.printStackTrace();
 			}
 		});

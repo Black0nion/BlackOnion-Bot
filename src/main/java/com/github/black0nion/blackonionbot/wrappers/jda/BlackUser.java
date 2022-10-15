@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.utils.Utils;

@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -48,11 +48,7 @@ public class PermissionsCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		final String mode = e.getSubcommandName();
-		if (mode == null || mode.isEmpty()) {
-			cmde.exception();
-			return;
-		}
+		final String mode = cmde.getSubcommandName();
 
 		if (Utils.equalsOneIgnoreCase(mode, "add", "remove", "list")) {
 			final BlackUser user = BlackUser.from(Objects.requireNonNull(e.getOption("user", OptionMapping::getAsUser)));

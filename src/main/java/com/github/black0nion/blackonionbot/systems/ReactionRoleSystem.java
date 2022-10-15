@@ -1,9 +1,11 @@
 package com.github.black0nion.blackonionbot.systems;
 
+import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.misc.SQLSetup;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -11,9 +13,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.function.BiConsumer;
 
-// TODO: implement
 public class ReactionRoleSystem extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
@@ -25,6 +27,17 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	@Override
 	public void onMessageReactionRemove(final MessageReactionRemoveEvent e) {
 		handle(e, e.getGuild()::removeRoleFromMember);
+	}
+
+	@SQLSetup
+	private static void setupDB() throws SQLException {
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS reaction_roles (" +
+			"guild_id BIGINT NOT NULL, " +
+			"role_id BIGINT NOT NULL, " +
+			"channel_id BIGINT NOT NULL, " +
+			"message_id BIGINT NOT NULL, " +
+			"emoji VARCHAR(40) NOT NULL, " +
+			"PRIMARY KEY (guild_id, channel_id, message_id, emoji, role_id));");
 	}
 
 	private void handle(GenericMessageReactionEvent event, BiConsumer<UserSnowflake, Role> action) {
@@ -44,17 +57,19 @@ public class ReactionRoleSystem extends ListenerAdapter {
 		}
 	}
 
-	private Role getRole(final GenericMessageReactionEvent e, long guildid, long channelid, long messageid) throws NotFoundException {
-		String emote = e.getEmoji().getAsReactionCode();
+	// TODO: test
+	private Role getRole(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) throws NotFoundException {
+		String emoji = Utils.serializeEmoji(e.getEmoji());
 
-		if (e.getEmoji().getType() == Emoji.Type.CUSTOM)
-			emote = "<:" + emote + ">";
-
-		// TODO: query DB
-
-		if ("entry from db" != null)
-			throw new NotFoundException("Reaction entry");
-
-		return e.getGuild().getRoleById(-1);
+		try (var ps = new SQLHelper("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
+				.addParameters(guildId, channelID, messageId, emoji).create();
+				var rs = ps.executeQuery()) {
+			if (rs.next()) {
+				return e.getGuild().getRoleById(rs.getLong("role_id"));
+			}
+		} catch (SQLException ex) {
+			logger.error("Error while querying a reactionrole entry", ex);
+		}
+		return null;
 	}
 }

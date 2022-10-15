@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.misc.OperatingSystem;
+import com.github.black0nion.blackonionbot.misc.enums.OperatingSystem;
 import com.google.common.io.Files;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
+import static com.github.black0nion.blackonionbot.misc.enums.OperatingSystem.*;
 
 public class BotInformation {
 	private BotInformation() {}

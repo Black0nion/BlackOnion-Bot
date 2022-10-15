@@ -51,7 +51,7 @@ public class TimeOutCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		switch (e.getSubcommandName()) {
+		switch (cmde.getSubcommandName()) {
 			case "add" -> addTimeout(cmde, e);
 			case "remove" -> removeTimeout(cmde, e);
 			default -> cmde.sendPleaseUse();

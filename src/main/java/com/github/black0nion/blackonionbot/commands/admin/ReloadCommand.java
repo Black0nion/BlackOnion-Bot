@@ -83,9 +83,7 @@ public class ReloadCommand extends SlashCommand {
 			initReloadableMethods();
 		}
 
-		if (e.getSubcommandName() == null) throw new NullPointerException("Subcommand name is null!");
-
-		if (e.getSubcommandName().equals("list")) {
+		if (cmde.getSubcommandName().equals("list")) {
 			StringBuilder reloadableMethodsString = new StringBuilder("```");
 			for (final Map.Entry<String, Method> entry : reloadableMethods.entrySet()) {
 				final Method meth = entry.getValue();
@@ -98,7 +96,7 @@ public class ReloadCommand extends SlashCommand {
 					.append(meth.getName());
 			}
 			cmde.success("reloadables", reloadableMethodsString.append("```").toString());
-		} else if (e.getSubcommandName().equals(METHOD)) {
+		} else if (cmde.getSubcommandName().equals(METHOD)) {
 			String option = e.getOption(METHOD, "all", OptionMapping::getAsString);
 			if (option.equalsIgnoreCase("all")) {
 				reloadAll();

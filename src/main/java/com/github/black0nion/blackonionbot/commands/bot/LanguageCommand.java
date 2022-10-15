@@ -45,9 +45,9 @@ public class LanguageCommand extends SlashCommand {
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
 		String subcommandGroup = null;
-		String subcommand;
+		String subcommand = cmde.getSubcommandName();
 		Language lang = null;
-		Checks.notNull(subcommand = e.getSubcommandName(), "Subcommand Name");
+
 		if (!subcommand.equalsIgnoreCase("list"))
 			Checks.notNull(subcommandGroup = e.getSubcommandGroup(), "Subcommand Group");
 		if (subcommand.equalsIgnoreCase("set"))

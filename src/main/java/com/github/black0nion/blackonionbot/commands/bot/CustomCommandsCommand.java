@@ -4,25 +4,32 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.systems.CustomCommand;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandResponsePlaintext;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+// TODO: remake with modals
 public class CustomCommandsCommand extends SlashCommand {
 	private static final String OPTION = "option";
 	private static final String COMMAND_NAME = "command_name";
@@ -31,12 +38,28 @@ public class CustomCommandsCommand extends SlashCommand {
 	private static final String DELETE = "delete";
 
 	public CustomCommandsCommand() {
-		super(builder(Commands.slash("customcommand", "Used to create a custom command.")
+		super(builder(Commands.slash("customcommand", "Used to manage custom commands.")
+			.addSubcommands(
+				new SubcommandData(LIST, "List all custom commands"),
+				new SubcommandData(CREATE, "Start the creation wizard"),
+				new SubcommandData(DELETE, "Delete a custom command")
+					.addOption(OptionType.STRING, COMMAND_NAME, "The command to delete", true, true)
+			)
 			.addOptions(new OptionData(OptionType.STRING, OPTION, "The name of the command to set/get/clear.", true)
 				.addChoice("List", LIST)
 				.addChoice("Create", CREATE)
 				.addChoice("Delete", DELETE))
-			.addOption(OptionType.STRING, COMMAND_NAME, "[command (required for create and delete)]")));
+			.addOption(OptionType.STRING, COMMAND_NAME, "command (required for create and delete)")));
+	}
+
+	@Override
+	// TODO: test
+	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
+		if (event.getSubcommandName().equals(DELETE) && event.getFocusedOption().getName().equals(COMMAND_NAME)) {
+			List<String> elements = new StartsWithArrayList(BlackGuild.from(event.getGuild()).getCustomCommands().keySet())
+				.getElementsStartingWith(event.getFocusedOption().getValue());
+			event.replyChoices(elements.stream().map(e -> new Command.Choice(e, e)).toList()).queue();
+		}
 	}
 
 	private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
@@ -53,7 +76,7 @@ public class CustomCommandsCommand extends SlashCommand {
 						return;
 					}
 
-					final CustomCommand customCommand = new CustomCommand(cmde.getGuild(), command, contentRaw);
+					final CustomCommand customCommand = new CustomCommand(cmde.getGuild().getIdLong(), command, new CustomCommandResponsePlaintext(contentRaw));
 					askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), customCommand, slashCommandInteractionEvent, guild, member, user);
 				}));
 	}

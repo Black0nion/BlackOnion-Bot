@@ -7,10 +7,10 @@ import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.GuildType;
+import com.github.black0nion.blackonionbot.misc.enums.Category;
+import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.misc.RunMode;
+import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.utils.*;
@@ -214,7 +214,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		final TextChannel channel = event.getChannel().asTextChannel();
 
 		final boolean locked = BanUsageCommand.isBanned(guild.getIdLong(), author.getIdLong());
-		final String log = EmojiParser.parseToAliases(guild.getName() + "(G:" + guild.getId() + ") > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getName() + "#" + author.getDiscriminator() + "(U:" + author.getId() + "): (M:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
+		final String log = EmojiParser.parseToAliases(guild.getDebugMessage() + " > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getDebugMessage() + ": (E:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
 		if (config.getRunMode() == RunMode.DEV) {
 			if (locked) logger.warn(log);

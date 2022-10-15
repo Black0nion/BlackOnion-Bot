@@ -224,7 +224,6 @@ public class Bot extends ListenerAdapter {
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(GiveawaySystem::init)
 			.addAndGetSelf(playerManager::init)
 			.addAndGetSelf(() -> new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize)))
 			.addAndGetSelf(PluginSystem::loadPlugins)
@@ -256,6 +255,7 @@ public class Bot extends ListenerAdapter {
 		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
 		slashCommandBase.updateCommandsDev(jda);
+		executor.submit(GiveawaySystem::init);
 	}
 
 	@Reloadable("commands")

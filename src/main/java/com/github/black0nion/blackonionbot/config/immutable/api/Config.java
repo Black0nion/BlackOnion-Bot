@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.config.immutable.api;
 
-import com.github.black0nion.blackonionbot.misc.RunMode;
+import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
-import com.github.black0nion.blackonionbot.misc.Progress;
+import com.github.black0nion.blackonionbot.misc.enums.Category;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import com.github.black0nion.blackonionbot.misc.enums.Progress;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
+import java.sql.SQLException;
 import java.util.*;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
@@ -95,7 +96,7 @@ public abstract class SlashCommand {
 		}
 	}
 
-	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel);
+	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) throws SQLException;
 
 	protected void updateAutoComplete(Map.Entry<String, StartsWithArrayList> entry) {
 		Checks.notNull(entry, "Entry");

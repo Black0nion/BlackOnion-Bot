@@ -34,6 +34,11 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 	}
 
 	@Override
+	public String getDebugMessage() {
+		return member.getNickname() + "#" + member.getUser().getDiscriminator() + "(" + member.getUser().getName() + ")(M:" + member.getId() + ")";
+	}
+
+	@Override
 	@Nonnull
 	public User getUser() {
 		return this.member.getUser();

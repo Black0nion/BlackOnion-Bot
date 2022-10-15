@@ -36,8 +36,10 @@ public class WarnsCommand extends SlashCommand {
 	public WarnsCommand() {
 		super(builder(Commands.slash("warns", "Used to get the warns of a userid.")
 			.addSubcommands(
-				new SubcommandData(ID, "Inspect a certain warn").addOption(OptionType.INTEGER, WARN_ID, "The id of the warn to inspect", true),
-				new SubcommandData(USER, "Get the warns of an user").addOption(OptionType.USER, USER, "The user to get the warns of", true),
+				new SubcommandData(ID, "Inspect a certain warn")
+					.addOption(OptionType.INTEGER, WARN_ID, "The id of the warn to inspect", true),
+				new SubcommandData(USER, "Get the warns of an user")
+					.addOption(OptionType.USER, USER, "The user to get the warns of", true),
 				new SubcommandData(ALL, "Get all warns of the guild")
 			))
 			.setRequiredPermissions(Permission.KICK_MEMBERS));
@@ -45,11 +47,11 @@ public class WarnsCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		switch (e.getSubcommandName()) {
+		switch (cmde.getSubcommandName()) {
 			case ID -> handleId(cmde);
 			case USER -> handleUser(cmde);
 			case ALL -> handleAll(cmde);
-			default -> throw new NotImplementedException(e.getSubcommandName());
+			default -> throw new NotImplementedException(cmde.getSubcommandName());
 		}
 	}
 

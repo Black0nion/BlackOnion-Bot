@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.database;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.reflections.Reflections;
@@ -11,8 +10,10 @@ import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class PostgresConnection {
 
@@ -36,13 +37,21 @@ public class PostgresConnection {
 		ds = new HikariDataSource(hikariConfig);
 
 		// find all methods annotated with @SQLSetup and run them
-		new Reflections(Main.class.getPackage().getName(), Scanners.MethodsAnnotated)
+		List<Method> methods = new Reflections(Main.class.getPackage().getName(), Scanners.MethodsAnnotated)
 			.getMethodsAnnotatedWith(SQLSetup.class)
 			.stream()
 			// we don't care at what point the peek will be executed so the SonarLint warning can be ignored
 			// also, in this case, I'm accessing my own code with reflections, so I know what I'm doing (I think)
 			.peek(m -> m.setAccessible(true)) // NOSONAR
-			.forEach(method -> Utils.uncheckedSupplier(() -> method.invoke(null)));
+			.toList();
+
+		for (Method method : methods) {
+			try {
+				method.invoke(null);
+			} catch (Exception e) {
+				logger.error("Error while running SQL setup method " + method.getName(), e);
+			}
+		}
 	}
 
 	public Connection acquireConnection() throws SQLException {

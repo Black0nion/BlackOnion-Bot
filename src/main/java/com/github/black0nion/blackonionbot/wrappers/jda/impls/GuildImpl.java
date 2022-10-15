@@ -58,6 +58,11 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	}
 
 	@Override
+	public String getDebugMessage() {
+		return guild.getName() + "(G:" + guild.getId() + ")";
+	}
+
+	@Override
 	@CheckReturnValue
 	@Nonnull
 	public RestAction<List<Command>> retrieveCommands() {

@@ -1,24 +1,27 @@
 package com.github.black0nion.blackonionbot.commands.admin;
 
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.misc.SQLSetup;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.regex.Pattern;
-
-import static java.util.Objects.requireNonNull;
 
 public class BanUsageCommand extends SlashCommand {
 
@@ -38,14 +41,18 @@ public class BanUsageCommand extends SlashCommand {
 		);
 	}
 
-	private static final Pattern guildIdPattern = Pattern.compile("^\\d{17,18}$");
+	private static final Pattern GUILD_ID_PATTERN = Pattern.compile("^\\d{17,18}$");
+
+	@SQLSetup
+	private static void setup() throws SQLException {
+		SQLHelper.run("CREATE TYPE IF NOT EXISTS user_or_guild AS ENUM ('user', 'guild')");
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS banned_entities (id BIGINT PRIMARY KEY, type user_or_guild NOT NULL)");
+	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) throws SQLException {
 		final User user = e.getOption("targetuser", OptionMapping::getAsUser);
 		final String guildId = e.getOption("targetguild", OptionMapping::getAsString);
-
-		requireNonNull(e.getSubcommandGroup(), "subcommandgroup");
 
 		if (user == null && guildId == null) {
 			cmde.send("wrongargumentcount");
@@ -53,32 +60,56 @@ public class BanUsageCommand extends SlashCommand {
 		}
 
 		if (user != null) {
-			if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
-				// TODO: insert user into database
-				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", user.getAsTag()));
+			if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
+				if (new SQLHelper("INSERT INTO banned_entities (id, type) VALUES (?, 'user') ON CONFLICT DO NOTHING")
+						.addParameter(user.getIdLong())
+						.execute())
+					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", Utils.escapeMarkdown(user.getAsTag())));
+				else
+					cmde.exception();
 			} else {
-				// TODO: remove user from database
-				cmde.send("userunbanned");
+				// TODO figure out how to filter out not banned users
+				if (new SQLHelper("DELETE FROM banned_entities WHERE id = ? AND type = 'user'").addParameter(user.getIdLong()).execute()) {
+					cmde.send("userunbannednoreason");
+				} else {
+					cmde.send("erroroccurred");
+					LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to unban user {}", user.getIdLong());
+				}
 			}
 		}
 
-		if (guildId != null) {
-			if (guildIdPattern.matcher(guildId).matches()) {
-				if (e.getSubcommandGroup().equalsIgnoreCase("ban")) {
-					// TODO: insert guild into database
+		if (guildId == null) return;
+
+		if (GUILD_ID_PATTERN.matcher(guildId).matches()) {
+			if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
+				// TODO test behaviour of ON CONFLICT DO NOTHING
+				if (new SQLHelper("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING")
+						.addParameter(guildId)
+						.execute())
 					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
-				} else {
-					// TODO: remove guild from database
-					cmde.send("guildunbanned");
-				}
+				else
+					cmde.exception();
 			} else {
-				cmde.send("invalidguildid");
+				if (new SQLHelper("DELETE FROM banned_entities WHERE id = ? AND type = 'user'").addParameter(user.getIdLong()).execute()) {
+					cmde.send("guildunbanned");
+				} else {
+					cmde.exception();
+					LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to unban guild {}", guild.getIdLong());
+				}
 			}
+		} else {
+			cmde.send("invalidguildid");
 		}
 	}
 
 	public static boolean isBanned(long guildID, long userID) {
-		// TODO: implement
-		return false;
+		try {
+			return new SQLHelper("SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
+				.addParameters(userID, guildID).anyMatch();
+		} catch (SQLException e) {
+			LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to check if user " + userID + "or guild " + guildID + " are banned!", e);
+			return false;
+
+		}
 	}
 }

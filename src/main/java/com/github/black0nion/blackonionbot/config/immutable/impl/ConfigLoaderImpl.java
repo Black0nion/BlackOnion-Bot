@@ -18,19 +18,22 @@ public class ConfigLoaderImpl implements ConfigLoader {
 
 	@Override
 	public <T> T get(String name, Class<T> clazz, ConfigFlag... flagsArr) {
-		return getImpl(name, clazz, flagsArr);
+		return loadImpl(name, clazz, flagsArr);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> T getImpl(String name, Class<T> clazz, ConfigFlag... flagsArr) {
+	public static <T> T loadImpl(String name, Class<T> clazz, ConfigFlag... flagsArr) {
 		name = name.toUpperCase(Locale.ROOT);
 		final String value = System.getenv().containsKey(name) ? System.getenv(name) : System.getProperty(name);
+		return parse(name, value, clazz, flagsArr);
+	}
+
+	public static <T> T parse(String name, String value, Class<T> clazz, ConfigFlag... flagsArr) {
 		List<ConfigFlag> flags = flagsArr == null ? List.of() : List.of(flagsArr);
 		if (value == null) {
 			if (flags.contains(Flags.NonNull)) {
 				throw new ConfigLoadingException(new IllegalArgumentException("Missing required config value: " + name));
 			}
-			Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
+			@SuppressWarnings("unchecked") Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
 			return defaultFlag != null ? defaultFlag.defaultValue() : null;
 		}
 		T result = Utils.parseToT(value, clazz);

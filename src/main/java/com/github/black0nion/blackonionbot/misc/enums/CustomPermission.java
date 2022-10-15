@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.misc;
+package com.github.black0nion.blackonionbot.misc.enums;
 
 import java.util.*;
 import java.util.stream.Collectors;

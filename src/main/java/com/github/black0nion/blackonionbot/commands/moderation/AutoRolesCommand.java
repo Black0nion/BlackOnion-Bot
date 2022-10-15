@@ -35,7 +35,7 @@ public class AutoRolesCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
-		switch (Objects.requireNonNull(e.getSubcommandName())) {
+		switch (cmde.getSubcommandName()) {
 			case CREATE_COMMAND -> setCreateCommand(cmde, e, guild);
 			case REMOVE_COMMAND -> setRemoveCommand(cmde, e, guild);
 			default -> cmde.send("invalidsubcommand");

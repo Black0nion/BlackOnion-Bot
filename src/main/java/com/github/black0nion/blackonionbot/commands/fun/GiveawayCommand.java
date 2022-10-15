@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class GiveawayCommand extends SlashCommand {
 	private static final String WINNERS = "winners";
@@ -59,7 +59,7 @@ public class GiveawayCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		switch (e.getSubcommandName()) {
+		switch (cmde.getSubcommandName()) {
 			case "create" -> createGiveaway(cmde, e, author, guild, channel);
 			case "end" -> endGiveaway(cmde, e, member, author, guild, channel);
 			default -> cmde.sendPleaseUse();
@@ -86,7 +86,7 @@ public class GiveawayCommand extends SlashCommand {
 		if (months != null) time += (long) months * 30 * 24 * 60 * 60 * 1000;
 		if (years != null) time += (long) years * 365 * 24 * 60 * 60 * 1000;
 
-		var data = Date.from(Instant.now().plusMillis(time));
+		var data = LocalDateTime.from(Instant.now().plusMillis(time));
 		var item = e.getOption(ITEM_TO_GIVE, OptionMapping::getAsString);
 		var winners = e.getOption(WINNERS, OptionMapping::getAsInt);
 		final EmbedBuilder giveawayMessage = cmde.success()

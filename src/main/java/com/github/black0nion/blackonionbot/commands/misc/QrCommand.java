@@ -61,10 +61,10 @@ public class QrCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		switch (e.getSubcommandGroup()) {
+		switch (cmde.getSubcommandGroup()) {
 			case "encode" -> encodeQR(cmde, e);
 			case "decode" -> {
-				switch (e.getSubcommandName()) {
+				switch (cmde.getSubcommandName()) {
 					case IMAGE -> decodeImage(cmde, e);
 					case URL -> decodeUrl(cmde, e);
 					default -> cmde.sendPleaseUse();

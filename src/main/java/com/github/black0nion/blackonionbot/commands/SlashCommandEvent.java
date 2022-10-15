@@ -16,16 +16,20 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getErrorEmbed;
 import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmbed;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An util class that contains various objects related to command executions.
@@ -143,8 +147,11 @@ public class SlashCommandEvent {
 		this.reply(embed.setTitle(title).addField(name, value, false));
 	}
 
+	/**
+	 * Sends an error embed with two generic error messages
+	 */
 	public void exception() {
-		this.error("errorhappened", "somethingwentwrong");
+		this.error("erroroccurred", "somethingwentwrong");
 	}
 
 	public void exception(@Nullable Throwable t) {
@@ -275,5 +282,21 @@ public class SlashCommandEvent {
 
 	private void logError(final Throwable e) {
 		LoggerFactory.getLogger(this.command != null ? this.command.getClass() : this.getClass()).error("Exception in command", e);
+	}
+
+	public <T> T getOption(@Nonnull String name, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {
+		return requireNonNull(event.getOption(name, resolver));
+	}
+
+	public <T> T getOption(@Nonnull String name, @Nullable Supplier<? extends T> fallback, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {
+		return requireNonNull(event.getOption(name, fallback, resolver));
+	}
+
+	public String getSubcommandName() {
+		return requireNonNull(event.getSubcommandName());
+	}
+
+	public String getSubcommandGroup() {
+		return requireNonNull(event.getSubcommandGroup());
 	}
 }

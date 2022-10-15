@@ -1,15 +1,15 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.misc.Category;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
-import com.github.black0nion.blackonionbot.misc.Progress;
+import com.github.black0nion.blackonionbot.misc.enums.Category;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import com.github.black0nion.blackonionbot.misc.enums.GuildType;
+import com.github.black0nion.blackonionbot.misc.enums.Progress;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.apache.commons.lang3.ArrayUtils;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 /**
  * A builder class for creating a {@link SlashCommand}.<br>
- * Handles the creation of the command and its properties like required permissions, if the command is toggleable or the required {@link com.github.black0nion.blackonionbot.misc.GuildType GuildType}.
+ * Handles the creation of the command and its properties like required permissions, if the command is toggleable or the required {@link GuildType GuildType}.
  */
 @SuppressWarnings("unused")
 public class SlashCommandBuilder {
