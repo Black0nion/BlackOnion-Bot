@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.immutable;
+package com.github.black0nion.blackonionbot.config;
 
 import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
 

@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.immutable.ConfigLoaderHolder;
+import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
 import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;

@@ -10,6 +10,11 @@ public enum CustomPermission {
 	SET_ACTIVITY(DEVELOPER), RELOAD(DEVELOPER), BAN_USAGE(MODERATOR);
 
 	private final List<CustomPermission> links = new ArrayList<>();
+	private final String name;
+
+	CustomPermission(String name) {
+		this.name = name;
+	}
 
 	/**
 	 * <pre>
@@ -27,8 +32,34 @@ public enum CustomPermission {
 	 *
 	 * @param includedIn the minimum permission requirement.
 	 */
-	CustomPermission(final CustomPermission... includedIn) {
+	CustomPermission(CustomPermission... includedIn) {
+		this.name = name().toLowerCase().replace('_', ' ');
 		this.links.addAll(Arrays.asList(includedIn));
+	}
+
+	/**
+	 * <pre>
+	 * {@code
+	 * ADMIN
+	 * DEVELOPER(ADMIN),
+	 *
+	 * SET_STATUS(DEVELOPER);
+	 * }
+	 * </pre>
+	 * <p>
+	 * Explanation: SET_STATUS is <i>INCLUDED in</i> DEVELOPER. DEVELOPERs also have
+	 * the permission SET_STATUS, and because DEVELOPER has the permission ADMIN
+	 * admins can also use it
+	 *
+	 * @param includedIn the minimum permission requirement.
+	 */
+	CustomPermission(String name, final CustomPermission... includedIn) {
+		this.name = name;
+		this.links.addAll(Arrays.asList(includedIn));
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public static CustomPermission parse(final String input) {
@@ -51,7 +82,7 @@ public enum CustomPermission {
 
 	public static boolean hasRights(final CustomPermission requiredPermission, final List<CustomPermission> permissions) {
 		if (permissions.contains(requiredPermission)) return true;
-		if (permissions.size() != 0) {
+		if (!permissions.isEmpty()) {
 			for (final CustomPermission perm : requiredPermission.links) {
 				final boolean hasRights = hasRights(perm, permissions);
 				if (hasRights) return true;

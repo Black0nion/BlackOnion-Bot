@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.dynamic.api;
+package com.github.black0nion.blackonionbot.config.mutable.api;
 
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;

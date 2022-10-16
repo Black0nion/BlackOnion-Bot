@@ -1,15 +1,15 @@
-package com.github.black0nion.blackonionbot.config.dynamic.impl;
+package com.github.black0nion.blackonionbot.config.mutable.impl;
 
-import com.github.black0nion.blackonionbot.config.dynamic.api.DynamicConfigLoader;
-import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
+import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.immutable.ConfigLoaderHolder;
+import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
 import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
 
-public class SettingsImpl extends ConfigLoaderHolder<DynamicConfigLoader> implements Settings {
+public class SettingsImpl extends ConfigLoaderHolder<MutableConfigLoader> implements Settings {
 
 	private long logsChannel = get("logs_channel", Long.class, defaultValue(-1L), range(0, Long.MAX_VALUE));
 	private Activity.ActivityType activityType = get("activity_type", Activity.ActivityType.class, defaultValue(Activity.ActivityType.LISTENING));
@@ -21,7 +21,7 @@ public class SettingsImpl extends ConfigLoaderHolder<DynamicConfigLoader> implem
 	@SuppressWarnings("unused")
 	private String activityUrl = get("activity_url", String.class, matchesRegex(Activity.STREAMING_URL));
 
-	public SettingsImpl(DynamicConfigLoader configLoader) {
+	public SettingsImpl(MutableConfigLoader configLoader) {
 		super(configLoader);
 	}
 

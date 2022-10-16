@@ -1,6 +1,7 @@
-package com.github.black0nion.blackonionbot.config.immutable;
+package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.generic.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import org.junit.jupiter.api.Test;
 
 import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
@@ -45,5 +46,14 @@ class ConfigLoaderImplTest {
 	@Test
 	void test_config_loading() {
 		assertDoesNotThrow(ConfigFileLoader::loadConfig);
+	}
+
+	@Test
+	void test_get() {
+		final String name = "surelynobodywilleverhavethisintheirsystemproperties";
+		ConfigLoadingException exception = assertThrows(ConfigLoadingException.class, () -> ConfigLoaderImpl.INSTANCE.get(name, String.class, NonNull));
+		assertEquals("Failed to load config value for " + name, exception.getMessage());
+		assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+		assertEquals("Missing required config value: " + name.toUpperCase(), exception.getCause().getMessage());
 	}
 }

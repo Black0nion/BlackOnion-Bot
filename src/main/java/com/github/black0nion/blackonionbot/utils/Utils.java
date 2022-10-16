@@ -82,8 +82,10 @@ public class Utils {
 		return Double.parseDouble(df.format(number).replace(",", "."));
 	}
 
+	private static final JSONObject COUNTRIES_JSON = new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining())));
+
 	public static String getCountryFromCode(final String code) {
-		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining()))).getString(code);
+		return COUNTRIES_JSON.getString(code);
 	}
 
 	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {
@@ -106,7 +108,8 @@ public class Utils {
 
 	public static boolean isLong(final Object input) {
 		try {
-			Long.parseLong(((String) input).trim());
+			if (input instanceof Number) return true;
+			Long.parseLong(input.toString().trim());
 			return true;
 		} catch (final Exception ignored) {
 			return false;
@@ -127,13 +130,8 @@ public class Utils {
 	}
 
 	public static boolean isBoolean(final Object input) {
-		try {
-			//noinspection ResultOfMethodCallIgnored
-			Boolean.parseBoolean(((String) input).trim());
-			return true;
-		} catch (final Exception ignored) {
-			return false;
-		}
+		if (input instanceof Boolean) return true;
+		return input != null && (input.toString().trim().equalsIgnoreCase("true") || input.toString().trim().equalsIgnoreCase("false"));
 	}
 
 	/**
@@ -205,32 +203,39 @@ public class Utils {
 	 * }</pre>
 	 */
 	public static String getPermissionString(final Permission... permissions) {
+		if (permissions.length == 0) return "```\n```";
+		final List<Permission> sortedPermissions = Arrays.stream(permissions)
+			.filter(Objects::nonNull)
+			.distinct()
+			.sorted(Comparator.comparing(Permission::getName))
+			.toList();
 		StringBuilder output = new StringBuilder("```");
-		for (int i = 0; i < permissions.length; i++) {
-			output.append("- ").append(permissions[i].getName()).append(i == permissions.length - 1 ? "" : "\n");
+		for (Permission permission : sortedPermissions) {
+			output.append("\n- ").append(permission.getName());
 		}
-		return output + "```";
+		return output + "\n```";
 	}
 
 	public static String getPermissionString(final CustomPermission... permissions) {
+		if (permissions.length == 0) return "```\n```";
+		final List<CustomPermission> sortedPermissions = Arrays.stream(permissions)
+			.filter(Objects::nonNull)
+			.distinct()
+			.sorted(Comparator.comparing(CustomPermission::getName))
+			.toList();
 		StringBuilder output = new StringBuilder("```");
-		for (int i = 0; i < permissions.length; i++) {
-			output.append("- ").append(permissions[i].name()).append(i == permissions.length - 1 ? "" : "\n");
+		for (CustomPermission permission : sortedPermissions) {
+			output.append("\n- ").append(permission.getName());
 		}
-		return output + "```";
+		return output + "\n```";
 	}
 
-	public static String parseDate(final long diff) {
-		final long diffSeconds = diff / 1000 % 60;
-		final long diffMinutes = diff / (60 * 1000) % 60;
-		final long diffHours = diff / (60 * 60 * 1000) % 24;
-		final long diffDays = diff / (24 * 60 * 60 * 1000);
-
-		return (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : "");
-	}
-
+	/**
+	 * @return 1) the given String with the first letter capitalized and the rest lower case 2) null if the input is null 3) empty if the input is empty
+	 */
 	public static String firstLetterUppercase(final String input) {
-		return input.substring(0, 1).toUpperCase() + input.substring(1);
+		if (input == null || input.isEmpty()) return input;
+		return input.substring(0, 1).toUpperCase(Locale.ROOT) + (input.length() > 1 ? input.substring(1).toLowerCase(Locale.ROOT) : "");
 	}
 
 	@SuppressWarnings("checkstyle:RegexpSinglelineJava")

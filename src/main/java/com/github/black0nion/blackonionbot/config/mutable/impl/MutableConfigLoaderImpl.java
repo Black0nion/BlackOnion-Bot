@@ -1,6 +1,6 @@
-package com.github.black0nion.blackonionbot.config.dynamic.impl;
+package com.github.black0nion.blackonionbot.config.mutable.impl;
 
-import com.github.black0nion.blackonionbot.config.dynamic.api.DynamicConfigLoader;
+import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
 import com.github.black0nion.blackonionbot.config.generic.ConfigLoadingException;
 import com.github.black0nion.blackonionbot.config.generic.ConfigSavingException;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
@@ -17,14 +17,14 @@ import java.util.List;
 
 import static com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl.getFlag;
 
-public class DynamicConfigLoaderImpl implements DynamicConfigLoader {
+public class MutableConfigLoaderImpl implements MutableConfigLoader {
 
 	private static final Path CONFIG_FILE_PATH = Path.of("files/config.json");
-	public static final DynamicConfigLoaderImpl INSTANCE = new DynamicConfigLoaderImpl();
+	public static final MutableConfigLoaderImpl INSTANCE = new MutableConfigLoaderImpl();
 
 	private final JSONObject json;
 
-	private DynamicConfigLoaderImpl() {
+	private MutableConfigLoaderImpl() {
 		try {
 			List<String> lines = Files.exists(CONFIG_FILE_PATH) ? Files.readAllLines(CONFIG_FILE_PATH) : null;
 			if (lines == null || lines.isEmpty()) {

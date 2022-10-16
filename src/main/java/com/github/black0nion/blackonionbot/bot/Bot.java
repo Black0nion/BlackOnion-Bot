@@ -3,9 +3,9 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
-import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
-import com.github.black0nion.blackonionbot.config.dynamic.impl.DynamicConfigLoaderImpl;
-import com.github.black0nion.blackonionbot.config.dynamic.impl.SettingsImpl;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
+import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigImpl;
@@ -151,7 +151,7 @@ public class Bot extends ListenerAdapter {
 
 		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
-		settings = new SettingsImpl(DynamicConfigLoaderImpl.INSTANCE);
+		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
 
 		// slf4j MDC; used to set the run mode in the logs sent to loki
 		MDC.put("run_mode", config.getRunMode().name());

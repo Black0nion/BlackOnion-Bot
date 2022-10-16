@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
@@ -45,7 +46,7 @@ public class StatsCommand extends SlashCommand {
 			.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
 			.addField("usercount", StatisticsManager.getUserCount(), true)
 			.addField("guildcount", StatisticsManager.getGuildCount(), true)
-			.addField("uptime", Utils.parseDate(diff), true)
+			.addField("uptime", Utils.formatDuration(Duration.ofMillis(diff)), true)
 			.addField("version", ConfigFileLoader.getMetadata().version(), true)
 			.setThumbnail(e.getJDA().getSelfUser().getAvatarUrl() + "?size=512")
 			.setTimestamp(Instant.now())

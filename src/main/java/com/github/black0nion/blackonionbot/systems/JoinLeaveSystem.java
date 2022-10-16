@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.dynamic.api.Settings;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.misc.enums.DrawType;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
