@@ -1484,4 +1484,28 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 	public SortedSnowflakeCacheView<ForumChannel> getForumChannelCache() {
 		return guild.getForumChannelCache();
 	}
+
+	@NotNull
+	@Override
+	public SortedSnowflakeCacheView<ScheduledEvent> getScheduledEventCache() {
+		return guild.getScheduledEventCache();
+	}
+
+	@NotNull
+	@Override
+	public CacheRestAction<ScheduledEvent> retrieveScheduledEventById(@NotNull String id) {
+		return guild.retrieveScheduledEventById(id);
+	}
+
+	@NotNull
+	@Override
+	public ScheduledEventAction createScheduledEvent(@NotNull String name, @NotNull String location, @NotNull OffsetDateTime startTime, @NotNull OffsetDateTime endTime) {
+		return guild.createScheduledEvent(name, location, startTime, endTime);
+	}
+
+	@NotNull
+	@Override
+	public ScheduledEventAction createScheduledEvent(@NotNull String name, @NotNull GuildChannel channel, @NotNull OffsetDateTime startTime) {
+		return guild.createScheduledEvent(name, channel, startTime);
+	}
 }
