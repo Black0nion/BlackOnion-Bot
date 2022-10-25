@@ -5,7 +5,6 @@
 [![Build & Deploy](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml)
 [![All Contributors][allcontributors]](#link)
 [![codecov](https://codecov.io/gh/Black0nion/BlackOnion-Bot/branch/main/graph/badge.svg?token=LZM1L4S66I)](https://codecov.io/gh/Black0nion/BlackOnion-Bot)
-
 	
 # BlackOnion-Bot
 
