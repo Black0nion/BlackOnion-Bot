@@ -7,8 +7,6 @@
 
 The official BlackOnion-Bot!
 
-Authors: mainly SIMULATAN + RealYusufIsmail
-
 ## How to run the Bot
 ### Development
 1. Clone the repository (GitHub Desktop is helpful)
