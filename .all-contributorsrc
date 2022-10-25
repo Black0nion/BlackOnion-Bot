@@ -14,6 +14,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "SIMULATAN",
+      "name": "Jakob",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63104422?v=4",
+      "profile": "http://black-onion.com/thisIsMe/?q=simulatan",
+      "contributions": [
+        "infra",
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
