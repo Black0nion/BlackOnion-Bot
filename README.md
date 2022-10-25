@@ -1,8 +1,12 @@
-[![Build & Deploy](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[allcontributors]: https://img.shields.io/badge/all_contributors-2-orange.svg 'Number of contributors on All-Contributors'
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+[![Build & Deploy](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml)
+[![All Contributors][allcontributors]](#link)
 [![codecov](https://codecov.io/gh/Black0nion/BlackOnion-Bot/branch/main/graph/badge.svg?token=LZM1L4S66I)](https://codecov.io/gh/Black0nion/BlackOnion-Bot)
+
+	
 # BlackOnion-Bot
 
 The official BlackOnion-Bot!
@@ -18,7 +22,8 @@ There is a pre-built docker image with the name `ghcr.io/black0nion/blackonion-b
 
 ## Contributions
 ... are very welcome! If you have any questions, please use the GitHub Discussion tab. If you encounter any issues, please report them on the [issue tracker](https://github.com/Black0nion/BlackOnion-Bot/issues) and if you have an improvement, please submit a pull request.
-## Contributors ✨
+
+## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
