@@ -22,11 +22,9 @@ import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -47,7 +45,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -275,19 +273,11 @@ public class Utils {
 		return null;
 	}
 
-	public static <T> T getOrReplaceMessage(Callable<T> msg, String replacedMessage) {
-		try {
-			return msg.call();
-		} catch (Exception e) {
-			throw new RuntimeException(replacedMessage, e);
-		}
-	}
-
 	public static WebhookClient makeWebhookClient(Webhook webhook) {
 		final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
 		clientBuilder.setThreadFactory(job -> {
 			final Thread thread = new Thread(job);
-			thread.setName("ContentModerator");
+			thread.setName("WebhookClient");
 			thread.setDaemon(true);
 			return thread;
 		});
@@ -295,13 +285,18 @@ public class Utils {
 		return clientBuilder.build();
 	}
 
-	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) {
+		public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) {
+		return getWebhook(channel, webhooks,  webhook -> webhook.getOwner().getIdLong() == Bot.getInstance().getSelfUserId());
+	}
+
+	static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks, Predicate<Webhook> validator) {
 		return webhooks.stream()
 			.filter(Objects::nonNull)
-			.filter(webhook -> webhook.getOwner() != null)
-			.filter(webhook -> webhook.getName().equals("BlackOnion-Bot ContentModerator") && webhook.getOwner().getIdLong() == Bot.getInstance().getSelfUserId())
+			.filter(webhook -> webhook.getOwner() != null
+				&& webhook.getName().equals("BlackOnion-Bot ContentModerator")
+				&& validator.test(webhook))
 			.findFirst()
-			.orElse(channel
+			.orElseGet(() -> channel
 				.createWebhook("BlackOnion-Bot ContentModerator")
 				.setAvatar(Bot.BLACKONION_ICON)
 				.submit()
@@ -310,6 +305,8 @@ public class Utils {
 
 	public static JSONArray optionsToJson(List<OptionData> options) {
 		final JSONArray jsonArray = new JSONArray();
+		if (options == null) return jsonArray;
+
 		for (OptionData option : options) {
 			jsonArray.put(new JSONObject()
 				.put("name", option.getName())
@@ -344,8 +341,16 @@ public class Utils {
 			if (duration.toMinutes() > 1) {
 				sb.append("s");
 			}
+			sb.append(" ");
+			duration = duration.minusMinutes(duration.toMinutes());
 		}
-		return sb.toString();
+		if (duration.toSeconds() > 0) {
+			sb.append(duration.toSeconds()).append(" second");
+			if (duration.toSeconds() > 1) {
+				sb.append("s");
+			}
+		}
+		return sb.toString().trim();
 	}
 
 	private static final int MAX_TIMEOUT_DURATION_MIN = 28 * 24 * 60; // 28 days
@@ -354,10 +359,10 @@ public class Utils {
 	private static final int MAX_TIMEOUT_DURATION_WEEK = 4; // 28 days
 
 	// Units
-	private static final String MINUTES = "minutes";
-	private static final String HOURS = "hours";
-	private static final String DAYS = "days";
-	private static final String WEEKS = "weeks";
+	public static final String MINUTES = "minutes";
+	public static final String HOURS = "hours";
+	public static final String DAYS = "days";
+	public static final String WEEKS = "weeks";
 
 	public static OptionData[] getDurationOptions(String message) {
 		String description = "The time of the " + message + " in ";
@@ -367,27 +372,6 @@ public class Utils {
 			new OptionData(OptionType.INTEGER, DAYS, description + DAYS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY),
 			new OptionData(OptionType.INTEGER, WEEKS, description + WEEKS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)
 		};
-	}
-
-	public static Duration parseDuration(SlashCommandInteractionEvent e) throws TooLongException {
-		var min = e.getOption(MINUTES, OptionMapping::getAsLong);
-		var hour = e.getOption(HOURS, OptionMapping::getAsLong);
-		var day = e.getOption(DAYS, OptionMapping::getAsLong);
-		var week = e.getOption(WEEKS, OptionMapping::getAsLong);
-
-		Duration dur = Duration.ofMinutes(
-			(min != null ? min : 0) +
-				(hour != null ? hour * 60 : 0) +
-				(day != null ? day * 60 * 24 : 0) +
-				(week != null ? week * 60 * 24 * 7 : 0)
-		);
-		if (dur.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-			throw TooLongException.INSTANCE;
-		}
-		if (dur.toMinutes() <= 0) {
-			throw new IllegalArgumentException("Duration must be greater than 0");
-		}
-		return dur;
 	}
 
 	/**
@@ -402,22 +386,35 @@ public class Utils {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T parseToT(String value, Class<T> clazz) {
-		if (clazz.equals(String.class)) {
+		return parseToT(value, clazz, false);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static <T> T parseToT(String value, Class<T> clazz, boolean recursed) {
+		if (clazz.equals(Object.class)) {
+			return (T) value;
+		} else if (clazz.equals(String.class)) {
 			return (T) value;
 		} else if (clazz.equals(Integer.class)) {
 			return (T) Integer.valueOf(value);
 		} else if (clazz.equals(Long.class)) {
 			return (T) Long.valueOf(value);
 		} else if (clazz.equals(Boolean.class)) {
-			return (T) Boolean.valueOf(value);
+			if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+				return (T) Boolean.valueOf(value);
+			} else {
+				throw new IllegalArgumentException("Invalid boolean value: " + value);
+			}
 		} else if (clazz.equals(Double.class)) {
 			return (T) Double.valueOf(value);
 		} else if (clazz.equals(Float.class)) {
 			return (T) Float.valueOf(value);
+		} else if (clazz.isEnum()) {
+			return (T) Enum.valueOf((Class<Enum>) clazz, value); // NOSONAR
 		} else {
-			return Primitives.wrap(clazz).cast(value);
+			if (recursed) return null;
+			return parseToT(value, Primitives.wrap(clazz), true);
 		}
 	}
 
@@ -428,14 +425,6 @@ public class Utils {
 
 	public static String serializeEmoji(Emoji emoji) {
 		return emoji.getType() == Emoji.Type.CUSTOM ? ((CustomEmoji) emoji).getId() : emoji.getName();
-	}
-
-	public static class TooLongException extends Exception {
-		static final TooLongException INSTANCE = new TooLongException();
-
-		public TooLongException() {
-			super();
-		}
 	}
 
 	public static ErrorHandler getCantSendHandler(AwaitDone<InteractionHook> await, String message, SlashCommandEvent event) {

@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.moderation;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.misc.exception.TooLongException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.utils.AwaitDone;
@@ -11,6 +12,7 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -22,8 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-import static com.github.black0nion.blackonionbot.utils.Utils.parseDuration;
-
 /**
  * This command was taken from <a href="https://github.com/YusufsDiscordbot">Yusuf's Discord Bot</a>
  */
@@ -33,7 +33,7 @@ public class TimeOutCommand extends SlashCommand {
 	private static final String TIME_OUT_NAME = "timeout";
 
 	// max time
-	private static final int MAX_TIMEOUT_DURATION_MIN = 40320; // 28 days
+	static final int MAX_TIMEOUT_DURATION_MIN = 40320; // 28 days
 
 	public TimeOutCommand() {
 		super(builder(Commands.slash(TIME_OUT_NAME, "Used to timeout a userid")
@@ -47,6 +47,27 @@ public class TimeOutCommand extends SlashCommand {
 					.addOption(OptionType.STRING, REASON_OPTION, "Why the timeout should be removed from the user", false))
 			)
 			.setRequiredPermissions(Permission.MODERATE_MEMBERS));
+	}
+
+	public static Duration parseDuration(GenericCommandInteractionEvent e) {
+		var min = e.getOption(Utils.MINUTES, OptionMapping::getAsLong);
+		var hour = e.getOption(Utils.HOURS, OptionMapping::getAsLong);
+		var day = e.getOption(Utils.DAYS, OptionMapping::getAsLong);
+		var week = e.getOption(Utils.WEEKS, OptionMapping::getAsLong);
+
+		Duration dur = Duration.ofMinutes(
+			(min != null ? min : 0) +
+				(hour != null ? hour * 60 : 0) +
+				(day != null ? day * 60 * 24 : 0) +
+				(week != null ? week * 60 * 24 * 7 : 0)
+		);
+		if (dur.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
+			throw new IllegalArgumentException(new TooLongException());
+		}
+		if (dur.toMinutes() <= 0) {
+			throw new IllegalArgumentException("Duration must be greater than 0");
+		}
+		return dur;
 	}
 
 	@Override
@@ -75,8 +96,12 @@ public class TimeOutCommand extends SlashCommand {
 		try {
 			Duration duration = parseDuration(e);
 			doTimeout(cmde, timeOutMember, duration, reason);
-		} catch (Utils.TooLongException ignored) {
-			cmde.send("toolongduration", new Placeholder("duration", MAX_TIMEOUT_DURATION_MIN));
+		} catch (IllegalArgumentException ex) {
+			if (ex.getCause() instanceof TooLongException) {
+				cmde.send("toolongduration", new Placeholder("duration", MAX_TIMEOUT_DURATION_MIN));
+			} else {
+				cmde.send("invalidduration");
+			}
 		}
 	}
 

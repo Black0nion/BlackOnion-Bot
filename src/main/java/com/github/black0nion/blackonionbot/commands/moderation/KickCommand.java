@@ -59,7 +59,7 @@ public class KickCommand extends SlashCommand {
 	private static void kickMember(SlashCommandEvent cmde, @NotNull Member member, String reason, @NotNull JDA jda, @NotNull Guild guild, @NotNull SlashCommandInteractionEvent event) {
 		String message = cmde.getTranslation(reason != null ? "idid" : "ididnoreason", new Placeholder("user", member.getUser().getAsMention()), new Placeholder("reason", reason), ACTION);
 		AwaitDone<InteractionHook> await = new AwaitDone<>();
-		guild.kick(member, "[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : ""))
+		guild.kick(member).reason("[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : ""))
 				.queue(success -> {
 					event.reply(message).queue(await::done);
 					jda.openPrivateChannelById(member.getUser().getIdLong())
