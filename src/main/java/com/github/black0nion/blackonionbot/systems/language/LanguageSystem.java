@@ -17,8 +17,6 @@ public class LanguageSystem {
 	private LanguageSystem() {}
 	private static final Logger logger = LoggerFactory.getLogger(LanguageSystem.class);
 
-	private static final Logger log = LoggerFactory.getLogger(LanguageSystem.class);
-
 	private static final HashMap<String, Language> languages = new HashMap<>();
 	private static Language defaultLocale;
 	private static String languageString;
