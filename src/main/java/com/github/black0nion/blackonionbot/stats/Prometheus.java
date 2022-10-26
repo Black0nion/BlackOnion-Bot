@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class Prometheus {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Prometheus.class);
+	private static final Logger logger = LoggerFactory.getLogger(Prometheus.class);
 
 	private final Config config;
 
@@ -32,16 +32,16 @@ public class Prometheus {
 	}
 
 	private void start() {
-		LOGGER.info("Initializing Prometheus...");
+		logger.info("Initializing Prometheus...");
 		try {
 			// expose built in metrics for the hotspot JVM
 			DefaultExports.initialize();
 			server = new HTTPServer.Builder()
 				.withPort(config.getPrometheusPort())
 				.build();
-			LOGGER.info("Prometheus HTTP Server started on port {}", config.getPrometheusPort());
+			logger.info("Prometheus HTTP Server started on port {}", config.getPrometheusPort());
 		} catch (IOException ex) {
-			LOGGER.error("Could not initialize Prometheus HTTP Server!", ex);
+			logger.error("Could not initialize Prometheus HTTP Server!", ex);
 		}
 	}
 }

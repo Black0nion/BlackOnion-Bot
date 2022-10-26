@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SessionHandlerTest {
-	private static final Logger log = LoggerFactory.getLogger(SessionHandlerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(SessionHandlerTest.class);
 
 	private final SessionHandler handler = mock(SessionHandler.class);
 	private final Context ctx = mock(Context.class);
@@ -40,7 +40,7 @@ class SessionHandlerTest {
 		String body = (String) login.handle(ctx, null, null, null);
 		assertNotNull(body);
 
-		log.info("Response Body: " + body);
+		logger.info("Response Body: " + body);
 		assertNotNull(body);
 		assertTrue(body.equalsIgnoreCase(EXAMPLE_SESSION_ID));
 	}
@@ -56,7 +56,7 @@ class SessionHandlerTest {
 		String body = (String) login.handle(ctx, null, null, null);
 		assertNotNull(body);
 
-		log.info("Response Body: " + body);
+		logger.info("Response Body: " + body);
 		assertNotNull(body);
 		assertTrue(body.equalsIgnoreCase(EXAMPLE_SESSION_ID));
 	}
