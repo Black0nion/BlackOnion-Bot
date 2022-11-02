@@ -30,26 +30,6 @@ repositories {
 	mavenCentral()
 }
 
-compileJava.options.encoding = "UTF-8"
-
-sourceCompatibility = 17
-targetCompatibility = 17
-
-sourceSets {
-	testShared {
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
-	test {
-		compileClasspath += testShared.output
-		runtimeClasspath += testShared.output
-	}
-	testIntegration {
-		compileClasspath += testShared.output + main.output
-		runtimeClasspath += testShared.output + main.output
-	}
-}
-
 dependencies {
 	implementation("com.google.guava:guava:31.1-jre")
 
@@ -105,12 +85,12 @@ tasks.test {
 	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
-tasks.testIntegration {
+tasks.register("testIntegration") {
 	description = "Runs integration tests."
 	group = "verification"
 
-	testClassesDirs = sourceSets.testIntegration.output.classesDirs
-	classpath = sourceSets.testIntegration.runtimeClasspath
+	//testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+	//classpath = sourceSets["integrationTest"].runtimeClasspath
 
 }
 
@@ -124,7 +104,7 @@ spotless {
 	}
 }
 
-test.dependsOn testIntegration // integration tests are part of the default test task
+//test.dependsOn(testIntegration) // integration tests are part of the default test task
 
 		tasks.jacocoTestReport {
 			group = "Reporting"
@@ -139,38 +119,28 @@ test.dependsOn testIntegration // integration tests are part of the default test
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 
 
-mainClassName = "com.github.black0nion.blackonionbot.Main"
+//mainClassName = "com.github.black0nion.blackonionbot.Main"
 
 version = System.getenv("VERSION") ?: "dev"
-processResources {
-	val locAndFiles = getLoc()
 
-	filesMatching("bot.metadata.json") {
-		expand(
-			version: version,
-			lines_of_code: locAndFiles.get(0),
-		files: locAndFiles.get(1)
-		)
-	}
-}
-
-
-
+/**
 tasks.named<Jar>("jar") {
 	archiveFileName.set("")
 }
+*/
 
 /**
  * This task downloads all dependencies (with transitive dependencies) and puts them into the libraries folder.
  * Used instead of shadowJar to hopefully optimize build times.
  * Run the application jar with the downloaded library files in the classpath.
  */
+/**
 tasks.register("downloadDependencies") {
 	doLast {
 		logger.info("===== Downloading dependencies =====")
 		logger.info("  ---       Cleaning up...     ---")
 		// delete superseded library jars
-		val newFiles : Set<String> = sourceSets . main . runtimeClasspath . getFiles ().stream().map(File::getName).toList()
+		//val newFiles : Set<String> = sourceSets . main . runtimeClasspath . getFiles ().stream().map(File::getName).toList()
 		fileTree("libraries").files.stream().map(File::getName).filter {
 		logger.info("  -> Deleting leftover file: ${file.getName()}...")
 			!newFiles.contains(it) }.forEach { file("libraries/$it").delete()
@@ -191,25 +161,4 @@ tasks.register("downloadDependencies") {
 		logger.info("===== Dependencies downloaded ======")
 	}
 }
-
-tasks.register("getLoc") {
-	doLast {
-		var linesOfCode : Int = 0
-		var filesCount : Int = 0
-		project.sourceSets.main.allSource.srcDirs.each {
-			val dir : File ->
-			if (dir.isDirectory()) {
-				dir.eachFileRecurse {
-					val file : File ->
-					if (file.isFile()) {
-						file.eachLine {
-							linesOfCode++
-						}
-						filesCount++
-					}
-				}
-			}
-		}
-	}
-}
-
+*/
