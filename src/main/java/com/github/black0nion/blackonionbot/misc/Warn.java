@@ -1,6 +1,5 @@
 package com.github.black0nion.blackonionbot.misc;
 
-import com.github.black0nion.blackonionbot.database.DatabaseConnection;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +95,8 @@ public record Warn(
 					}
 				}
 				if (!warns.isEmpty()) {
-					try (PreparedStatement ps2 = DatabaseConnection.getConnection().prepareStatement("INSERT INTO warns VALUES (?, ?, ?, ?, ?)")) {
+					try (SQLHelper sqlHelper = new SQLHelper("INSERT INTO warns VALUES (?, ?, ?, ?, ?)");
+							PreparedStatement ps2 = sqlHelper.create()) {
 						for (Warn warn : warns) {
 							ps2.setLong(1, warn.issuer());
 							ps2.setLong(2, warn.userid());

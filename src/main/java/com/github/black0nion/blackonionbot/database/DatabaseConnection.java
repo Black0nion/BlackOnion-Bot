@@ -94,7 +94,7 @@ public class DatabaseConnection {
 		return getInstance().dsLowPriority.getConnection();
 	}
 
-	public static Connection getConnection() throws SQLException {
+	static Connection getConnection() throws SQLException {
 		// TODO: feature flags for stack traces
 		if (logger.isDebugEnabled())
 			logger.debug("Connection requested from: {}", Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 2, 7)));

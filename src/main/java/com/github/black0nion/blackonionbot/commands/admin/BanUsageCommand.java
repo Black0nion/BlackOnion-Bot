@@ -104,6 +104,7 @@ public class BanUsageCommand extends SlashCommand {
 		}
 	}
 
+	// TODO: implement caching
 	public static boolean isBanned(long guildID, long userID) {
 		try {
 			try (SQLHelper sq = new SQLHelper("SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
