@@ -265,7 +265,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			commandPool.submit(() -> {
 				try {
 					cmd.execute(cmde, event, member, author, guild, channel);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (!(t instanceof DummyException))
 						cmde.exception(t);
 				}

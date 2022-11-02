@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.misc;
 
-import com.github.black0nion.blackonionbot.database.PostgresConnection;
+import com.github.black0nion.blackonionbot.database.DatabaseConnection;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +42,7 @@ public record Warn(
 
 	@SQLSetup
 	public static void setupDatabase() {
-		try (PreparedStatement statement = PostgresConnection.getConnection().prepareStatement(
+		try (PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(
 			"CREATE TABLE IF NOT EXISTS warns (" +
 				"issuer BIGINT NOT NULL," +
 				"userid BIGINT NOT NULL," +
@@ -106,7 +106,7 @@ public record Warn(
 					}
 				}
 				if (!warns.isEmpty()) {
-					try (PreparedStatement ps2 = PostgresConnection.getConnection().prepareStatement("INSERT INTO warns VALUES (?, ?, ?, ?, ?)")) {
+					try (PreparedStatement ps2 = DatabaseConnection.getConnection().prepareStatement("INSERT INTO warns VALUES (?, ?, ?, ?, ?)")) {
 						for (Warn warn : warns) {
 							ps2.setLong(1, warn.issuer());
 							ps2.setLong(2, warn.userid());

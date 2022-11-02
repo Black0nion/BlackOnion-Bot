@@ -41,7 +41,7 @@ public class DefaultInjector implements Injector {
 		try {
 			return (T) constructor.newInstance(instances);
 		} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-			throw new InjectorCreateInstanceException(e);
+			throw new InjectorCreateInstanceException(e instanceof InstantiationException ? e.getCause() : e);
 		}
 	}
 }

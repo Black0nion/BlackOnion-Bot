@@ -23,7 +23,7 @@ public class DatabaseLogin implements SessionHandler {
 		SQLHelper.run("CREATE TABLE IF NOT EXISTS sessions (" +
 			SESSION_ID + " VARCHAR(255) PRIMARY KEY, " +
 			ACCESS_TOKEN + " VARCHAR(255) NOT NULL, " +
-			REFRESH_TOKEN + " VARCHAR(255) NOT NULL" +
+			REFRESH_TOKEN + " VARCHAR(255) NOT NULL, " +
 			EXPIRES_AT + " BIGINT" +
 		")");
 	}

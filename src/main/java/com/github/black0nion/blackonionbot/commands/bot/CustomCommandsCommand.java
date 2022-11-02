@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,15 +40,11 @@ public class CustomCommandsCommand extends SlashCommand {
 		super(builder(Commands.slash("customcommand", "Used to manage custom commands.")
 			.addSubcommands(
 				new SubcommandData(LIST, "List all custom commands"),
-				new SubcommandData(CREATE, "Start the creation wizard"),
+				new SubcommandData(CREATE, "Start the creation wizard")
+					.addOption(OptionType.STRING, COMMAND_NAME, "The command to create"),
 				new SubcommandData(DELETE, "Delete a custom command")
 					.addOption(OptionType.STRING, COMMAND_NAME, "The command to delete", true, true)
-			)
-			.addOptions(new OptionData(OptionType.STRING, OPTION, "The name of the command to set/get/clear.", true)
-				.addChoice("List", LIST)
-				.addChoice("Create", CREATE)
-				.addChoice("Delete", DELETE))
-			.addOption(OptionType.STRING, COMMAND_NAME, "command (required for create and delete)")));
+			)));
 	}
 
 	@Override

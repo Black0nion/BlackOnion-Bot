@@ -43,7 +43,7 @@ public class ConfigLoaderImpl implements ConfigLoader {
 		T result = Utils.parseToT(value, clazz);
 		for (ConfigFlag f : flags) {
 			if (f instanceof Flags.MatchesRegex flag && !flag.regex().matcher(value).matches()) {
-				throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex());
+				throw new IllegalArgumentException("Config value " + name + " does not match regex " + flag.regex() + " (is '" + value + "')");
 			} else if (f instanceof Flags.Range flag
 				&& result instanceof Number num
 				&& (num.doubleValue() < flag.min() || num.doubleValue() > flag.max())) {

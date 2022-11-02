@@ -208,10 +208,6 @@ public class SlashCommandEvent {
 		this.event.reply(getTranslation(message, placeholders)).setEphemeral(this.command.isEphemeral()).queue(result);
 	}
 
-	public void send(final AudioManager message, final Consumer<InteractionHook> result) {
-		//this.event.reply(message).setEphemeral(this.command.isEphemeral()).queue(result, this::logError);
-	}
-
 	private String getPleaseUse() {
 		return getPleaseUse(this.guild, this.user, this.command);
 	}

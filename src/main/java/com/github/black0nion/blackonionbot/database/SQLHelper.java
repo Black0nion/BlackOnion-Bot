@@ -44,7 +44,7 @@ public class SQLHelper {
 	}
 
 	public PreparedStatement create() throws SQLException {
-		Connection connection = this.connection != null ? this.connection : PostgresConnection.getConnection(); // NOSONAR
+		Connection connection = this.connection != null ? this.connection : DatabaseConnection.getConnection(); // NOSONAR
 		if (connection == null) throw new SQLException("No connection acquired!");
 
 		PreparedStatement ps = connection.prepareStatement(rawSQL); // NOSONAR - we're returning the prepared statement, so we don't need to close it
@@ -65,7 +65,7 @@ public class SQLHelper {
 	}
 
 	public boolean execute() throws SQLException {
-		Connection connection = this.connection != null ? this.connection : PostgresConnection.getConnection(); // NOSONAR
+		Connection connection = this.connection != null ? this.connection : DatabaseConnection.getConnection(); // NOSONAR
 		if (connection == null) throw new SQLException("Could not acquire connection instance!");
 
 		try (PreparedStatement statement = connection.prepareStatement(rawSQL)) {
@@ -83,7 +83,8 @@ public class SQLHelper {
 	}
 
 	public static void run(String sql) throws SQLException {
-		try (PreparedStatement statement = PostgresConnection.getConnection().prepareStatement(sql)) {
+		try (Connection connection = DatabaseConnection.getConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.execute();
 		}
 	}

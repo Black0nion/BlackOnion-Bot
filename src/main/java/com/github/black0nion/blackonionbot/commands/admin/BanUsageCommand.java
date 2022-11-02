@@ -45,7 +45,11 @@ public class BanUsageCommand extends SlashCommand {
 
 	@SQLSetup
 	private static void setup() throws SQLException {
-		SQLHelper.run("CREATE TYPE IF NOT EXISTS user_or_guild AS ENUM ('user', 'guild')");
+		SQLHelper.run("DO $$ BEGIN " +
+			"CREATE TYPE user_or_guild AS ENUM ('user', 'guild');" +
+			"EXCEPTION WHEN duplicate_object THEN null;" +
+			"END $$;"
+		);
 		SQLHelper.run("CREATE TABLE IF NOT EXISTS banned_entities (id BIGINT PRIMARY KEY, type user_or_guild NOT NULL)");
 	}
 
@@ -104,11 +108,11 @@ public class BanUsageCommand extends SlashCommand {
 	public static boolean isBanned(long guildID, long userID) {
 		try {
 			return new SQLHelper("SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
-				.addParameters(userID, guildID).anyMatch();
+				.addParameters(userID, guildID)
+				.anyMatch();
 		} catch (SQLException e) {
-			LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to check if user " + userID + "or guild " + guildID + " are banned!", e);
+			LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to check if user " + userID + " or guild " + guildID + " are banned!", e);
 			return false;
-
 		}
 	}
 }

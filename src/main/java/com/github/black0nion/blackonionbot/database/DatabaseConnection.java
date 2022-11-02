@@ -3,8 +3,10 @@ package com.github.black0nion.blackonionbot.database;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
+import com.github.black0nion.blackonionbot.misc.exception.SQLSetupException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
@@ -12,27 +14,33 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class PostgresConnection {
+public class DatabaseConnection {
 
-	private static final Logger logger = LoggerFactory.getLogger(PostgresConnection.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
 
 	private final HikariDataSource ds;
 
-	private static PostgresConnection instance;
-	public static PostgresConnection getInstance() {
+	private static DatabaseConnection instance;
+
+	public static DatabaseConnection getInstance() {
 		return instance;
 	}
 
-	public PostgresConnection(Config config) {
+	public DatabaseConnection(Config config) {
 		if (instance != null) instance.close();
 		instance = this; // NOSONAR
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setJdbcUrl(config.getJdbcUrl());
 		hikariConfig.setUsername(config.getPostgresUsername());
 		hikariConfig.setPassword(config.getPostgresPassword());
+
+		hikariConfig.setConnectionTimeout(2500);
+
+		hikariConfig.setMetricsTrackerFactory(new PrometheusMetricsTrackerFactory());
 
 		ds = new HikariDataSource(hikariConfig);
 
@@ -45,13 +53,17 @@ public class PostgresConnection {
 			.peek(m -> m.setAccessible(true)) // NOSONAR
 			.toList();
 
+		logger.info("Found {} methods annotated with @SQLSetup, running them now...", methods.size());
 		for (Method method : methods) {
 			try {
+				logger.debug("Running method {}#{}", method.getDeclaringClass().getName(), method.getName());
 				method.invoke(null);
 			} catch (Exception e) {
-				logger.error("Error while running SQL setup method " + method.getName(), e);
+				throw new SQLSetupException("Error while running SQL setup method " + method.getName(),
+					e.getCause() != null ? e.getCause() : e);
 			}
 		}
+		logger.info("Finished running SQL setup methods.");
 	}
 
 	public Connection acquireConnection() throws SQLException {

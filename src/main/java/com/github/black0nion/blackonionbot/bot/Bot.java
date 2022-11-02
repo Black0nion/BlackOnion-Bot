@@ -10,7 +10,7 @@ import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigImpl;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
-import com.github.black0nion.blackonionbot.database.PostgresConnection;
+import com.github.black0nion.blackonionbot.database.DatabaseConnection;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
@@ -172,8 +172,8 @@ public class Bot extends ListenerAdapter {
 			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
 		);
 
-		PostgresConnection database;
-		injectorMap.add(database = new PostgresConnection(config)); // NOSONAR
+		DatabaseConnection database;
+		injectorMap.add(database = new DatabaseConnection(config)); // NOSONAR
 
 		Injector injector = new DefaultInjector(config, injectorMap);
 
