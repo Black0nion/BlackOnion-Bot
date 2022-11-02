@@ -4,32 +4,31 @@
 //file:noinspection GrUnresolvedAccess
 plugins {
 	java
-	`java-library`
 	application
 	jacoco // code coverage reports
 }
 
 repositories {
 	maven {
-		url "https://m2.dv8tion.net/releases"
-		name "m2-dv8tion"
+		url = uri("https://m2.dv8tion.net/releases")
+		name = "m2-dv8tion"
 		content {
-			includeGroup "net.dv8tion"
-			includeGroup "com.sedmelluq"
+			includeGroup = "net.dv8tion"
+			includeGroup = "com.sedmelluq"
 		}
 	}
 
 	maven {
-		url "https://m2.chew.pro/releases"
-		name "m2-chew"
+		url = uri("https://m2.chew.pro/releases")
+		name = "m2-chew"
 		content {
-			includeGroup "pw.chew"
+			includeGroup = "pw.chew"
 		}
 	}
 
 	maven {
-		url "https://jitpack.io"
-		name "jitpack"
+		url = uri("https://jitpack.io")
+		name = "jitpack"
 	}
 	mavenCentral()
 }
@@ -55,13 +54,12 @@ sourceSets {
 }
 
 dependencies {
-	val testImplementation ( = {
-	testImplementation(
-		it
-				testIntegrationImplementation (it)
-				testSharedImplementation (it)
-	)
-}
+	val testsImplementation = {
+		testImplementation it
+		testIntegrationImplementation it
+		testSharedImplementation = it
+	}
+
 	implementation("com.google.guava:guava:31.1-jre")
 
 	implementation("com.google.code.gson:gson:2.9.1")
@@ -116,13 +114,13 @@ tasks.test {
 	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
-task testIntegration (type: Test) {
+tasks.testIntegration {
 	description = 'Runs integration tests.'
 	group = 'verification'
 
 	testClassesDirs = sourceSets.testIntegration.output.classesDirs
 	classpath = sourceSets.testIntegration.runtimeClasspath
-	shouldRunAfter test
+
 }
 
 test.dependsOn testIntegration // integration tests are part of the default test task
@@ -147,23 +145,24 @@ configurations {
 			testSharedRuntimeOnly.extendsFrom runtimeOnly
 }
 
+
 mainClassName = "com.github.black0nion.blackonionbot.Main"
 
 version = System.getenv("VERSION") ?: "dev"
 processResources {
-	def locAndFiles = getLoc ()
+	val locAndFiles = getLoc()
 
 	filesMatching("bot.metadata.json") {
 		expand(
 			version: version,
-			lines_of_code: locAndFiles. get (0),
-		files: locAndFiles.get(1)
+			lines_of_code: locAndFiles.get(0),
+			files: locAndFiles.get(1)
 		)
 	}
 }
 
-jar {
-	archiveVersion.set("")
+tasks.named<Jar>("jar") {
+	archiveFileName.set("")
 }
 
 /**
@@ -171,16 +170,16 @@ jar {
  * Used instead of shadowJar to hopefully optimize build times.
  * Run the application jar with the downloaded library files in the classpath.
  */
-task downloadDependencies {
+tasks.register("downloadDependencies") {
 	doLast {
 		logger.info("===== Downloading dependencies =====")
 		logger.info("  ---       Cleaning up...     ---")
 		// delete superseded library jars
-		Set<String> newFiles = sourceSets . main . runtimeClasspath . getFiles ().stream().map(File::getName).toList()
-		fileTree("libraries").files.stream().filter(file ->!newFiles.contains(file.getName())).forEach(file -> {
+		val newFiles : Set<String> = sourceSets . main . runtimeClasspath . getFiles ().stream().map(File::getName).toList()
+		fileTree("libraries").files.stream().map(File::getName).filter {
 		logger.info("  -> Deleting leftover file: ${file.getName()}...")
-		file.delete()
-	})
+			!newFiles.contains(it) }.forEach { file("libraries/$it").delete()
+		}
 		logger.info("  ---     Cleanup complete.    ---")
 
 		logger.info("\n  ---  Copying dependencies... ---")
