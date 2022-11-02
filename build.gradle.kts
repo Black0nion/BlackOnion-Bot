@@ -1,11 +1,8 @@
-// intellij + gradle + groovy = pain
-
-//file:noinspection GroovyUnusedAssignment
-//file:noinspection GrUnresolvedAccess
 plugins {
 	java
 	application
 	jacoco // code coverage reports
+	id("com.diffplug.spotless") version "6.11.0"
 }
 
 repositories {
@@ -13,8 +10,8 @@ repositories {
 		url = uri("https://m2.dv8tion.net/releases")
 		name = "m2-dv8tion"
 		content {
-			includeGroup = "net.dv8tion"
-			includeGroup = "com.sedmelluq"
+			includeGroup("net.dv8tion")
+			includeGroup("com.sedmelluq")
 		}
 	}
 
@@ -22,7 +19,7 @@ repositories {
 		url = uri("https://m2.chew.pro/releases")
 		name = "m2-chew"
 		content {
-			includeGroup = "pw.chew"
+			includeGroup("pw.chew")
 		}
 	}
 
@@ -40,26 +37,20 @@ targetCompatibility = 17
 
 sourceSets {
 	testShared {
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
 	}
 	test {
-		compileClasspath += sourceSets.testShared.output
-		runtimeClasspath += sourceSets.testShared.output
+		compileClasspath += testShared.output
+		runtimeClasspath += testShared.output
 	}
 	testIntegration {
-		compileClasspath += sourceSets.testShared.output + sourceSets.main.output
-		runtimeClasspath += sourceSets.testShared.output + sourceSets.main.output
+		compileClasspath += testShared.output + main.output
+		runtimeClasspath += testShared.output + main.output
 	}
 }
 
 dependencies {
-	val testsImplementation = {
-		testImplementation it
-		testIntegrationImplementation it
-		testSharedImplementation = it
-	}
-
 	implementation("com.google.guava:guava:31.1-jre")
 
 	implementation("com.google.code.gson:gson:2.9.1")
@@ -73,7 +64,7 @@ dependencies {
 
 	implementation("com.github.walkyst:lavaplayer-fork:1.3.98.4")
 
-	implementation('io.javalin:javalin-bundle:5.1.2')
+	implementation("io.javalin:javalin-bundle:5.1.2")
 
 	implementation("org.json:json:20220924")
 
@@ -81,7 +72,7 @@ dependencies {
 
 	implementation("club.minnced:discord-webhooks:0.8.2")
 
-	implementation('se.michaelthelin.spotify:spotify-web-api-java:7.2.2')
+	implementation("se.michaelthelin.spotify:spotify-web-api-java:7.2.2")
 
 	implementation("com.vdurmont:emoji-java:5.1.1")
 
@@ -92,7 +83,7 @@ dependencies {
 	implementation("com.google.zxing:core:3.5.0")
 	implementation("com.google.zxing:javase:3.5.0")
 
-	implementation('ch.qos.logback:logback-classic:1.4.4')
+	implementation("ch.qos.logback:logback-classic:1.4.4")
 	implementation("uk.org.lidalia:sysout-over-slf4j:1.0.2")
 	implementation("io.prometheus:simpleclient_logback:0.16.0")
 	implementation("com.github.loki4j:loki-logback-appender:1.3.2")
@@ -100,9 +91,9 @@ dependencies {
 
 	implementation("io.github.classgraph:classgraph:4.8.149")
 
-	implementation('io.prometheus:simpleclient:0.16.0')
-	implementation('io.prometheus:simpleclient_hotspot:0.16.0')
-	implementation('io.prometheus:simpleclient_httpserver:0.16.0')
+	implementation("io.prometheus:simpleclient:0.16.0")
+	implementation("io.prometheus:simpleclient_hotspot:0.16.0")
+	implementation("io.prometheus:simpleclient_httpserver:0.16.0")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
 	testImplementation("com.github.erosb:everit-json-schema:1.14.1")
@@ -115,12 +106,22 @@ tasks.test {
 }
 
 tasks.testIntegration {
-	description = 'Runs integration tests.'
-	group = 'verification'
+	description = "Runs integration tests."
+	group = "verification"
 
 	testClassesDirs = sourceSets.testIntegration.output.classesDirs
 	classpath = sourceSets.testIntegration.runtimeClasspath
 
+}
+
+spotless {
+	kotlinGradle {
+		target("**/*.gradle.kts")
+		ktfmt("0.39").dropboxStyle()
+		trimTrailingWhitespace()
+		indentWithSpaces()
+		endWithNewline()
+	}
 }
 
 test.dependsOn testIntegration // integration tests are part of the default test task
@@ -137,14 +138,6 @@ test.dependsOn testIntegration // integration tests are part of the default test
 
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 
-configurations {
-	testIntegrationImplementation.extendsFrom implementation
-			testIntegrationRuntimeOnly.extendsFrom runtimeOnly
-
-			testSharedImplementation.extendsFrom implementation
-			testSharedRuntimeOnly.extendsFrom runtimeOnly
-}
-
 
 mainClassName = "com.github.black0nion.blackonionbot.Main"
 
@@ -156,10 +149,12 @@ processResources {
 		expand(
 			version: version,
 			lines_of_code: locAndFiles.get(0),
-			files: locAndFiles.get(1)
+		files: locAndFiles.get(1)
 		)
 	}
 }
+
+
 
 tasks.named<Jar>("jar") {
 	archiveFileName.set("")
@@ -185,9 +180,9 @@ tasks.register("downloadDependencies") {
 		logger.info("\n  ---  Copying dependencies... ---")
 		copy {
 			from(sourceSets.main.runtimeClasspath) {
-				include "*.jar"
+				include("*.jar")
 			}
-			into 'libraries/'
+			into("libraries/")
 			eachFile {
 				logger.info("  -> Copying ${it.name}...")
 			}
@@ -197,20 +192,24 @@ tasks.register("downloadDependencies") {
 	}
 }
 
-val getLoc () {
-	int linesOfCode = 0
-	int filesCount = 0
-	project.sourceSets.main.allSource.srcDirs.each {
-		File dir ->
-		if (dir.isDirectory()) {
-			dir.eachFileRecurse {
-				File file ->
-				if (file.isFile()) {
-					file.eachLine(e -> linesOfCode++)
-					filesCount++
+tasks.register("getLoc") {
+	doLast {
+		var linesOfCode : Int = 0
+		var filesCount : Int = 0
+		project.sourceSets.main.allSource.srcDirs.each {
+			val dir : File ->
+			if (dir.isDirectory()) {
+				dir.eachFileRecurse {
+					val file : File ->
+					if (file.isFile()) {
+						file.eachLine {
+							linesOfCode++
+						}
+						filesCount++
+					}
 				}
 			}
 		}
 	}
-	return [linesOfCode, filesCount]
 }
+
