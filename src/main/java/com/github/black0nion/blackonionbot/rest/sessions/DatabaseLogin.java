@@ -35,8 +35,8 @@ public class DatabaseLogin implements SessionHandler {
 
 	@Override
 	public DiscordUser loginToSession(String sessionId) throws ExecutionException, InputMismatchException, NullPointerException, SQLException {
-		try (PreparedStatement ps = new SQLHelper("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId).create();
-			ResultSet rs = ps.executeQuery()) {
+		try (SQLHelper sq = new SQLHelper("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
+			ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return OAuthHandler.getUserWithToken(rs.getString(ACCESS_TOKEN), rs.getString(REFRESH_TOKEN));
 			}
@@ -46,15 +46,16 @@ public class DatabaseLogin implements SessionHandler {
 
 	@Override
 	public void logoutFromSession(String sessionId) throws InputMismatchException, NullPointerException, SQLException {
-		try (PreparedStatement ps = new SQLHelper("DELETE FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId).create()) {
+		try (SQLHelper sq = new SQLHelper("DELETE FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
+				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 		}
 	}
 
 	@Override
 	public String createSession(String accessToken, String refreshToken, int expiresIn) {
-		try (PreparedStatement ps = new SQLHelper("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?").addParameter(accessToken).create();
-			ResultSet rs = ps.executeQuery()) {
+		try (SQLHelper sq = new SQLHelper("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?").addParameter(accessToken);
+				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return rs.getString(SESSION_ID);
 			}
@@ -63,8 +64,9 @@ public class DatabaseLogin implements SessionHandler {
 		}
 
 		String sessionId = AbstractSession.generateSessionId();
-		try (PreparedStatement ps = new SQLHelper("INSERT INTO sessions (session_id, access_token, refresh_token, expires_in) VALUES (? ?, ?, ?)")
-				.addParameters(sessionId, accessToken, refreshToken, expiresIn).create()) {
+		try (SQLHelper sq = new SQLHelper("INSERT INTO sessions (session_id, access_token, refresh_token, expires_in) VALUES (? ?, ?, ?)")
+					.addParameters(sessionId, accessToken, refreshToken, expiresIn);
+				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 			return sessionId;
 		} catch (SQLException e) {
@@ -76,7 +78,7 @@ public class DatabaseLogin implements SessionHandler {
 	@Override
 	public boolean isIdOccupied(String sessionId) {
 		try {
-			return new SQLHelper("SELECT " + SESSION_ID + " FROM sessions WHERE session_id = ?").addParameter(sessionId).anyMatch();
+			return SQLHelper.anyMatch("SELECT " + SESSION_ID + " FROM sessions WHERE session_id = ?", sessionId);
 		} catch (SQLException e) {
 			logger.error("Could not check if session id is occupied", e);
 			return false;

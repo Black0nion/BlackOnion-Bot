@@ -41,20 +41,15 @@ public record Warn(
 	}
 
 	@SQLSetup
-	public static void setupDatabase() {
-		try (PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(
-			"CREATE TABLE IF NOT EXISTS warns (" +
-				"issuer BIGINT NOT NULL," +
-				"userid BIGINT NOT NULL," +
-				"guildid BIGINT NOT NULL," +
-				"id BIGINT NOT NULL," +
-				"reason TEXT" +
-				");"
-		)) {
-			statement.execute();
-		} catch (SQLException e) {
-			LoggerFactory.getLogger(Warn.class).error("Error while creating table 'warns'", e);
-		}
+	public static void setupDatabase() throws SQLException {
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS warns (" +
+			"issuer BIGINT NOT NULL," +
+			"userid BIGINT NOT NULL," +
+			"guildid BIGINT NOT NULL," +
+			"id BIGINT NOT NULL," +
+			"reason TEXT" +
+			");"
+		);
 	}
 
 	/**
@@ -63,10 +58,9 @@ public record Warn(
 	 */
 	public static List<Warn> loadWarns(String entity, long entityID) {
 		List<Warn> warns = new ArrayList<>();
-		try (PreparedStatement ps = new SQLHelper("SELECT * FROM warns WHERE " + entity + "id = ?")
-				.addParameter(entityID)
-				.create();
-			 ResultSet rs = ps.executeQuery()) {
+		try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE " + entity + "id = ?")
+				.addParameter(entityID);
+			ResultSet rs = sq.executeQuery()) {
 			while (rs.next()) {
 				Warn warn = new Warn(
 					rs.getLong(ISSUER_STR),
@@ -85,8 +79,8 @@ public record Warn(
 
 	public static void saveWarns(List<Warn> warns, long guildID) {
 		try {
-			try (PreparedStatement ps = new SQLHelper("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID).create();
-				 ResultSet rs = ps.executeQuery()) {
+			try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID);
+					ResultSet rs = sq.executeQuery()) {
 				while (!rs.isClosed() && rs.next()) {
 					Warn warn = new Warn(
 						rs.getLong(ISSUER_STR),
@@ -96,11 +90,7 @@ public record Warn(
 						rs.getString(REASON_STR)
 					);
 					if (!warns.contains(warn)) {
-						new SQLHelper("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?")
-							.addParameter(guildID)
-							.addParameter(warn.userid())
-							.addParameter(warn.id())
-							.execute();
+						SQLHelper.run("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?", guildID, warn.userid(), warn.id());
 					} else {
 						warns.remove(warn);
 					}

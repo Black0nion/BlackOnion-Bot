@@ -2,10 +2,10 @@ package com.github.black0nion.blackonionbot.commands;
 
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.DummyException;
+import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -33,7 +32,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * An util class that contains various objects related to command executions.
- *
+ * <br>
  * Removes a lot of boilerplate handling slash command events, like responding, passing loads of JDA objects, etc.
  * Can often times be used instead of splitting it up into multiple parameters for methods.
  *
@@ -50,8 +49,8 @@ public class SlashCommandEvent {
 	private final TextChannel channel;
 	private final BlackMember member;
 	private final BlackUser user;
-	private final TranslatedEmbed successEmbed;
-	private final TranslatedEmbed errorEmbed;
+	private final TranslatedEmbedBuilder successEmbed;
+	private final TranslatedEmbedBuilder errorEmbed;
 	private Language language;
 
 	public SlashCommandEvent(final SlashCommandInteractionEvent e, final BlackGuild guild, final BlackMember member, final BlackUser user) {
@@ -84,8 +83,8 @@ public class SlashCommandEvent {
 	}
 
 	//region Embeds
-	public TranslatedEmbed success() {
-		return new TranslatedEmbed(this.successEmbed);
+	public TranslatedEmbedBuilder success() {
+		return new TranslatedEmbedBuilder(this.successEmbed);
 	}
 
 	public void success(final String name, final String value) {
@@ -112,8 +111,8 @@ public class SlashCommandEvent {
 		this.doReply(this.success(), title, name, value, placeholders);
 	}
 
-	public TranslatedEmbed error() {
-		return new TranslatedEmbed(this.errorEmbed);
+	public TranslatedEmbedBuilder error() {
+		return new TranslatedEmbedBuilder(this.errorEmbed);
 	}
 
 	public void error(final String name, final String value) {
@@ -132,7 +131,7 @@ public class SlashCommandEvent {
 		this.doReply(this.error(), title, name, value, placeholders);
 	}
 
-	private void doReply(TranslatedEmbed embed, String title, String name, String value, final Placeholder... placeholders) {
+	private void doReply(TranslatedEmbedBuilder embed, String title, String name, String value, final Placeholder... placeholders) {
 		if (title != null) title = this.language.getTranslationNonNull(title);
 		if (name != null) name = this.language.getTranslationNonNull(name);
 		if (value != null) value = this.language.getTranslationNonNull(value);
@@ -155,8 +154,8 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null && !(t instanceof DummyException)) this.logError(t);
-		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof DummyException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
+		if (t != null && !(t instanceof CommandReturnException)) this.logError(t);
+		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof CommandReturnException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
 	}
 
 	public void reply(final EmbedBuilder builder) {
@@ -237,7 +236,7 @@ public class SlashCommandEvent {
 	public void handlePerms(Permission... permissions) {
 		if (!this.member.hasPermission(permissions)) {
 			this.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(permissions)));
-			throw new DummyException();
+			throw new CommandReturnException();
 		}
 	}
 

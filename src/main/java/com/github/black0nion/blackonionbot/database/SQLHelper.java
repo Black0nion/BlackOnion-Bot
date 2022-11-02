@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,12 +10,12 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-public class SQLHelper {
+public class SQLHelper implements AutoCloseable {
 
 	private final String rawSQL;
 	private final List<Object> parameters = new ArrayList<>();
-	private Connection connection = null;
-	private boolean closeConnection = false;
+	private Connection connection;
+	private PreparedStatement preparedStatement;
 
 	public SQLHelper(String rawSQL, Object... parameters) {
 		this.rawSQL = rawSQL;
@@ -37,55 +38,65 @@ public class SQLHelper {
 		return this;
 	}
 
-	public SQLHelper useConnection(Connection connection) {
+	public SQLHelper setConnection(Connection connection) {
 		this.connection = connection;
-		this.closeConnection = false;
 		return this;
 	}
 
 	public PreparedStatement create() throws SQLException {
-		Connection connection = this.connection != null ? this.connection : DatabaseConnection.getConnection(); // NOSONAR
+		if (connection == null) connection = DatabaseConnection.getConnection();
 		if (connection == null) throw new SQLException("No connection acquired!");
 
-		PreparedStatement ps = connection.prepareStatement(rawSQL); // NOSONAR - we're returning the prepared statement, so we don't need to close it
+		preparedStatement = connection.prepareStatement(rawSQL); // NOSONAR we're returning the PreparedStatement
 		if (!parameters.isEmpty()) {
 			int index = 1;
 			for (Object object : parameters) {
-				ps.setObject(index, object);
+				preparedStatement.setObject(index, object);
 				index++;
 			}
 		}
-		return ps;
+		return preparedStatement;
+	}
+
+	public ResultSet executeQuery() throws SQLException {
+		return create().executeQuery();
 	}
 
 	public boolean anyMatch() throws SQLException {
-		try (PreparedStatement ps = create()) {
-			return ps.executeQuery().next();
+		try (ResultSet rs = executeQuery()) {
+			return rs.next();
+		}
+	}
+
+	public static boolean anyMatch(String sql, Object... arguments) throws SQLException {
+		try (SQLHelper helper = new SQLHelper(sql, arguments)) {
+			return helper.anyMatch();
 		}
 	}
 
 	public boolean execute() throws SQLException {
-		Connection connection = this.connection != null ? this.connection : DatabaseConnection.getConnection(); // NOSONAR
-		if (connection == null) throw new SQLException("Could not acquire connection instance!");
-
-		try (PreparedStatement statement = connection.prepareStatement(rawSQL)) {
-			if (!parameters.isEmpty()) {
-				int i = 1;
-				for (Object object : parameters) {
-					statement.setObject(i, object);
-					i++;
-				}
-			}
-			return statement.execute();
-		} finally {
-			if (closeConnection) connection.close();
+		try (PreparedStatement ps = create()) {
+			return ps.execute();
 		}
 	}
 
-	public static void run(String sql) throws SQLException {
-		try (Connection connection = DatabaseConnection.getConnection();
-			 PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.execute();
+	public boolean run() throws SQLException {
+		try {
+			return execute();
+		} finally {
+			close();
 		}
+	}
+
+	public static boolean run(String sql, Object... parameters) throws SQLException {
+		try (SQLHelper sqlHelper = new SQLHelper(sql, parameters)) {
+			return sqlHelper.execute();
+		}
+	}
+
+	@Override
+	public void close() throws SQLException {
+		connection.close();
+		preparedStatement.close();
 	}
 }

@@ -35,6 +35,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -105,48 +106,12 @@ public class SlashCommandBase extends ListenerAdapter {
 
 				SlashCommandData data = newInstance.getData();
 				if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
-					final JSONObject commandJSON = new JSONObject()
-						.put("name", data.getName())
-						.put("description", data.getDescription())
-						.put("permissions", newInstance.getRequiredPermissions())
-						.put("options", Utils.optionsToJson(data.getOptions()));
-
-					JSONArray groupJson = new JSONArray();
-					for (SubcommandGroupData subcommandGroupData : data.getSubcommandGroups()) {
-						final JSONObject subcommandGroupJson = new JSONObject()
-							.put("name", subcommandGroupData.getName())
-							.put("description", subcommandGroupData.getDescription());
-
-						final JSONArray subcommandJson = new JSONArray();
-						for (SubcommandData subcommandData : subcommandGroupData.getSubcommands()) {
-							JSONObject subcommandObjJson = new JSONObject()
-								.put("name", subcommandData.getName())
-								.put("description", subcommandData.getDescription());
-							subcommandObjJson.put("options", Utils.optionsToJson(subcommandData.getOptions()));
-							subcommandJson.put(subcommandObjJson);
-						}
-						subcommandGroupJson.put("subcommands", subcommandJson);
-						groupJson.put(subcommandGroupJson);
-					}
-					commandJSON.put("subcommand_groups", groupJson);
-
-					JSONObject subcommandJson = new JSONObject();
-					for (SubcommandData subcommandData : data.getSubcommands()) {
-						subcommandJson.put(subcommandData.getName(), new JSONObject()
-							.put("name", subcommandData.getName())
-							.put("description", subcommandData.getDescription())
-							.put("options", Utils.optionsToJson(subcommandData.getOptions())));
-					}
-					commandJSON.put("subcommands", subcommandJson);
-
-					commandsArr.put(commandJSON);
+					commandsArr.put(serializeCommand(newInstance, data));
 				}
 
 				addCommand(newInstance);
 			} catch (Exception e) {
-				e.printStackTrace();
-				// 10/10 error handling
-				System.exit(-1);
+				throw new IllegalArgumentException("Could not create instance of " + command.getName(), e);
 			}
 		}
 		commandsJson.put("commands", commandsArr);
@@ -156,6 +121,44 @@ public class SlashCommandBase extends ListenerAdapter {
 		Optional.ofNullable(getCommand(HelpCommand.class)).ifPresent(HelpCommand::updateAutoComplete);
 
 		Bot.getInstance().getExecutor().submit(Dashboard::init);
+	}
+
+	@Nonnull
+	private static JSONObject serializeCommand(SlashCommand slashCommand, SlashCommandData data) {
+		final JSONObject commandJSON = new JSONObject()
+			.put("name", data.getName())
+			.put("description", data.getDescription())
+			.put("permissions", slashCommand.getRequiredPermissions())
+			.put("options", Utils.optionsToJson(data.getOptions()));
+
+		JSONArray groupJson = new JSONArray();
+		for (SubcommandGroupData subcommandGroupData : data.getSubcommandGroups()) {
+			final JSONObject subcommandGroupJson = new JSONObject()
+				.put("name", subcommandGroupData.getName())
+				.put("description", subcommandGroupData.getDescription());
+
+			final JSONArray subcommandJson = new JSONArray();
+			for (SubcommandData subcommandData : subcommandGroupData.getSubcommands()) {
+				JSONObject subcommandObjJson = new JSONObject()
+					.put("name", subcommandData.getName())
+					.put("description", subcommandData.getDescription());
+				subcommandObjJson.put("options", Utils.optionsToJson(subcommandData.getOptions()));
+				subcommandJson.put(subcommandObjJson);
+			}
+			subcommandGroupJson.put("subcommands", subcommandJson);
+			groupJson.put(subcommandGroupJson);
+		}
+		commandJSON.put("subcommand_groups", groupJson);
+
+		JSONObject subcommandJson = new JSONObject();
+		for (SubcommandData subcommandData : data.getSubcommands()) {
+			subcommandJson.put(subcommandData.getName(), new JSONObject()
+				.put("name", subcommandData.getName())
+				.put("description", subcommandData.getDescription())
+				.put("options", Utils.optionsToJson(subcommandData.getOptions())));
+		}
+		commandJSON.put("subcommands", subcommandJson);
+		return commandJSON;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -266,7 +269,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				try {
 					cmd.execute(cmde, event, member, author, guild, channel);
 				} catch (Exception t) {
-					if (!(t instanceof DummyException))
+					if (!(t instanceof CommandReturnException))
 						cmde.exception(t);
 				}
 			});

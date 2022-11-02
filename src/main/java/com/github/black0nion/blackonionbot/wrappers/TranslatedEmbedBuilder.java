@@ -10,22 +10,22 @@ import java.awt.*;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
-public class TranslatedEmbed extends EmbedBuilder {
+public class TranslatedEmbedBuilder extends EmbedBuilder {
 
 	private final Language lang;
 	private String title = null;
 	private String url = null;
 	private Color color = null;
 
-	public TranslatedEmbed(final Language lang) {
+	public TranslatedEmbedBuilder(final Language lang) {
 		this.lang = lang;
 	}
 
-	public TranslatedEmbed() {
+	public TranslatedEmbedBuilder() {
 		this.lang = LanguageSystem.getDefaultLanguage();
 	}
 
-	public TranslatedEmbed(final TranslatedEmbed embed) {
+	public TranslatedEmbedBuilder(final TranslatedEmbedBuilder embed) {
 		super(embed);
 		this.lang = embed.lang;
 		this.title = embed.title;
@@ -39,7 +39,7 @@ public class TranslatedEmbed extends EmbedBuilder {
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setFooter(String text) {
+	public TranslatedEmbedBuilder setFooter(String text) {
 		final String tempText = this.lang.getTranslation(text);
 		if (tempText != null) {
 			text = tempText;
@@ -50,7 +50,7 @@ public class TranslatedEmbed extends EmbedBuilder {
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setTitle(String title, final String url) {
+	public TranslatedEmbedBuilder setTitle(String title, final String url) {
 		if (title == null) {
 			super.setTitle(null, url);
 		}
@@ -64,120 +64,127 @@ public class TranslatedEmbed extends EmbedBuilder {
 		return this;
 	}
 
+	@Override
 	@Nonnull
-	public TranslatedEmbed addField(final String name, final Object value, boolean inline) {
+	public TranslatedEmbedBuilder addField(final Field field) {
+		super.addField(field);
+		return this;
+	}
+
+	@Nonnull
+	public TranslatedEmbedBuilder addField(final String name, final Object value, boolean inline) {
 		return this.addField(name, String.valueOf(value), inline);
 	}
 
 	@Nonnull
-	public TranslatedEmbed addField(final String name, final String value) {
+	public TranslatedEmbedBuilder addField(final String name, final String value) {
 		return this.addField(name, value, false);
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed addField(String name, String value, final boolean inline) {
-		final String translatedName = this.lang.getTranslation(name);
-		final String translatedValue = this.lang.getTranslation(value);
+	public TranslatedEmbedBuilder addField(@Nonnull String name, @Nonnull String value, final boolean inline) {
+		if (this.lang != null) {
+			final String translatedName = this.lang.getTranslation(name);
+			if (translatedName != null) {
+				name = translatedName;
+			}
 
-		if (translatedName != null) name = translatedName;
-		if (translatedValue != null) value = translatedValue;
+			final String translatedValue = this.lang.getTranslation(value);
+			if (translatedValue != null) {
+				value = translatedValue;
+			}
+		}
+
 		super.addField(name, value, inline);
 		return this;
 	}
 
 	@Nonnull
-	public TranslatedEmbed addFields(final @Nonnull List<Field> fields) {
+	public TranslatedEmbedBuilder addFields(final @Nonnull List<Field> fields) {
 		this.getFields().addAll(fields);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed addBlankField(final boolean inline) {
+	public TranslatedEmbedBuilder addBlankField(final boolean inline) {
 		super.addBlankField(inline);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed addField(final Field field) {
-		super.addField(field);
-		return this;
-	}
-
-	@Override
-	@Nonnull
-	public TranslatedEmbed appendDescription(final @Nonnull CharSequence description) {
+	public TranslatedEmbedBuilder appendDescription(final @Nonnull CharSequence description) {
 		super.appendDescription(description);
 		return this;
 	}
 
 	@Nonnull
-	public TranslatedEmbed setDescriptionTranslated(final @Nonnull CharSequence description) {
+	public TranslatedEmbedBuilder setDescriptionTranslated(final @Nonnull CharSequence description) {
 		super.setDescription(this.lang.getTranslation(String.valueOf(description)));
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed clear() {
+	public TranslatedEmbedBuilder clear() {
 		super.clear();
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed clearFields() {
+	public TranslatedEmbedBuilder clearFields() {
 		super.clearFields();
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setAuthor(final String name) {
+	public TranslatedEmbedBuilder setAuthor(final String name) {
 		super.setAuthor(name);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setAuthor(final String name, final String url) {
+	public TranslatedEmbedBuilder setAuthor(final String name, final String url) {
 		super.setAuthor(name, url);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setAuthor(final String name, final String url, final String iconUrl) {
+	public TranslatedEmbedBuilder setAuthor(final String name, final String url, final String iconUrl) {
 		super.setAuthor(name, url, iconUrl);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setFooter(String text, final String iconUrl) {
+	public TranslatedEmbedBuilder setFooter(String text, final String iconUrl) {
 		super.setFooter(text, iconUrl);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setImage(final String url) {
+	public TranslatedEmbedBuilder setImage(final String url) {
 		super.setImage(url);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setThumbnail(final String url) {
+	public TranslatedEmbedBuilder setThumbnail(final String url) {
 		super.setThumbnail(url);
 		return this;
 	}
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setTimestamp(final TemporalAccessor temporal) {
+	public TranslatedEmbedBuilder setTimestamp(final TemporalAccessor temporal) {
 		super.setTimestamp(temporal);
 		return this;
 	}
@@ -188,7 +195,7 @@ public class TranslatedEmbed extends EmbedBuilder {
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setTitle(String title) {
+	public TranslatedEmbedBuilder setTitle(String title) {
 		return this.setTitle(title, null);
 	}
 
@@ -202,7 +209,7 @@ public class TranslatedEmbed extends EmbedBuilder {
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setColor(final Color color) {
+	public TranslatedEmbedBuilder setColor(final Color color) {
 		this.color = color;
 		super.setColor(color);
 		return this;
@@ -210,7 +217,7 @@ public class TranslatedEmbed extends EmbedBuilder {
 
 	@Override
 	@Nonnull
-	public TranslatedEmbed setColor(final int color) {
+	public TranslatedEmbedBuilder setColor(final int color) {
 		this.color = new Color(color);
 		super.setColor(color);
 		return this;

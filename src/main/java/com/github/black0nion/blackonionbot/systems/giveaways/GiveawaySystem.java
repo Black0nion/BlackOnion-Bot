@@ -2,11 +2,14 @@ package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -14,14 +17,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
+// TODO: refactor to DI & tests
 public class GiveawaySystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(GiveawaySystem.class);
@@ -30,25 +39,14 @@ public class GiveawaySystem {
 
 	private static final List<Giveaway> giveaways = new ArrayList<>();
 
-	private static final Collection<String> giveawayKeys = new ArrayList<>();
 	private static final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
 		new ThreadFactoryBuilder().setNameFormat("giveaway-scheduler-%d").build()
 	);
 
-	static {
-		giveawayKeys.add("endDate");
-		giveawayKeys.add("messageId");
-		giveawayKeys.add("channelId");
-		giveawayKeys.add("createrId");
-		giveawayKeys.add("guildId");
-		giveawayKeys.add("item");
-		giveawayKeys.add("winners");
-	}
-
 	public static void init() {
 		try {
-			try (PreparedStatement ps = new SQLHelper("SELECT * FROM giveaways").create();
-					ResultSet rs = ps.executeQuery()) {
+			try (SQLHelper sq = new SQLHelper("SELECT * FROM giveaways");
+					ResultSet rs = sq.executeQuery()) {
 				while (rs.next()) {
 					giveaways.add(new Giveaway(
 							LocalDateTime.ofEpochSecond(rs.getLong("endDate"), 0, ZoneOffset.UTC),
@@ -67,8 +65,8 @@ public class GiveawaySystem {
 	}
 
 	@Nullable
-	public static Giveaway getGiveaway(final long messageid) {
-		return giveaways.stream().filter(giveaway -> giveaway.messageId() == messageid).findFirst().orElse(null);
+	public static Giveaway getGiveaway(final long messageId) {
+		return giveaways.stream().filter(giveaway -> giveaway.messageId() == messageId).findFirst().orElse(null);
 	}
 
 	public static void createGiveaway(final LocalDateTime endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
@@ -100,33 +98,41 @@ public class GiveawaySystem {
 		try {
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
+				Language lang = LanguageSystem.getLanguage(null, guild);
 				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
-					msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
+					msg.reply(lang.getTranslationNonNull("nowinner")).queue();
+					updateGiveawayMessage(msg, lang);
 					deleteGiveaway(giveaway);
 					return;
 				}
 
 				users.remove(selfUser);
-				final int winnerCountGiveawy = giveaway.winners();
-				final int winnerCount = Math.min(winnerCountGiveawy, users.size());
+				final int winnerCountGiveaway = giveaway.winners();
+				final int winnerCount = Math.min(winnerCountGiveaway, users.size());
 				final String[] winners = new String[winnerCount];
-				final long[] winnersIds = new long[winnerCount];
 
 				Collections.shuffle(users, ThreadLocalRandom.current());
 
 				for (int i = 0; i < winners.length; i++) {
 					final User currentWinner = users.get(i);
-					winners[i] = currentWinner.getAsMention();
-					winnersIds[i] = currentWinner.getIdLong();
+					winners[i] = "- " + currentWinner.getAsMention();
 				}
 
-				msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslation("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).mentionUsers(winnersIds).queue();
+				updateGiveawayMessage(msg, lang);
+				msg.reply("GIVEAWAY\n" + lang.getTranslation("giveawaywinner", new Placeholder("winner", String.join("\n", winners)))).queue();
 			});
 		} catch (final Exception ex) {
 			logger.error("Error while ending giveaway", ex);
 		} finally {
 			deleteGiveaway(giveaway);
 		}
+	}
+
+	private static void updateGiveawayMessage(Message msg, Language lang) {
+		MessageEmbed embed = msg.getEmbeds().get(0);
+		EmbedBuilder builder = new EmbedBuilder(embed);
+		builder.setDescription(embed.getDescription() + "\n" + lang.getTranslation("giveawayended"));
+		msg.editMessageEmbeds(builder.build()).queue();
 	}
 
 	private static void deleteGiveaway(final Giveaway giveaway) {

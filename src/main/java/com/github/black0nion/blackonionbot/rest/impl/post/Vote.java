@@ -6,7 +6,7 @@ import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
@@ -49,7 +49,7 @@ public class Vote implements IPostRoute {
 				Objects.requireNonNull(Bot.getInstance().getJDA().getGuildById(config.getDevGuild())).retrieveMemberById(userid).queue(member -> {
 					final User user = member.getUser();
 					channel
-						.sendMessageEmbeds(new TranslatedEmbed()
+						.sendMessageEmbeds(new TranslatedEmbedBuilder()
 							.setColor(EmbedUtils.BLACK_ONION_COLOR)
 							.setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** (" + user
 								.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")
@@ -58,7 +58,7 @@ public class Vote implements IPostRoute {
 							.build())
 						.queue();
 				}, bruh -> Bot.getInstance().getJDA().retrieveUserById(userid).queue(user -> channel
-					.sendMessageEmbeds(new TranslatedEmbed()
+					.sendMessageEmbeds(new TranslatedEmbedBuilder()
 						.setColor(EmbedUtils.BLACK_ONION_COLOR)
 						.setDescription("**" + BlackUser.from(user).getEscapedEffectiveName() + "** (" + user
 							.getId() + ") just voted for me on [top.gg](https://top.gg/bot/795225954355249180)!")

@@ -8,7 +8,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.model.InteractPage;
@@ -437,10 +437,10 @@ public class Utils {
 				await.setOnDone(hook -> hook.editOriginal(message + "\n" + lang.getTranslation("usernotnotified")).queue()));
 	}
 
-	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields, int perPage) {
+	public static List<Page> getPages(TranslatedEmbedBuilder baseEmbed, List<MessageEmbed.Field> fields, int perPage) {
 		return Lists.partition(fields, perPage).stream()
 			// DON'T switch to method references or only one copy will get created!
-			.map(t -> new TranslatedEmbed(baseEmbed).addFields(t))
+			.map(t -> new TranslatedEmbedBuilder(baseEmbed).addFields(t))
 			.map(EmbedBuilder::build)
 			.map(InteractPage::new)
 			.map(Page.class::cast)
@@ -487,5 +487,11 @@ public class Utils {
 		} catch (Throwable e) {
 			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
+	}
+
+	public static String stackTraceToString(StackTraceElement[] stackTraceElements) {
+		return Arrays.stream(stackTraceElements)
+			.map(StackTraceElement::toString)
+			.collect(Collectors.joining("\n"));
 	}
 }

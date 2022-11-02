@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.fun;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.DummyException;
+import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -80,7 +80,7 @@ public class CatBreedsCommand extends SlashCommand {
 				pages.add(new InteractPage(currentEmbed.build()));
 			}
 			if (!found) {
-				throw new DummyException("No breeds found");
+				throw new CommandReturnException("No breeds found");
 			} else {
 				cmde.reply((MessageEmbed) pages.get(0).getContent(), success -> success.retrieveOriginal().queue(message -> Pages.paginate(message, pages, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong())));
 			}

@@ -19,17 +19,15 @@ public record Giveaway(LocalDateTime endDate, long messageId, long channelId, lo
 
 	@SQLSetup
 	public static void setup() throws SQLException {
-		try (PreparedStatement ps = new SQLHelper("CREATE TABLE IF NOT EXISTS giveaways (" +
-				"endDate BIGINT, " +
-				"messageId BIGINT, " +
-				"channelId BIGINT, " +
-				"createrId BIGINT, " +
-				"guildId BIGINT, " +
-				"item VARCHAR(255), " +
-				"winners INT)")
-				.create()) {
-			ps.execute();
-		}
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS giveaways (" +
+			"endDate BIGINT, " +
+			"messageId BIGINT, " +
+			"channelId BIGINT, " +
+			"createrId BIGINT, " +
+			"guildId BIGINT, " +
+			"item VARCHAR(255), " +
+			"winners INT)"
+		);
 	}
 
 	@Override
@@ -39,15 +37,17 @@ public record Giveaway(LocalDateTime endDate, long messageId, long channelId, lo
 	}
 
 	public void writeToDatabase() throws SQLException {
-		try (PreparedStatement ps = new SQLHelper(
-				"INSERT INTO giveaways (endDate, messageId, channelId, createrId, guildId, item, winners) VALUES (?, ?, ?, ?, ?, ?, ?)",
-				endSeconds(), messageId, channelId, createrId, guildId, item, winners).create()) {
+		try (SQLHelper sq = new SQLHelper(
+					"INSERT INTO giveaways (endDate, messageId, channelId, createrId, guildId, item, winners) VALUES (?, ?, ?, ?, ?, ?, ?)",
+					endSeconds(), messageId, channelId, createrId, guildId, item, winners);
+				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 		}
 	}
 
 	public void deleteFromDatabase() throws SQLException {
-		try (PreparedStatement ps = new SQLHelper("DELETE FROM giveaways WHERE messageId = ?", messageId).create()) {
+		try (SQLHelper sq = new SQLHelper("DELETE FROM giveaways WHERE messageId = ?", messageId);
+				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 		}
 	}

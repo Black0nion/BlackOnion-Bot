@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.systems;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import javassist.NotFoundException;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
@@ -13,6 +12,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.BiConsumer;
 
@@ -20,12 +21,12 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
 	@Override
-	public void onMessageReactionAdd(final MessageReactionAddEvent e) {
+	public void onMessageReactionAdd(@Nonnull final MessageReactionAddEvent e) {
 		handle(e, e.getGuild()::addRoleToMember);
 	}
 
 	@Override
-	public void onMessageReactionRemove(final MessageReactionRemoveEvent e) {
+	public void onMessageReactionRemove(@Nonnull final MessageReactionRemoveEvent e) {
 		handle(e, e.getGuild()::removeRoleFromMember);
 	}
 
@@ -52,18 +53,16 @@ public class ReactionRoleSystem extends ListenerAdapter {
 			action.accept(event.getUser(), role);
 		} catch (final IllegalStateException ex1) {
 			logger.error("Unknown Emoji: '{}'", event.getReaction().getEmoji().getName());
-		} catch (final NotFoundException ignored) {
-			// ran when no reaction role is found
 		}
 	}
 
 	// TODO: test
-	private Role getRole(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) throws NotFoundException {
+	private Role getRole(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) {
 		String emoji = Utils.serializeEmoji(e.getEmoji());
 
-		try (var ps = new SQLHelper("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
-				.addParameters(guildId, channelID, messageId, emoji).create();
-				var rs = ps.executeQuery()) {
+		try (SQLHelper sq = new SQLHelper("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
+					.addParameters(guildId, channelID, messageId, emoji);
+				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return e.getGuild().getRoleById(rs.getLong("role_id"));
 			}

@@ -166,6 +166,7 @@ public class Bot extends ListenerAdapter {
 		injectorMap.add(settings);
 		SessionHandler sessionHandler = injectorMap.add(new DatabaseLogin());
 		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config));
+
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
 			sessionHandler,
@@ -243,6 +244,9 @@ public class Bot extends ListenerAdapter {
 			}
 		}));
 
+		// waits for all threads to finish, then shuts down the executor
+		asyncStartup.shutdown();
+
 		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
 
 		statisticsManager.start();
@@ -250,11 +254,11 @@ public class Bot extends ListenerAdapter {
 
 	@Override
 	public void onReady(final ReadyEvent e) {
-		final JDA jda = e.getJDA();
-		selfUserId = jda.getSelfUser().getIdLong();
-		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
+		final JDA readyJda = e.getJDA();
+		selfUserId = readyJda.getSelfUser().getIdLong();
+		logger.info("Connected to {}#{} in {}ms.", readyJda.getSelfUser().getName(), readyJda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
-		slashCommandBase.updateCommandsDev(jda);
+		slashCommandBase.updateCommandsDev(readyJda);
 		executor.submit(GiveawaySystem::init);
 	}
 

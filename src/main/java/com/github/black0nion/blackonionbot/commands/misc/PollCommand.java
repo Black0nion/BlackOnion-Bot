@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.misc;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -41,25 +41,25 @@ public class PollCommand extends SlashCommand {
 	private static final String TOPIC = "topic";
 	private static final String OPTION_PREFIX = "option_";
 
-	private static final OptionData[] choices = IntStream.range(0, DIGITS_UNICODE.size())
+	private static final OptionData[] CHOICES = IntStream.range(0, DIGITS_UNICODE.size())
 		.mapToObj(i -> new OptionData(OptionType.STRING, OPTION_PREFIX + DIGITS_LIST.get(i), "Choice #" + i))
 		.toArray(OptionData[]::new);
 
 	public PollCommand() {
 		super(builder(Commands.slash("poll", "Used to create a poll.")
 			.addOption(OptionType.STRING, TOPIC, "Used to set the topic of the poll.", true)
-			.addOptions(choices)));
+			.addOptions(CHOICES)));
 	}
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel pollChannel) {
-		TranslatedEmbed embed = cmde.success();
+		TranslatedEmbedBuilder embed = cmde.success();
 		embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
 		embed.setFooter("Poll created by " + author.getEscapedEffectiveName() + "#" + author.getDiscriminator(), author.getAvatarUrl());
 
 		boolean hadNullOption = false;
 		int index = 0;
-		for (OptionData optionData : choices) {
+		for (OptionData optionData : CHOICES) {
 			var option = e.getOption(optionData.getName());
 			if (option != null) {
 				embed.addField(cmde.getTranslation("optionnumber", new Placeholder("num", index)), DIGITS_UNICODE.get(index));

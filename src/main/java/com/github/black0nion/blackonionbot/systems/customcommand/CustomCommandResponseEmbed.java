@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.systems.customcommand;
 
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -8,9 +8,9 @@ import java.time.Instant;
 
 public class CustomCommandResponseEmbed implements CustomCommandResponse {
 
-	private final TranslatedEmbed embed;
+	private final TranslatedEmbedBuilder embed;
 
-	public CustomCommandResponseEmbed(TranslatedEmbed embed) {
+	public CustomCommandResponseEmbed(TranslatedEmbedBuilder embed) {
 		this.embed = embed;
 	}
 

@@ -107,8 +107,8 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			return;
 		}
 
-		if (new SQLHelper("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?);",
-				cmde.getGuild().getIdLong(), role.getIdLong(), textChannel.getIdLong(), messageId, emojiStr).execute()) {
+		if (SQLHelper.run("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?);",
+				cmde.getGuild().getIdLong(), role.getIdLong(), textChannel.getIdLong(), messageId, emojiStr)) {
 			cmde.success("reactionrolecreated", "reactionrolecreatedinfo",
 				new Placeholder("emote", emoji.getFormatted()),
 				new Placeholder("role", role.getAsMention()));
@@ -128,18 +128,18 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			return;
 		}
 
-		if (new SQLHelper("DELETE FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji_id = ? AND role_id = ?")
-				.addParameters(
-					cmde.getGuild().getIdLong(),
-					textChannel.getIdLong(),
-					messageId,
-					emojiStr,
-					role.getIdLong()
-				).execute()) {
-			cmde.success("entrydeleted", "reactionroledeleted");
-		} else {
-			cmde.send("erroroccurred");
-			logDebugMessage(cmde, textChannel, messageId, emoji, role);
+		try (SQLHelper sqlHelper = new SQLHelper("DELETE FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji_id = ? AND role_id = ?",
+				cmde.getGuild().getIdLong(),
+				textChannel.getIdLong(),
+				messageId,
+				emojiStr,
+				role.getIdLong())) {
+			if (sqlHelper.run()) {
+				cmde.success("entrydeleted", "reactionroledeleted");
+			} else {
+				cmde.send("erroroccurred");
+				logDebugMessage(cmde, textChannel, messageId, emoji, role);
+			}
 		}
 	}
 
@@ -150,8 +150,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 	}
 
 	private static boolean entryExists(@NotNull Guild guild, Long messageId, String emoji, Role role, TextChannel textChannel) throws SQLException {
-		return new SQLHelper("SELECT * FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ? AND role_id = ?")
-			.addParameters(guild.getIdLong(), textChannel.getIdLong(), messageId, emoji, role.getIdLong())
-			.anyMatch();
+		return SQLHelper.anyMatch("SELECT * FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ? AND role_id = ?",
+				guild.getIdLong(), textChannel.getIdLong(), messageId, emoji, role.getIdLong());
 	}
 }

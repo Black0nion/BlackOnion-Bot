@@ -3,12 +3,12 @@ package com.github.black0nion.blackonionbot.utils;
 /**
  * A dummy exception, useful for returning from a bottom level method
  */
-public class DummyException extends RuntimeException {
-	public DummyException() {
+public class CommandReturnException extends RuntimeException {
+	public CommandReturnException() {
 		super();
 	}
 
-	public DummyException(String message) {
+	public CommandReturnException(String message) {
 		super(message);
 	}
 }

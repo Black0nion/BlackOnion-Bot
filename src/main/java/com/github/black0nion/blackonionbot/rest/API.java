@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
 import com.github.black0nion.blackonionbot.rest.api.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.rest.impl.get.Paths;
 import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
-import com.github.black0nion.blackonionbot.utils.DummyException;
+import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.javalin.http.ExceptionHandler;
@@ -123,7 +123,7 @@ public class API {
 
 		ExceptionHandler<Exception> exceptionHandler = (e, ctx) -> {
 			// dummy exceptions are just to instantly return from a handler, we don't care about them
-			if (e instanceof DummyException) return;
+			if (e instanceof CommandReturnException) return;
 
 			// only log unexpected exceptions
 			if (!(e instanceof HttpResponseException))
