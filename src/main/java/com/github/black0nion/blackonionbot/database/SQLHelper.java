@@ -59,6 +59,8 @@ public class SQLHelper implements AutoCloseable {
 	}
 
 	public ResultSet executeQuery() throws SQLException {
+		// the connection will be closed by the close() method of this class
+		//noinspection resource
 		return create().executeQuery();
 	}
 

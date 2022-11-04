@@ -99,7 +99,7 @@ public class API {
 					ws.onError(ctx -> endpoint.onError(ctx.session, ctx.error()));
 				});
 			} catch (final Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to register websocket endpoint: " + websockets.getName(), e);
 			}
 		}
 		//endregion
@@ -117,7 +117,7 @@ public class API {
 						httpRoutes.add(route);
 				}
 			} catch (final Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to register http route: " + req.getName(), e);
 			}
 		}
 

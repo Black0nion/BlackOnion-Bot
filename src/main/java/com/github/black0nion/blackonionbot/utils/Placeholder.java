@@ -30,7 +30,7 @@ public class Placeholder {
 
 	public static String process(String input, final Placeholder... placeholders) {
 		if (input == null || input.length() == 0) {
-			return null;
+			return input;
 		}
 		for (final Placeholder placeholder : placeholders) {
 			input = placeholder.process(input);

@@ -1,8 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
-import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
@@ -34,12 +32,7 @@ public class ConsoleCommands {
 						return g.getName() + "(" + g.getId() + ")" + (user != null ? " | " + user.getAsTag() + "(" + user.getId() + ")" : "");
 					}));
 				} else if (input.equalsIgnoreCase("shutdown")) {
-					logger.warn("Shutting down...");
-					Bot.getInstance().getJDA().shutdown();
-					PluginSystem.disablePlugins();
-					API.getInstance().getApp().close();
-					logger.warn("Successfully disconnected!");
-					System.exit(0);
+					Bot.getInstance().shutdown();
 				} else {
 					logger.info("Command not recognized. Valid Commands: [reload, shutdown, setlogorigin, setloglevel, peek]");
 				}

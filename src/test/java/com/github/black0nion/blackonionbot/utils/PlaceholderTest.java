@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class PlaceholderTest {
 
@@ -61,5 +62,26 @@ class PlaceholderTest {
 		Placeholder placeholder2 = new Placeholder("key2", "value2");
 		assertEquals("test value value2 test", Placeholder.process("test %key% %key2% test", placeholder, placeholder2));
 		assertEquals("test value2 value test", Placeholder.process("test %key2% %key% test", placeholder, placeholder2));
+	}
+
+	@Test
+	void test_process_multiple_no_match() {
+		Placeholder placeholder = new Placeholder("key", "value");
+		Placeholder placeholder2 = new Placeholder("key2", "value2");
+		assertEquals("test %otherkey% value2 test", Placeholder.process("test %otherkey% %key2% test", placeholder, placeholder2));
+		assertEquals("test value2 %otherkey% test", Placeholder.process("test %key2% %otherkey% test", placeholder, placeholder2));
+		assertEquals("test %otherkey% %otherkey2% test", Placeholder.process("test %otherkey% %otherkey2% test", placeholder, placeholder2));
+	}
+
+	@Test
+	void test_process_nullInput() {
+		Placeholder placeholder = new Placeholder("key", "value");
+		assertNull(Placeholder.process(null, placeholder));
+	}
+
+	@Test
+	void test_process_emptyInput() {
+		Placeholder placeholder = new Placeholder("key", "value");
+		assertEquals("", Placeholder.process("", placeholder));
 	}
 }

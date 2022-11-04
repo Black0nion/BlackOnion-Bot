@@ -103,5 +103,6 @@ public class DatabaseConnection {
 
 	public void close() {
 		ds.close();
+		dsLowPriority.close();
 	}
 }

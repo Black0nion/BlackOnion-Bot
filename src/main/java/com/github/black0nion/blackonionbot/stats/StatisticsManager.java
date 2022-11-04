@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -33,6 +35,8 @@ public class StatisticsManager extends ListenerAdapter {
 	private static final String NAMESPACE = "blackonionbot";
 	/** in seconds */
 	public static final int DELAY_BETWEEN_COLLECTION = 15;
+
+	private static final Logger logger = LoggerFactory.getLogger(StatisticsManager.class);
 
 	public StatisticsManager(Config config) {
 		final BotMetadata metadata = ConfigFileLoader.getMetadata();
@@ -183,7 +187,7 @@ public class StatisticsManager extends ListenerAdapter {
 			// returns a percentage value with 1 decimal point precision
 			return Utils.roundToDouble("#0.000", value);
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Error while getting CPU load", e);
 		}
 		return Double.NaN;
 	}

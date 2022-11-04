@@ -1,7 +1,9 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
+import com.github.black0nion.blackonionbot.misc.exception.LanguageCreationException;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.jupiter.api.Order;
@@ -64,5 +66,42 @@ class LanguageTest {
 		translations.forEach(m -> assertNotNull(m.getFullName()));
 		translations.forEach(m -> assertTrue(m.getFullName().matches("[A-Z][a-z]+ \\([A-Z]{2}\\)")));
 		logger.info("List contains dummy translations: '{}'", translations.stream().map(lang -> lang.getTranslationNonNull("dummy")).toList());
+	}
+
+	@Test
+	void test_constructor_with_invalid_json() {
+		LanguageCreationException e = assertThrows(LanguageCreationException.class, () -> new Language(new JSONObject()));
+		assertInstanceOf(JSONException.class, e.getCause());
+		assertEquals("JSONObject[\"metadata\"] not found.", e.getCause().getMessage());
+	}
+
+	@Test
+	void test_constructor_null_json() {
+		LanguageCreationException e = assertThrows(LanguageCreationException.class, () -> new Language((JSONObject) null));
+		assertInstanceOf(IllegalArgumentException.class, e.getCause());
+	}
+
+	@Test
+	void test_constructor_no_name() {
+		LanguageCreationException e = assertThrows(LanguageCreationException.class, () -> new Language(new JSONObject()
+			.put("metadata", new JSONObject())));
+		assertInstanceOf(JSONException.class, e.getCause());
+		assertEquals("JSONObject[\"name\"] not found.", e.getCause().getMessage());
+	}
+
+	@Test
+	void test_constructor_no_code() {
+		LanguageCreationException e = assertThrows(LanguageCreationException.class, () -> new Language(new JSONObject()
+			.put("metadata", new JSONObject()
+				.put("name", "test"))));
+		assertInstanceOf(IllegalArgumentException.class, e.getCause());
+	}
+
+	@Test
+	void test_constructor_no_metadata() {
+		LanguageCreationException e = assertThrows(LanguageCreationException.class, () -> new Language(new JSONObject()
+			.put("hello", "world")));
+		assertInstanceOf(JSONException.class, e.getCause());
+		assertEquals("JSONObject[\"metadata\"] not found.", e.getCause().getMessage());
 	}
 }

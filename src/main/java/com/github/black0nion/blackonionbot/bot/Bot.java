@@ -112,6 +112,7 @@ public class Bot extends ListenerAdapter {
 	private final SlashCommandBase slashCommandBase;
 	private final Config config;
 	private final Settings settings;
+	private final DatabaseConnection database;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -149,6 +150,8 @@ public class Bot extends ListenerAdapter {
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
+		Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+
 		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
 		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
@@ -173,7 +176,6 @@ public class Bot extends ListenerAdapter {
 			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
 		);
 
-		DatabaseConnection database;
 		injectorMap.add(database = new DatabaseConnection(config)); // NOSONAR
 
 		Injector injector = new DefaultInjector(config, injectorMap);
@@ -217,8 +219,7 @@ public class Bot extends ListenerAdapter {
 				.build();
 			Pages.activate(paginator);
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
 
 		PlayerManager playerManager = new PlayerManager(config);
@@ -247,9 +248,19 @@ public class Bot extends ListenerAdapter {
 		// waits for all threads to finish, then shuts down the executor
 		asyncStartup.shutdown();
 
-		Runtime.getRuntime().addShutdownHook(new Thread(database::close));
-
 		statisticsManager.start();
+	}
+
+	public void shutdown() {
+		logger.info("Shutting down...");
+		PluginSystem.disablePlugins();
+		// shutdown executors
+		executor.shutdown();
+		scheduledExecutor.shutdown();
+		// shutdown jda
+		jda.shutdown();
+		// shutdown HikariCP
+		database.close();
 	}
 
 	@Override
