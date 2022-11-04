@@ -116,9 +116,7 @@ tasks.jacocoTestReport {
 
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 
-application {
-	mainClass.set("com.github.black0nion.blackonionbot.Main")
-}
+application { mainClass.set("com.github.black0nion.blackonionbot.Main") }
 
 version = System.getenv("VERSION") ?: "dev"
 
@@ -130,23 +128,24 @@ tasks.named<Jar>("jar") { archiveFileName.set("blackonionbot") }
  * application jar with the downloaded library files in the classpath.
  */
 tasks.register("downloadDependencies") {
-	description = "Downloads all dependencies and puts them into the libraries folder."
-	group = "build"
+    description = "Downloads all dependencies and puts them into the libraries folder."
+    group = "build"
 
-	doLast {
-		logger.lifecycle("Downloading dependencies...")
-		val dependencies = configurations["runtimeClasspath"].resolvedConfiguration.resolvedArtifacts
-		val librariesFolder = File("libraries")
-		librariesFolder.mkdirs()
-		dependencies.forEach { artifact ->
-			logger.lifecycle("Downloading ${artifact.file.name}...")
-			val file = artifact.file
-			val targetFile = File(librariesFolder, file.name)
-			if (!targetFile.exists()) {
-				file.copyTo(targetFile)
-			}
-		}
+    doLast {
+        logger.lifecycle("Downloading dependencies...")
+        val dependencies =
+            configurations["runtimeClasspath"].resolvedConfiguration.resolvedArtifacts
+        val librariesFolder = File("libraries")
+        librariesFolder.mkdirs()
+        dependencies.forEach { artifact ->
+            logger.lifecycle("Downloading ${artifact.file.name}...")
+            val file = artifact.file
+            val targetFile = File(librariesFolder, file.name)
+            if (!targetFile.exists()) {
+                file.copyTo(targetFile)
+            }
+        }
 
-		logger.lifecycle("Done downloading dependencies.")
-	}
+        logger.lifecycle("Done downloading dependencies.")
+    }
 }
