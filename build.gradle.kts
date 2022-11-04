@@ -123,3 +123,30 @@ application {
 version = System.getenv("VERSION") ?: "dev"
 
 tasks.named<Jar>("jar") { archiveFileName.set("blackonionbot") }
+
+/**
+ * This task downloads all dependencies (with transitive dependencies) and puts them into the
+ * libraries folder. Used instead of shadowJar to hopefully optimize build times. Run the
+ * application jar with the downloaded library files in the classpath.
+ */
+tasks.register("downloadDependencies") {
+	description = "Downloads all dependencies and puts them into the libraries folder."
+	group = "build"
+
+	doLast {
+		logger.lifecycle("Downloading dependencies...")
+		val dependencies = configurations["runtimeClasspath"].resolvedConfiguration.resolvedArtifacts
+		val librariesFolder = File("libraries")
+		librariesFolder.mkdirs()
+		dependencies.forEach { artifact ->
+			logger.lifecycle("Downloading ${artifact.file.name}...")
+			val file = artifact.file
+			val targetFile = File(librariesFolder, file.name)
+			if (!targetFile.exists()) {
+				file.copyTo(targetFile)
+			}
+		}
+
+		logger.lifecycle("Done downloading dependencies.")
+	}
+}
