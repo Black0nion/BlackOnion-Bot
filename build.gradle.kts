@@ -116,8 +116,10 @@ tasks.jacocoTestReport {
 
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 
-// mainClassName = "com.github.black0nion.blackonionbot.Main"
+application {
+	mainClass.set("com.github.black0nion.blackonionbot.Main")
+}
 
 version = System.getenv("VERSION") ?: "dev"
 
-/** tasks.named<Jar>("jar") { archiveFileName.set("") } */
+tasks.named<Jar>("jar") { archiveFileName.set("blackonionbot") }
