@@ -38,10 +38,6 @@ public class API {
 
 	private static API instance;
 
-	public static API getInstance() {
-		return instance;
-	}
-
 	@Reloadable("api")
 	private static void reload() {
 		new API(instance.config, instance.injector, instance.statsCollectorFactory);
@@ -51,6 +47,9 @@ public class API {
 	private final Injector injector;
 	private final StatsCollectorFactory statsCollectorFactory;
 
+	/**
+	 * Automatically closes the old API instance if it exists
+	 */
 	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
 		if (instance != null && instance.getApp() != null) instance.getApp().close();
 		instance = this;
