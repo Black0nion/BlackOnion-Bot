@@ -3,13 +3,13 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
-import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
-import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
-import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigImpl;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
+import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
 import com.github.black0nion.blackonionbot.database.DatabaseConnection;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
@@ -57,7 +57,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
 import java.io.File;
@@ -150,14 +149,13 @@ public class Bot extends ListenerAdapter {
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
-		Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+		Thread shutdownHookThread = new Thread(this::shutdown);
+		shutdownHookThread.setName("ShutdownHook");
+		Runtime.getRuntime().addShutdownHook(shutdownHookThread);
 
 		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
 		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
-
-		// slf4j MDC; used to set the run mode in the logs sent to loki
-		MDC.put("run_mode", config.getRunMode().name());
 
 		DockerManager.init();
 		logger.info("Starting BlackOnion-Bot in '{}' mode...", config.getRunMode());
@@ -258,9 +256,13 @@ public class Bot extends ListenerAdapter {
 		executor.shutdown();
 		scheduledExecutor.shutdown();
 		// shutdown jda
-		jda.shutdown();
+		if (jda != null) {
+			jda.shutdown();
+		}
 		// shutdown HikariCP
-		database.close();
+		if (database != null) {
+			database.close();
+		}
 	}
 
 	@Override

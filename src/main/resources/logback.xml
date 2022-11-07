@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <statusListener class="com.github.black0nion.blackonionbot.systems.logging.StatusListener"/>
     <conversionRule conversionWord="highlight" converterClass="com.github.black0nion.blackonionbot.systems.logging.ColorConversion"/>
     <shutdownHook/>
 
@@ -26,21 +27,19 @@
         </rollingPolicy>
     </appender>
 
-    <define name="lokiURL" class="com.github.black0nion.blackonionbot.config.immutable.LokiConfig"/>
+    <define name="lokiURL" class="com.github.black0nion.blackonionbot.config.logging.LokiConfig"/>
+    <define name="runMode" class="com.github.black0nion.blackonionbot.config.logging.RunModeConfig"/>
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <batchTimeoutMs>30000</batchTimeoutMs>
+        <batchTimeoutMs>${LOKI_BATCH_TIMEOUT_MS:-30000}</batchTimeoutMs>
         <verbose>true</verbose>
         <drainOnStop>true</drainOnStop>
         <http>
-            <if condition='isDefined("lokiURL") &amp;&amp; !isNull("lokiURL")'>
-                <then>
-                    <url>${lokiURL}</url>
-                </then>
-            </if>
+            <url>${lokiURL}</url>
         </http>
         <format>
             <label>
-                <pattern>app=blackonion-bot,level=%level,run_mode=%X{run_mode:-UNKNOWN}</pattern>
+                <!-- runMode should never be unset -->
+                <pattern>app=blackonion-bot,level=%level,run_mode=${runMode:-UNKNOWN}</pattern>
             </label>
             <message>
                 <pattern>level=%level logger=%logger thread=%thread ex=%ex | %msg %ex</pattern>
@@ -52,21 +51,22 @@
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
         <appender-ref ref="METRICS"/>
-        <if condition='!isNull("lokiURL")'>
-            <then>
-                <appender-ref ref="LOKI"/>
-            </then>
-        </if>
     </logger>
 
     <root level="${ROOT_LOG_LEVEL:-WARN}">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
         <appender-ref ref="METRICS"/>
-        <if condition='!isNull("lokiURL")'>
-            <then>
-                <appender-ref ref="LOKI"/>
-            </then>
-        </if>
     </root>
+
+    <if condition='!isNull("lokiURL")'>
+        <then>
+            <logger name="com.github.black0nion.blackonionbot" level="${LOG_LEVEL:-INFO}" additivity="false">
+                <appender-ref ref="LOKI"/>
+            </logger>
+            <root>
+                <appender-ref ref="LOKI"/>
+            </root>
+        </then>
+    </if>
 </configuration>

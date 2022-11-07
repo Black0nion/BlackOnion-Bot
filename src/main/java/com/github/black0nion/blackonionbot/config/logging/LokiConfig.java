@@ -1,6 +1,7 @@
-package com.github.black0nion.blackonionbot.config.immutable;
+package com.github.black0nion.blackonionbot.config.logging;
 
 import ch.qos.logback.core.PropertyDefinerBase;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
