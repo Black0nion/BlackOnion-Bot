@@ -49,6 +49,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 		final long messageid = event.getMessageIdLong();
 		try {
 			Role role = getRole(event, guildid, channelid, messageid);
+			if (role == null) return;
 
 			action.accept(event.getUser(), role);
 		} catch (final IllegalStateException ex1) {
