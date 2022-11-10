@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DatabaseConnection {
 
@@ -52,7 +53,12 @@ public class DatabaseConnection {
 		dsLowPriority.setMaximumPoolSize(5);
 
 
+		runSqlSetupMethods();
+	}
+
+	private static void runSqlSetupMethods() {
 		// find all methods annotated with @SQLSetup and run them
+		// NOSONAR
 		List<Method> methods = new Reflections(Main.class.getPackage().getName(), Scanners.MethodsAnnotated)
 			.getMethodsAnnotatedWith(SQLSetup.class)
 			.stream()
@@ -60,7 +66,12 @@ public class DatabaseConnection {
 			// also, in this case, I'm accessing my own code with reflections, so I know what I'm doing (I think)
 			// (actually, I don't)
 			.peek(m -> m.setAccessible(true)) // NOSONAR
+			// randomly sort
+			.sorted(SQLSetupComparator.INSTANCE)
 			.toList();
+
+		logger.debug("Running SQL setup methods in the following order: {}",
+			methods.stream().map(m -> m.getDeclaringClass().getSimpleName() + "." + m.getName()).collect(Collectors.joining(", "))); // NOSONAR what does that even mean
 
 		logger.info("Found {} methods annotated with @SQLSetup, running them now...", methods.size());
 		for (Method method : methods) {

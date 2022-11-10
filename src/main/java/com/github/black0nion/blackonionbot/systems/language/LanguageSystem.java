@@ -1,6 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
+import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.exception.MultipleDefaultLanguagesException;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,10 +44,20 @@ public class LanguageSystem {
 			.forEach(lang -> {
 				languages.put(lang.getLanguageCode(), lang);
 				if (lang.isDefault()) defaultLocale = lang;
+				try {
+					SQLHelper.run("INSERT INTO language (code, name) VALUES (?, ?) ON CONFLICT DO NOTHING", lang.getLanguageCode(), lang.getName());
+				} catch (SQLException e) {
+					logger.error("Error while updating language table", e);
+				}
 			});
 		if (defaultLocale == null) {
 			defaultLocale = languages.values().stream().findFirst().orElseThrow(() -> new NullPointerException("No languages found!"));
 		}
+	}
+
+	@SQLSetup
+	public static void setup() throws SQLException {
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS language (code VARCHAR(2) PRIMARY KEY, name TEXT NOT NULL)");
 	}
 
 	public static Map<String, Language> getLanguages() {

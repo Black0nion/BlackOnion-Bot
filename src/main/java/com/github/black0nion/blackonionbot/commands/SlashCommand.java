@@ -44,7 +44,6 @@ import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
  *    }
  * }</pre>
  */
-@SuppressWarnings("unused")
 public abstract class SlashCommand {
 	private final SlashCommandData data;
 	private Category category;

@@ -58,6 +58,28 @@ public enum CustomPermission {
 		this.links.addAll(Arrays.asList(includedIn));
 	}
 
+	/**
+	 * Parses a semicolon separated list of permissions into an array of permissions
+	 */
+	public static CustomPermission[] parseListToArray(String permissionString) {
+		return Arrays.stream(permissionString.split(";"))
+			.map(CustomPermission::valueOf)
+			.toArray(CustomPermission[]::new);
+	}
+
+	/**
+	 * Parses a semicolon separated list of permissions into a list of permissions
+	 */
+	public static List<CustomPermission> parseListToList(String permissionString) {
+		if (permissionString == null || permissionString.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return Arrays.stream(permissionString.split(";"))
+			.map(CustomPermission::parse)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList()); // NOSONAR we need a mutable list
+	}
+
 	public String getName() {
 		return name;
 	}
