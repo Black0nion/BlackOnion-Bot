@@ -107,7 +107,7 @@ public class WarnsCommand extends SlashCommand {
 					false)
 				)
 			);
-			pages = Utils.getPages(cmde.success(), fields,2);
+			pages = Utils.getPages(cmde.success(), fields, 15);
 		}
 		final List<Page> finalList = pages;
 		if (pages != null) cmde.reply((MessageEmbed) pages.get(0).getContent(),

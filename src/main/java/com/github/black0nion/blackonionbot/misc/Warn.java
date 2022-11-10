@@ -45,7 +45,7 @@ public record Warn(
 			"issuer BIGINT NOT NULL," +
 			"userid BIGINT NOT NULL," +
 			"guildid BIGINT NOT NULL," +
-			"id BIGINT NOT NULL," +
+			"id BIGINT NOT NULL UNIQUE," +
 			"reason TEXT" +
 			");"
 		);
@@ -77,36 +77,34 @@ public record Warn(
 	}
 
 	public static void saveWarns(List<Warn> warns, long guildID) {
-		try {
-			try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID);
-					ResultSet rs = sq.executeQuery()) {
-				while (!rs.isClosed() && rs.next()) {
-					Warn warn = new Warn(
-						rs.getLong(ISSUER_STR),
-						rs.getLong(USERID_STR),
-						rs.getLong(GUILDID_STR),
-						rs.getLong(ID_STR),
-						rs.getString(REASON_STR)
-					);
-					if (!warns.contains(warn)) {
-						SQLHelper.run("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?", guildID, warn.userid(), warn.id());
-					} else {
-						warns.remove(warn);
-					}
+		try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID);
+				ResultSet rs = sq.executeQuery()) {
+			while (!rs.isClosed() && rs.next()) {
+				Warn warn = new Warn(
+					rs.getLong(ISSUER_STR),
+					rs.getLong(USERID_STR),
+					rs.getLong(GUILDID_STR),
+					rs.getLong(ID_STR),
+					rs.getString(REASON_STR)
+				);
+				if (!warns.contains(warn)) {
+					SQLHelper.run("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?", guildID, warn.userid(), warn.id());
+				} else {
+					warns.remove(warn);
 				}
-				if (!warns.isEmpty()) {
-					try (SQLHelper sqlHelper = new SQLHelper("INSERT INTO warns VALUES (?, ?, ?, ?, ?)");
-							PreparedStatement ps2 = sqlHelper.create()) {
-						for (Warn warn : warns) {
-							ps2.setLong(1, warn.issuer());
-							ps2.setLong(2, warn.userid());
-							ps2.setLong(3, warn.guildid());
-							ps2.setLong(4, warn.id());
-							ps2.setString(5, warn.reason());
-							ps2.addBatch();
-						}
-						ps2.executeBatch();
+			}
+			if (!warns.isEmpty()) {
+				try (SQLHelper sqlHelper = new SQLHelper("INSERT INTO warns VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING");
+						PreparedStatement ps2 = sqlHelper.create()) {
+					for (Warn warn : warns) {
+						ps2.setLong(1, warn.issuer());
+						ps2.setLong(2, warn.userid());
+						ps2.setLong(3, warn.guildid());
+						ps2.setLong(4, warn.id());
+						ps2.setString(5, warn.reason());
+						ps2.addBatch();
 					}
+					ps2.executeBatch();
 				}
 			}
 		} catch (SQLException e) {
