@@ -89,7 +89,7 @@ dependencies {
 
     implementation "commons-validator:commons-validator:1.7"
 
-    implementation "com.google.zxing:core:3.5.0"
+    implementation "com.google.zxing:core:3.5.1"
     implementation "com.google.zxing:javase:3.5.0"
 
     implementation 'ch.qos.logback:logback-classic:1.4.4'
