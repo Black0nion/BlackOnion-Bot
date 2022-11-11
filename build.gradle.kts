@@ -28,7 +28,28 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    create("testShared") {
+        compileClasspath += sourceSets["main"].output
+        runtimeClasspath += sourceSets["main"].output
+    }
+    named("test") {
+        compileClasspath += sourceSets["testShared"].output
+        runtimeClasspath += sourceSets["testShared"].output
+    }
+    create("testIntegration") {
+        compileClasspath += sourceSets["testShared"].output + sourceSets["main"].output
+        runtimeClasspath += sourceSets["testShared"].output + sourceSets["main"].output
+    }
+}
+
 dependencies {
+    val testsImplementation = { dependencyNotation: Any ->
+        "testImplementation"(dependencyNotation)
+        "testIntegrationImplementation"(dependencyNotation)
+        "testSharedImplementation"(dependencyNotation)
+    }
+
     implementation("com.google.guava:guava:31.1-jre")
 
     implementation("com.google.code.gson:gson:2.9.1")
@@ -73,26 +94,36 @@ dependencies {
     implementation("io.prometheus:simpleclient_hotspot:0.16.0")
     implementation("io.prometheus:simpleclient_httpserver:0.16.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
-    testImplementation("com.github.erosb:everit-json-schema:1.14.1")
-    testImplementation("org.mockito:mockito-core:4.8.1")
+    testsImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+    testsImplementation("com.github.erosb:everit-json-schema:1.14.1")
+    testsImplementation("org.mockito:mockito-core:4.8.1")
 }
+
+configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
+
+application { mainClass.set("com.github.black0nion.blackonionbot.Main") }
+
+version = System.getenv("VERSION") ?: "dev"
+
+tasks.named<Jar>("jar") { archiveVersion.set("") }
 
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-    dependsOn(
-        tasks.getByName("testIntegration")) // integration tests are part of the default test task
+    // dependsOn testIntegration
+    dependsOn(testIntegration)
 }
 
-tasks.register("testIntegration") {
-    description = "Runs integration tests."
-    group = "verification"
+val testIntegration by
+    tasks.registering(Test::class) {
+        description = "Runs integration tests."
+        group = "verification"
 
-    // testClassesDirs = sourceSets["integrationTest"].output.classesDirs
-    // classpath = sourceSets["integrationTest"].runtimeClasspath
-
-}
+        testClassesDirs = sourceSets["testIntegration"].output.classesDirs
+        classpath = sourceSets["testIntegration"].runtimeClasspath
+        shouldRunAfter(tasks.test)
+        useJUnitPlatform()
+    }
 
 spotless {
     kotlinGradle {
@@ -114,13 +145,13 @@ tasks.jacocoTestReport {
     finalizedBy("jacocoTestCoverageVerification")
 }
 
-configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
+configurations {
+    getByName("testIntegrationImplementation").extendsFrom(implementation.get())
+    getByName("testIntegrationRuntimeOnly").extendsFrom(runtimeOnly.get())
 
-application { mainClass.set("com.github.black0nion.blackonionbot.Main") }
-
-version = System.getenv("VERSION") ?: "dev"
-
-tasks.named<Jar>("jar") { archiveFileName.set("blackonionbot") }
+    getByName("testSharedImplementation").extendsFrom(implementation.get())
+    getByName("testSharedRuntimeOnly").extendsFrom(runtimeOnly.get())
+}
 
 /**
  * This task downloads all dependencies (with transitive dependencies) and puts them into the
@@ -148,4 +179,27 @@ tasks.register("downloadDependencies") {
 
         logger.lifecycle("Done downloading dependencies.")
     }
+}
+
+tasks.processResources {
+    val locAndFiles = getLoc()
+    filesMatching("bot.metadata.json") {
+        expand("version" to version, "lines_of_code" to locAndFiles[0], "files" to locAndFiles[1])
+    }
+}
+
+fun getLoc(): List<Int> {
+    var linesOfCode = 0
+    var filesCount = 0
+    project.sourceSets["main"].allSource.srcDirs.forEach { dir ->
+        if (dir.isDirectory) {
+            dir.listFiles()?.forEach { file ->
+                if (file.isFile) {
+                    file.forEachLine { linesOfCode++ }
+                    filesCount++
+                }
+            }
+        }
+    }
+    return listOf(linesOfCode, filesCount)
 }
