@@ -63,7 +63,7 @@ dependencies {
 
     implementation("com.github.walkyst:lavaplayer-fork:1.3.98.4")
 
-    implementation("io.javalin:javalin-bundle:5.1.2")
+    implementation("io.javalin:javalin-bundle:5.1.3")
 
     implementation("org.json:json:20220924")
 
@@ -79,8 +79,8 @@ dependencies {
 
     implementation("commons-validator:commons-validator:1.7")
 
-    implementation("com.google.zxing:core:3.5.0")
-    implementation("com.google.zxing:javase:3.5.0")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.google.zxing:javase:3.5.1")
 
     implementation("ch.qos.logback:logback-classic:1.4.4")
     implementation("uk.org.lidalia:sysout-over-slf4j:1.0.2")
