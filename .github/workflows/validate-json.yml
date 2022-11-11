@@ -24,7 +24,7 @@ jobs:
         with:
           labels: jsoninvalid
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: mshick/add-pr-comment@v1
+      - uses: mshick/add-pr-comment@v2
         if: ${{ failure() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
