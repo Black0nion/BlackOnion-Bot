@@ -16,13 +16,18 @@ public class SQLHelper implements AutoCloseable {
 	private final List<Object> parameters = new ArrayList<>();
 	private Connection connection;
 	private PreparedStatement preparedStatement;
+	private final ConnectionSupplier connectionSupplier;
 
-	public SQLHelper(String rawSQL, Object... parameters) {
+	public SQLHelper(ConnectionSupplier connectionGetter, String rawSQL, Object... parameters) {
+		this.connectionSupplier = connectionGetter;
 		this.rawSQL = rawSQL;
-		this.parameters.addAll(Arrays.asList(parameters));
+		if (parameters != null && parameters.length > 0) {
+			this.parameters.addAll(Arrays.asList(parameters));
+		}
 	}
 
-	public SQLHelper(String rawSQL) {
+	public SQLHelper(ConnectionSupplier connectionGetter, String rawSQL) {
+		this.connectionSupplier = connectionGetter;
 		this.rawSQL = rawSQL;
 	}
 
@@ -44,7 +49,7 @@ public class SQLHelper implements AutoCloseable {
 	}
 
 	public PreparedStatement create() throws SQLException {
-		if (connection == null) connection = DatabaseConnection.getConnection();
+		if (connectionSupplier != null && connection == null) connection = connectionSupplier.get();
 		if (connection == null) throw new SQLException("No connection acquired!");
 
 		preparedStatement = connection.prepareStatement(rawSQL); // NOSONAR we're returning the PreparedStatement
@@ -70,8 +75,8 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
-	public static boolean anyMatch(String sql, Object... arguments) throws SQLException {
-		try (SQLHelper helper = new SQLHelper(sql, arguments)) {
+	public static boolean anyMatch(ConnectionSupplier connectionSupplier, String sql, Object... arguments) throws SQLException {
+		try (SQLHelper helper = new SQLHelper(connectionSupplier, sql, arguments)) {
 			return helper.anyMatch();
 		}
 	}
@@ -82,6 +87,9 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Runs the SQL statement <b>and closes the connection</b>.
+	 */
 	public boolean run() throws SQLException {
 		try {
 			return execute();
@@ -90,8 +98,8 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
-	public static boolean run(String sql, Object... parameters) throws SQLException {
-		try (SQLHelper sqlHelper = new SQLHelper(sql, parameters)) {
+	public static boolean run(ConnectionSupplier connectionSupplier, String sql, Object... parameters) throws SQLException {
+		try (SQLHelper sqlHelper = new SQLHelper(connectionSupplier, sql, parameters)) {
 			return sqlHelper.execute();
 		}
 	}

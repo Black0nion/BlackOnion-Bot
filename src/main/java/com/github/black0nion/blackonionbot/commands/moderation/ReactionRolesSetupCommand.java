@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.moderation;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.exception.UnwrapMeException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -30,6 +31,7 @@ import java.util.regex.Matcher;
 import static java.util.Objects.requireNonNull;
 
 public class ReactionRolesSetupCommand extends SlashCommand {
+
 	private static final String CREATE_REACTION = "create";
 	private static final String CREATE_REACTION_CHANNEL = "channel";
 	private static final String CREATE_REACTION_MESSAGE_ID = "message_id";
@@ -41,7 +43,9 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 	private static final String REMOVE_REACTION_EMOTE = "emoji";
 	private static final String REMOVE_REACTION_ROLE = "role";
 
-	public ReactionRolesSetupCommand() {
+	private final SQLHelperFactory sql;
+
+	public ReactionRolesSetupCommand(SQLHelperFactory sqlHelperFactory) {
 		super(builder(
 			Commands.slash("reactionroles", "Used to set up a reaction role.").addSubcommands(
 				new SubcommandData(CREATE_REACTION, "Used to create a reaction role.")
@@ -56,6 +60,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 					.addOption(OptionType.ROLE, REMOVE_REACTION_ROLE, "The role to remove from the userid when they react.")))
 			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION));
+		this.sql = sqlHelperFactory;
 	}
 
 	@Override
@@ -107,7 +112,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			return;
 		}
 
-		if (SQLHelper.run("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?);",
+		if (sql.run("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?);",
 				cmde.getGuild().getIdLong(), role.getIdLong(), textChannel.getIdLong(), messageId, emojiStr)) {
 			cmde.success("reactionrolecreated", "reactionrolecreatedinfo",
 				new Placeholder("emote", emoji.getFormatted()),
@@ -128,7 +133,7 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			return;
 		}
 
-		try (SQLHelper sqlHelper = new SQLHelper("DELETE FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji_id = ? AND role_id = ?",
+		try (SQLHelper sqlHelper = sql.create("DELETE FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji_id = ? AND role_id = ?",
 				cmde.getGuild().getIdLong(),
 				textChannel.getIdLong(),
 				messageId,
@@ -149,8 +154,8 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 			cmde.getGuild().getDebugMessage(), textChannel.getName() + "(C:" + textChannel.getIdLong() + ")", messageId, emoji.getFormatted(), role.getName() + "(R:" + role.getIdLong() + ")");
 	}
 
-	private static boolean entryExists(@NotNull Guild guild, Long messageId, String emoji, Role role, TextChannel textChannel) throws SQLException {
-		return SQLHelper.anyMatch("SELECT * FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ? AND role_id = ?",
+	private boolean entryExists(@NotNull Guild guild, Long messageId, String emoji, Role role, TextChannel textChannel) throws SQLException {
+		return sql.anyMatch("SELECT * FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ? AND role_id = ?",
 				guild.getIdLong(), textChannel.getIdLong(), messageId, emoji, role.getIdLong());
 	}
 }

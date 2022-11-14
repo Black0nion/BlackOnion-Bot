@@ -54,7 +54,7 @@ public class BlackUser extends UserImpl {
 
 	@SQLSetup(after = { LanguageSystem.class, DatabaseLogin.class })
 	public static void setup() throws SQLException {
-		SQLHelper.run("CREATE TABLE usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permission VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
+		SQLHelper.run("CREATE TABLE IF NOT EXISTS usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permission VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
 	}
 
 	private Language language;

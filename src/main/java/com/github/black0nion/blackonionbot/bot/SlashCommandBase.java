@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.misc.enums.Category;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
@@ -216,7 +217,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		final TextChannel channel = event.getChannel().asTextChannel();
 
-		final boolean locked = BanUsageCommand.isBanned(guild.getIdLong(), author.getIdLong());
+		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
 		final String log = EmojiParser.parseToAliases(guild.getDebugMessage() + " > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getDebugMessage() + ": (E:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
 
 		if (config.getRunMode() == RunMode.DEV) {

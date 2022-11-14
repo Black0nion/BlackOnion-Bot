@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.generic.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.common.ConfigLoadingException;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.immutable.Flags;
 import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;

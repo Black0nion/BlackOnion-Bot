@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
+import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigImpl;
@@ -10,7 +12,8 @@ import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImp
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
-import com.github.black0nion.blackonionbot.database.DatabaseConnection;
+import com.github.black0nion.blackonionbot.database.DatabaseConnector;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
@@ -111,7 +114,8 @@ public class Bot extends ListenerAdapter {
 	private final SlashCommandBase slashCommandBase;
 	private final Config config;
 	private final Settings settings;
-	private final DatabaseConnection database;
+	private final DatabaseConnector database;
+	private final SQLHelperFactory sqlHelperFactory;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -142,9 +146,17 @@ public class Bot extends ListenerAdapter {
 	public Settings getSettings() {
 		return settings;
 	}
+
+	/**
+	 * Don't use in new code, prefer dependency injection to allow unit testing
+	 */
+	public SQLHelperFactory getSqlHelperFactory() {
+		return sqlHelperFactory;
+	}
+
 	//endregion
 
-	public Bot() throws IOException {
+	public Bot() throws Exception {
 		instance = this; // NOSONAR
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
@@ -153,6 +165,7 @@ public class Bot extends ListenerAdapter {
 		shutdownHookThread.setName("ShutdownHook");
 		Runtime.getRuntime().addShutdownHook(shutdownHookThread);
 
+		FeatureFlags featureFlags = new FeatureFlags(new FeatureFlagFactoryImpl());
 		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
 		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
@@ -163,9 +176,15 @@ public class Bot extends ListenerAdapter {
 		new File("files").mkdirs();
 
 		InjectorMap injectorMap = new InjectorMap();
+		injectorMap.add(featureFlags);
 		injectorMap.add(config);
 		injectorMap.add(settings);
-		SessionHandler sessionHandler = injectorMap.add(new DatabaseLogin());
+
+		injectorMap.add(database = new DatabaseConnector(config, featureFlags)); // NOSONAR
+		sqlHelperFactory = database.getSqlHelperFactory();
+		injectorMap.add(sqlHelperFactory);
+
+		SessionHandler sessionHandler = injectorMap.add(new DatabaseLogin(sqlHelperFactory));
 		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config));
 
 		AbstractSession.setSessionHandler(sessionHandler);
@@ -173,8 +192,6 @@ public class Bot extends ListenerAdapter {
 			sessionHandler,
 			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
 		);
-
-		injectorMap.add(database = new DatabaseConnection(config)); // NOSONAR
 
 		Injector injector = new DefaultInjector(config, injectorMap);
 

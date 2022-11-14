@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.misc;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,8 @@ public record Warn(
 	}
 
 	@SQLSetup
-	public static void setupDatabase() throws SQLException {
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS warns (" +
+	public static void setupDatabase(SQLHelperFactory factory) throws SQLException {
+		factory.run("CREATE TABLE IF NOT EXISTS warns (" +
 			"issuer BIGINT NOT NULL," +
 			"userid BIGINT NOT NULL," +
 			"guildid BIGINT NOT NULL," +
@@ -55,9 +56,9 @@ public record Warn(
 	 * @param entity either "guild" or "user"
 	 * @param entityID the ID of the entity
 	 */
-	public static List<Warn> loadWarns(String entity, long entityID) {
+	public static List<Warn> loadWarns(SQLHelperFactory sql, String entity, long entityID) {
 		List<Warn> warns = new ArrayList<>();
-		try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE " + entity + "id = ?")
+		try (SQLHelper sq = sql.create("SELECT * FROM warns WHERE " + entity + "id = ?")
 				.addParameter(entityID);
 			ResultSet rs = sq.executeQuery()) {
 			while (rs.next()) {
@@ -76,8 +77,8 @@ public record Warn(
 		return warns;
 	}
 
-	public static void saveWarns(List<Warn> warns, long guildID) {
-		try (SQLHelper sq = new SQLHelper("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID);
+	public static void saveWarns(SQLHelperFactory sql, List<Warn> warns, long guildID) {
+		try (SQLHelper sq = sql.create("SELECT * FROM warns WHERE guildid = ?").addParameter(guildID);
 				ResultSet rs = sq.executeQuery()) {
 			while (!rs.isClosed() && rs.next()) {
 				Warn warn = new Warn(
@@ -88,7 +89,7 @@ public record Warn(
 					rs.getString(REASON_STR)
 				);
 				if (!warns.contains(warn)) {
-					SQLHelper.run("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?", guildID, warn.userid(), warn.id());
+					sql.run("DELETE FROM warns WHERE guildid = ? AND userid = ? AND id = ?", guildID, warn.userid(), warn.id());
 				} else {
 					warns.remove(warn);
 				}

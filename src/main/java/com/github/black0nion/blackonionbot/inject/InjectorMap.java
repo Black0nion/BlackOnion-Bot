@@ -53,4 +53,13 @@ public class InjectorMap extends HashMap<Class<?>, Object> implements Map<Class<
 			throw new IllegalArgumentException("Value is not an instance of the key");
 		}
 	}
+
+	public <T> T getInstance(Class<T> wantedClass) {
+		requireNonNull(wantedClass, "wantedClass");
+		Object instance = get(wantedClass);
+		if (instance == null) {
+			throw new IllegalArgumentException("Entry for type '" + wantedClass.getName() + "' not found in map");
+		}
+		return wantedClass.cast(instance);
+	}
 }

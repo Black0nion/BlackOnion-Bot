@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.database.DatabaseConnection;
+import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
@@ -105,11 +105,11 @@ public class BanUsageCommand extends SlashCommand {
 	}
 
 	// TODO: implement caching
-	public static boolean isBanned(long guildID, long userID) {
+	public static boolean isBanned(DatabaseConnector connector, long guildID, long userID) {
 		try {
 			try (SQLHelper sq = new SQLHelper("SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
 					.addParameters(userID, guildID)
-					.setConnection(DatabaseConnection.getLowPriorityConnection())) {
+					.setConnection(connector.getLowPriorityConnection())) {
 				return sq.anyMatch();
 			}
 		} catch (SQLException e) {

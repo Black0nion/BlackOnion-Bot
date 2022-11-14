@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.rest.sessions;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
@@ -16,11 +17,17 @@ import java.util.concurrent.ExecutionException;
 
 public class DatabaseLogin implements SessionHandler {
 
+	private final SQLHelperFactory sql;
+
+	public DatabaseLogin(SQLHelperFactory sqlHelperFactory) {
+		this.sql = sqlHelperFactory;
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseLogin.class);
 
 	@SQLSetup
-	public static void setup() throws SQLException {
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS sessions (" +
+	public static void setup(SQLHelperFactory factory) throws SQLException {
+		factory.run("CREATE TABLE IF NOT EXISTS sessions (" +
 			SESSION_ID + " VARCHAR(255) PRIMARY KEY, " +
 			ACCESS_TOKEN + " VARCHAR(255) NOT NULL, " +
 			REFRESH_TOKEN + " VARCHAR(255) NOT NULL, " +
@@ -35,8 +42,8 @@ public class DatabaseLogin implements SessionHandler {
 
 	@Override
 	public DiscordUser loginToSession(String sessionId) throws ExecutionException, InputMismatchException, NullPointerException, SQLException {
-		try (SQLHelper sq = new SQLHelper("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
-			ResultSet rs = sq.executeQuery()) {
+		try (SQLHelper sq = sql.create("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
+			 ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return OAuthHandler.getUserWithToken(rs.getString(ACCESS_TOKEN), rs.getString(REFRESH_TOKEN));
 			}
@@ -46,15 +53,15 @@ public class DatabaseLogin implements SessionHandler {
 
 	@Override
 	public void logoutFromSession(String sessionId) throws InputMismatchException, NullPointerException, SQLException {
-		try (SQLHelper sq = new SQLHelper("DELETE FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
-				PreparedStatement ps = sq.create()) {
+		try (SQLHelper sq = sql.create("DELETE FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
+			 PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 		}
 	}
 
 	@Override
 	public String createSession(String accessToken, String refreshToken, int expiresIn) {
-		try (SQLHelper sq = new SQLHelper("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?").addParameter(accessToken);
+		try (SQLHelper sq = sql.create("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?").addParameter(accessToken);
 				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return rs.getString(SESSION_ID);
@@ -64,7 +71,7 @@ public class DatabaseLogin implements SessionHandler {
 		}
 
 		String sessionId = AbstractSession.generateSessionId();
-		try (SQLHelper sq = new SQLHelper("INSERT INTO sessions (session_id, access_token, refresh_token, expires_in) VALUES (? ?, ?, ?)")
+		try (SQLHelper sq = sql.create("INSERT INTO sessions (session_id, access_token, refresh_token, expires_in) VALUES (? ?, ?, ?)")
 					.addParameters(sessionId, accessToken, refreshToken, expiresIn);
 				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
@@ -78,7 +85,7 @@ public class DatabaseLogin implements SessionHandler {
 	@Override
 	public boolean isIdOccupied(String sessionId) {
 		try {
-			return SQLHelper.anyMatch("SELECT " + SESSION_ID + " FROM sessions WHERE session_id = ?", sessionId);
+			return sql.anyMatch("SELECT " + SESSION_ID + " FROM sessions WHERE session_id = ?", sessionId);
 		} catch (SQLException e) {
 			logger.error("Could not check if session id is occupied", e);
 			return false;

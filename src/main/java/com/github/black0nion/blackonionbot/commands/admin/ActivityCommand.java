@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.admin;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -54,7 +53,6 @@ public class ActivityCommand extends SlashCommand {
 				e.getJDA().getPresence().setActivity(newActivity);
 				settings.setActivityType(type);
 				settings.setActivityName(text);
-				ConfigFileLoader.saveConfig();
 				cmde.send("newactivity", new Placeholder("newactivity",
 					newActivity != null ? newActivity.getName() : cmde.getTranslation("empty")));
 			} else cmde.send("invalidactivitytype");
@@ -62,7 +60,6 @@ public class ActivityCommand extends SlashCommand {
 			settings.setActivityType(null);
 			settings.setActivityName(null);
 			e.getJDA().getPresence().setActivity(null);
-			ConfigFileLoader.saveConfig();
 			cmde.send("activitycleared");
 		}
 	}

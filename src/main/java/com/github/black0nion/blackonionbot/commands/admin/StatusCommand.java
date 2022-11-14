@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.commands.admin;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -43,7 +42,6 @@ public class StatusCommand extends SlashCommand {
 			return;
 		}
 		settings.setOnlineStatus(status);
-		ConfigFileLoader.saveConfig();
 		cmde.send("newstatus", new Placeholder(STATUS, status.name()));
 
 		e.getJDA().getPresence().setStatus(status);

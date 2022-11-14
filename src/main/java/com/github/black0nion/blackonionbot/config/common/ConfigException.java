@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.generic;
+package com.github.black0nion.blackonionbot.config.common;
 
 public class ConfigException extends RuntimeException {
 

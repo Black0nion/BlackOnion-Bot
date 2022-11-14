@@ -7,4 +7,9 @@ public class NullInjector implements Injector {
 	public <T> T createInstance(Class<?> toInstantiate, Class<T> expectedType) {
 		return null;
 	}
+
+	@Override
+	public <T> T getInstance(Class<T> wantedClass) {
+		return null;
+	}
 }

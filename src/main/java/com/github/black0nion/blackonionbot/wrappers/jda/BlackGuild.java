@@ -82,7 +82,7 @@ public class BlackGuild extends GuildImpl {
 		super(guild);
 
 		try {
-			this.warns.addAll(Warn.loadWarns("guild", this.getIdLong()));
+			this.warns.addAll(Warn.loadWarns(Bot.getInstance().getDatabaseFactory(), "guild", this.getIdLong()));
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
