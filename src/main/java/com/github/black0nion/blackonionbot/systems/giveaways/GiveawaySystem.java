@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -35,27 +36,33 @@ public class GiveawaySystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(GiveawaySystem.class);
 
-	private GiveawaySystem() {}
+	private final SQLHelperFactory sql;
 
-	private static final List<Giveaway> giveaways = new ArrayList<>();
+	public GiveawaySystem(SQLHelperFactory sql) {
+		this.sql = sql;
+	}
 
-	private static final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
-		new ThreadFactoryBuilder().setNameFormat("giveaway-scheduler-%d").build()
+	private final List<Giveaway> giveaways = new ArrayList<>();
+
+	private static int schedulerId = 1;
+	private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
+		new ThreadFactoryBuilder().setNameFormat("giveaway-scheduler-" + schedulerId++ + "-%d").build()
 	);
 
-	public static void init() {
+	public void init() {
 		try {
-			try (SQLHelper sq = new SQLHelper("SELECT * FROM giveaways");
+			try (SQLHelper sq = sql.create("SELECT * FROM giveaways");
 					ResultSet rs = sq.executeQuery()) {
 				while (rs.next()) {
 					giveaways.add(new Giveaway(
-							LocalDateTime.ofEpochSecond(rs.getLong("endDate"), 0, ZoneOffset.UTC),
-							rs.getLong("messageId"),
-							rs.getLong("channelId"),
-							rs.getLong("createrId"),
-							rs.getLong("guildId"),
-							rs.getString("item"),
-							rs.getInt("winners")
+						sql,
+						LocalDateTime.ofEpochSecond(rs.getLong("endDate"), 0, ZoneOffset.UTC),
+						rs.getLong("messageId"),
+						rs.getLong("channelId"),
+						rs.getLong("createrId"),
+						rs.getLong("guildId"),
+						rs.getString("item"),
+						rs.getInt("winners")
 					));
 				}
 			}
@@ -65,13 +72,13 @@ public class GiveawaySystem {
 	}
 
 	@Nullable
-	public static Giveaway getGiveaway(final long messageId) {
+	public Giveaway getGiveaway(final long messageId) {
 		return giveaways.stream().filter(giveaway -> giveaway.messageId() == messageId).findFirst().orElse(null);
 	}
 
-	public static void createGiveaway(final LocalDateTime endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
+	public void createGiveaway(final LocalDateTime endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
 		try {
-			final Giveaway giveaway = new Giveaway(endDate, messageId, channelId, createrId, guildId, item, winners);
+			final Giveaway giveaway = new Giveaway(sql, endDate, messageId, channelId, createrId, guildId, item, winners);
 			if (giveaways.contains(giveaway)) return;
 			giveaways.add(giveaway);
 			giveaway.writeToDatabase();
@@ -81,7 +88,7 @@ public class GiveawaySystem {
 		}
 	}
 
-	public static void scheduleGiveaway(final Giveaway giveaway) {
+	public void scheduleGiveaway(final Giveaway giveaway) {
 		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
@@ -94,7 +101,7 @@ public class GiveawaySystem {
 		});
 	}
 
-	public static void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
+	public void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
@@ -128,14 +135,14 @@ public class GiveawaySystem {
 		}
 	}
 
-	private static void updateGiveawayMessage(Message msg, Language lang) {
+	private void updateGiveawayMessage(Message msg, Language lang) {
 		MessageEmbed embed = msg.getEmbeds().get(0);
 		EmbedBuilder builder = new EmbedBuilder(embed);
 		builder.setDescription(embed.getDescription() + "\n" + lang.getTranslation("giveawayended"));
 		msg.editMessageEmbeds(builder.build()).queue();
 	}
 
-	private static void deleteGiveaway(final Giveaway giveaway) {
+	private void deleteGiveaway(final Giveaway giveaway) {
 		try {
 			giveaways.remove(giveaway);
 			giveaway.deleteFromDatabase();

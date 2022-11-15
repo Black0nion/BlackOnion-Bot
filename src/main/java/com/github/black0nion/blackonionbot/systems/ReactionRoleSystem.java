@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.Role;
@@ -18,6 +19,13 @@ import java.sql.SQLException;
 import java.util.function.BiConsumer;
 
 public class ReactionRoleSystem extends ListenerAdapter {
+
+	private final SQLHelperFactory sql;
+
+	public ReactionRoleSystem(SQLHelperFactory factory) {
+		this.sql = factory;
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
 	@Override
@@ -31,8 +39,8 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	}
 
 	@SQLSetup
-	private static void setupDB() throws SQLException {
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS reaction_roles (" +
+	private static void setupDB(SQLHelperFactory sql) throws SQLException {
+		sql.run("CREATE TABLE IF NOT EXISTS reaction_roles (" +
 			"guild_id BIGINT NOT NULL, " +
 			"role_id BIGINT NOT NULL, " +
 			"channel_id BIGINT NOT NULL, " +
@@ -61,7 +69,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	private Role getRole(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) {
 		String emoji = Utils.serializeEmoji(e.getEmoji());
 
-		try (SQLHelper sq = new SQLHelper("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
+		try (SQLHelper sq = sql.create("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
 					.addParameters(guildId, channelID, messageId, emoji);
 				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {

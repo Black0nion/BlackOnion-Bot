@@ -75,12 +75,6 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
-	public static boolean anyMatch(ConnectionSupplier connectionSupplier, String sql, Object... arguments) throws SQLException {
-		try (SQLHelper helper = new SQLHelper(connectionSupplier, sql, arguments)) {
-			return helper.anyMatch();
-		}
-	}
-
 	public boolean execute() throws SQLException {
 		try (PreparedStatement ps = create()) {
 			return ps.execute();

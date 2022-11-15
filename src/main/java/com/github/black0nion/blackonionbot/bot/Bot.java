@@ -116,6 +116,7 @@ public class Bot extends ListenerAdapter {
 	private final Settings settings;
 	private final DatabaseConnector database;
 	private final SQLHelperFactory sqlHelperFactory;
+	private final GiveawaySystem giveawaySystem;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -198,13 +199,23 @@ public class Bot extends ListenerAdapter {
 		slashCommandBase = new SlashCommandBase(config, injector);
 		injectorMap.add(slashCommandBase);
 
+		giveawaySystem = new GiveawaySystem(sqlHelperFactory);
+
 		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER))
 			.enableCache(CacheFlag.VOICE_STATE)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(slashCommandBase, this, new ReactionRoleSystem(), new JoinLeaveSystem(config, settings), new AutoRolesSystem(), statisticsManager, eventWaiter);
+			.addEventListeners(
+				slashCommandBase,
+				this,
+				new ReactionRoleSystem(sqlHelperFactory),
+				new JoinLeaveSystem(config, settings),
+				new AutoRolesSystem(),
+				statisticsManager,
+				eventWaiter
+			);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
@@ -289,7 +300,7 @@ public class Bot extends ListenerAdapter {
 		logger.info("Connected to {}#{} in {}ms.", readyJda.getSelfUser().getName(), readyJda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
 		slashCommandBase.updateCommandsDev(readyJda);
-		executor.submit(GiveawaySystem::init);
+		executor.submit(giveawaySystem::init);
 	}
 
 	@Reloadable("commands")

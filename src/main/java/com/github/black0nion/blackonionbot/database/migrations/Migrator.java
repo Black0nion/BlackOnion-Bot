@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.database.migrations;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +25,12 @@ public class Migrator {
 
 	private final DatabaseConnector databaseConnector;
 	private final Config config;
+	private final SQLHelperFactory sql;
 
 	public Migrator(DatabaseConnector connection, Config config) {
 		this.databaseConnector = connection;
 		this.config = config;
+		this.sql = this.databaseConnector.getSqlHelperFactory();
 	}
 
 	public void migrate() throws SQLException, IOException {
@@ -40,7 +43,7 @@ public class Migrator {
 	}
 
 	private void migrateImpl() throws SQLException, IOException {
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS migrations (version FLOAT PRIMARY KEY NOT NULL)");
+		sql.run("CREATE TABLE IF NOT EXISTS migrations (version FLOAT PRIMARY KEY NOT NULL)");
 
 		if (alreadyAtLatestSchemaVersion()) return;
 
@@ -50,7 +53,7 @@ public class Migrator {
 		// if not, backup schema
 		boolean backupExists;
 
-		try (SQLHelper sqlHelper = new SQLHelper("""
+		try (SQLHelper sqlHelper = sql.create("""
 				SELECT EXISTS (
 				SELECT FROM information_schema.tables
 				WHERE  table_schema = 'backup'
@@ -64,8 +67,8 @@ public class Migrator {
 		if (backupExists) {
 			logger.debug("Backup exists, checking if versions match");
 			// check if backup schema exists and has same version as current schema
-			try (SQLHelper sq1 = new SQLHelper(getHashSQL("migrations")); ResultSet rs1 = sq1.executeQuery();
-				 SQLHelper sq2 = new SQLHelper(getHashSQL("backup.migrations")); ResultSet rs2 = sq2.executeQuery()) {
+			try (SQLHelper sq1 = sql.create(getHashSQL("migrations")); ResultSet rs1 = sq1.executeQuery();
+				 SQLHelper sq2 = sql.create(getHashSQL("backup.migrations")); ResultSet rs2 = sq2.executeQuery()) {
 				if (rs1.next() && rs2.next()) {
 					String hash1 = rs1.getString(1);
 					String hash2 = rs2.getString(1);
@@ -92,7 +95,7 @@ public class Migrator {
 		if (files == null) return;
 
 		// get the version from the database
-		try (SQLHelper sqlHelper = new SQLHelper("SELECT max(version) FROM migrations"); ResultSet rs = sqlHelper.executeQuery()) {
+		try (SQLHelper sqlHelper = sql.create("SELECT max(version) FROM migrations"); ResultSet rs = sqlHelper.executeQuery()) {
 			if (rs.next()) {
 				float version = rs.getFloat("version");
 				for (File file : files) {
@@ -103,25 +106,25 @@ public class Migrator {
 					}
 				}
 			}
-			SQLHelper.run("INSERT INTO migrations (version) VALUES (?)", CURRENT_VERSION);
+			sql.run("INSERT INTO migrations (version) VALUES (?)", CURRENT_VERSION);
 		}
 	}
 
 	private void backupSchema() throws SQLException {
-		try (SQLHelper sqlHelper = new SQLHelper("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+		try (SQLHelper sqlHelper = sql.create("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
 				ResultSet rs = sqlHelper.executeQuery()) {
 			while (rs.next()) {
 				String tableName = rs.getString("table_name");
-				SQLHelper.run("CREATE SCHEMA IF NOT EXISTS backup");
-				SQLHelper.run("DROP TABLE IF EXISTS backup." + tableName);
-				SQLHelper.run("CREATE TABLE backup." + tableName + " AS TABLE " + tableName);
+				sql.run("CREATE SCHEMA IF NOT EXISTS backup");
+				sql.run("DROP TABLE IF EXISTS backup." + tableName);
+				sql.run("CREATE TABLE backup." + tableName + " AS TABLE " + tableName);
 			}
 		}
 		logger.debug("Backup complete");
 	}
 
-	private static boolean alreadyAtLatestSchemaVersion() throws SQLException {
-		try (SQLHelper sq1 = new SQLHelper("SELECT version FROM migrations ORDER BY version DESC LIMIT 1");
+	private boolean alreadyAtLatestSchemaVersion() throws SQLException {
+		try (SQLHelper sq1 = sql.create("SELECT version FROM migrations ORDER BY version DESC LIMIT 1");
 				ResultSet rs = sq1.executeQuery()) {
 			if (rs.next()) {
 				float version = rs.getFloat(1);

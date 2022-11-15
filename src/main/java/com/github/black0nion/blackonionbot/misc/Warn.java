@@ -95,7 +95,7 @@ public record Warn(
 				}
 			}
 			if (!warns.isEmpty()) {
-				try (SQLHelper sqlHelper = new SQLHelper("INSERT INTO warns VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING");
+				try (SQLHelper sqlHelper = sql.create("INSERT INTO warns VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING");
 						PreparedStatement ps2 = sqlHelper.create()) {
 					for (Warn warn : warns) {
 						ps2.setLong(1, warn.issuer());

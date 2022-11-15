@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
-import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.exception.MultipleDefaultLanguagesException;
@@ -45,7 +46,7 @@ public class LanguageSystem {
 				languages.put(lang.getLanguageCode(), lang);
 				if (lang.isDefault()) defaultLocale = lang;
 				try {
-					SQLHelper.run("INSERT INTO language (code, name) VALUES (?, ?) ON CONFLICT DO NOTHING", lang.getLanguageCode(), lang.getName());
+					Bot.getInstance().getSqlHelperFactory().run("INSERT INTO language (code, name) VALUES (?, ?) ON CONFLICT DO NOTHING", lang.getLanguageCode(), lang.getName());
 				} catch (SQLException e) {
 					logger.error("Error while updating language table", e);
 				}
@@ -56,8 +57,8 @@ public class LanguageSystem {
 	}
 
 	@SQLSetup
-	public static void setup() throws SQLException {
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS language (code VARCHAR(2) PRIMARY KEY, name TEXT NOT NULL)");
+	public static void setup(SQLHelperFactory sql) throws SQLException {
+		sql.run("CREATE TABLE IF NOT EXISTS language (code VARCHAR(2) PRIMARY KEY, name TEXT NOT NULL)");
 	}
 
 	public static Map<String, Language> getLanguages() {

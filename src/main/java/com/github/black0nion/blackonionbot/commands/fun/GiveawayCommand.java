@@ -40,7 +40,9 @@ public class GiveawayCommand extends SlashCommand {
 
 	private static final String MESSAGE_ID = "message_id";
 
-	public GiveawayCommand() {
+	private final GiveawaySystem giveawaySystem;
+
+	public GiveawayCommand(GiveawaySystem giveawaySystem) {
 		super(builder(Commands.slash("giveaway", "Manage giveaways")
 			.addSubcommands(
 				new SubcommandData("create", "Create a giveaway").addOptions(
@@ -55,6 +57,7 @@ public class GiveawayCommand extends SlashCommand {
 				new SubcommandData("end", "End a giveaway").addOption(OptionType.STRING, MESSAGE_ID, "The message id of the giveaway.", true)
 			))
 		);
+		this.giveawaySystem = giveawaySystem;
 	}
 
 	@Override
@@ -66,7 +69,7 @@ public class GiveawayCommand extends SlashCommand {
 		}
 	}
 
-	private static void createGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackUser author, BlackGuild guild, TextChannel channel) {
+	private void createGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackUser author, BlackGuild guild, TextChannel channel) {
 		Integer min = e.getOption(MINUTES, OptionMapping::getAsInt);
 		Integer hours = e.getOption(HOURS, OptionMapping::getAsInt);
 		Integer days = e.getOption(DAYS, OptionMapping::getAsInt);
@@ -101,16 +104,16 @@ public class GiveawayCommand extends SlashCommand {
 			message -> {
 				message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
 				message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
-				GiveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
+				giveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
 			}
 		));
 	}
 
-	private static void endGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	private void endGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		var id = e.getOption(MESSAGE_ID, OptionMapping::getAsString);
 		if (Utils.isLong(id)) {
 			final long idLong = Long.parseLong(id);
-			final Giveaway giveaway = GiveawaySystem.getGiveaway(idLong);
+			final Giveaway giveaway = giveawaySystem.getGiveaway(idLong);
 
 			if (giveaway == null || giveaway.channelId() != channel.getIdLong()) {
 				cmde.error("giveawaynotfound", "giveawaynotfounddesc");
@@ -121,7 +124,7 @@ public class GiveawayCommand extends SlashCommand {
 					if (msg == null) {
 						cmde.exception();
 					} else {
-						GiveawaySystem.endGiveaway(giveaway, msg, guild);
+						giveawaySystem.endGiveaway(giveaway, msg, guild);
 						cmde.success("giveawayended", "giveawaygotended");
 					}
 				});

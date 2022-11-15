@@ -9,6 +9,11 @@ public class NullInjector implements Injector {
 	}
 
 	@Override
+	public Object[] getInstances(Class<?>... wantedClasses) {
+		return new Object[0];
+	}
+
+	@Override
 	public <T> T getInstance(Class<T> wantedClass) {
 		return null;
 	}

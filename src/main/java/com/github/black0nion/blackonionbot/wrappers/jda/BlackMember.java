@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.MemberImpl;
@@ -58,7 +59,7 @@ public class BlackMember extends MemberImpl {
 		super(member);
 		this.blackGuild = blackGuild;
 
-		loadWarns("user", this.getIdLong());
+		loadWarns(Bot.getInstance().getSqlHelperFactory(), "user", this.getIdLong());
 		this.warns.forEach(this.blackGuild::addWarn);
 	 	this.blackUser = BlackUser.from(this.member.getUser());
 	}
@@ -90,7 +91,7 @@ public class BlackMember extends MemberImpl {
 	}
 
 	private void saveWarns() {
-		Warn.saveWarns(this.warns, this.getIdLong());
+		Warn.saveWarns(Bot.getInstance().getSqlHelperFactory(), this.warns, this.getIdLong());
 	}
 
 	/**

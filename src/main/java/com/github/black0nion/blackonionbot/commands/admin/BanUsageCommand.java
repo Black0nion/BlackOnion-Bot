@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -31,7 +32,9 @@ public class BanUsageCommand extends SlashCommand {
 		new SubcommandData("guild", "(un)ban a guild").addOption(OptionType.STRING, "targetguild", "guild to (un)ban", true),
 	};
 
-	public BanUsageCommand() {
+	private final SQLHelperFactory sql;
+
+	public BanUsageCommand(SQLHelperFactory sql) {
 		super(builder(
 			Commands.slash("usage", "(un)ban a user or a guild from using commands.")
 				.addSubcommandGroups(
@@ -40,18 +43,19 @@ public class BanUsageCommand extends SlashCommand {
 			.setAdminGuild()
 			.permissions(CustomPermission.BAN_USAGE)
 		);
+		this.sql = sql;
 	}
 
 	private static final Pattern GUILD_ID_PATTERN = Pattern.compile("^\\d{17,18}$");
 
 	@SQLSetup
-	private static void setup() throws SQLException {
-		SQLHelper.run("DO $$ BEGIN " +
+	private static void setup(SQLHelperFactory sql) throws SQLException {
+		sql.run("DO $$ BEGIN " +
 			"CREATE TYPE user_or_guild AS ENUM ('user', 'guild');" +
 			"EXCEPTION WHEN duplicate_object THEN null;" +
 			"END $$;"
 		);
-		SQLHelper.run("CREATE TABLE IF NOT EXISTS banned_entities (id BIGINT PRIMARY KEY, type user_or_guild NOT NULL)");
+		sql.run("CREATE TABLE IF NOT EXISTS banned_entities (id BIGINT PRIMARY KEY, type user_or_guild NOT NULL)");
 	}
 
 	@Override
@@ -66,13 +70,13 @@ public class BanUsageCommand extends SlashCommand {
 
 		if (user != null) {
 			if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
-				if (SQLHelper.run("INSERT INTO banned_entities (id, type) VALUES (?, 'user') ON CONFLICT DO NOTHING", user.getIdLong())) {
+				if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'user') ON CONFLICT DO NOTHING", user.getIdLong())) {
 					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", Utils.escapeMarkdown(user.getAsTag())));
 				} else {
 					cmde.exception();
 				}
 			} else {
-				if (SQLHelper.run("DELETE FROM banned_entities WHERE id = ? AND type = 'user'", user.getIdLong())) {
+				if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'user'", user.getIdLong())) {
 					cmde.send("userunbannednoreason");
 				} else {
 					cmde.send("erroroccurred");
@@ -90,12 +94,12 @@ public class BanUsageCommand extends SlashCommand {
 
 		if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
 			// TODO: test behaviour of ON CONFLICT DO NOTHING
-			if (SQLHelper.run("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING", guildId))
+			if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING", guildId))
 				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
 			else
 				cmde.exception();
 		} else {
-			if (SQLHelper.run("DELETE FROM banned_entities WHERE id = ? AND type = 'guild'", guildId)) {
+			if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'guild'", guildId)) {
 				cmde.send("guildunbanned");
 			} else {
 				cmde.exception();
@@ -107,9 +111,8 @@ public class BanUsageCommand extends SlashCommand {
 	// TODO: implement caching
 	public static boolean isBanned(DatabaseConnector connector, long guildID, long userID) {
 		try {
-			try (SQLHelper sq = new SQLHelper("SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
-					.addParameters(userID, guildID)
-					.setConnection(connector.getLowPriorityConnection())) {
+			try (SQLHelper sq = new SQLHelper(connector::getLowPriorityConnection, "SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
+					.addParameters(userID, guildID)) {
 				return sq.anyMatch();
 			}
 		} catch (SQLException e) {
