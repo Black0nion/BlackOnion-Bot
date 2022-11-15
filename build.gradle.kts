@@ -63,7 +63,7 @@ dependencies {
 
     implementation("com.github.walkyst:lavaplayer-fork:1.3.99.1")
 
-    implementation("io.javalin:javalin-bundle:5.1.3")
+    implementation("io.javalin:javalin-bundle:5.1.4")
 
     implementation("org.json:json:20220924")
 
