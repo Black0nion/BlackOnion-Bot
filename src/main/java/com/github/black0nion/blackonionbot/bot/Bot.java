@@ -224,6 +224,7 @@ public class Bot extends ListenerAdapter {
 		builder.setActivity(ActivityCommand.getActivity(settings));
 
 		logger.info("Starting JDA...");
+		if (true) return;
 		try {
 			this.jda = builder.build();
 		} catch (final Exception e) {

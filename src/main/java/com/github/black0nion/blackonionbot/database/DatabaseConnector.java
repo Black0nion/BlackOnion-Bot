@@ -79,9 +79,9 @@ public class DatabaseConnector {
 		for (Method method : methods) {
 			try {
 				logger.debug("Running method {}#{}", method.getDeclaringClass().getName(), method.getName());
-				method.invoke(sqlHelperFactory);
+				method.invoke(null, sqlHelperFactory);
 			} catch (Exception e) {
-				throw new SQLSetupException("Error while running SQL setup method " + method.getName(),
+				throw new SQLSetupException("Error while running SQL setup method " + method.getDeclaringClass().getName() + "#" + method.getName(),
 					e.getCause() != null ? e.getCause() : e);
 			}
 		}

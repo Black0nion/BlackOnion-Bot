@@ -54,10 +54,7 @@ public class Migrator {
 		boolean backupExists;
 
 		try (SQLHelper sqlHelper = sql.create("""
-				SELECT EXISTS (
-				SELECT FROM information_schema.tables
-				WHERE  table_schema = 'backup'
-				AND    table_name   = 'migrations'
+				
 				);
 				"""); ResultSet resultSet = sqlHelper.executeQuery()) {
 			resultSet.next();
@@ -111,6 +108,9 @@ public class Migrator {
 	}
 
 	private void backupSchema() throws SQLException {
+		CloneSchema.addFunction(config, sql);
+		sql.run("SELECT clone_schema('public', 'backup')");
+		if (true) return;
 		try (SQLHelper sqlHelper = sql.create("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
 				ResultSet rs = sqlHelper.executeQuery()) {
 			while (rs.next()) {
