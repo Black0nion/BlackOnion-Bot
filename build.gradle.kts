@@ -88,7 +88,7 @@ dependencies {
     implementation("com.github.loki4j:loki-logback-appender:1.3.2")
     implementation("org.codehaus.janino:janino:3.1.8")
 
-    implementation("io.github.classgraph:classgraph:4.8.149")
+    implementation("io.github.classgraph:classgraph:4.8.151")
 
     implementation("io.prometheus:simpleclient:0.16.0")
     implementation("io.prometheus:simpleclient_hotspot:0.16.0")
