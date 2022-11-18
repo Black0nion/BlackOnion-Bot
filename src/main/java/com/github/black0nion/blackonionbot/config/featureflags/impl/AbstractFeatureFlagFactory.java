@@ -1,6 +1,6 @@
-package com.github.black0nion.blackonionbot.config.featureflags.api;
+package com.github.black0nion.blackonionbot.config.featureflags.impl;
 
-import com.github.black0nion.blackonionbot.config.featureflags.impl.AbstractFeatureFlag;
+import com.github.black0nion.blackonionbot.config.featureflags.api.FeatureFlagFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

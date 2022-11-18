@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.misc;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;

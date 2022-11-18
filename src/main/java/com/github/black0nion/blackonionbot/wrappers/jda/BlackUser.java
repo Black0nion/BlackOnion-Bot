@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;

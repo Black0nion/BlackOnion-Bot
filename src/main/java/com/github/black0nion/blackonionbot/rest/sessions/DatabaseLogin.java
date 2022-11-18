@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.rest.sessions;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.OAuthHandler;

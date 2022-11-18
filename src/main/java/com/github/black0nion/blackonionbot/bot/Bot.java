@@ -13,7 +13,7 @@ import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;

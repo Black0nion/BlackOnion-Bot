@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.database;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.impl.SQLHelperFactoryImpl;
 import com.github.black0nion.blackonionbot.database.migrations.Migrator;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
@@ -37,7 +39,7 @@ public class DatabaseConnector {
 
 	public DatabaseConnector(Config config, FeatureFlags featureFlags) throws SQLException, IOException {
 		this.featureFlags = featureFlags;
-		this.sqlHelperFactory = (rawSQL, parameters) -> new SQLHelper(DatabaseConnector.this::getConnection, rawSQL, parameters);
+		this.sqlHelperFactory = new SQLHelperFactoryImpl(featureFlags, this::getConnection);
 
 		HikariConfig hikariConfig = createHikariConfig(config);
 		hikariConfig.setPoolName("MainPool");
@@ -53,7 +55,7 @@ public class DatabaseConnector {
 		dsLowPriority = new HikariDataSource(hikariConfigLowPriority);
 		dsLowPriority.setMaximumPoolSize(5);
 
-		new Migrator(this, config).migrate();
+		new Migrator(this, featureFlags).migrate();
 
 		runSqlSetupMethods();
 	}
@@ -112,23 +114,21 @@ public class DatabaseConnector {
 
 	Connection getConnection() throws SQLException {
 		// check for the feature flag first because that's (probably) faster
-		if (featureFlags.DB__LOG_CONNECTION_ACQUIRED.getValue() && logger.isDebugEnabled())
-			logger.debug("Connection requested from: {}", Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 2, 7)));
+		if (featureFlags.db_logConnectionAcquired.getValue() && logger.isDebugEnabled())
+			logger.debug("Connection requested from: {}", Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 2, 10)));
 		return ds.getConnection();
 	}
 
 	public Connection getLowPriorityConnection() throws SQLException {
-		if (featureFlags.DB__LOG_CONNECTION_ACQUIRED.getValue() && logger.isDebugEnabled())
-			logger.debug("Low Priority Connection requested from: {}", Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 0, 5)));
+		if (featureFlags.db_logConnectionAcquired.getValue() && logger.isDebugEnabled())
+			logger.debug("Low Priority Connection requested from: {}", Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 0, 8)));
 		return dsLowPriority.getConnection();
 	}
 
 	public void close() {
 		ds.close();
 		dsLowPriority.close();
-		if (featureFlags.DB__LOG_CONNECTION_RELEASED.isEnabled()) {
-			logger.info("Closed all connections");
-		}
+		logger.info("Closed all connection pools.");
 	}
 
 	public SQLHelperFactory getSqlHelperFactory() {

@@ -5,6 +5,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.inject.Injector;
@@ -217,12 +218,23 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		final TextChannel channel = event.getChannel().asTextChannel();
 
-		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
-		final String log = EmojiParser.parseToAliases(guild.getDebugMessage() + " > " + channel.getName() + "(C:" + channel.getId() + ") | " + author.getDebugMessage() + ": (E:" + event.getId() + ")" + event.getCommandPath() + " " + event.getOptions().stream().map(OptionMapping::toString).collect(Collectors.joining(" ")).replace("\n", "\\n"));
+		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(FeatureFlags.class), injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
 
 		if (config.getRunMode() == RunMode.DEV) {
+			final String log = EmojiParser.parseToAliases(guild.getDebugMessage()
+				+ " > "
+				+ channel.getName()
+				+ "(C:" + channel.getId() + ") | " + author.getDebugMessage()
+				+ ": (E:" + event.getId() + ")"
+				+ event.getCommandPath() + " "
+				+ event.getOptions().stream()
+				.map(OptionMapping::toString)
+				.collect(Collectors.joining(" "))
+				.replace("\n", "\\n"));
+
 			if (locked) logger.warn(log);
 			else logger.info(log);
+			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 		}
 
@@ -242,7 +254,6 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
 				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredCustomPermissions())));
 				return;

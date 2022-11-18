@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 
 import java.sql.PreparedStatement;

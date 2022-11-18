@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.Role;

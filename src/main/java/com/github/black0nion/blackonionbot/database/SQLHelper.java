@@ -1,5 +1,9 @@
 package com.github.black0nion.blackonionbot.database;
 
+import com.github.black0nion.blackonionbot.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,13 +16,16 @@ import static java.util.Objects.requireNonNull;
 
 public class SQLHelper implements AutoCloseable {
 
+	private static final Logger logger = LoggerFactory.getLogger(SQLHelper.class);
 	private final String rawSQL;
 	private final List<Object> parameters = new ArrayList<>();
-	private Connection connection;
-	private PreparedStatement preparedStatement;
+	protected Connection connection;
+	protected PreparedStatement preparedStatement;
+	private final boolean logConnectionReleases;
 	private final ConnectionSupplier connectionSupplier;
 
-	public SQLHelper(ConnectionSupplier connectionGetter, String rawSQL, Object... parameters) {
+	public SQLHelper(boolean logConnectionReleases, ConnectionSupplier connectionGetter, String rawSQL, Object... parameters) {
+		this.logConnectionReleases = logConnectionReleases;
 		this.connectionSupplier = connectionGetter;
 		this.rawSQL = rawSQL;
 		if (parameters != null && parameters.length > 0) {
@@ -26,7 +33,8 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
-	public SQLHelper(ConnectionSupplier connectionGetter, String rawSQL) {
+	public SQLHelper(boolean logConnectionReleases, ConnectionSupplier connectionGetter, String rawSQL) {
+		this.logConnectionReleases = logConnectionReleases;
 		this.connectionSupplier = connectionGetter;
 		this.rawSQL = rawSQL;
 	}
@@ -78,6 +86,8 @@ public class SQLHelper implements AutoCloseable {
 	public boolean execute() throws SQLException {
 		try (PreparedStatement ps = create()) {
 			return ps.execute();
+		} finally {
+			close();
 		}
 	}
 
@@ -92,15 +102,29 @@ public class SQLHelper implements AutoCloseable {
 		}
 	}
 
-	public static boolean run(ConnectionSupplier connectionSupplier, String sql, Object... parameters) throws SQLException {
-		try (SQLHelper sqlHelper = new SQLHelper(connectionSupplier, sql, parameters)) {
-			return sqlHelper.execute();
+	/**
+	 * Runs the query, returns the value, <b>and closes the connection</b>.
+	 *
+	 * @return either the first column of the first row of the query or null
+	 */
+	public String runQuery() throws SQLException {
+		try (ResultSet rs = executeQuery()) {
+			if (rs.next()) {
+				return rs.getString(1);
+			}
+		} finally {
+			this.close();
 		}
+		return null;
 	}
 
 	@Override
 	public void close() throws SQLException {
 		connection.close();
 		preparedStatement.close();
+		if (logConnectionReleases && logger.isDebugEnabled()) {
+			logger.debug("Closed connection requested from: {}",
+				Utils.stackTraceToString(Arrays.copyOfRange(Thread.currentThread().getStackTrace(), 2, 10)));
+		}
 	}
 }

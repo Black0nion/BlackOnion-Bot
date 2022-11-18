@@ -5,6 +5,7 @@ import com.github.black0nion.blackonionbot.config.featureflags.impl.BooleanFeatu
 import com.github.black0nion.blackonionbot.misc.Holder;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("CheckStyle")
 public class FeatureFlags extends Holder<FeatureFlagFactory> {
 
 
@@ -12,6 +13,7 @@ public class FeatureFlags extends Holder<FeatureFlagFactory> {
 		super(factory);
 	}
 
-	public final BooleanFeatureFlag DB__LOG_CONNECTION_ACQUIRED = getValue().create("db.log_connection_acquired");
-	public final BooleanFeatureFlag DB__LOG_CONNECTION_RELEASED = getValue().create("db.log_connection_released");
+	public final BooleanFeatureFlag db_logConnectionAcquired = getValue().create("db.log_connection_acquired");
+	public final BooleanFeatureFlag db_logConnectionReleased = getValue().create("db.log_connection_released");
+	public final BooleanFeatureFlag db_logMigrationCommands = getValue().create("db.log_migration_commands");
 }

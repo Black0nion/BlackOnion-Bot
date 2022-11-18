@@ -2,9 +2,10 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -109,9 +110,9 @@ public class BanUsageCommand extends SlashCommand {
 	}
 
 	// TODO: implement caching
-	public static boolean isBanned(DatabaseConnector connector, long guildID, long userID) {
+	public static boolean isBanned(FeatureFlags flags, DatabaseConnector connector, long guildID, long userID) {
 		try {
-			try (SQLHelper sq = new SQLHelper(connector::getLowPriorityConnection, "SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
+			try (SQLHelper sq = new SQLHelper(flags.db_logConnectionReleased.getValue(), connector::getLowPriorityConnection, "SELECT * FROM banned_entities WHERE (id = ? AND type = 'user') OR (id = ? AND type = 'guild')")
 					.addParameters(userID, guildID)) {
 				return sq.anyMatch();
 			}

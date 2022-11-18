@@ -491,6 +491,7 @@ public class Utils {
 
 	public static String stackTraceToString(StackTraceElement[] stackTraceElements) {
 		return Arrays.stream(stackTraceElements)
+			.filter(Objects::nonNull)
 			.map(StackTraceElement::toString)
 			.collect(Collectors.joining("\n"));
 	}
