@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.database.migrations;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.utils.ClasspathScanner;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
@@ -22,16 +21,14 @@ import java.util.regex.Pattern;
 public class Migrator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
-	private static final int CURRENT_VERSION = 2;
+	private static final int CURRENT_VERSION = 1;
 	// VERSION_DESCRIPTION-OF-THE-MIGRATION.sql
 	private static final Pattern MIGRATION_FILES_PATTERN = Pattern.compile("^(\\d+)_(.*)\\.sql$");
 
 	private final MigratorSQLHelperFactoryImpl sql;
-	private final SQLHelperFactory sqlAutoCommit;
 	private final FeatureFlags featureFlags;
 
 	public Migrator(DatabaseConnector connection, FeatureFlags featureFlags) throws SQLException {
-		this.sqlAutoCommit = connection.getSqlHelperFactory();
 		this.sql = new MigratorSQLHelperFactoryImpl(featureFlags, new MigratorConnectionGetter(connection));
 		this.featureFlags = featureFlags;
 	}
@@ -47,6 +44,7 @@ public class Migrator {
 	}
 
 	private void migrateImpl() throws SQLException, IOException {
+		logger.debug("Starting migration");
 		sql.run("CREATE TABLE IF NOT EXISTS migrations (version INTEGER PRIMARY KEY NOT NULL)");
 
 		if (alreadyAtLatestSchemaVersion()) return;
@@ -87,20 +85,25 @@ public class Migrator {
 							logger.debug("Skipping migration stored in {} which migrates from {}", file, fileVersion);
 						}
 					}
-					sql.commit();
 				}
 			} else {
 				logger.info("No database version found (= no existing tables), skipping any migrations");
 			}
 
-			logger.info("Inserting new version ({}) into database", CURRENT_VERSION);
-			sqlAutoCommit.run("INSERT INTO migrations (version) VALUES (?) ON CONFLICT DO NOTHING", CURRENT_VERSION);
+			logger.debug("Inserting new version ({}) into database", CURRENT_VERSION);
+			sql.run("INSERT INTO migrations (version) VALUES (?) ON CONFLICT DO NOTHING", CURRENT_VERSION);
+
+			logger.debug("Migrations finished, committing changes...");
+			sql.commit();
+			logger.info("Migration committed.");
 		} catch (Exception ex) {
 			sql.revert();
 			throw ex;
 		} finally {
 			// finally, close the connection used for migrations
+			logger.debug("Closing connection used for migrations...");
 			sql.getSupplier().get().close();
+			logger.debug("Connection closed.");
 		}
 	}
 
@@ -111,6 +114,7 @@ public class Migrator {
 				int version = rs.getInt("version");
 				logger.info("DB version is {}, local version is {}", version, CURRENT_VERSION);
 				if (version == CURRENT_VERSION) {
+					logger.info("Already at latest schema version, skipping migration.");
 					return true;
 				}
 			}
