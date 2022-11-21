@@ -31,7 +31,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-// TODO: refactor to DI & tests
 public class GiveawaySystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(GiveawaySystem.class);
@@ -88,6 +87,9 @@ public class GiveawaySystem {
 		}
 	}
 
+	/**
+	 * Adds an existing giveaway to the {@link #scheduler Giveaway Scheduler}
+	 */
 	public void scheduleGiveaway(final Giveaway giveaway) {
 		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
 		assert guild != null;
