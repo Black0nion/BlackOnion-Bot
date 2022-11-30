@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
-import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
+import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 
@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
-import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
+import static com.github.black0nion.blackonionbot.config.common.Flags.*;
 
 // the nullable things are already checked by the get value so the warnings can be ignored
 public class ConfigImpl extends ConfigLoaderHolder<ConfigLoader> implements Config {

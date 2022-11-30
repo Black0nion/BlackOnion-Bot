@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class Migrator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
-	private static final int CURRENT_VERSION = 1;
+	private static final int CURRENT_VERSION = 69;
 	// VERSION_DESCRIPTION-OF-THE-MIGRATION.sql
 	private static final Pattern MIGRATION_FILES_PATTERN = Pattern.compile("^(\\d+)_(.*)\\.sql$");
 
@@ -33,13 +33,18 @@ public class Migrator {
 		this.featureFlags = featureFlags;
 	}
 
-	public void migrate() {
+	public void migrate() throws SQLException {
 		try {
 			migrateImpl();
 		} catch (MigrationException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new MigrationException("Failed to migrate database", e);
+		} finally {
+			// finally, close the connection used for migrations
+			logger.debug("Closing connection used for migrations...");
+			sql.getSupplier().get().close();
+			logger.debug("Connection closed.");
 		}
 	}
 
@@ -99,17 +104,12 @@ public class Migrator {
 		} catch (Exception ex) {
 			sql.revert();
 			throw ex;
-		} finally {
-			// finally, close the connection used for migrations
-			logger.debug("Closing connection used for migrations...");
-			sql.getSupplier().get().close();
-			logger.debug("Connection closed.");
 		}
 	}
 
 	private boolean alreadyAtLatestSchemaVersion() throws SQLException {
-		try (SQLHelper sq1 = sql.create("SELECT version FROM migrations ORDER BY version DESC LIMIT 1");
-				ResultSet rs = sq1.executeQuery()) {
+		try (SQLHelper sq = sql.create("SELECT max(version) AS version FROM migrations");
+				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				int version = rs.getInt("version");
 				logger.info("DB version is {}, local version is {}", version, CURRENT_VERSION);
@@ -142,6 +142,7 @@ public class Migrator {
 					}
 				}
 			}
+			reader.close();
 		}
 	}
 }

@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
-import com.github.black0nion.blackonionbot.misc.exception.UnwrapMeException;
+import com.github.black0nion.blackonionbot.misc.exception.CauseWrapperException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -22,6 +22,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -49,15 +52,15 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 		super(builder(
 			Commands.slash("reactionroles", "Used to set up a reaction role.").addSubcommands(
 				new SubcommandData(CREATE_REACTION, "Used to create a reaction role.")
-					.addOption(OptionType.CHANNEL, CREATE_REACTION_CHANNEL, "The channel to create the reaction role in.")
-					.addOption(OptionType.NUMBER, CREATE_REACTION_MESSAGE_ID, "The message to create the reaction role in.")
-					.addOption(OptionType.STRING, CREATE_REACTION_EMOTE, "The emoji id to create the reaction role with.")
-					.addOption(OptionType.ROLE, CREATE_REACTION_ROLE, "The role to give to the userid when they react."),
+					.addOption(OptionType.CHANNEL, CREATE_REACTION_CHANNEL, "The channel to create the reaction role in.", true)
+					.addOption(OptionType.STRING, CREATE_REACTION_MESSAGE_ID, "The message to create the reaction role on.", true)
+					.addOption(OptionType.STRING, CREATE_REACTION_EMOTE, "The emoji id to create the reaction role with.", true)
+					.addOption(OptionType.ROLE, CREATE_REACTION_ROLE, "The role to give to the userid when they react.", true),
 				new SubcommandData(REMOVE_REACTION, "Used to remove a reaction role.")
-					.addOption(OptionType.CHANNEL, REMOVE_REACTION_CHANNEL, "The channel to remove the reaction role from.")
-					.addOption(OptionType.NUMBER, REMOVE_REACTION_MESSAGE_ID, "The message to remove the reaction role from.")
-					.addOption(OptionType.STRING, REMOVE_REACTION_EMOTE, "The emoji id to remove the reaction role with.")
-					.addOption(OptionType.ROLE, REMOVE_REACTION_ROLE, "The role to remove from the userid when they react.")))
+					.addOption(OptionType.CHANNEL, REMOVE_REACTION_CHANNEL, "The channel to remove the reaction role from.", true)
+					.addOption(OptionType.NUMBER, REMOVE_REACTION_MESSAGE_ID, "The message to remove the reaction role from.", true)
+					.addOption(OptionType.STRING, REMOVE_REACTION_EMOTE, "The emoji id to remove the reaction role with.", true)
+					.addOption(OptionType.ROLE, REMOVE_REACTION_ROLE, "The role to remove from the userid when they react.", true)))
 			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION));
 		this.sql = sqlHelperFactory;
@@ -65,6 +68,14 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) throws SQLException {
+		e.replyModal(Modal.create("rr_" + member.getId() + guild.getId() + channel.getId(), "Create a Reaction Role")
+				.addActionRow(TextInput.create("subject", "Subject", TextInputStyle.SHORT)
+					.setPlaceholder("Subject of this ticket")
+					.setMinLength(10)
+					.setMaxLength(100) // or setRequiredRange(10, 100)
+					.build())
+			.build()).queue(System.out::println, Throwable::printStackTrace);
+		if (true) return;
 		ChannelType channelType = cmde.getOption(REMOVE_REACTION_CHANNEL, OptionMapping::getChannelType);
 
 		if (!requireNonNull(channelType).isMessage()) {
@@ -95,11 +106,11 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 							default -> cmde.send("invalidsubcommand");
 						}
 					} catch (SQLException ex) {
-						throw new UnwrapMeException(ex);
+						throw new CauseWrapperException(ex);
 					}
 				}, error -> cmde.send("messagecouldntbefound")
 			);
-		} catch (UnwrapMeException ex) {
+		} catch (CauseWrapperException ex) {
 			throw (SQLException) ex.getCause();
 		}
 	}

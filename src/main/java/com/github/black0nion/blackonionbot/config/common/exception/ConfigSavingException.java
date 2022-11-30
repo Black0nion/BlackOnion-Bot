@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.common;
+package com.github.black0nion.blackonionbot.config.common.exception;
 
 public class ConfigSavingException extends ConfigException {
 

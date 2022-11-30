@@ -25,6 +25,6 @@ public class MigratorSQLHelperFactoryImpl extends SQLHelperFactoryImpl {
 	}
 
 	public void revert() throws SQLException {
-		connectionGetter.getSupplier().get().commit();
+		connectionGetter.getSupplier().get().rollback();
 	}
 }

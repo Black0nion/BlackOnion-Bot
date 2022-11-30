@@ -26,10 +26,15 @@ import java.util.Map;
 
 public class CatCommand extends SlashCommand {
 
-	public CatCommand() {
-		super(builder(Commands.slash("cat", "cato").addOption(OptionType.STRING, "breed", "The breed of the cat to show", false, true)));
+	private final SlashCommandBase cmdBase;
 
-		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://api.thecatapi.com/v1/breeds"))
+	public CatCommand(Bot bot, SlashCommandBase cmdBase) {
+		super(builder(Commands.slash("cat", "cato")
+			.addOption(OptionType.STRING, "breed", "The breed of the cat to show", false, true))
+		);
+		this.cmdBase = cmdBase;
+
+		bot.getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://api.thecatapi.com/v1/breeds"))
 			.GET()
 			.header("Content-Type", "application/json")
 			.build(), HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenAccept(response -> {
@@ -56,7 +61,7 @@ public class CatCommand extends SlashCommand {
 		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://api.thecatapi.com/v1/images/search" + (breed != null ? "?breed_ids=" + breed : ""))).build(), HttpResponse.BodyHandlers.ofString())
 			.thenApply(HttpResponse::body).thenAccept(response -> {
 				if (response == null || response.isEmpty() || response.equalsIgnoreCase("[]")) {
-					cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", SlashCommandBase.getCommand(CatBreedsCommand.class).getName()));
+					cmde.error("catnotfound", "catbreednotfound", new Placeholder("command", cmdBase.getCommand(CatBreedsCommand.class).getName()));
 				} else {
 					final JSONArray responseAsJSONArray = new JSONArray(response);
 					final JSONObject responseAsJSON = responseAsJSONArray.getJSONObject(0);

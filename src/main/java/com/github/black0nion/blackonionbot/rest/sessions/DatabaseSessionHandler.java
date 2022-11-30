@@ -15,15 +15,15 @@ import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 
-public class DatabaseLogin implements SessionHandler {
+public class DatabaseSessionHandler implements SessionHandler {
 
 	private final SQLHelperFactory sql;
 
-	public DatabaseLogin(SQLHelperFactory sqlHelperFactory) {
+	public DatabaseSessionHandler(SQLHelperFactory sqlHelperFactory) {
 		this.sql = sqlHelperFactory;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(DatabaseLogin.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseSessionHandler.class);
 
 	@SQLSetup
 	public static void setup(SQLHelperFactory factory) throws SQLException {
@@ -42,8 +42,8 @@ public class DatabaseLogin implements SessionHandler {
 
 	@Override
 	public DiscordUser loginToSession(String sessionId) throws ExecutionException, InputMismatchException, NullPointerException, SQLException {
-		try (SQLHelper sq = sql.create("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
-			 ResultSet rs = sq.executeQuery()) {
+		try (SQLHelper sq = sql.create("SELECT * FROM sessions WHERE " + SESSION_ID + " = ?", sessionId);
+				ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				return OAuthHandler.getUserWithToken(rs.getString(ACCESS_TOKEN), rs.getString(REFRESH_TOKEN));
 			}
@@ -54,19 +54,17 @@ public class DatabaseLogin implements SessionHandler {
 	@Override
 	public void logoutFromSession(String sessionId) throws InputMismatchException, NullPointerException, SQLException {
 		try (SQLHelper sq = sql.create("DELETE FROM sessions WHERE " + SESSION_ID + " = ?").addParameter(sessionId);
-			 PreparedStatement ps = sq.create()) {
+				PreparedStatement ps = sq.create()) {
 			ps.executeUpdate();
 		}
 	}
 
 	@Override
 	public String createSession(String accessToken, String refreshToken, int expiresIn) {
-		try (SQLHelper sq = sql.create("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?").addParameter(accessToken);
-				ResultSet rs = sq.executeQuery()) {
-			if (rs.next()) {
-				return rs.getString(SESSION_ID);
-			}
+		try {
+			return sql.runQuery("SELECT " + SESSION_ID + " FROM sessions WHERE " + ACCESS_TOKEN + " = ?", accessToken);
 		} catch (SQLException e) {
+			// TODO: maybe remove this log, because it's expected that no session exists yet
 			logger.error("Error while getting existing SessionID", e);
 		}
 

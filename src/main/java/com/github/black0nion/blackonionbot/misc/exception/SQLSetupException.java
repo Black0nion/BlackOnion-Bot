@@ -15,8 +15,4 @@ public class SQLSetupException extends RuntimeException {
 	public SQLSetupException(Throwable cause) {
 		super(cause);
 	}
-
-	public SQLSetupException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 }

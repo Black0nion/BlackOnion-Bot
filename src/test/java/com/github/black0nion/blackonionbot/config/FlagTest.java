@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.config;
 
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.immutable.Flags;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
+import com.github.black0nion.blackonionbot.config.common.Flags;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

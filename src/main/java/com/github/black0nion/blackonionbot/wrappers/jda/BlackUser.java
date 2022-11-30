@@ -55,7 +55,7 @@ public class BlackUser extends UserImpl {
 
 	@SQLSetup(after = LanguageSystem.class)
 	public static void setup(SQLHelperFactory sql) throws SQLException {
-		sql.run("CREATE TABLE IF NOT EXISTS usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permission VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
+		sql.run("CREATE TABLE IF NOT EXISTS usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permissions VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
 	}
 
 	private Language language;
@@ -64,7 +64,7 @@ public class BlackUser extends UserImpl {
 	private BlackUser(final User user) throws SQLException {
 		super(user);
 
-		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permission) FROM usersettings WHERE id = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
+		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permissions) AS permissions FROM usersettings WHERE id = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				permissions = CustomPermission.parseListToList(rs.getString("permissions"));
 			}

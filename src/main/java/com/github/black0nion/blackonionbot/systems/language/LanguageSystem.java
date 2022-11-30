@@ -38,7 +38,7 @@ public class LanguageSystem {
 			.map(Language::new)
 			.peek(lang -> {
 				if (lang.isDefault()) {
-					if (hasDefault.get()) throw new MultipleDefaultLanguagesException("There can only be one default language!");
+					if (hasDefault.get()) throw new MultipleDefaultLanguagesException();
 					hasDefault.set(true);
 				}
 			})

@@ -1,6 +1,4 @@
-package com.github.black0nion.blackonionbot.config.immutable.api;
-
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
+package com.github.black0nion.blackonionbot.config.common;
 
 public interface ConfigLoader {
 

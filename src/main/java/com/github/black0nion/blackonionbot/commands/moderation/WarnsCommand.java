@@ -63,7 +63,7 @@ public class WarnsCommand extends SlashCommand {
 			StringBuilder result = new StringBuilder("empty");
 			if (warn != null) {
 				result = new StringBuilder()
-					.append(BotInformation.datePattern.format(new Date(Warn.START_TIME_STAMP + warn.id())))
+					.append(BotInformation.DATE_FORMAT.format(new Date(Warn.START_TIME_STAMP + warn.id())))
 					.append(": <@").append(warn.issuer()).append("> > ")
 					.append("<@").append(warn.userid()).append("> with the reason: `")
 					.append(warn.reason() != null ? warn.getReasonEscaped() : "none")
@@ -102,7 +102,7 @@ public class WarnsCommand extends SlashCommand {
 			List<MessageEmbed.Field> fields = new ArrayList<>();
 			warns.stream().sorted(Comparator.comparingLong(Warn::id).reversed()).forEach(warn ->
 				fields.add(new MessageEmbed.Field(
-					BotInformation.datePattern.format(new Date(Warn.START_TIME_STAMP + warn.id())),
+					BotInformation.DATE_FORMAT.format(new Date(Warn.START_TIME_STAMP + warn.id())),
 					"<@" + warn.issuer() + "> > <@" + warn.userid() + "> with reason: `" + (warn.reason() != null ? warn.reason() : "none") + "` (ID: " + warn.id() + ")",
 					false)
 				)

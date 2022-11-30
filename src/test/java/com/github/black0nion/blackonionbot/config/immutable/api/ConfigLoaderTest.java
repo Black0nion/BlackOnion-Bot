@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.config.immutable.api;
 
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
+import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;

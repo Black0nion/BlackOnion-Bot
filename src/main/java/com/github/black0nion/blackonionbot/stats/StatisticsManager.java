@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.BotMetadata;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
@@ -38,7 +39,10 @@ public class StatisticsManager extends ListenerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatisticsManager.class);
 
-	public StatisticsManager(Config config) {
+	private final FeatureFlags featureFlags;
+
+	public StatisticsManager(Config config, FeatureFlags featureFlags) {
+		this.featureFlags = featureFlags;
 		final BotMetadata metadata = ConfigFileLoader.getMetadata();
 		Gauge.build()
 			.name("info")
@@ -55,7 +59,7 @@ public class StatisticsManager extends ListenerAdapter {
 	}
 
 	public void start() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
 	}
 
 	public static final Gauge UPTIME = Gauge.build()

@@ -32,10 +32,20 @@ public interface SQLHelperFactory {
 		return create(rawSQL, parameters).run();
 	}
 
+	/**
+	 * Runs the query, returns the value, <b>and closes the connection</b>.
+	 *
+	 * @return either the first column of the first row of the query or null
+	 */
 	default String runQuery(String rawSQL) throws SQLException {
 		return runQuery(rawSQL, new Object[0]);
 	}
 
+	/**
+	 * Runs the query and returns the value
+	 *
+	 * @return either the first column of the first row of the query or null
+	 */
 	default String runQuery(String rawSQL, Object... parameters) throws SQLException {
 		// the runQuery method already closes everything
 		//noinspection resource

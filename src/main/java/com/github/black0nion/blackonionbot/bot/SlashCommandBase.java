@@ -9,7 +9,7 @@ import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.inject.Injector;
-import com.github.black0nion.blackonionbot.misc.enums.Category;
+import com.github.black0nion.blackonionbot.commands.Category;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;

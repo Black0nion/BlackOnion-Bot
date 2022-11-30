@@ -6,7 +6,7 @@ import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImp
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
-import static com.github.black0nion.blackonionbot.config.immutable.Flags.defaultValue;
+import static com.github.black0nion.blackonionbot.config.common.Flags.defaultValue;
 
 public class RunModeConfig extends PropertyDefinerBase {
 	@Override

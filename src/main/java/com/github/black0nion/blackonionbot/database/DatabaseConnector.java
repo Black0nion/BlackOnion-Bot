@@ -47,13 +47,18 @@ public class DatabaseConnector {
 		// in prod, only real leaks are interesting
 		hikariConfig.setLeakDetectionThreshold(config.getRunMode() == RunMode.DEV ? 5000 : 15000);
 
+		logger.debug("Starting MainPool...");
 		ds = new HikariDataSource(hikariConfig);
+		logger.debug("Started MainPool!");
 
 		HikariConfig hikariConfigLowPriority = createHikariConfig(config);
 		hikariConfigLowPriority.setPoolName("LowPriorityPool");
 
+		hikariConfigLowPriority.setMaximumPoolSize(5);
+
+		logger.debug("Starting LowPriorityPool...");
 		dsLowPriority = new HikariDataSource(hikariConfigLowPriority);
-		dsLowPriority.setMaximumPoolSize(5);
+		logger.debug("Started LowPriorityPool!");
 
 		new Migrator(this, featureFlags).migrate();
 
@@ -70,12 +75,14 @@ public class DatabaseConnector {
 			// also, in this case, I'm accessing my own code with reflections, so I know what I'm doing (I think)
 			// (actually, I don't)
 			.peek(m -> m.setAccessible(true)) // NOSONAR
-			// randomly sort
+			// sort to make sure that the methods dependencies are satisfied at the point of execution
+			// (e.g. if method A depends on something done in method B, method B will be executed before method A)
 			.sorted(SQLSetupComparator.INSTANCE)
 			.toList();
 
-		logger.debug("Running SQL setup methods in the following order: {}",
-			methods.stream().map(m -> m.getDeclaringClass().getSimpleName() + "." + m.getName()).collect(Collectors.joining(", "))); // NOSONAR what does that even mean
+		logger.debug("Running SQL setup methods in the following order: {}", methods.stream() // NOSONAR what does that even mean
+				.map(m -> m.getDeclaringClass().getSimpleName() + "." + m.getName())
+				.collect(Collectors.joining(", ")));
 
 		logger.info("Found {} methods annotated with @SQLSetup, running them now...", methods.size());
 		for (Method method : methods) {

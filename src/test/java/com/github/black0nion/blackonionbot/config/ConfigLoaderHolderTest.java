@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.config;
 
-import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
+import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
 import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
 import org.junit.jupiter.api.Test;
 

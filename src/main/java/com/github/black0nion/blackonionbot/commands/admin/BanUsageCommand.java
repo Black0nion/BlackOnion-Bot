@@ -94,7 +94,6 @@ public class BanUsageCommand extends SlashCommand {
 		}
 
 		if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
-			// TODO: test behaviour of ON CONFLICT DO NOTHING
 			if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING", guildId))
 				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
 			else

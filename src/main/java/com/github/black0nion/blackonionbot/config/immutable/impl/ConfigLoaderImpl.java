@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.common.ConfigLoadingException;
-import com.github.black0nion.blackonionbot.config.immutable.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.immutable.Flags;
-import com.github.black0nion.blackonionbot.config.immutable.api.ConfigLoader;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
+import com.github.black0nion.blackonionbot.config.common.Flags;
+import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import java.util.List;
@@ -37,7 +37,8 @@ public class ConfigLoaderImpl implements ConfigLoader {
 			if (flags.contains(Flags.NonNull)) {
 				throw new IllegalArgumentException("Missing required config value: " + name);
 			}
-			@SuppressWarnings("unchecked") Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
+			@SuppressWarnings("unchecked")
+			Flags.Default<T> defaultFlag = getFlag(flags, Flags.Default.class);
 			return defaultFlag != null ? defaultFlag.defaultValue() : null;
 		}
 		T result = Utils.parseToT(value, clazz);

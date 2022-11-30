@@ -56,13 +56,13 @@ public class KickCommand extends SlashCommand {
 		}
 	}
 
-	private static void kickMember(SlashCommandEvent cmde, @NotNull Member member, String reason, @NotNull JDA jda, @NotNull Guild guild, @NotNull SlashCommandInteractionEvent event) {
-		String message = cmde.getTranslation(reason != null ? "idid" : "ididnoreason", new Placeholder("user", member.getUser().getAsMention()), new Placeholder("reason", reason), ACTION);
+	private static void kickMember(SlashCommandEvent cmde, @NotNull Member memberToKick, String reason, @NotNull JDA jda, @NotNull Guild guild, @NotNull SlashCommandInteractionEvent event) {
+		String message = cmde.getTranslation(reason != null ? "idid" : "ididnoreason", new Placeholder("user", memberToKick.getUser().getAsMention()), new Placeholder("reason", reason), ACTION);
 		AwaitDone<InteractionHook> await = new AwaitDone<>();
-		guild.kick(member).reason("[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : ""))
+		guild.kick(memberToKick).reason("[" + cmde.getUser().getId() + "]" + (reason != null ? " " + reason : ""))
 				.queue(success -> {
 					event.reply(message).queue(await::done);
-					jda.openPrivateChannelById(member.getUser().getIdLong())
+					jda.openPrivateChannelById(memberToKick.getUser().getIdLong())
 						.flatMap(channel -> channel.sendMessage(cmde.getTranslation(reason != null ? "yougot" : "yougotnoreason", new Placeholder("reason", reason), new Placeholder("guild", guild.getName()), ACTION)))
 						.queue(null, err -> Utils.getCantSendHandler(await, message, cmde));
 				}, cmde::exception);

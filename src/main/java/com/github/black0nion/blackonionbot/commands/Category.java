@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.misc.enums;
+package com.github.black0nion.blackonionbot.commands;
 
 import javax.annotation.Nullable;
 

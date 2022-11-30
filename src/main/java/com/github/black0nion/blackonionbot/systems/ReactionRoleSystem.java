@@ -10,23 +10,24 @@ import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class ReactionRoleSystem extends ListenerAdapter {
+
+	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
 	private final SQLHelperFactory sql;
 
 	public ReactionRoleSystem(SQLHelperFactory factory) {
 		this.sql = factory;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(ReactionRoleSystem.class);
 
 	@Override
 	public void onMessageReactionAdd(@Nonnull final MessageReactionAddEvent e) {
@@ -41,6 +42,7 @@ public class ReactionRoleSystem extends ListenerAdapter {
 	@SQLSetup
 	private static void setupDB(SQLHelperFactory sql) throws SQLException {
 		sql.run("CREATE TABLE IF NOT EXISTS reaction_roles (" +
+			"id SERIAL, " +
 			"guild_id BIGINT NOT NULL, " +
 			"role_id BIGINT NOT NULL, " +
 			"channel_id BIGINT NOT NULL, " +
@@ -49,19 +51,19 @@ public class ReactionRoleSystem extends ListenerAdapter {
 			"PRIMARY KEY (guild_id, channel_id, message_id, emoji, role_id));");
 	}
 
-	private void handle(GenericMessageReactionEvent event, BiConsumer<UserSnowflake, Role> action) {
+	private void handle(GenericMessageReactionEvent event, BiFunction<UserSnowflake, Role, RestAction<?>> action) {
 		if (event.getUser() == null || event.getUser().isBot()) return;
 
-		final long guildid = event.getGuild().getIdLong();
-		final long channelid = event.getChannel().getIdLong();
-		final long messageid = event.getMessageIdLong();
+		final long guildId = event.getGuild().getIdLong();
+		final long channelId = event.getChannel().getIdLong();
+		final long messageId = event.getMessageIdLong();
 		try {
-			Role role = getRole(event, guildid, channelid, messageid);
+			Role role = getRole(event, guildId, channelId, messageId);
 			if (role == null) return;
 
-			action.accept(event.getUser(), role);
-		} catch (final IllegalStateException ex1) {
-			logger.error("Unknown Emoji: '{}'", event.getReaction().getEmoji().getName());
+			action.apply(event.getUser(), role).queue();
+		} catch (final IllegalStateException ex) {
+			logger.error("Unknown Emoji: '{}'", event.getReaction().getEmoji().getName(), ex);
 		}
 	}
 

@@ -1,5 +1,7 @@
 package com.github.black0nion.blackonionbot.config.common;
 
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigException;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

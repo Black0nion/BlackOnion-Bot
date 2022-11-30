@@ -1,9 +1,7 @@
 package com.github.black0nion.blackonionbot.commands;
 
-import com.github.black0nion.blackonionbot.misc.enums.Category;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
-import com.github.black0nion.blackonionbot.misc.enums.Progress;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;

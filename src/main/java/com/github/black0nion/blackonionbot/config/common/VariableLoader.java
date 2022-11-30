@@ -23,13 +23,17 @@ public class VariableLoader {
 	}
 
 
+	/**
+	 * @return self
+	 */
 	@SuppressWarnings("CheckStyle")
-	public void loadVariables(List<String> list, Incrementer count, BiConsumer<String, String> consumer) {
+	public VariableLoader loadVariables(List<String> list, Incrementer count, BiConsumer<String, String> consumer) {
 		list.stream()
 			.filter(line -> !line.startsWith("#"))
 			.map(envFilePattern::matcher)
 			.filter(Matcher::matches)
 			.peek(c -> { if (count != null) count.increment(); }) // NOSONAR
 			.forEach(split -> consumer.accept(split.group(1), split.group(2)));
+		return this;
 	}
 }

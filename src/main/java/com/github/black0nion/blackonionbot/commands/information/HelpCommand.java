@@ -2,8 +2,8 @@ package com.github.black0nion.blackonionbot.commands.information;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.misc.enums.Category;
-import com.github.black0nion.blackonionbot.misc.enums.Progress;
+import com.github.black0nion.blackonionbot.commands.Category;
+import com.github.black0nion.blackonionbot.commands.Progress;
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;

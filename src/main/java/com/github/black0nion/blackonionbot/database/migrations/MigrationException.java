@@ -2,8 +2,7 @@ package com.github.black0nion.blackonionbot.database.migrations;
 
 public class MigrationException extends RuntimeException {
 
-	public MigrationException() {
-	}
+	public MigrationException() {}
 
 	public MigrationException(String s) {
 		super(s);

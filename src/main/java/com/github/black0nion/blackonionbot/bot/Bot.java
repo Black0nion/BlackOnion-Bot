@@ -23,7 +23,7 @@ import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
 import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
-import com.github.black0nion.blackonionbot.rest.sessions.DatabaseLogin;
+import com.github.black0nion.blackonionbot.rest.sessions.DatabaseSessionHandler;
 import com.github.black0nion.blackonionbot.stats.JettyCollector;
 import com.github.black0nion.blackonionbot.stats.Prometheus;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
@@ -67,9 +67,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
 
@@ -157,8 +155,9 @@ public class Bot extends ListenerAdapter {
 
 	//endregion
 
-	public Bot() throws Exception {
+	public Bot() throws Exception { // NOSONAR
 		instance = this; // NOSONAR
+		final long startTime = System.currentTimeMillis();
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
@@ -177,6 +176,7 @@ public class Bot extends ListenerAdapter {
 		new File("files").mkdirs();
 
 		InjectorMap injectorMap = new InjectorMap();
+		injectorMap.add(this);
 		injectorMap.add(featureFlags);
 		injectorMap.add(config);
 		injectorMap.add(settings);
@@ -185,8 +185,8 @@ public class Bot extends ListenerAdapter {
 		sqlHelperFactory = database.getSqlHelperFactory();
 		injectorMap.add(sqlHelperFactory);
 
-		SessionHandler sessionHandler = injectorMap.add(new DatabaseLogin(sqlHelperFactory));
-		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config));
+		SessionHandler sessionHandler = injectorMap.add(new DatabaseSessionHandler(sqlHelperFactory));
+		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
 
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
@@ -200,6 +200,7 @@ public class Bot extends ListenerAdapter {
 		injectorMap.add(slashCommandBase);
 
 		giveawaySystem = new GiveawaySystem(sqlHelperFactory);
+		injectorMap.add(giveawaySystem);
 
 		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER))
@@ -223,8 +224,12 @@ public class Bot extends ListenerAdapter {
 		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
 		builder.setActivity(ActivityCommand.getActivity(settings));
 
+		if (featureFlags.bot_shutdownBeforeConnection.getValue()) {
+			logger.warn("Shutting down before connecting to Discord due to the 'bot.shutdownBeforeConnection' feature flag");
+			System.exit(0);
+		}
+
 		logger.info("Starting JDA...");
-		if (true) return;
 		try {
 			this.jda = builder.build();
 		} catch (final Exception e) {
@@ -272,10 +277,9 @@ public class Bot extends ListenerAdapter {
 			}
 		}));
 
-		// waits for all threads to finish, then shuts down the executor
-		asyncStartup.shutdown();
-
 		statisticsManager.start();
+
+		logger.info("Successfully started the application tasks in {} ms!", System.currentTimeMillis() - startTime);
 	}
 
 	public void shutdown() {

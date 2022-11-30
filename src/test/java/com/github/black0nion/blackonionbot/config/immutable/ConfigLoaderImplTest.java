@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.config.immutable;
 
-import com.github.black0nion.blackonionbot.config.common.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
 import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
 import org.junit.jupiter.api.Test;
 
-import static com.github.black0nion.blackonionbot.config.immutable.Flags.*;
+import static com.github.black0nion.blackonionbot.config.common.Flags.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigLoaderImplTest {

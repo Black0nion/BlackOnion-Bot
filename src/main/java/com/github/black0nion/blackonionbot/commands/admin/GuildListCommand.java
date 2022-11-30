@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.admin;
 
 import com.github.black0nion.blackonionbot.commands.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -43,14 +42,15 @@ public class GuildListCommand extends SlashCommand {
 		for (Guild guild : e.getJDA().getGuilds()) {
 			found = true;
 			logger.info("'{}'", guild.getOwner());
-			@Nullable BlackUser owner = Optional.ofNullable(guild.getOwner())
+			@Nullable
+			BlackUser owner = Optional.ofNullable(guild.getOwner())
 				.map(Member::getUser)
 				.map(BlackUser::from)
 				.orElse(null);
 			String text = "- " + Utils.escapeMarkdown(guild.getName()) + " (" + guild.getId() + ")";
 			try {
 				if (currentEmbed.getDescriptionBuilder().length() + text.length() + 4 >= MessageEmbed.DESCRIPTION_MAX_LENGTH)
-					throw new CommandReturnException();
+					return;
 				currentEmbed.appendDescription("\n" + text + " (Owner: " + (owner == null ? cmde.getTranslation("empty") : owner.getEscapedEffectiveName()) + ")");
 			} catch (Exception ignored) {
 				pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));

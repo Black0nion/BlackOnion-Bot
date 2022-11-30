@@ -392,26 +392,19 @@ public class Utils {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static <T> T parseToT(String value, Class<T> clazz, boolean recursed) {
-		if (clazz.equals(Object.class)) {
-			return (T) value;
-		} else if (clazz.equals(String.class)) {
-			return (T) value;
-		} else if (clazz.equals(Integer.class)) {
-			return (T) Integer.valueOf(value);
-		} else if (clazz.equals(Long.class)) {
-			return (T) Long.valueOf(value);
-		} else if (clazz.equals(Boolean.class)) {
+		if (clazz.equals(Object.class)) return (T) value;
+		else if (clazz.equals(String.class)) return (T) value;
+		else if (clazz.equals(Integer.class)) return (T) Integer.valueOf(value);
+		else if (clazz.equals(Long.class)) return (T) Long.valueOf(value);
+		else if (clazz.equals(Double.class)) return (T) Double.valueOf(value);
+		else if (clazz.equals(Float.class)) return (T) Float.valueOf(value);
+		else if (clazz.isEnum()) return (T) Enum.valueOf((Class<Enum>) clazz, value); // NOSONAR
+		else if (clazz.equals(Boolean.class)) {
 			if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
 				return (T) Boolean.valueOf(value);
 			} else {
 				throw new IllegalArgumentException("Invalid boolean value: " + value);
 			}
-		} else if (clazz.equals(Double.class)) {
-			return (T) Double.valueOf(value);
-		} else if (clazz.equals(Float.class)) {
-			return (T) Float.valueOf(value);
-		} else if (clazz.isEnum()) {
-			return (T) Enum.valueOf((Class<Enum>) clazz, value); // NOSONAR
 		} else {
 			if (recursed) return null;
 			return parseToT(value, Primitives.wrap(clazz), true);

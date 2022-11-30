@@ -1,7 +1,3 @@
 package com.github.black0nion.blackonionbot.misc.exception;
 
-public class TooLongException extends Exception {
-	public TooLongException() {
-		super();
-	}
-}
+public class TooLongException extends Exception {}

@@ -9,7 +9,7 @@ public abstract class AbstractFeatureFlagFactory implements FeatureFlagFactory {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public <T extends AbstractFeatureFlag<?>> T create(String key, Class<T> wantedFeatureFlag) {
+	public final <T extends AbstractFeatureFlag<?>> T create(String key, Class<T> wantedFeatureFlag) {
 		T impl = createImpl(key, wantedFeatureFlag);
 		logger.debug("Created feature flag {} with value {}", key, impl.getValue());
 		return impl;
