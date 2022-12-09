@@ -55,7 +55,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.9.1")
     implementation("com.github.Marcono1234:gson-record-type-adapter-factory:v0.3.0")
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.22")
+    implementation("net.dv8tion:JDA:5.0.0-beta.2")
     implementation("com.github.black0nion:Pagination-Utils:3.3.0")
     implementation("pw.chew:jda-chewtils:1.24.1")
 
