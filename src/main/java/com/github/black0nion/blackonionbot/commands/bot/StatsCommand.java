@@ -21,8 +21,11 @@ import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
 
 public class StatsCommand extends SlashCommand {
 
-	public StatsCommand(Config config) {
+	private final SlashCommandBase slashCommandBase;
+
+	public StatsCommand(Config config, SlashCommandBase slashCommandBase) {
 		super("stats", "Shows statistics regarding the bot.", config);
+		this.slashCommandBase = slashCommandBase;
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class StatsCommand extends SlashCommand {
 			.addField("files", ConfigFileLoader.getMetadata().files(), true)
 			.addField("commandsexecuted", (int) StatisticsManager.TOTAL_COMMANDS_EXECUTED.get(), true)
 			.addField("messagessent", (int) StatisticsManager.TOTAL_MESSAGES_SENT.get(), true)
-			.addField("commands", SlashCommandBase.getCommandCount(), true)
+			.addField("commands", slashCommandBase.getCommandCount(), true)
 			.addField("ping", StatisticsManager.getGatewayPing() + "ms", true)
 			.addField("usercount", StatisticsManager.getUserCount(), true)
 			.addField("guildcount", StatisticsManager.getGuildCount(), true)

@@ -82,7 +82,7 @@
   "error": "Error",
   "errorcantplayagainst": "You can't play against %enemy%!",
   "erroroccurred": "An error occurred!",
-  "errorwithmessage": "An error occured! Message: `%msg%`",
+  "errorwithid": "An error occured! Please report this to the developers with the ID `%id%`",
   "experimental": "experimental",
   "fieldoccopied": "This field is already occopied!",
   "files": "Files",

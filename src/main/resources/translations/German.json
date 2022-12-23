@@ -82,7 +82,7 @@
   "error": "Fehler",
   "errorcantplayagainst": "Du kannst nicht gegen %enemy% spielen!",
   "erroroccurred": "Ein Fehler ist aufgetreten!",
-  "errorwithmessage": "Ein Fehler ist aufgetreten! Nachricht: `%msg%`",
+  "errorwithid": "Ein Fehler ist aufgetreten! Bitte melde dies den Developern mit der ID `%id%`",
   "experimental": "experimentell",
   "fieldoccopied": "Dieses Feld ist bereits vergeben!",
   "files": "Dateien",

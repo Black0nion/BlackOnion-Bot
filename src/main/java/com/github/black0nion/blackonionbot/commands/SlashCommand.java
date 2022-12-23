@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.internal.utils.Checks;
@@ -82,6 +83,8 @@ public abstract class SlashCommand {
 		this.requiredPermissions = builder.getRequiredPermissions();
 		this.requiredBotPermissions = builder.getRequiredBotPermissions();
 		this.requiredCustomPermissions = builder.getRequiredCustomPermissions();
+		// TODO: test if this works
+		this.data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(this.requiredPermissions));
 		this.isToggleable = builder.isToggleable();
 		this.shouldAutoRegister = builder.shouldAutoRegister();
 		this.isPremium = builder.isPremium();

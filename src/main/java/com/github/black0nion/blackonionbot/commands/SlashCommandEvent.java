@@ -154,8 +154,11 @@ public class SlashCommandEvent {
 	}
 
 	public void exception(@Nullable Throwable t) {
-		if (t != null && !(t instanceof CommandReturnException)) this.logError(t);
-		this.send("errorwithmessage", new Placeholder("msg", t != null ? (t instanceof CommandReturnException ? "" : t.getClass().getSimpleName() + ": ") + t.getMessage() : "null"));
+		long id = System.currentTimeMillis() + (long) (Math.random() * 1000);
+		if (t != null && !(t instanceof CommandReturnException)) this.logError(t, id);
+
+		if (this.event != null && this.event.isAcknowledged()) return;
+		this.send("errorwithid", new Placeholder("id", id));
 	}
 
 	public void reply(final EmbedBuilder builder) {
@@ -275,8 +278,8 @@ public class SlashCommandEvent {
 	}
 	//endregion
 
-	private void logError(final Throwable e) {
-		LoggerFactory.getLogger(this.command != null ? this.command.getClass() : this.getClass()).error("Exception in command", e);
+	private void logError(final Throwable e, final long id) {
+		LoggerFactory.getLogger(this.command != null ? this.command.getClass() : this.getClass()).error("Exception in command (id: {})", id, e);
 	}
 
 	public <T> T getOption(@Nonnull String name, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {

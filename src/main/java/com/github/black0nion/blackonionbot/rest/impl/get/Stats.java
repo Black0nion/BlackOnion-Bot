@@ -18,15 +18,17 @@ import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
 public class Stats implements IGetRoute {
 
 	private final Config config;
+	private final SlashCommandBase slashCommandBase;
 
-	public Stats(Config config) {
+	public Stats(Config config, SlashCommandBase slashCommandBase) {
 		this.config = config;
+		this.slashCommandBase = slashCommandBase;
 	}
 
 	@Override
 	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
 		return new JSONObject()
-			.put("commands", SlashCommandBase.getCommandCount())
+			.put("commands", slashCommandBase.getCommandCount())
 			.put("code_stats", new JSONObject()
 				.put("line_count", ConfigFileLoader.getMetadata().lines_of_code())
 				.put("file_count", ConfigFileLoader.getMetadata().files()))

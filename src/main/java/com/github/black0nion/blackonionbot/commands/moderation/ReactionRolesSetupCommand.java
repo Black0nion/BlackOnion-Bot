@@ -22,9 +22,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.components.Modal;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +65,6 @@ public class ReactionRolesSetupCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) throws SQLException {
-		e.replyModal(Modal.create("rr_" + member.getId() + guild.getId() + channel.getId(), "Create a Reaction Role")
-				.addActionRow(TextInput.create("subject", "Subject", TextInputStyle.SHORT)
-					.setPlaceholder("Subject of this ticket")
-					.setMinLength(10)
-					.setMaxLength(100) // or setRequiredRange(10, 100)
-					.build())
-			.build()).queue(System.out::println, Throwable::printStackTrace);
-		if (true) return;
 		ChannelType channelType = cmde.getOption(REMOVE_REACTION_CHANNEL, OptionMapping::getChannelType);
 
 		if (!requireNonNull(channelType).isMessage()) {

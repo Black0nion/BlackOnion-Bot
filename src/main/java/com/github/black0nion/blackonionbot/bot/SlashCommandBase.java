@@ -292,20 +292,20 @@ public class SlashCommandBase extends ListenerAdapter {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
-		getInstance().commands.computeIfAbsent(c.getData().getName(), s -> {
+		commands.computeIfAbsent(c.getData().getName(), s -> {
 			final Category category = c.getCategory();
 			final List<SlashCommand> commandsInCat = Optional.ofNullable(getInstance().commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
-			getInstance().commandsInCategory.put(category, commandsInCat);
-			getInstance().commandInstances.put(c.getClass(), c);
-			getInstance().commandCount++;
+			commandsInCategory.put(category, commandsInCat);
+			commandInstances.put(c.getClass(), c);
+			commandCount++;
 			return new Pair<>(null, c);
 		});
 	}
 
 	private int commandCount = 0;
 
-	public static int getCommandCount() {
-		return getInstance().commandCount;
+	public int getCommandCount() {
+		return commandCount;
 	}
 }
