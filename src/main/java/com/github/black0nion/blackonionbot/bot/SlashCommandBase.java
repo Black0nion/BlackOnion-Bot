@@ -1,15 +1,19 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.commands.admin.BanUsageCommand;
-import com.github.black0nion.blackonionbot.commands.bot.ToggleCommand;
-import com.github.black0nion.blackonionbot.commands.information.HelpCommand;
+import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
+import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
+import com.github.black0nion.blackonionbot.commands.message.MessageCommand;
+import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.BanUsageCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.bot.ToggleCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.information.HelpCommand;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.inject.Injector;
-import com.github.black0nion.blackonionbot.commands.Category;
+import com.github.black0nion.blackonionbot.commands.common.Category;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
@@ -23,8 +27,13 @@ import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -39,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,19 +61,19 @@ import java.util.stream.Collectors;
  */
 public class SlashCommandBase extends ListenerAdapter {
 
-	private final Map<Category, List<SlashCommand>> commandsInCategory = new EnumMap<>(Category.class);
+	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
 
-	public Map<Category, List<SlashCommand>> getCommandsInCategory() {
+	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
 		return commandsInCategory;
 	}
 
-	private final Map<String, Pair<Long, SlashCommand>> commands = new HashMap<>();
+	private final Map<String, Pair<Long, AbstractCommand<?, ?>>> commands = new HashMap<>();
 
-	public Map<String, Pair<Long, SlashCommand>> getCommands() {
+	public Map<String, Pair<Long, AbstractCommand<?, ?>>> getCommands() {
 		return commands;
 	}
 
-	private final Map<Class<? extends SlashCommand>, SlashCommand> commandInstances = new HashMap<>();
+	private final Map<Class<? extends AbstractCommand<?, ?>>, AbstractCommand<?, ?>> commandInstances = new HashMap<>();
 
 	private JSONObject commandsJson;
 
@@ -89,6 +99,7 @@ public class SlashCommandBase extends ListenerAdapter {
 		this.injector = injector;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void addCommands() {
 		commandCount = 0;
 		commands.clear();
@@ -97,18 +108,22 @@ public class SlashCommandBase extends ListenerAdapter {
 		commandsJson = new JSONObject();
 		final JSONArray commandsArr = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
-		final Set<Class<? extends SlashCommand>> annotated = reflections.getSubTypesOf(SlashCommand.class);
+		final Set<Class<? extends AbstractCommand>> annotated = reflections.getSubTypesOf(AbstractCommand.class);
 
-		for (final Class<?> command : annotated) {
+		for (final Class<? extends AbstractCommand> command : annotated) {
+			if (Modifier.isAbstract(command.getModifiers())) continue;
+
 			try {
-				final SlashCommand newInstance = injector.createInstance(command, SlashCommand.class);
+				final AbstractCommand newInstance = injector.createInstance(command, AbstractCommand.class);
 				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 
-				SlashCommandData data = newInstance.getData();
-				if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
-					commandsArr.put(serializeCommand(newInstance, data));
+				if (newInstance instanceof SlashCommand slashCommand) {
+					SlashCommandData data = slashCommand.getData();
+					if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
+						commandsArr.put(serializeCommand(slashCommand, data));
+					}
 				}
 
 				addCommand(newInstance);
@@ -164,12 +179,12 @@ public class SlashCommandBase extends ListenerAdapter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends SlashCommand> T getCommand(Class<T> clazz) {
-		return (T) getInstance().commandInstances.get(clazz);
+	public <T extends SlashCommand> T getCommand(Class<T> clazz) {
+		return (T) commandInstances.get(clazz);
 	}
 
 	@Nullable
-	public static SlashCommand getCommand(String name) {
+	public static AbstractCommand<?, ?> getCommand(String name) {
 		if (name == null) return null;
 		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
 	}
@@ -186,7 +201,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				.ifPresentOrElse(guild -> guild.updateCommands()
 					.addCommands(commands.values().stream()
 						.map(Pair::getSecond)
-						.map(SlashCommand::getData)
+						.map(AbstractCommand::getData)
 						.toList())
 					.queue(cmds -> logger.info("Successfully updated {} dev commands!", cmds.size())),
 					() -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
@@ -196,9 +211,9 @@ public class SlashCommandBase extends ListenerAdapter {
 	@Override
 	public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
 		String name = event.getName();
-		if (commands.containsKey(name)) {
+		if (commands.containsKey(name) && commands.get(name).getSecond() instanceof SlashCommand command) {
 			try {
-				commands.get(name).getSecond().handleAutoComplete(event);
+				command.handleAutoComplete(event);
 			} catch (Exception e) {
 				logger.error("An issue happened trying to handle AutoComplete", e);
 			}
@@ -206,7 +221,52 @@ public class SlashCommandBase extends ListenerAdapter {
 	}
 
 	@Override
-	public void onSlashCommandInteraction(final SlashCommandInteractionEvent event) {
+	public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+		String key = event.getComponentId().split("\\|")[0];
+		if (commands.containsKey(key)) {
+			try {
+				commands.get(key).getSecond().handleButtonPress(event);
+			} catch (Exception e) {
+				logger.error("An issue happened trying to handle a Button", e);
+			}
+		}
+	}
+
+	@Override
+	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+		String key = event.getModalId().split("\\|")[0];
+		if (commands.containsKey(key)) {
+			try {
+				commands.get(key).getSecond().handleModalInteraction(event);
+			} catch (Exception e) {
+				logger.error("An issue happened trying to handle a Modal", e);
+			}
+		}
+	}
+
+	@Override
+	public void onGenericSelectMenuInteraction(@NotNull GenericSelectMenuInteractionEvent event) {
+		String key = event.getComponentId().split("\\|")[0];
+		if (commands.containsKey(key)) {
+			try {
+				commands.get(key).getSecond().handleSelectMenuInteraction(event);
+			} catch (Exception e) {
+				logger.error("An issue happened trying to handle a SelectMenu", e);
+			}
+		}
+	}
+
+	@Override
+	public void onSlashCommandInteraction(@NotNull final SlashCommandInteractionEvent event) {
+		onCommandInteraction(event, event.getChannel().asTextChannel(), SlashCommand.class);
+	}
+
+	@Override
+	public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
+		onCommandInteraction(event, Objects.requireNonNull(event.getChannel()).asTextChannel(), MessageCommand.class);
+	}
+
+	public <E extends GenericCommandInteractionEvent, C extends AbstractCommand<?, ?>> void onCommandInteraction(final E event, TextChannel channel, Class<C> clazz) {
 		if (event.getUser().isBot() || (event.getGuild() != null && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY)))
 			return;
 
@@ -216,8 +276,6 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		assert guild != null && member != null;
 
-		final TextChannel channel = event.getChannel().asTextChannel();
-
 		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(FeatureFlags.class), injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
 
 		if (config.getRunMode() == RunMode.DEV) {
@@ -226,7 +284,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				+ channel.getName()
 				+ "(C:" + channel.getId() + ") | " + author.getDebugMessage()
 				+ ": (E:" + event.getId() + ")"
-				+ event.getCommandPath() + " "
+				+ event.getFullCommandName().replace(" ", "/") + " "
 				+ event.getOptions().stream()
 				.map(OptionMapping::toString)
 				.collect(Collectors.joining(" "))
@@ -246,8 +304,17 @@ public class SlashCommandBase extends ListenerAdapter {
 
 		if (Utils.handleSelfRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
-			final SlashCommand cmd = commands.get(event.getName()).getSecond();
-			final SlashCommandEvent cmde = new SlashCommandEvent(cmd, event, guild, member, author);
+			final AbstractCommand<?, ?> command = commands.get(event.getName()).getSecond();
+			if (!clazz.isAssignableFrom(command.getClass())) return;
+
+			final C cmd = clazz.cast(command);
+
+			final AbstractCommandEvent<?, ?> cmde = switch (event) {
+				case SlashCommandInteractionEvent e1 -> new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author);
+				case MessageContextInteractionEvent e1 -> new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author);
+				default -> throw new IllegalStateException("Unexpected value: " + cmd);
+			};
+
 			final boolean disabled = !guild.isCommandActivated(cmd);
 			if (disabled) {
 				cmde.send("commanddisabled", new Placeholder("cmd", cmd.getName()));
@@ -259,7 +326,7 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getCommandPath(), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
+			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getFullCommandName().replace(" ", "/"), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : Permission.EMPTY_PERMISSIONS;
@@ -267,19 +334,26 @@ public class SlashCommandBase extends ListenerAdapter {
 			if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(requiredPermissions)) {
-				if (cmd.isHidden(author)) return;
+				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(author)) return;
 				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredPermissions())));
 				return;
-			} else if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions))
+			}
+
+			if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions))
 				return;
-			else if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+
+			if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
 				return;
 			}
 
 			commandPool.submit(() -> {
 				try {
-					cmd.execute(cmde, event, member, author, guild, channel);
+					if (cmd instanceof SlashCommand slashCommand) {
+						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel);
+					} else if (cmd instanceof MessageCommand messageCommand) {
+						messageCommand.execute((MessageCommandEvent) cmde, (MessageContextInteractionEvent) event, member, author, guild, channel, ((MessageContextInteractionEvent) event).getTarget());
+					}
 				} catch (Exception t) {
 					if (!(t instanceof CommandReturnException))
 						cmde.exception(t);
@@ -288,16 +362,18 @@ public class SlashCommandBase extends ListenerAdapter {
 		}
 	}
 
-	private void addCommand(final SlashCommand c) {
+	@SuppressWarnings("unchecked")
+	private void addCommand(final AbstractCommand<?, ?> c) {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
 		commands.computeIfAbsent(c.getData().getName(), s -> {
 			final Category category = c.getCategory();
-			final List<SlashCommand> commandsInCat = Optional.ofNullable(getInstance().commandsInCategory.get(category)).orElseGet(ArrayList::new);
+			final List<AbstractCommand<?, ?>> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
-			commandInstances.put(c.getClass(), c);
+			// no clue what the fuck the error message means tbh
+			commandInstances.put((Class<? extends AbstractCommand<?, ?>>) c.getClass(), c);
 			commandCount++;
 			return new Pair<>(null, c);
 		});

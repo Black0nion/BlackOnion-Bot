@@ -18,7 +18,7 @@ repositories {
     }
 
     maven {
-        url "https://m2.chew.pro/releases"
+        url "https://m2.chew.pro/snapshots"
         name "m2-chew"
         content {
             includeGroup "pw.chew"
@@ -65,9 +65,10 @@ dependencies {
     implementation "com.google.code.gson:gson:2.9.1"
     implementation "com.github.Marcono1234:gson-record-type-adapter-factory:v0.3.0"
 
-    implementation "net.dv8tion:JDA:5.0.0-alpha.21"
+    implementation "net.dv8tion:JDA:5.0.0-beta.2"
     implementation "com.github.black0nion:Pagination-Utils:3.3.0"
-    implementation "pw.chew:jda-chewtils:1.24.1"
+    // this commit contains an unreleased fix for JDA Alpha .21
+    implementation "com.github.Chew:JDA-Chewtils:5e1a9f93f9"
 
     implementation "com.github.Mokulu:discord-oauth2-api:1.0.2"
 
@@ -158,15 +159,20 @@ processResources {
 
     filesMatching("bot.metadata.json") {
         expand(
-                version: version,
-                lines_of_code: locAndFiles.get(0),
-                files: locAndFiles.get(1)
+            version: version,
+            lines_of_code: locAndFiles.get(0),
+            files: locAndFiles.get(1)
         )
     }
 }
 
 jar {
     archiveVersion.set("")
+}
+
+// enable java preview features
+tasks.withType(JavaCompile).each {
+    it.options.compilerArgs.add('--enable-preview')
 }
 
 /**

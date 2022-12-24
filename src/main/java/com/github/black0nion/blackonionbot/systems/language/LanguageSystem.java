@@ -7,6 +7,8 @@ import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.exception.MultipleDefaultLanguagesException;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
@@ -63,6 +65,10 @@ public class LanguageSystem {
 
 	public static Map<String, Language> getLanguages() {
 		return languages;
+	}
+
+	public static Language getLanguage(User user, Guild guild) {
+		return getLanguage(BlackUser.from(user), BlackGuild.from(guild));
 	}
 
 	public static Language getLanguage(@Nullable final BlackUser author, @Nullable final BlackGuild guild) {

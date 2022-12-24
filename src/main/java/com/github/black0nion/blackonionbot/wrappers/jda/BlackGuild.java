@@ -2,11 +2,14 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.SlashCommand;
-import com.github.black0nion.blackonionbot.misc.*;
+import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
+import com.github.black0nion.blackonionbot.misc.ConfigGetter;
+import com.github.black0nion.blackonionbot.misc.ConfigSetter;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
-import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -71,7 +74,7 @@ public class BlackGuild extends GuildImpl {
 	private String leaveMessage;
 	private long leaveChannel;
 	@Nullable
-	private List<SlashCommand> disabledCommands;
+	private List<String> disabledCommands;
 	private long suggestionsChannel;
 	private List<Long> autoRoles;
 	private boolean loop;
@@ -207,7 +210,7 @@ public class BlackGuild extends GuildImpl {
 		this.leaveChannel = leaveChannel;
 	}
 
-	public @Nullable List<SlashCommand> getDisabledCommands() {
+	public @Nullable List<String> getDisabledCommands() {
 		return this.disabledCommands;
 	}
 
@@ -215,18 +218,19 @@ public class BlackGuild extends GuildImpl {
 		this.setDisabledCommands(Arrays.stream(disabledCommands)
 			.map(SlashCommandBase::getCommand)
 			.filter(Objects::nonNull)
+			.map(AbstractCommand::getName)
 			.collect(Collectors.toList()));
 	}
 
-	public void setDisabledCommands(final List<SlashCommand> disabledCommands) {
+	public void setDisabledCommands(final List<String> disabledCommands) {
 		this.disabledCommands = disabledCommands;
 	}
 
-	public boolean isCommandActivated(final SlashCommand cmd) {
-		return this.disabledCommands == null || !this.disabledCommands.contains(cmd);
+	public boolean isCommandActivated(final AbstractCommand<?, ?> cmd) {
+		return this.disabledCommands == null || !this.disabledCommands.contains(cmd.getName());
 	}
 
-	public boolean setCommandActivated(final SlashCommand cmd, final boolean activated) {
+	public boolean setCommandActivated(final AbstractCommand<?, ?> cmd, final boolean activated) {
 		if (!cmd.isToggleable()) return false;
 		if (this.disabledCommands == null) {
 			if (activated) return true;
@@ -234,9 +238,9 @@ public class BlackGuild extends GuildImpl {
 		}
 
 		if (!activated) {
-			this.disabledCommands.add(cmd);
+			this.disabledCommands.add(cmd.getName());
 		} else {
-			this.disabledCommands.remove(cmd);
+			this.disabledCommands.remove(cmd.getName());
 		}
 
 		this.setDisabledCommands(this.disabledCommands);

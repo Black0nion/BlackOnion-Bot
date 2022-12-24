@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
@@ -142,10 +142,6 @@ public class Bot extends ListenerAdapter {
 		return config;
 	}
 
-	public Settings getSettings() {
-		return settings;
-	}
-
 	/**
 	 * Don't use in new code, prefer dependency injection to allow unit testing
 	 */
@@ -203,7 +199,7 @@ public class Bot extends ListenerAdapter {
 		injectorMap.add(giveawaySystem);
 
 		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER))
+			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS))
 			.enableCache(CacheFlag.VOICE_STATE)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)

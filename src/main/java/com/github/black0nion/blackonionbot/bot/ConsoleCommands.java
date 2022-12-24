@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;

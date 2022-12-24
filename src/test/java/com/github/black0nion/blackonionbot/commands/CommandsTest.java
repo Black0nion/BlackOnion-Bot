@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.commands;
 
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
@@ -9,6 +10,6 @@ class CommandsTest {
 	@Test
 	void test_less_than_100_commands() {
 		int commandCount = new Reflections("com.github.black0nion.blackonionbot.commands").getSubTypesOf(SlashCommand.class).size();
-		assertTrue(commandCount < 100, "There are more than 100 commands! (" + commandCount + ")");
+		assertTrue(commandCount < 100, "There are more than 100 slash commands! (" + commandCount + ")");
 	}
 }

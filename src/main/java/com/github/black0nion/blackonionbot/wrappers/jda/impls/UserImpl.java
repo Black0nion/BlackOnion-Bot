@@ -25,7 +25,7 @@ public abstract class UserImpl extends BlackWrapper implements User {
 
 	@Override
 	public String getDebugMessage() {
-		return user.getName() + "#" + user.getDiscriminator() + "(U:" + user.getId() + ")";
+		return Utils.getDebugMessage(this);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -17,7 +17,9 @@ import com.google.common.collect.Lists;
 import com.google.gson.internal.Primitives;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -487,5 +489,13 @@ public class Utils {
 			.filter(Objects::nonNull)
 			.map(StackTraceElement::toString)
 			.collect(Collectors.joining("\n"));
+	}
+
+	public static String getDebugMessage(Guild guild) {
+		return guild.getName() + "(G:" + guild.getId() + ")";
+	}
+
+	public static String getDebugMessage(User user) {
+		return user.getName() + "#" + user.getDiscriminator() + "(U:" + user.getId() + ")";
 	}
 }
