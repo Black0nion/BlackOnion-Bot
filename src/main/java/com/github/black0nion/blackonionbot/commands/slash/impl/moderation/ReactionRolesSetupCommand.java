@@ -32,7 +32,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.regex.Matcher;
@@ -195,7 +194,7 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 	}
 
 	private void logDebugMessage(Guild guild, TextChannel textChannel, long messageId, Emoji emoji, Role role) {
-		LoggerFactory.getLogger(ReactionRolesSetupCommand.class).error("Failed to delete entry from database! " +
+		logger.error("Failed to update entry in database! " +
 				"Guild: {}, Channel: {}, Message: {}, Emoji: {}, Role: {}",
 			guild, textChannel.getName() + "(C:" + textChannel.getIdLong() + ")", messageId, emoji.getFormatted(), role.getName() + "(R:" + role.getIdLong() + ")");
 	}
@@ -206,6 +205,6 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 
 	private boolean entryExists(@NotNull Guild guild, Long messageId, String emoji, String role, TextChannel textChannel) throws SQLException {
 		return sql.anyMatch("SELECT * FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ? AND role_id = ?",
-				guild.getIdLong(), textChannel.getIdLong(), messageId, emoji, role);
+				guild.getIdLong(), textChannel.getIdLong(), messageId, emoji, Long.parseLong(role));
 	}
 }

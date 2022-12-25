@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public class ReactionRoleSystem extends ListenerAdapter {
@@ -58,28 +61,32 @@ public class ReactionRoleSystem extends ListenerAdapter {
 		final long channelId = event.getChannel().getIdLong();
 		final long messageId = event.getMessageIdLong();
 		try {
-			Role role = getRole(event, guildId, channelId, messageId);
-			if (role == null) return;
+			List<Role> roles = getRoles(event, guildId, channelId, messageId);
 
-			action.apply(event.getUser(), role).queue();
+			for (Role r : roles) {
+				action.apply(event.getUser(), r).queue();
+			}
 		} catch (final IllegalStateException ex) {
 			logger.error("Unknown Emoji: '{}'", event.getReaction().getEmoji().getName(), ex);
 		}
 	}
 
-	// TODO: test
-	private Role getRole(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) {
+	private List<Role> getRoles(final GenericMessageReactionEvent e, long guildId, long channelID, long messageId) {
 		String emoji = Utils.serializeEmoji(e.getEmoji());
 
 		try (SQLHelper sq = sql.create("SELECT role_id FROM reaction_roles WHERE guild_id = ? AND channel_id = ? AND message_id = ? AND emoji = ?")
-					.addParameters(guildId, channelID, messageId, emoji);
+				.addParameters(guildId, channelID, messageId, emoji);
 				ResultSet rs = sq.executeQuery()) {
-			if (rs.next()) {
-				return e.getGuild().getRoleById(rs.getLong("role_id"));
-			}
+			if (!rs.next()) return Collections.emptyList();
+
+			List<Role> result = new LinkedList<>();
+			do {
+				result.add(e.getGuild().getRoleById(rs.getLong("role_id")));
+			} while (rs.next());
+			return result;
 		} catch (SQLException ex) {
 			logger.error("Error while querying a reactionrole entry", ex);
 		}
-		return null;
+		return Collections.emptyList();
 	}
 }
