@@ -148,7 +148,8 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 			return;
 		}
 
-		if (sql.run("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?);",
+		// the RETURNING is to make the statement return something so that we can check if it was successful
+		if (sql.run("INSERT INTO reaction_roles (guild_id, role_id, channel_id, message_id, emoji) VALUES (?, ?, ?, ?, ?) RETURNING guild_id;",
 				guild.getIdLong(), role.getIdLong(), textChannel.getIdLong(), messageId, emojiStr)) {
 			cmde.success("reactionrolecreated", "reactionrolecreatedinfo",
 				new Placeholder("emote", emoji.getFormatted()),

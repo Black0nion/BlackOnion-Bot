@@ -62,23 +62,23 @@ public class BanUsageCommand extends SlashCommand {
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild executedGuild, TextChannel channel) throws SQLException {
 		final User user = e.getOption("targetuser", OptionMapping::getAsUser);
-		final String guildId = e.getOption("targetguild", OptionMapping::getAsString);
+		final String guildIdString = e.getOption("targetguild", OptionMapping::getAsString);
 
-		if (user == null && guildId == null) {
+		if (user == null && guildIdString == null) {
 			cmde.send("wrongargumentcount");
 			return;
 		}
 
 		if (user != null) {
 			if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
-				if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'user') ON CONFLICT DO NOTHING", user.getIdLong())) {
+				if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'user') ON CONFLICT DO NOTHING RETURNING id", user.getIdLong())) {
 					cmde.send("cantusecommandsanymore", new Placeholder("userorguild", Utils.escapeMarkdown(user.getAsTag())));
 				} else {
 					cmde.exception();
 				}
 			} else {
-				if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'user'", user.getIdLong())) {
-					cmde.send("userunbannednoreason");
+				if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'user' RETURNING id", user.getIdLong())) {
+					cmde.send("canusecommandsagain", new Placeholder("userorguild", Utils.escapeMarkdown(user.getAsTag())));
 				} else {
 					cmde.send("erroroccurred");
 					LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to unban user {}", user.getIdLong());
@@ -86,21 +86,22 @@ public class BanUsageCommand extends SlashCommand {
 			}
 		}
 
-		if (guildId == null) return;
+		if (guildIdString == null) return;
 
-		if (!GUILD_ID_PATTERN.matcher(guildId).matches()) {
+		if (!GUILD_ID_PATTERN.matcher(guildIdString).matches()) {
 			cmde.send("invalidguildid");
 			return;
 		}
+		long guildId = Long.parseLong(guildIdString);
 
 		if (cmde.getSubcommandGroup().equalsIgnoreCase("ban")) {
-			if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING", guildId))
+			if (sql.run("INSERT INTO banned_entities (id, type) VALUES (?, 'guild') ON CONFLICT DO NOTHING RETURNING id", guildId))
 				cmde.send("cantusecommandsanymore", new Placeholder("userorguild", guildId));
 			else
 				cmde.exception();
 		} else {
-			if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'guild'", guildId)) {
-				cmde.send("guildunbanned");
+			if (sql.run("DELETE FROM banned_entities WHERE id = ? AND type = 'guild' RETURNING id", guildId)) {
+				cmde.send("canusecommandsagain", new Placeholder("userorguild", guildId));
 			} else {
 				cmde.exception();
 				LoggerFactory.getLogger(BanUsageCommand.class).error("Failed to unban guild {}", guildId);

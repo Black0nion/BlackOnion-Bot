@@ -34,6 +34,7 @@
   "bytronalddump": "Zitate von TronaldDump: https://tronalddump.io",
   "c4_askforaccept": "%challenged%, willst du gegen %challenger% eine Runde \"4 Gewinnt\" spielen?",
   "cantusecommandsanymore": "`%userorguild%` kann nun keine Befehle mehr ausführen!",
+  "canusecommandsagain": "`%userorguild%` kann jetzt wieder Befehle ausführen!",
   "catbreednotfound": "Diese Rasse konnte nicht gefunden werden, für eine Liste an möglichen Rassen benutze ``%command%``!",
   "catnotfound": "Katze nicht gefunden :(",
   "challengeaccepted": "Herausforderung angenommen!",
