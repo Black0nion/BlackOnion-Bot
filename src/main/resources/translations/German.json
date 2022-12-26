@@ -55,7 +55,7 @@
   "commandstatus": "Der Befehl `%cmd%` ist gerade **%status%**!",
   "commandtoggled": "Der Status des Befehls %command% wurde geändert!",
   "commandtohelp": "Um Hilfe zu erhalten, benutze %command%!",
-  "configreloaded": "Die Config `%config%` wurden reloaded!",
+  "configreloaded": "Die Config(s) `%config%` wurden reloaded!",
   "configsreload": "Alle Configs wurden reloaded!",
   "connectfour": "4 Gewinnt",
   "country": "Land",

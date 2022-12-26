@@ -55,7 +55,7 @@
   "commandstatus": "The command `%cmd%` is currently **%status%**!",
   "commandtoggled": "The status of the command %command% got changed!",
   "commandtohelp": "To get help, use %command%!",
-  "configreloaded": "The config `%config%` got reloaded!",
+  "configreloaded": "The config(s) `%config%` got reloaded!",
   "configsreload": "All configs got reloaded!",
   "connectfour": "Connect 4",
   "country": "Country",

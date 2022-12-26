@@ -1,23 +1,23 @@
 package com.github.black0nion.blackonionbot.commands.slash.impl.admin;
 
 import com.github.black0nion.blackonionbot.Main;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.commands.common.utils.UserRespondUtilsImpl;
+import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.utils.NotImplementedException;
+import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -25,30 +25,16 @@ import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ReloadCommand extends SlashCommand {
 
-	public static final String METHOD = "method";
-	public static final String LIST = "list";
-	private static HashMap<String, Method> reloadableMethods = null;
+	private static Map<String, Method> reloadableMethods = null;
 
 	public ReloadCommand() {
-		super(builder(
-			Commands.slash("reload", "Reloads the bot")
-				.addSubcommands(
-					new SubcommandData(LIST, "Lists all reloadable methods"),
-					new SubcommandData(METHOD, "Reloads a specific method")
-						.addOptions(new OptionData(OptionType.STRING, METHOD, "The method to reload", true)
-							.addChoices(Utils.add(
-								// don't replace with toList because the result would be immutable
-								reloadableMethods.keySet().stream().map(m -> new Command.Choice(m, m)).collect(Collectors.toList()),
-								new Command.Choice("ALL", "all"))
-							)
-						)
-				)
-		).setAdminGuild());
+		super(builder("reload", "Reloads the bot")
+			.setAdminGuild());
 	}
 
 	@Reloadable("reloadablemethods")
@@ -78,42 +64,50 @@ public class ReloadCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		e.deferReply().queue();
 		if (reloadableMethods == null) {
 			initReloadableMethods();
 		}
 
-		if (cmde.getSubcommandName().equals("list")) {
-			StringBuilder reloadableMethodsString = new StringBuilder("```");
-			for (final Map.Entry<String, Method> entry : reloadableMethods.entrySet()) {
-				final Method meth = entry.getValue();
-				reloadableMethodsString
-					.append("\n")
-					.append(entry.getKey())
-					.append(": ")
-					.append(meth.getDeclaringClass().getSimpleName())
-					.append(".")
-					.append(meth.getName());
+		e.replyComponents(ActionRow.of(StringSelectMenu.create(enrichId("reloadablemethods"))
+				.addOptions(reloadableMethods.keySet().stream()
+					.map(l -> SelectOption.of(l, l))
+					.toArray(SelectOption[]::new))
+				.setMaxValues(SelectMenu.OPTIONS_MAX_AMOUNT)
+				.build()))
+			.setEphemeral(true)
+			.queue();
+	}
+
+	@Override
+	public void handleSelectMenuInteraction(GenericSelectMenuInteractionEvent<?, ?> e) {
+		if (!(e instanceof StringSelectInteractionEvent event)) return;
+		e.deferReply().queue();
+		UserRespondUtils cmde = new UserRespondUtilsImpl(e, BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser())) {
+			@Override
+			public boolean isEphemeral() {
+				return true;
 			}
-			cmde.success("reloadables", reloadableMethodsString.append("```").toString());
-		} else if (cmde.getSubcommandName().equals(METHOD)) {
-			String option = e.getOption(METHOD, "all", OptionMapping::getAsString);
-			if (option.equalsIgnoreCase("all")) {
-				reloadAll();
-				cmde.send("configsreload");
-			} else {
+		};
+
+		List<String> options = event.getValues();
+		if (options.contains("all")) {
+			reloadAll();
+			cmde.send("configsreload");
+		} else {
+			for (String option : options) {
 				final @Nullable Method method = reloadableMethods.get(option);
 				if (method == null) throw new NullPointerException("Invalid method.");
 				try {
 					method.invoke(method.getClass());
-					// DON'T use cmde.send() here because that'll invoke "reply" which will error because of the deferred reply (for some reason)
-					e.getHook().sendMessage(cmde.getTranslation("configreloaded", new Placeholder("config", option))).queue();
 				} catch (IllegalAccessException | InvocationTargetException ex) {
 					cmde.exception(ex);
 				}
 			}
-		} else {
-			throw new NotImplementedException(e.getSubcommandName());
+			// DON'T use cmde.send() here because that'll invoke "reply" which will error because of the deferred reply (for some reason)
+			// TODO: setEphemeral() doesn't work here
+			e.getHook().sendMessage(cmde.getTranslation("configreloaded", new Placeholder("config", String.join(", ", options.toArray(String[]::new)))))
+				.setEphemeral(true)
+				.queue();
 		}
 	}
 }
