@@ -2,7 +2,7 @@ plugins {
     java
     application
     jacoco // code coverage reports
-    id("com.diffplug.spotless") version "6.11.0"
+    id("com.diffplug.spotless") version "6.12.0"
 }
 
 repositories {
