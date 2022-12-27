@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("CheckStyle")
 public class FeatureFlags extends Holder<FeatureFlagFactory> {
 
-
 	public FeatureFlags(@NotNull FeatureFlagFactory factory) {
 		super(factory);
 	}

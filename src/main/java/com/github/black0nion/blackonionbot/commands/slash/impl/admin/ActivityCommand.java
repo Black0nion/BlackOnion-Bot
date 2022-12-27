@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -44,22 +45,23 @@ public class ActivityCommand extends SlashCommand {
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
 		if (cmde.getSubcommandName().equalsIgnoreCase("set")) {
-			if (e.getOption("type") == null || e.getOption("text") == null) {
-				cmde.sendPleaseUse();
-			}
 			final String text = e.getOption("text", OptionMapping::getAsString);
 			Activity.ActivityType type = parse(e.getOption("type", OptionMapping::getAsString));
+			@Nullable String url = e.getOption("url", OptionMapping::getAsString);
 			if (type != null) {
-				Activity newActivity = getActivity(type, text, e.getOption("url", OptionMapping::getAsString));
+				Activity newActivity = getActivity(type, text, url);
 				e.getJDA().getPresence().setActivity(newActivity);
+
 				settings.setActivityType(type);
 				settings.setActivityName(text);
-				cmde.send("newactivity", new Placeholder("newactivity",
-					newActivity != null ? newActivity.getName() : cmde.getTranslation("empty")));
+				settings.setActivityUrl(url);
+				cmde.send("newactivity", new Placeholder("activity",
+					newActivity != null ? type + " " + Utils.escapeMarkdown(newActivity.getName()) : cmde.getTranslation("empty")));
 			} else cmde.send("invalidactivitytype");
 		} else if (cmde.getSubcommandName().equalsIgnoreCase("clear")) {
 			settings.setActivityType(null);
 			settings.setActivityName(null);
+			settings.setActivityUrl(null);
 			e.getJDA().getPresence().setActivity(null);
 			cmde.send("activitycleared");
 		}

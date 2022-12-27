@@ -233,7 +233,7 @@
   "myping": "My Ping is **%ping%ms**",
   "myprefixis": "My prefix is: %prefix%",
   "name": "Name",
-  "newactivity": "New activity",
+  "newactivity": "New activity: `%activity%`",
   "newlanguage": "New Language: `%newlang%`",
   "news": "News",
   "newstatus": "Successfully set status!\nNew status: `%status%`",

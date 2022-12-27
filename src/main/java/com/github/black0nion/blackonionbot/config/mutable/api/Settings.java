@@ -19,9 +19,9 @@ public interface Settings {
 	String getActivityName();
 	void setActivityName(String activityName);
 
-	OnlineStatus getOnlineStatus();
-	void setOnlineStatus(OnlineStatus onlineStatus);
-
 	String getActivityUrl();
 	void setActivityUrl(String activityUrl);
+
+	OnlineStatus getOnlineStatus();
+	void setOnlineStatus(OnlineStatus onlineStatus);
 }

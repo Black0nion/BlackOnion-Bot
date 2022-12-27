@@ -312,7 +312,7 @@ public class SlashCommandBase extends ListenerAdapter {
 			final AbstractCommandEvent<?, ?> cmde = switch (event) {
 				case SlashCommandInteractionEvent e1 -> new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author);
 				case MessageContextInteractionEvent e1 -> new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author);
-				default -> throw new IllegalStateException("Unexpected value: " + cmd);
+				default -> throw new IllegalArgumentException("Unexpected value: " + cmd);
 			};
 
 			final boolean disabled = !guild.isCommandActivated(cmd);
