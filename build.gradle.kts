@@ -52,7 +52,7 @@ dependencies {
 
     implementation("com.google.guava:guava:31.1-jre")
 
-    implementation("com.google.code.gson:gson:2.9.1")
+    implementation("com.google.code.gson:gson:2.10")
     implementation("com.github.Marcono1234:gson-record-type-adapter-factory:v0.3.0")
 
     implementation("net.dv8tion:JDA:5.0.0-beta.2")
