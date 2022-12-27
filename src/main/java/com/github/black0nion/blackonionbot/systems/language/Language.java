@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
+import com.github.black0nion.blackonionbot.misc.exception.LanguageCreationException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.json.JSONObject;
@@ -39,29 +40,35 @@ public class Language {
 	}
 
 	public Language(final JSONObject translations) {
+		String langCode = null;
+		String langName = null;
+
 		try {
+			if (translations == null) throw new IllegalArgumentException("Translations must not be null");
 			messages = new HashMap<>();
 			JSONObject metadata = translations.getJSONObject("metadata");
-			this.name = metadata.getString("name");
-			Checks.matches(this.name, Pattern.compile("[A-Z][a-z]+"), "Language name");
-			this.languageCode = metadata.getString("code");
-			Checks.matches(this.languageCode, Pattern.compile("[A-Z]{2}"), "Language code");
+			langName = metadata.getString("name");
+			Checks.matches(langName, Pattern.compile("[A-Z][a-z]+"), "Language name");
+			langCode = metadata.getString("code");
+			Checks.matches(langCode, Pattern.compile("[A-Z]{2}"), "Language code");
 			this.isDefault = metadata.has("default") && metadata.getBoolean("default");
 
 			if (translations.isEmpty()) {
-				throw new NullPointerException("Translation file is empty");
+				throw new IllegalArgumentException("Translation file is empty");
 			}
 
 			for (final String key : translations.keySet()) {
 				if (!key.toLowerCase().equals(key))
-					logger.error("'{}' is not entirely in lower case! Please correct in '{}' !", key, this.languageCode);
+					logger.error("'{}' is not entirely in lower case! Please correct in '{}' !", key, langCode);
 				if (key.equalsIgnoreCase("metadata")) continue;
+
 				messages.put(key.toLowerCase(), translations.getString(key));
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new LanguageCreationException(langCode, langName, e);
 		}
+		this.languageCode = langCode;
+		this.name = langName;
 	}
 
 	public String getLanguageCode() {
@@ -105,8 +112,7 @@ public class Language {
 		if (key == null) return null;
 		String result = getTranslation(key);
 		if (result == null) return null;
-		for (final Placeholder placeholder : placeholders) result = placeholder.process(result);
-		return result;
+		return Placeholder.process(result, placeholders);
 	}
 
 	@Override

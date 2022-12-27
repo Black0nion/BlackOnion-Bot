@@ -17,9 +17,9 @@ public class TicTacToeBot {
 		Pair<Integer, Integer> bestMove = null;
 		int bestScore = -100;
 		for (final Pair<Integer, Integer> position : getAvailablePositions(board)) {
-			board[position.getKey()][position.getValue()] = ai;
+			board[position.getFirst()][position.getSecond()] = ai;
 			final int score = minimax(board);
-			board[position.getKey()][position.getValue()] = FieldType.EMPTY;
+			board[position.getFirst()][position.getSecond()] = FieldType.EMPTY;
 			if (score > bestScore) {
 				bestScore = score;
 				bestMove = position;
@@ -65,9 +65,9 @@ public class TicTacToeBot {
 		}
 
 		for (final Pair<Integer, Integer> position : getAvailablePositions(board)) {
-			board[position.getKey()][position.getValue()] = humanCount > aiCount ? ai : human;
+			board[position.getFirst()][position.getSecond()] = humanCount > aiCount ? ai : human;
 			final int currentScore = minimax(board);
-			board[position.getKey()][position.getValue()] = FieldType.EMPTY;
+			board[position.getFirst()][position.getSecond()] = FieldType.EMPTY;
 			if (humanCount > aiCount ? currentScore > bestScore : currentScore < bestScore) {
 				bestScore = currentScore;
 			}

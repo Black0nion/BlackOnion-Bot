@@ -1,82 +1,96 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
+import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.utils.EmbedUtils;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class GiveawaySystem {
-	private static final List<Giveaway> giveaways = new ArrayList<>();
 
-	private static MongoCollection<Document> collection;
+	private static final Logger logger = LoggerFactory.getLogger(GiveawaySystem.class);
 
-	private static final Collection<String> giveawayKeys = new ArrayList<>();
+	private final SQLHelperFactory sql;
 
-	static {
-		giveawayKeys.add("endDate");
-		giveawayKeys.add("messageId");
-		giveawayKeys.add("channelId");
-		giveawayKeys.add("createrId");
-		giveawayKeys.add("guildId");
-		giveawayKeys.add("item");
-		giveawayKeys.add("winners");
+	public GiveawaySystem(SQLHelperFactory sql) {
+		this.sql = sql;
 	}
 
-	public static void init() {
-		collection = MongoDB.getInstance().getDatabase().getCollection("giveaways");
+	private final List<Giveaway> giveaways = new ArrayList<>();
 
-		Bot.getInstance().getExecutor().submit(() -> {
-			try {
-				Bot.getInstance().getJDA().awaitReady();
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
+	private static int schedulerId = 1;
+	private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1,
+		new ThreadFactoryBuilder().setNameFormat("giveaway-scheduler-" + schedulerId++ + "-%d").build()
+	);
 
-			for (final Document doc : collection.find())
-				if (doc.keySet().containsAll(giveawayKeys)) {
-					createGiveaway(doc.getDate("endDate"), doc.getLong("messageId"), doc.getLong("channelId"), doc.getLong("createrId"), doc.getLong("guildId"), doc.getString("item"), doc.getInteger("winners"));
+	public void init() {
+		try {
+			try (SQLHelper sq = sql.create("SELECT * FROM giveaways");
+					ResultSet rs = sq.executeQuery()) {
+				while (rs.next()) {
+					giveaways.add(new Giveaway(
+						sql,
+						LocalDateTime.ofEpochSecond(rs.getLong("endDate"), 0, ZoneOffset.UTC),
+						rs.getLong("messageId"),
+						rs.getLong("channelId"),
+						rs.getLong("createrId"),
+						rs.getLong("guildId"),
+						rs.getString("item"),
+						rs.getInt("winners")
+					));
 				}
-		});
+			}
+		} catch (SQLException e) {
+			logger.error("Error while initializing GiveawaySystem", e);
+		}
 	}
 
 	@Nullable
-	public static Giveaway getGiveaway(final long messageid) {
-		return giveaways.stream().filter(giveaway -> giveaway.messageId() == messageid).findFirst().orElse(null);
+	public Giveaway getGiveaway(final long messageId) {
+		return giveaways.stream().filter(giveaway -> giveaway.messageId() == messageId).findFirst().orElse(null);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static void createGiveaway(final Date endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
+	public void createGiveaway(final LocalDateTime endDate, final long messageId, final long channelId, final long createrId, final long guildId, final String item, final int winners) {
 		try {
-			final Giveaway giveaway = new Giveaway(endDate, messageId, channelId, createrId, guildId, item, winners);
+			final Giveaway giveaway = new Giveaway(sql, endDate, messageId, channelId, createrId, guildId, item, winners);
 			if (giveaways.contains(giveaway)) return;
 			giveaways.add(giveaway);
-			final ObjectMapper mapper = new ObjectMapper();
-			final HashMap<String, Object> values = mapper.readValue(mapper.writeValueAsString(giveaway), HashMap.class);
-			values.remove("endDate");
-			values.put("endDate", endDate);
-			collection.insertOne(new Document(values));
+			giveaway.writeToDatabase();
 			scheduleGiveaway(giveaway);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void scheduleGiveaway(final Giveaway giveaway) {
-		final Date endDate = giveaway.endDate();
+	/**
+	 * Adds an existing giveaway to the {@link #scheduler Giveaway Scheduler}
+	 */
+	public void scheduleGiveaway(final Giveaway giveaway) {
 		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
@@ -85,52 +99,57 @@ public class GiveawaySystem {
 				return;
 			}
 
-			Bot.getInstance().getScheduledExecutor().schedule(() -> endGiveaway(giveaway, msg, guild), endDate.getTime() - Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS);
+			scheduler.schedule(() -> endGiveaway(giveaway, msg, guild), giveaway.endSeconds() - System.currentTimeMillis() / 1000, TimeUnit.SECONDS);
 		});
 	}
 
-	public static void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
+	public void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
+				Language lang = LanguageSystem.getLanguage(null, guild);
 				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
-					msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("nowinner", "nobodyparticipated", false).build()).queue();
+					msg.reply(lang.getTranslationNonNull("nowinner")).queue();
+					updateGiveawayMessage(msg, lang);
 					deleteGiveaway(giveaway);
 					return;
 				}
 
 				users.remove(selfUser);
-				final int winnerCountGiveawy = giveaway.winners();
-				final int winnerCount = Math.min(winnerCountGiveawy, users.size());
+				final int winnerCountGiveaway = giveaway.winners();
+				final int winnerCount = Math.min(winnerCountGiveaway, users.size());
 				final String[] winners = new String[winnerCount];
-				final long[] winnersIds = new long[winnerCount];
 
 				Collections.shuffle(users, ThreadLocalRandom.current());
 
 				for (int i = 0; i < winners.length; i++) {
 					final User currentWinner = users.get(i);
-					winners[i] = currentWinner.getAsMention();
-					winnersIds[i] = currentWinner.getIdLong();
+					winners[i] = "- " + currentWinner.getAsMention();
 				}
 
-				msg.editMessageEmbeds(EmbedUtils.getSuccessEmbed(null, guild).setTitle("GIVEAWAY").addField("Winner Winner Chicken Dinner :)", LanguageSystem.getTranslation("giveawaywinner", null, guild).replace("%winner%", String.join("\n", winners)), false).build()).mentionUsers(winnersIds).queue();
+				updateGiveawayMessage(msg, lang);
+				msg.reply("GIVEAWAY\n" + lang.getTranslation("giveawaywinner", new Placeholder("winner", String.join("\n", winners)))).queue();
 			});
 		} catch (final Exception ex) {
-			ex.printStackTrace();
+			logger.error("Error while ending giveaway", ex);
+		} finally {
+			deleteGiveaway(giveaway);
 		}
-		deleteGiveaway(giveaway);
 	}
 
-	private static void deleteGiveaway(final Giveaway giveaway) {
+	private void updateGiveawayMessage(Message msg, Language lang) {
+		MessageEmbed embed = msg.getEmbeds().get(0);
+		EmbedBuilder builder = new EmbedBuilder(embed);
+		builder.setDescription(embed.getDescription() + "\n" + lang.getTranslation("giveawayended"));
+		msg.editMessageEmbeds(builder.build()).queue();
+	}
+
+	private void deleteGiveaway(final Giveaway giveaway) {
 		try {
 			giveaways.remove(giveaway);
-			try {
-				collection.deleteOne(new BasicDBObject().append("messageId", giveaway.messageId()).append("guildId", giveaway.guildId()).append("channelId", giveaway.channelId()));
-			} catch (final Exception ex) {
-				ex.printStackTrace();
-			}
+			giveaway.deleteFromDatabase();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Error while deleting giveaway", e);
 		}
 	}
 }

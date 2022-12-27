@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers.jda.impls;
 
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.privileges.IntegrationPrivilege
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.managers.GuildManager;
 import net.dv8tion.jda.api.managers.GuildStickerManager;
+import net.dv8tion.jda.api.managers.GuildWelcomeScreenManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.*;
 import net.dv8tion.jda.api.requests.restaction.order.CategoryOrderAction;
@@ -55,6 +57,11 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	protected GuildImpl(Guild guild) {
 		this.guild = guild;
+	}
+
+	@Override
+	public String getDebugMessage() {
+		return Utils.getDebugMessage(guild);
 	}
 
 	@Override
@@ -1487,8 +1494,32 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@NotNull
 	@Override
+	public List<ScheduledEvent> getScheduledEvents() {
+		return guild.getScheduledEvents();
+	}
+
+	@NotNull
+	@Override
+	public List<ScheduledEvent> getScheduledEventsByName(@NotNull String name, boolean ignoreCase) {
+		return guild.getScheduledEventsByName(name, ignoreCase);
+	}
+
+	@NotNull
+	@Override
 	public SortedSnowflakeCacheView<ScheduledEvent> getScheduledEventCache() {
 		return guild.getScheduledEventCache();
+	}
+
+	@NotNull
+	@Override
+	public RestAction<GuildWelcomeScreen> retrieveWelcomeScreen() {
+		return guild.retrieveWelcomeScreen();
+	}
+
+	@NotNull
+	@Override
+	public CacheRestAction<ScheduledEvent> retrieveScheduledEventById(long id) {
+		return guild.retrieveScheduledEventById(id);
 	}
 
 	@NotNull
@@ -1499,13 +1530,19 @@ public abstract class GuildImpl extends BlackWrapper implements Guild {
 
 	@NotNull
 	@Override
+	public ScheduledEventAction createScheduledEvent(@NotNull String name, @NotNull GuildChannel channel, @NotNull OffsetDateTime startTime) {
+		return guild.createScheduledEvent(name, channel, startTime);
+	}
+
+	@NotNull
+	@Override
 	public ScheduledEventAction createScheduledEvent(@NotNull String name, @NotNull String location, @NotNull OffsetDateTime startTime, @NotNull OffsetDateTime endTime) {
 		return guild.createScheduledEvent(name, location, startTime, endTime);
 	}
 
 	@NotNull
 	@Override
-	public ScheduledEventAction createScheduledEvent(@NotNull String name, @NotNull GuildChannel channel, @NotNull OffsetDateTime startTime) {
-		return guild.createScheduledEvent(name, channel, startTime);
+	public GuildWelcomeScreenManager modifyWelcomeScreen() {
+		return guild.modifyWelcomeScreen();
 	}
 }

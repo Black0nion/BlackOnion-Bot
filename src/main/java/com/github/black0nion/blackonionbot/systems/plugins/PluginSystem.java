@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -32,6 +34,7 @@ public class PluginSystem {
 		final String superclass = Plugin.class.getName();
 
 		final Optional<ClassInfo> optionalClassInfo = scanResult.getAllClasses().stream().filter(classInfo -> classInfo.extendsSuperclass(superclass)).findFirst();
+		scanResult.close();
 
 		if (optionalClassInfo.isEmpty()) {
 			logger.error("No plugin detected in file \"{}\".", jarName);

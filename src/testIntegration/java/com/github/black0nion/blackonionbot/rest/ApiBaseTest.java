@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.rest;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.NullInjector;
 import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
 import io.javalin.Javalin;

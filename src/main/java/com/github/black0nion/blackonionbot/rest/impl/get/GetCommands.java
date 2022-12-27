@@ -17,9 +17,16 @@ import javax.annotation.Nullable;
  * <code>[{"permissions":[],"subcommand_groups":[],"name":"weather","options":[{"name":"city_name","description":"The city to get weather information for.","type":"STRING","required":true}],"description":"Used to get weather information for a city.","subcommands":{}}]</code>
  */
 public class GetCommands implements IGetRoute {
+
+	private final SlashCommandBase slashCommandBase;
+
+	public GetCommands(SlashCommandBase slashCommandBase) {
+		this.slashCommandBase = slashCommandBase;
+	}
+
 	@Override
 	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
-		return SlashCommandBase.getInstance().getCommandsJson();
+		return slashCommandBase.getCommandsJson();
 	}
 
 	@Nonnull

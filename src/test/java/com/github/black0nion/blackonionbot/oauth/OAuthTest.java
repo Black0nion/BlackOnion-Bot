@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import org.junit.jupiter.api.Test;
 
 import java.util.InputMismatchException;

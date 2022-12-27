@@ -1,13 +1,12 @@
 package com.github.black0nion.blackonionbot.rest;
 
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
 import com.github.black0nion.blackonionbot.rest.api.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.rest.impl.get.Paths;
 import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
-import com.github.black0nion.blackonionbot.utils.DummyException;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.javalin.http.ExceptionHandler;
@@ -38,10 +37,6 @@ public class API {
 
 	private static API instance;
 
-	public static API getInstance() {
-		return instance;
-	}
-
 	@Reloadable("api")
 	private static void reload() {
 		new API(instance.config, instance.injector, instance.statsCollectorFactory);
@@ -51,13 +46,16 @@ public class API {
 	private final Injector injector;
 	private final StatsCollectorFactory statsCollectorFactory;
 
+	/**
+	 * Automatically closes the old API instance if it exists
+	 */
 	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
-		API prevInstance = instance;
+		if (instance != null && instance.getApp() != null) instance.getApp().close();
 		instance = this;
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;
-		start(prevInstance);
+		start();
 	}
 
 	private final StatisticsHandler statisticsHandler = new StatisticsHandler();
@@ -70,10 +68,7 @@ public class API {
 		statsCollectorFactory.init(statisticsHandler);
 	}
 
-	private void start(API prevInstance) {
-		if (app != null) app.close();
-		if (prevInstance != null && prevInstance.getApp() != null) prevInstance.getApp().close();
-
+	private void start() {
 		initStats();
 
 		app = Javalin.create(cfg -> {
@@ -102,7 +97,7 @@ public class API {
 					ws.onError(ctx -> endpoint.onError(ctx.session, ctx.error()));
 				});
 			} catch (final Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to register websocket endpoint: " + websockets.getName(), e);
 			}
 		}
 		//endregion
@@ -120,14 +115,11 @@ public class API {
 						httpRoutes.add(route);
 				}
 			} catch (final Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to register http route: " + req.getName(), e);
 			}
 		}
 
 		ExceptionHandler<Exception> exceptionHandler = (e, ctx) -> {
-			// dummy exceptions are just to instantly return from a handler, we don't care about them
-			if (e instanceof DummyException) return;
-
 			// only log unexpected exceptions
 			if (!(e instanceof HttpResponseException))
 				logger.error("API Error happened", e);

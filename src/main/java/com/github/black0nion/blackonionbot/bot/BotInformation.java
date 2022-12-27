@@ -1,11 +1,7 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.misc.GuildType;
-import com.github.black0nion.blackonionbot.misc.OperatingSystem;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.misc.enums.OperatingSystem;
 import com.google.common.io.Files;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -17,55 +13,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.black0nion.blackonionbot.misc.OperatingSystem.*;
+import static com.github.black0nion.blackonionbot.misc.enums.OperatingSystem.*;
 
 public class BotInformation {
 	private BotInformation() {}
 
 	private static final String PATTERN = "dd.MM.yyyy HH:mm";
 
-	@SuppressWarnings("java:S2885")
-	public static final SimpleDateFormat datePattern = new SimpleDateFormat(PATTERN);
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(PATTERN);
 
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
 
 	public static final OperatingSystemMXBean OS_BEAN = ManagementFactory.getOperatingSystemMXBean();
-	public static final OperatingSystem OPERATING_SYSTEM;
+	public static final OperatingSystem OPERATING_SYSTEM = OperatingSystem.get();
 	public static final String OS_NAME;
 
 	public static final String CPU_NAME;
 	public static final String CPU_MHZ;
 
-	public static final long SUPPORT_SERVER;
-
 	static {
-		long supportServer = -1;
-		long logsChannel = -1;
-		try {
-			final Document doc = BlackGuild.configs.find(Filters.eq("guildtype", GuildType.SUPPORT_SERVER.name())).first();
-			if (doc != null && doc.containsKey("guildid") && doc.containsKey("botlogschannel")) {
-				supportServer = doc.getLong("guildid");
-				logsChannel = doc.getLong("botlogschannel");
-			}
-		} catch (Exception ignored) {
-			LoggerFactory.getLogger(BotInformation.class).warn("Could not load support server information from database");
-		}
-		SUPPORT_SERVER = supportServer;
-		Bot.getInstance().getConfig().setLogsChannel(logsChannel);
-
 		String osName = "Unknown";
 		String cpuName = "N/A";
 		String cpuMhz = "N/A";
-		OperatingSystem operatingSystem = UNKNOWN;
 		try {
-			if (OS_BEAN.getName().toLowerCase().contains("windows")) {
-				operatingSystem = WINDOWS;
-				osName = OS_BEAN.getName();
-			} else if (OS_BEAN.getName().toLowerCase().contains("mac")) {
-				operatingSystem = MACOS;
-				osName = "macOS :vomitting:";
-			} else if (OS_BEAN.getName().toLowerCase().contains("linux")) {
-				operatingSystem = LINUX;
+			if (OPERATING_SYSTEM == LINUX) {
 				final File cpuinfofile = new File("/etc/os-release");
 				final HashMap<String, String> osInfo = new HashMap<>();
 				final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
@@ -77,7 +48,7 @@ public class BotInformation {
 				osName = osInfo.get("PRETTY_NAME").replace("\"", "");
 			}
 
-			if (operatingSystem != WINDOWS) {
+			if (OPERATING_SYSTEM != WINDOWS) {
 				final File cpuinfofile = new File("/proc/cpuinfo");
 				final HashMap<String, String> cpuinfo = new HashMap<>();
 				final List<String> input = Files.readLines(cpuinfofile, StandardCharsets.UTF_8);
@@ -108,6 +79,5 @@ public class BotInformation {
 		OS_NAME = osName;
 		CPU_NAME = cpuName;
 		CPU_MHZ = cpuMhz;
-		OPERATING_SYSTEM = operatingSystem;
 	}
 }

@@ -4,11 +4,11 @@ import com.github.black0nion.blackonionbot.wrappers.jda.BlackWrapper;
 import net.dv8tion.jda.annotations.Incubating;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.attribute.IPermissionContainer;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.utils.ImageProxy;
@@ -31,6 +31,11 @@ public abstract class MemberImpl extends BlackWrapper implements Member {
 
 	protected MemberImpl(Member member) {
 		this.member = member;
+	}
+
+	@Override
+	public String getDebugMessage() {
+		return member.getNickname() + "#" + member.getUser().getDiscriminator() + "(" + member.getUser().getName() + ")(M:" + member.getId() + ")";
 	}
 
 	@Override

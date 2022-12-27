@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -45,7 +45,7 @@ public class PlayerManager {
 	private final Config config;
 
 	public PlayerManager(Config config) {
-		instance = this;
+		instance = this; // NOSONAR
 		this.musicManagers = new HashMap<>();
 		this.audioPlayerManager = new DefaultAudioPlayerManager();
 		this.config = config;
@@ -161,7 +161,7 @@ public class PlayerManager {
 
 			@Override
 			public void loadFailed(final FriendlyException exception) {
-				channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("errorhappened", "somethingwentwrong", false).build()).queue();
+				channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
 				exception.printStackTrace();
 			}
 		});

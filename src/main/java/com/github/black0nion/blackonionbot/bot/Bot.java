@@ -1,24 +1,33 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.admin.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.admin.ReloadCommand;
-import com.github.black0nion.blackonionbot.commands.admin.StatusCommand;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
-import com.github.black0nion.blackonionbot.config.api.Config;
-import com.github.black0nion.blackonionbot.config.impl.ConfigImpl;
-import com.github.black0nion.blackonionbot.config.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ReloadCommand;
+import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
+import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigImpl;
+import com.github.black0nion.blackonionbot.config.immutable.impl.ConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
+import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
+import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
+import com.github.black0nion.blackonionbot.database.DatabaseConnector;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.mongodb.MongoManager;
 import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
 import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
-import com.github.black0nion.blackonionbot.rest.sessions.MongoLogin;
-import com.github.black0nion.blackonionbot.stats.*;
+import com.github.black0nion.blackonionbot.rest.sessions.DatabaseSessionHandler;
+import com.github.black0nion.blackonionbot.stats.JettyCollector;
+import com.github.black0nion.blackonionbot.stats.Prometheus;
+import com.github.black0nion.blackonionbot.stats.StatisticsManager;
+import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
@@ -51,7 +60,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
 import java.io.File;
@@ -71,7 +79,7 @@ public class Bot extends ListenerAdapter {
 		try {
 			BLACKONION_ICON = Icon.from(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("logo.png")));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e); // NOSONAR
 		}
 	}
 
@@ -103,6 +111,10 @@ public class Bot extends ListenerAdapter {
 	private long selfUserId = -1;
 	private final SlashCommandBase slashCommandBase;
 	private final Config config;
+	private final Settings settings;
+	private final DatabaseConnector database;
+	private final SQLHelperFactory sqlHelperFactory;
+	private final GiveawaySystem giveawaySystem;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -130,28 +142,48 @@ public class Bot extends ListenerAdapter {
 		return config;
 	}
 
+	/**
+	 * Don't use in new code, prefer dependency injection to allow unit testing
+	 */
+	public SQLHelperFactory getSqlHelperFactory() {
+		return sqlHelperFactory;
+	}
+
 	//endregion
 
-	public Bot() throws IOException {
-		instance = this;
+	public Bot() throws Exception { // NOSONAR
+		instance = this; // NOSONAR
+		final long startTime = System.currentTimeMillis();
 		Utils.printLogo();
 		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
+		Thread shutdownHookThread = new Thread(this::shutdown);
+		shutdownHookThread.setName("ShutdownHook");
+		Runtime.getRuntime().addShutdownHook(shutdownHookThread);
+
+		FeatureFlags featureFlags = new FeatureFlags(new FeatureFlagFactoryImpl());
 		ConfigFileLoader.loadConfig();
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
-		// slf4j MDC; used to set the run mode in the logs sent to loki
-		MDC.put("run_mode", config.getRunMode().name());
+		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
 
 		DockerManager.init();
 		logger.info("Starting BlackOnion-Bot in '{}' mode...", config.getRunMode());
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
-		MongoManager.connect(config);
-
 		InjectorMap injectorMap = new InjectorMap();
-		SessionHandler sessionHandler = injectorMap.add(new MongoLogin());
-		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config));
+		injectorMap.add(this);
+		injectorMap.add(featureFlags);
+		injectorMap.add(config);
+		injectorMap.add(settings);
+
+		injectorMap.add(database = new DatabaseConnector(config, featureFlags)); // NOSONAR
+		sqlHelperFactory = database.getSqlHelperFactory();
+		injectorMap.add(sqlHelperFactory);
+
+		SessionHandler sessionHandler = injectorMap.add(new DatabaseSessionHandler(sqlHelperFactory));
+		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
+
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
 			sessionHandler,
@@ -163,26 +195,41 @@ public class Bot extends ListenerAdapter {
 		slashCommandBase = new SlashCommandBase(config, injector);
 		injectorMap.add(slashCommandBase);
 
+		giveawaySystem = new GiveawaySystem(sqlHelperFactory);
+		injectorMap.add(giveawaySystem);
+
 		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER))
+			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS))
 			.enableCache(CacheFlag.VOICE_STATE)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setMaxReconnectDelay(32)
-			.addEventListeners(slashCommandBase, this, new ReactionRoleSystem(), new JoinLeaveSystem(config), new AutoRolesSystem(), statisticsManager, eventWaiter);
+			.addEventListeners(
+				slashCommandBase,
+				this,
+				new ReactionRoleSystem(sqlHelperFactory),
+				new JoinLeaveSystem(config, settings),
+				new AutoRolesSystem(),
+				statisticsManager,
+				eventWaiter
+			);
 
 		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
 		ReloadCommand.initReloadableMethods();
-		builder.setStatus(StatusCommand.getStatusFromConfig(config));
-		builder.setActivity(ActivityCommand.getActivity(config));
+		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
+		builder.setActivity(ActivityCommand.getActivity(settings));
+
+		if (featureFlags.bot_shutdownBeforeConnection.getValue()) {
+			logger.warn("Shutting down before connecting to Discord due to the 'bot.shutdownBeforeConnection' feature flag");
+			System.exit(0);
+		}
 
 		logger.info("Starting JDA...");
 		try {
 			this.jda = builder.build();
 		} catch (final Exception e) {
-			e.printStackTrace();
-			logger.error("Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.");
+			logger.error("Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.", e);
 			logger.error("Terminating bot.");
 			System.exit(-1);
 			return;
@@ -200,15 +247,13 @@ public class Bot extends ListenerAdapter {
 				.build();
 			Pages.activate(paginator);
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
 
 		PlayerManager playerManager = new PlayerManager(config);
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(GiveawaySystem::init)
 			.addAndGetSelf(playerManager::init)
 			.addAndGetSelf(() -> new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize)))
 			.addAndGetSelf(PluginSystem::loadPlugins)
@@ -228,20 +273,35 @@ public class Bot extends ListenerAdapter {
 			}
 		}));
 
-		Runtime.getRuntime().addShutdownHook(new Thread(MongoManager::disconnect));
-
 		statisticsManager.start();
+
+		logger.info("Successfully started the application tasks in {} ms!", System.currentTimeMillis() - startTime);
+	}
+
+	public void shutdown() {
+		logger.info("Shutting down...");
+		PluginSystem.disablePlugins();
+		// shutdown executors
+		executor.shutdown();
+		scheduledExecutor.shutdown();
+		// shutdown jda
+		if (jda != null) {
+			jda.shutdown();
+		}
+		// shutdown HikariCP
+		if (database != null) {
+			database.close();
+		}
 	}
 
 	@Override
 	public void onReady(final ReadyEvent e) {
-		final JDA jda = e.getJDA();
-		selfUserId = jda.getSelfUser().getIdLong();
-		logger.info("Connected to {}#{} in {}ms.", jda.getSelfUser().getName(), jda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
+		final JDA readyJda = e.getJDA();
+		selfUserId = readyJda.getSelfUser().getIdLong();
+		logger.info("Connected to {}#{} in {}ms.", readyJda.getSelfUser().getName(), readyJda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
-		jda.getPresence().setActivity(ActivityCommand.getActivity(config));
-
-		slashCommandBase.updateCommandsDev(jda);
+		slashCommandBase.updateCommandsDev(readyJda);
+		executor.submit(giveawaySystem::init);
 	}
 
 	@Reloadable("commands")

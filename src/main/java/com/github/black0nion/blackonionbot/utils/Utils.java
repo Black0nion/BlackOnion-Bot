@@ -4,26 +4,29 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.commands.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbed;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import com.google.common.collect.Lists;
+import com.google.gson.internal.Primitives;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -44,7 +47,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -79,8 +82,10 @@ public class Utils {
 		return Double.parseDouble(df.format(number).replace(",", "."));
 	}
 
+	private static final JSONObject COUNTRIES_JSON = new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining())));
+
 	public static String getCountryFromCode(final String code) {
-		return new JSONObject(String.join("\n", new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream("/countrycodes.json")))).lines().collect(Collectors.joining()))).getString(code);
+		return COUNTRIES_JSON.getString(code);
 	}
 
 	public static BufferedImage deepCopy(@NotNull final BufferedImage bufferedImage) {
@@ -89,10 +94,6 @@ public class Utils {
 		final WritableRaster raster = bufferedImage.copyData(bufferedImage.getRaster().createCompatibleWritableRaster());
 
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
-
-	public static <T> T[] subArray(final T[] array, final int beg, final int end) {
-		return Arrays.copyOfRange(array, beg, end + 1);
 	}
 
 	public static boolean isLong(final String input) {
@@ -107,7 +108,8 @@ public class Utils {
 
 	public static boolean isLong(final Object input) {
 		try {
-			Long.parseLong(((String) input).trim());
+			if (input instanceof Number) return true;
+			Long.parseLong(input.toString().trim());
 			return true;
 		} catch (final Exception ignored) {
 			return false;
@@ -123,27 +125,13 @@ public class Utils {
 		}
 	}
 
-	public static boolean isInteger(final Object input) {
-		try {
-			Integer.parseInt(((String) input).trim());
-			return true;
-		} catch (final Exception ignored) {
-			return false;
-		}
-	}
-
 	public static boolean isBoolean(String input) {
 		return isBoolean((Object) input);
 	}
 
 	public static boolean isBoolean(final Object input) {
-		try {
-			//noinspection ResultOfMethodCallIgnored
-			Boolean.parseBoolean(((String) input).trim());
-			return true;
-		} catch (final Exception ignored) {
-			return false;
-		}
+		if (input instanceof Boolean) return true;
+		return input != null && (input.toString().trim().equalsIgnoreCase("true") || input.toString().trim().equalsIgnoreCase("false"));
 	}
 
 	/**
@@ -215,34 +203,42 @@ public class Utils {
 	 * }</pre>
 	 */
 	public static String getPermissionString(final Permission... permissions) {
+		if (permissions.length == 0) return "```\n```";
+		final List<Permission> sortedPermissions = Arrays.stream(permissions)
+			.filter(Objects::nonNull)
+			.distinct()
+			.sorted(Comparator.comparing(Permission::getName))
+			.toList();
 		StringBuilder output = new StringBuilder("```");
-		for (int i = 0; i < permissions.length; i++) {
-			output.append("- ").append(permissions[i].getName()).append(i == permissions.length - 1 ? "" : "\n");
+		for (Permission permission : sortedPermissions) {
+			output.append("\n- ").append(permission.getName());
 		}
-		return output + "```";
+		return output + "\n```";
 	}
 
 	public static String getPermissionString(final CustomPermission... permissions) {
+		if (permissions.length == 0) return "```\n```";
+		final List<CustomPermission> sortedPermissions = Arrays.stream(permissions)
+			.filter(Objects::nonNull)
+			.distinct()
+			.sorted(Comparator.comparing(CustomPermission::getName))
+			.toList();
 		StringBuilder output = new StringBuilder("```");
-		for (int i = 0; i < permissions.length; i++) {
-			output.append("- ").append(permissions[i].name()).append(i == permissions.length - 1 ? "" : "\n");
+		for (CustomPermission permission : sortedPermissions) {
+			output.append("\n- ").append(permission.getName());
 		}
-		return output + "```";
+		return output + "\n```";
 	}
 
-	public static String parseDate(final long diff) {
-		final long diffSeconds = diff / 1000 % 60;
-		final long diffMinutes = diff / (60 * 1000) % 60;
-		final long diffHours = diff / (60 * 60 * 1000) % 24;
-		final long diffDays = diff / (24 * 60 * 60 * 1000);
-
-		return (diffDays != 0 ? diffDays + " days" : "") + (diffHours != 0 ? " " + diffHours + " hours" : "") + (diffMinutes != 0 ? " " + diffMinutes + " minutes" : "") + (diffSeconds != 0 ? " " + diffSeconds + " seconds" : "");
-	}
-
+	/**
+	 * @return 1) the given String with the first letter capitalized and the rest lower case 2) null if the input is null 3) empty if the input is empty
+	 */
 	public static String firstLetterUppercase(final String input) {
-		return input.substring(0, 1).toUpperCase() + input.substring(1);
+		if (input == null || input.isEmpty()) return input;
+		return input.substring(0, 1).toUpperCase(Locale.ROOT) + (input.length() > 1 ? input.substring(1).toLowerCase(Locale.ROOT) : "");
 	}
 
+	@SuppressWarnings("checkstyle:RegexpSinglelineJava")
 	public static void printLogo() {
 		LoggerFactory.getLogger(Main.class).info("""
 
@@ -279,19 +275,11 @@ public class Utils {
 		return null;
 	}
 
-	public static <T> T getOrReplaceMessage(Callable<T> msg, String replacedMessage) {
-		try {
-			return msg.call();
-		} catch (Exception e) {
-			throw new RuntimeException(replacedMessage, e);
-		}
-	}
-
 	public static WebhookClient makeWebhookClient(Webhook webhook) {
 		final WebhookClientBuilder clientBuilder = new WebhookClientBuilder(webhook.getUrl());
 		clientBuilder.setThreadFactory(job -> {
 			final Thread thread = new Thread(job);
-			thread.setName("ContentModerator");
+			thread.setName("WebhookClient");
 			thread.setDaemon(true);
 			return thread;
 		});
@@ -299,13 +287,18 @@ public class Utils {
 		return clientBuilder.build();
 	}
 
-	public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) {
+		public static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks) {
+		return getWebhook(channel, webhooks,  webhook -> webhook.getOwner().getIdLong() == Bot.getInstance().getSelfUserId());
+	}
+
+	static Webhook getWebhook(TextChannel channel, List<Webhook> webhooks, Predicate<Webhook> validator) {
 		return webhooks.stream()
 			.filter(Objects::nonNull)
-			.filter(webhook -> webhook.getOwner() != null)
-			.filter(webhook -> webhook.getName().equals("BlackOnion-Bot ContentModerator") && webhook.getOwner().getIdLong() == Bot.getInstance().getSelfUserId())
+			.filter(webhook -> webhook.getOwner() != null
+				&& webhook.getName().equals("BlackOnion-Bot ContentModerator")
+				&& validator.test(webhook))
 			.findFirst()
-			.orElse(channel
+			.orElseGet(() -> channel
 				.createWebhook("BlackOnion-Bot ContentModerator")
 				.setAvatar(Bot.BLACKONION_ICON)
 				.submit()
@@ -314,6 +307,8 @@ public class Utils {
 
 	public static JSONArray optionsToJson(List<OptionData> options) {
 		final JSONArray jsonArray = new JSONArray();
+		if (options == null) return jsonArray;
+
 		for (OptionData option : options) {
 			jsonArray.put(new JSONObject()
 				.put("name", option.getName())
@@ -348,8 +343,16 @@ public class Utils {
 			if (duration.toMinutes() > 1) {
 				sb.append("s");
 			}
+			sb.append(" ");
+			duration = duration.minusMinutes(duration.toMinutes());
 		}
-		return sb.toString();
+		if (duration.toSeconds() > 0) {
+			sb.append(duration.toSeconds()).append(" second");
+			if (duration.toSeconds() > 1) {
+				sb.append("s");
+			}
+		}
+		return sb.toString().trim();
 	}
 
 	private static final int MAX_TIMEOUT_DURATION_MIN = 28 * 24 * 60; // 28 days
@@ -358,10 +361,10 @@ public class Utils {
 	private static final int MAX_TIMEOUT_DURATION_WEEK = 4; // 28 days
 
 	// Units
-	private static final String MINUTES = "minutes";
-	private static final String HOURS = "hours";
-	private static final String DAYS = "days";
-	private static final String WEEKS = "weeks";
+	public static final String MINUTES = "minutes";
+	public static final String HOURS = "hours";
+	public static final String DAYS = "days";
+	public static final String WEEKS = "weeks";
 
 	public static OptionData[] getDurationOptions(String message) {
 		String description = "The time of the " + message + " in ";
@@ -371,27 +374,6 @@ public class Utils {
 			new OptionData(OptionType.INTEGER, DAYS, description + DAYS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_DAY),
 			new OptionData(OptionType.INTEGER, WEEKS, description + WEEKS, false).setRequiredRange(1, MAX_TIMEOUT_DURATION_WEEK)
 		};
-	}
-
-	public static Duration parseDuration(SlashCommandInteractionEvent e) throws TooLongException {
-		var min = e.getOption(MINUTES, OptionMapping::getAsLong);
-		var hour = e.getOption(HOURS, OptionMapping::getAsLong);
-		var day = e.getOption(DAYS, OptionMapping::getAsLong);
-		var week = e.getOption(WEEKS, OptionMapping::getAsLong);
-
-		Duration dur = Duration.ofMinutes(
-			(min != null ? min : 0) +
-				(hour != null ? hour * 60 : 0) +
-				(day != null ? day * 60 * 24 : 0) +
-				(week != null ? week * 60 * 24 * 7 : 0)
-		);
-		if (dur.toMinutes() > MAX_TIMEOUT_DURATION_MIN) {
-			throw TooLongException.INSTANCE;
-		}
-		if (dur.toMinutes() <= 0) {
-			throw new IllegalArgumentException("Duration must be greater than 0");
-		}
-		return dur;
 	}
 
 	/**
@@ -406,12 +388,38 @@ public class Utils {
 		}
 	}
 
-	public static class TooLongException extends Exception {
-		static final TooLongException INSTANCE = new TooLongException();
+	public static <T> T parseToT(String value, Class<T> clazz) {
+		return parseToT(value, clazz, false);
+	}
 
-		public TooLongException() {
-			super();
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static <T> T parseToT(String value, Class<T> clazz, boolean recursed) {
+		if (clazz.equals(Object.class)) return (T) value;
+		else if (clazz.equals(String.class)) return (T) value;
+		else if (clazz.equals(Integer.class)) return (T) Integer.valueOf(value);
+		else if (clazz.equals(Long.class)) return (T) Long.valueOf(value);
+		else if (clazz.equals(Double.class)) return (T) Double.valueOf(value);
+		else if (clazz.equals(Float.class)) return (T) Float.valueOf(value);
+		else if (clazz.isEnum()) return (T) Enum.valueOf((Class<Enum>) clazz, value); // NOSONAR
+		else if (clazz.equals(Boolean.class)) {
+			if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+				return (T) Boolean.valueOf(value);
+			} else {
+				throw new IllegalArgumentException("Invalid boolean value: " + value);
+			}
+		} else {
+			if (recursed) return null;
+			return parseToT(value, Primitives.wrap(clazz), true);
 		}
+	}
+
+	public static <T extends List<?>> T jsonArrayToList(JSONArray jsonArray) {
+		//noinspection unchecked
+		return (T) jsonArray.toList();
+	}
+
+	public static String serializeEmoji(Emoji emoji) {
+		return emoji.getType() == Emoji.Type.CUSTOM ? ((CustomEmoji) emoji).getId() : emoji.getName();
 	}
 
 	public static ErrorHandler getCantSendHandler(AwaitDone<InteractionHook> await, String message, SlashCommandEvent event) {
@@ -424,14 +432,10 @@ public class Utils {
 				await.setOnDone(hook -> hook.editOriginal(message + "\n" + lang.getTranslation("usernotnotified")).queue()));
 	}
 
-	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields) {
-		return getPages(baseEmbed, fields, 10);
-	}
-
-	public static List<Page> getPages(TranslatedEmbed baseEmbed, List<MessageEmbed.Field> fields, int perPage) {
+	public static List<Page> getPages(TranslatedEmbedBuilder baseEmbed, List<MessageEmbed.Field> fields, int perPage) {
 		return Lists.partition(fields, perPage).stream()
 			// DON'T switch to method references or only one copy will get created!
-			.map(t -> new TranslatedEmbed(baseEmbed).addFields(t))
+			.map(t -> new TranslatedEmbedBuilder(baseEmbed).addFields(t))
 			.map(EmbedBuilder::build)
 			.map(InteractPage::new)
 			.map(Page.class::cast)
@@ -478,5 +482,20 @@ public class Utils {
 		} catch (Throwable e) {
 			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
+	}
+
+	public static String stackTraceToString(StackTraceElement[] stackTraceElements) {
+		return Arrays.stream(stackTraceElements)
+			.filter(Objects::nonNull)
+			.map(StackTraceElement::toString)
+			.collect(Collectors.joining("\n"));
+	}
+
+	public static String getDebugMessage(Guild guild) {
+		return guild.getName() + "(G:" + guild.getId() + ")";
+	}
+
+	public static String getDebugMessage(User user) {
+		return user.getName() + "#" + user.getDiscriminator() + "(U:" + user.getId() + ")";
 	}
 }

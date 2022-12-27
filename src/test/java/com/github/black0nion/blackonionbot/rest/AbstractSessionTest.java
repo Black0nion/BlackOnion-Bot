@@ -56,16 +56,6 @@ class AbstractSessionTest {
 		AbstractSession.setSessionHandler(new MockedLogin());
 	}
 
-	@RepeatedTest(50)
-	@DisplayName("test id generation")
-	void test_id_generation(RepetitionInfo info) {
-		for (int i = 0; i < info.getTotalRepetitions(); i++) {
-			String id = assertDoesNotThrow(AbstractSession::generateSessionId);
-			assertTrue(id.matches(AbstractSession.SESSIONID_REGEX));
-			assertNotEquals(EXAMPLE_SESSION_ID, id);
-		}
-	}
-
 	@Test
 	void test_code_pattern() {
 		assertTrue(EXAMPLE_CODE.matches(OAuthAPI.TOKEN_PATTERN.toString()));

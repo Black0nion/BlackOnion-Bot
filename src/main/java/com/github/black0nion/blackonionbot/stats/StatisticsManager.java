@@ -1,9 +1,10 @@
 package com.github.black0nion.blackonionbot.stats;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.BotMetadata;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
+import com.github.black0nion.blackonionbot.config.immutable.BotMetadata;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
@@ -13,6 +14,8 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -34,7 +37,12 @@ public class StatisticsManager extends ListenerAdapter {
 	/** in seconds */
 	public static final int DELAY_BETWEEN_COLLECTION = 15;
 
-	public StatisticsManager(Config config) {
+	private static final Logger logger = LoggerFactory.getLogger(StatisticsManager.class);
+
+	private final FeatureFlags featureFlags;
+
+	public StatisticsManager(Config config, FeatureFlags featureFlags) {
+		this.featureFlags = featureFlags;
 		final BotMetadata metadata = ConfigFileLoader.getMetadata();
 		Gauge.build()
 			.name("info")
@@ -51,7 +59,7 @@ public class StatisticsManager extends ListenerAdapter {
 	}
 
 	public void start() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
 	}
 
 	public static final Gauge UPTIME = Gauge.build()
@@ -143,7 +151,8 @@ public class StatisticsManager extends ListenerAdapter {
 	private static int guildCount = -1;
 
 	static int reloadGuildCount() {
-		return guildCount = (int) Bot.getInstance().getJDA().getGuildCache().size();
+		guildCount = (int) Bot.getInstance().getJDA().getGuildCache().size();
+		return guildCount;
 	}
 
 	public static int getGuildCount() {
@@ -153,7 +162,8 @@ public class StatisticsManager extends ListenerAdapter {
 	private static long userCount = -1;
 
 	static long reloadUserCount() {
-		return userCount = Bot.getInstance().getJDA().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		userCount = Bot.getInstance().getJDA().getGuildCache().stream().map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+		return userCount;
 	}
 
 	public static long getUserCount() {
@@ -181,7 +191,7 @@ public class StatisticsManager extends ListenerAdapter {
 			// returns a percentage value with 1 decimal point precision
 			return Utils.roundToDouble("#0.000", value);
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Error while getting CPU load", e);
 		}
 		return Double.NaN;
 	}

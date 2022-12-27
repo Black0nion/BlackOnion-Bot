@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 
 import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -43,12 +44,12 @@ public abstract sealed class AbstractSession permits RestSession, WebSocketSessi
 	public final void loginToSession(final String sessionId) throws InputMismatchException, NullPointerException {
 		try {
 			this.user = sessionHandler.loginToSession(sessionId);
-		} catch (ExecutionException e) {
+		} catch (ExecutionException | SQLException e) {
 			throw e.getCause() instanceof RuntimeException ex ? ex : new RuntimeException(e.getCause());
 		}
 	}
 
-	public final void logout() throws InputMismatchException, NullPointerException {
+	public final void logout() throws InputMismatchException, NullPointerException, SQLException {
 		sessionHandler.logoutFromSession(this.sessionId);
 		this.sessionId = null;
 		this.user = null;
@@ -61,6 +62,7 @@ public abstract sealed class AbstractSession permits RestSession, WebSocketSessi
 	private static final int RIGHT_LIMIT_1 = 'Z';
 	private static final int RIGHT_LIMIT_2 = 'z';
 	private static final int RIGHT_LIMIT_3 = '9';
+
 	public static String generateSessionId() {
 		final String generatedId = ThreadLocalRandom.current().ints(LEFT_LIMIT_3, RIGHT_LIMIT_2 + 1)
 			.filter(i ->  ((i <= RIGHT_LIMIT_1 && i >= LEFT_LIMIT_1)

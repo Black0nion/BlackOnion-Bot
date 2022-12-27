@@ -1,12 +1,12 @@
 package com.github.black0nion.blackonionbot.rest.impl.get;
 
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.config.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.config.api.Config;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -18,15 +18,17 @@ import static com.github.black0nion.blackonionbot.bot.BotInformation.*;
 public class Stats implements IGetRoute {
 
 	private final Config config;
+	private final SlashCommandBase slashCommandBase;
 
-	public Stats(Config config) {
+	public Stats(Config config, SlashCommandBase slashCommandBase) {
 		this.config = config;
+		this.slashCommandBase = slashCommandBase;
 	}
 
 	@Override
 	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
 		return new JSONObject()
-			.put("commands", SlashCommandBase.getCommandCount())
+			.put("commands", slashCommandBase.getCommandCount())
 			.put("code_stats", new JSONObject()
 				.put("line_count", ConfigFileLoader.getMetadata().lines_of_code())
 				.put("file_count", ConfigFileLoader.getMetadata().files()))

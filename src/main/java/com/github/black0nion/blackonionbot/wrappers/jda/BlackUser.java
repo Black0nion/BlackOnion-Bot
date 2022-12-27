@@ -1,9 +1,11 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
-import com.github.black0nion.blackonionbot.misc.CustomPermission;
+import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.database.SQLHelper;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
-import com.github.black0nion.blackonionbot.mongodb.MongoManager;
+import com.github.black0nion.blackonionbot.misc.SQLSetup;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -12,27 +14,24 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import org.bson.Document;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class BlackUser extends UserImpl {
 
-	private static final LoadingCache<User, BlackUser> users = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
+	private static final LoadingCache<User, BlackUser> USER_CACHE = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
 		public @Nonnull BlackUser load(final @Nonnull User user) {
-			return new BlackUser(user);
+		return Utils.uncheckedSupplier(() -> new BlackUser(user));
 		}
 	});
 
@@ -43,7 +42,7 @@ public class BlackUser extends UserImpl {
 	@Nonnull
 	public static BlackUser from(@Nonnull final User user) {
 		try {
-			return users.get(user);
+			return USER_CACHE.get(user);
 		} catch (ExecutionException e) {
 			throw new UncheckedExecutionException(e);
 		}
@@ -51,29 +50,24 @@ public class BlackUser extends UserImpl {
 
 	@Reloadable("usercache")
 	public static void clearCache() {
-		users.invalidateAll();
+		USER_CACHE.invalidateAll();
+	}
+
+	@SQLSetup(after = LanguageSystem.class)
+	public static void setup(SQLHelperFactory sql) throws SQLException {
+		sql.run("CREATE TABLE IF NOT EXISTS usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permissions VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
 	}
 
 	private Language language;
 	private List<CustomPermission> permissions;
 
-	private BlackUser(final User user) {
+	private BlackUser(final User user) throws SQLException {
 		super(user);
 
-		this.save("name", user.getName());
-
-		try {
-			Document config = configs.find(Filters.eq("userid", user.getIdLong())).first();
-
-			if (config == null) {
-				config = new Document();
+		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permissions) AS permissions FROM usersettings WHERE id = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
+			if (rs.next()) {
+				permissions = CustomPermission.parseListToList(rs.getString("permissions"));
 			}
-
-			this.permissions = Utils.gOD(CustomPermission.parse(Utils.gOD(config.getList("permissions", String.class), new ArrayList<>())), new ArrayList<>());
-
-			this.language = LanguageSystem.getLanguageFromName(config.getString("language"));
-		} catch (final Exception e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -84,10 +78,6 @@ public class BlackUser extends UserImpl {
 
 	public void setLanguage(final @Nullable Language language) {
 		this.language = language;
-		if (language == null)
-			this.clear("language");
-		else
-			this.save("language", language.getLanguageCode());
 	}
 
 	public List<CustomPermission> getPermissions() {
@@ -135,7 +125,6 @@ public class BlackUser extends UserImpl {
 
 	public void setPermissions(final List<CustomPermission> permissions) {
 		this.permissions = permissions;
-		this.save("permissions", permissions.stream().map(CustomPermission::name).collect(Collectors.toList()));
 	}
 
 	public String getEscapedName() {
@@ -144,18 +133,6 @@ public class BlackUser extends UserImpl {
 
 	public String getEscapedEffectiveName() {
 		return this.getEscapedName() + "#" + this.getDiscriminator();
-	}
-
-	@Override
-	protected Document getIdentifier() {
-		return new Document("userid", this.user.getIdLong());
-	}
-
-	private static final MongoCollection<Document> configs = MongoManager.getCollection("usersettings", MongoDB.getInstance().getDatabase());
-
-	@Override
-	protected MongoCollection<Document> getCollection() {
-		return configs;
 	}
 
 	@Override

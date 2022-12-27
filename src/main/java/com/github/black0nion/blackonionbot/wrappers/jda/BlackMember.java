@@ -1,15 +1,13 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.mongodb.MongoDB;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.MemberImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mongodb.client.MongoCollection;
 import net.dv8tion.jda.api.entities.Member;
-import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -21,8 +19,6 @@ import java.util.concurrent.TimeUnit;
 import static com.github.black0nion.blackonionbot.misc.Warn.loadWarns;
 
 public class BlackMember extends MemberImpl {
-
-	private static final MongoCollection<Document> warnsCollection = MongoDB.getInstance().getDatabase().getCollection("warns");
 
 	private static final LoadingCache<Member, BlackMember> members = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Nonnull
@@ -63,9 +59,7 @@ public class BlackMember extends MemberImpl {
 		super(member);
 		this.blackGuild = blackGuild;
 
-		this.save("username", this.member.getEffectiveName());
-		this.save("guildname", blackGuild.getName());
-		loadWarns(this.warns, this.getIdentifier());
+		loadWarns(Bot.getInstance().getSqlHelperFactory(), "user", this.getIdLong());
 		this.warns.forEach(this.blackGuild::addWarn);
 	 	this.blackUser = BlackUser.from(this.member.getUser());
 	}
@@ -97,7 +91,7 @@ public class BlackMember extends MemberImpl {
 	}
 
 	private void saveWarns() {
-		Warn.saveWarns(this.warns, this.getIdentifier());
+		Warn.saveWarns(Bot.getInstance().getSqlHelperFactory(), this.warns, this.getIdLong());
 	}
 
 	/**
@@ -105,18 +99,6 @@ public class BlackMember extends MemberImpl {
 	 */
 	public List<Warn> getWarns() {
 		return Collections.unmodifiableList(this.warns);
-	}
-
-	@Override
-	public Document getIdentifier() {
-		return new Document().append("guildid", this.blackGuild.getIdLong()).append("userid", this.member.getIdLong());
-	}
-
-	private static final MongoCollection<Document> configs = MongoDB.getInstance().getDatabase().getCollection("membersettings");
-
-	@Override
-	protected MongoCollection<Document> getCollection() {
-		return configs;
 	}
 
 	@Override

@@ -16,7 +16,7 @@ repositories {
     }
 
     maven {
-        url = uri("https://m2.chew.pro/releases")
+        url = uri("https://m2.chew.pro/snapshots")
         name = "m2-chew"
         content { includeGroup("pw.chew") }
     }
@@ -55,9 +55,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.9.1")
     implementation("com.github.Marcono1234:gson-record-type-adapter-factory:v0.3.0")
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.22")
+    implementation("net.dv8tion:JDA:5.0.0-beta.2")
     implementation("com.github.black0nion:Pagination-Utils:3.3.0")
-    implementation("pw.chew:jda-chewtils:1.24.1")
+    // this commit contains an unreleased fix for JDA Alpha .21
+    implementation("com.github.Chew:JDA-Chewtils:5e1a9f93f9")
 
     implementation("com.github.Mokulu:discord-oauth2-api:1.0.2")
 
@@ -66,8 +67,6 @@ dependencies {
     implementation("io.javalin:javalin-bundle:5.1.4")
 
     implementation("org.json:json:20220924")
-
-    implementation("org.mongodb:mongo-java-driver:3.12.11")
 
     implementation("club.minnced:discord-webhooks:0.8.2")
 
@@ -90,6 +89,9 @@ dependencies {
 
     implementation("io.github.classgraph:classgraph:4.8.151")
 
+    implementation("org.postgresql:postgresql:42.5.0")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+
     implementation("io.prometheus:simpleclient:0.16.0")
     implementation("io.prometheus:simpleclient_hotspot:0.16.0")
     implementation("io.prometheus:simpleclient_httpserver:0.16.0")
@@ -98,6 +100,8 @@ dependencies {
     testsImplementation("com.github.erosb:everit-json-schema:1.14.1")
     testsImplementation("org.mockito:mockito-core:4.9.0")
 }
+
+tasks.withType<JavaCompile>().forEach { it.options.compilerArgs.add("--enable-preview") }
 
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 

@@ -24,6 +24,11 @@ public abstract class UserImpl extends BlackWrapper implements User {
 	}
 
 	@Override
+	public String getDebugMessage() {
+		return Utils.getDebugMessage(this);
+	}
+
+	@Override
 	@NotNull
 	public String getName() {
 		return this.user.getName();

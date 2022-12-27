@@ -11,6 +11,9 @@ public class ChainableAtomicReference<T> extends AtomicReference<T> {
 		super();
 	}
 
+	/**
+	 * Calls {@link AtomicReference#set(Object)} and returns {@code newValue}
+	 */
 	public T setAndGet(T newValue) {
 		super.set(newValue);
 		return newValue;

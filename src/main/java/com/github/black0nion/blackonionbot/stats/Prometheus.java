@@ -1,7 +1,8 @@
 package com.github.black0nion.blackonionbot.stats;
 
+import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.Reloadable;
-import com.github.black0nion.blackonionbot.config.api.Config;
+import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 import org.slf4j.Logger;
@@ -15,20 +16,15 @@ public class Prometheus {
 
 	private final Config config;
 
-	private static Prometheus instance;
-
-	private HTTPServer server;
 
 	public Prometheus(Config config) {
-		if (instance != null) instance.server.close();
-		instance = this;
 		this.config = config;
 		start();
 	}
 
 	@Reloadable("prometheus")
 	private static void restart() {
-		new Prometheus(instance.config);
+		new Prometheus(Bot.getInstance().getConfig());
 	}
 
 	private void start() {
@@ -36,7 +32,8 @@ public class Prometheus {
 		try {
 			// expose built in metrics for the hotspot JVM
 			DefaultExports.initialize();
-			server = new HTTPServer.Builder()
+
+			new HTTPServer.Builder()
 				.withPort(config.getPrometheusPort())
 				.build();
 			logger.info("Prometheus HTTP Server started on port {}", config.getPrometheusPort());
