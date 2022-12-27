@@ -1,0 +1,37 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "gitmoji",
+  "contributors": [
+    {
+      "login": "RealYusufIsmail",
+      "name": "Yusuf Arfan Ismail",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67903886?v=4",
+      "profile": "https://www.realyusufismail.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SIMULATAN",
+      "name": "Jakob",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63104422?v=4",
+      "profile": "http://black-onion.com/thisIsMe/?q=simulatan",
+      "contributions": [
+        "infra",
+        "test",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": false,
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors)",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "BlackOnion-Bot",
+  "projectOwner": "Black0nion"
+}

@@ -45,7 +45,8 @@ public class UserInfoCommand extends SlashCommand {
 			.addField("userid", statsUser.getId(), true)
 			.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false)
 			.addField("language", statsUser.getLanguage() != null ? statsUser.getLanguage().getName() + " (" + statsUser.getLanguage().getLanguageCode() + ")" : "nopreference", true)
-			.addField("created", statsUser.getTimeCreated().format(TIME_PATTERN), true);
+			.addField("created", statsUser.getTimeCreated().format(TIME_PATTERN), true)
+			.addField("bot", statsUser.isBot() ? "yes" : "no", true);
 
 		if (statsMember != null) {
 			builder.addField("joined", statsMember.getTimeJoined().format(TIME_PATTERN), true);
