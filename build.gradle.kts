@@ -101,8 +101,6 @@ dependencies {
     testsImplementation("org.mockito:mockito-core:4.9.0")
 }
 
-tasks.withType<JavaCompile>().forEach { it.options.compilerArgs.add("--enable-preview") }
-
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
 
 application { mainClass.set("com.github.black0nion.blackonionbot.Main") }
@@ -110,6 +108,8 @@ application { mainClass.set("com.github.black0nion.blackonionbot.Main") }
 version = System.getenv("VERSION") ?: "dev"
 
 tasks.named<Jar>("jar") { archiveVersion.set("") }
+
+tasks.compileJava { options.release.set(19) }
 
 tasks.test {
     useJUnitPlatform()

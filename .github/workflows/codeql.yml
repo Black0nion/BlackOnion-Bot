@@ -20,12 +20,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      
+
     - name: Setup Java JDK
       uses: actions/setup-java@v2
       with:
         distribution: temurin
-        java-version: 17
+        java-version: 19
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2

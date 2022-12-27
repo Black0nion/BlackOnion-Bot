@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -222,6 +223,11 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	@Override
 	public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+		if ("cancel".equals(event.getComponentId())) {
+			// don't delete the defer or it won't delete the message
+			event.deferEdit().flatMap(InteractionHook::deleteOriginal).queue();
+			return;
+		}
 		String key = event.getComponentId().split("\\|")[0];
 		if (commands.containsKey(key)) {
 			try {
@@ -309,11 +315,10 @@ public class SlashCommandBase extends ListenerAdapter {
 
 			final C cmd = clazz.cast(command);
 
-			final AbstractCommandEvent<?, ?> cmde = switch (event) {
-				case SlashCommandInteractionEvent e1 -> new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author);
-				case MessageContextInteractionEvent e1 -> new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author);
-				default -> throw new IllegalArgumentException("Unexpected value: " + cmd);
-			};
+			AbstractCommandEvent<?, ?> cmde;
+			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author);
+			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author);
+			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
 			final boolean disabled = !guild.isCommandActivated(cmd);
 			if (disabled) {

@@ -4,12 +4,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public interface CommandButtonUtils extends CommandUtilsBase {
-	default Button getDeleteButton() {
-		return Button.danger("delete", Emoji.fromUnicode("U+F6AE"));
-	}
 
 	default Button getCancelButton() {
-		return Button.danger("cancel", Emoji.fromUnicode("U+2716"));
+		return Button.secondary("cancel", Emoji.fromUnicode("U+2716"));
 	}
 
 	default Button getConfirmButton() {
