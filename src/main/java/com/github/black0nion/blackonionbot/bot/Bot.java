@@ -34,7 +34,6 @@ import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.systems.music.PlayerManager;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
@@ -250,11 +249,8 @@ public class Bot extends ListenerAdapter {
 			throw e instanceof RuntimeException ex ? ex : new RuntimeException(e);
 		}
 
-		PlayerManager playerManager = new PlayerManager(config);
-
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(playerManager::init)
 			.addAndGetSelf(() -> new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize)))
 			.addAndGetSelf(PluginSystem::loadPlugins)
 			.addAndGetSelf(ConsoleCommands::run)

@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.common;
 import javax.annotation.Nullable;
 
 public enum Category {
-	OTHER, MODERATION, FUN, BOT, MUSIC, MISC, INFORMATION, ADMIN;
+	OTHER, MODERATION, FUN, BOT, MISC, INFORMATION, ADMIN;
 
 	/**
 	 * @return the Category or null
