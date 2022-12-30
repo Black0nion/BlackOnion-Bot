@@ -12,6 +12,7 @@ import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -64,7 +65,13 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			channel.sendMessage(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName())).addFiles(FileUpload.fromData(file, "welcome.png")).queue();
+			var embed = new EmbedBuilder();
+			//TODO: Create custom embed builder
+			embed.setDescription(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()));
+			embed.setImage(FileUpload.fromData(file, "welcome.png").toString());
+			embed.setColor(Color.BLACK);
+			embed.setFooter("This message does not represent the opinion of the developers of this bot.");
+			channel.sendMessageEmbeds(embed.build()).queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -80,8 +87,12 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
 			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
-			channel.sendMessage(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()))
-				.addFiles(FileUpload.fromData(file, "goodbye.png")).queue();
+			var embed = new EmbedBuilder();
+			embed.setDescription(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()));
+			embed.setImage(FileUpload.fromData(file, "goodbye.png").toString());
+			embed.setColor(Color.BLACK);
+			embed.setFooter("This message does not represent the opinion of the developers of this bot.");
+			channel.sendMessageEmbeds(embed.build()).queue();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
