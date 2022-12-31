@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,9 +37,11 @@ public class GiveawaySystem {
 	private static final Logger logger = LoggerFactory.getLogger(GiveawaySystem.class);
 
 	private final SQLHelperFactory sql;
+	private final LanguageSystem languageSystem;
 
-	public GiveawaySystem(SQLHelperFactory sql) {
+	public GiveawaySystem(SQLHelperFactory sql, LanguageSystem languageSystem) {
 		this.sql = sql;
+		this.languageSystem = languageSystem;
 	}
 
 	private final List<Giveaway> giveaways = new ArrayList<>();
@@ -107,7 +110,7 @@ public class GiveawaySystem {
 		try {
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
-				Language lang = LanguageSystem.getLanguage(null, guild);
+				Language lang = Utils.gOD(guild.getLanguage(), languageSystem.getDefaultLanguage());
 				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.reply(lang.getTranslationNonNull("nowinner")).queue();
 					updateGiveawayMessage(msg, lang);

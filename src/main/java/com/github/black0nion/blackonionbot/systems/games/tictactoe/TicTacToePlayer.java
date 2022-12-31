@@ -31,6 +31,10 @@ public class TicTacToePlayer {
 		return this.user != null ? this.user.getAsMention() : "Bot";
 	}
 
+	public String getAsMention(String botId) {
+		return this.user != null ? this.user.getAsMention() : "<@" + botId + ">";
+	}
+
 	public boolean isBot() {
 		return this.user == null;
 	}

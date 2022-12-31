@@ -6,6 +6,7 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandResponsePlaintext;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
@@ -36,8 +37,9 @@ public class CustomCommandsCommand extends SlashCommand {
 	private static final String CREATE = "create";
 	private static final String DELETE = "delete";
 	private final SlashCommandBase slashCommandBase;
+	private final LanguageSystem languageSystem;
 
-	public CustomCommandsCommand(SlashCommandBase slashCommandBase) {
+	public CustomCommandsCommand(SlashCommandBase slashCommandBase, LanguageSystem languageSystem) {
 		super(builder(Commands.slash("customcommand", "Used to manage custom commands.")
 			.addSubcommands(
 				new SubcommandData(LIST, "List all custom commands"),
@@ -47,6 +49,7 @@ public class CustomCommandsCommand extends SlashCommand {
 					.addOption(OptionType.STRING, COMMAND_NAME, "The command to delete", true, true)
 			)));
 		this.slashCommandBase = slashCommandBase;
+		this.languageSystem = languageSystem;
 	}
 
 	@Override
@@ -74,7 +77,7 @@ public class CustomCommandsCommand extends SlashCommand {
 					}
 
 					final CustomCommand customCommand = new CustomCommand(cmde.getGuild().getIdLong(), command, new CustomCommandResponsePlaintext(contentRaw));
-					askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), customCommand, slashCommandInteractionEvent, guild, member, user);
+					askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), customCommand, slashCommandInteractionEvent, guild, member, user);
 				}));
 	}
 
@@ -93,7 +96,7 @@ public class CustomCommandsCommand extends SlashCommand {
 			} else if (contentRaw.equalsIgnoreCase("false")) {
 				reply = false;
 			} else {
-				askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), customCommand, slashCommandInteractionEvent, guild, member, user);
+				askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), customCommand, slashCommandInteractionEvent, guild, member, user);
 				return;
 			}
 
@@ -158,11 +161,11 @@ public class CustomCommandsCommand extends SlashCommand {
 			}
 
 			if (contentRaw.equalsIgnoreCase("raw") || contentRaw.equalsIgnoreCase("message")) {
-				askForRaw(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), slashCommandInteractionEvent, guild, member, user);
+				askForRaw(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), slashCommandInteractionEvent, guild, member, user);
 			} else if (contentRaw.equalsIgnoreCase("embed")) {
 				// TODO: add embed
 			} else {
-				this.askForType(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user), slashCommandInteractionEvent, guild, member, user);
+				this.askForType(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), slashCommandInteractionEvent, guild, member, user);
 			}
 		}));
 	}

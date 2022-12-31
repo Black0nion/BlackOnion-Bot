@@ -1,6 +1,8 @@
 package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.commands.common.utils.UserRespondUtilsImpl;
+import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
@@ -12,14 +14,15 @@ import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Pair;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -34,17 +37,17 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getTranslation;
-
 public class TicTacToeCommand extends SlashCommand {
 	private static final String USER = "user";
+	private final LanguageSystem languageSystem;
 
-	public TicTacToeCommand() {
+	public TicTacToeCommand(LanguageSystem languageSystem) {
 		super(builder(Commands.slash("tictactoe", "Used to play TicTacToe with the someone.")
 			.addOption(OptionType.USER, USER, "The user to play with.")));
+		this.languageSystem = languageSystem;
 	}
 
-	public void rerun(final TicTacToe game, final TextChannel channel) {
+	public void rerun(final UserRespondUtils cmde, final TicTacToe game, final TextChannel channel) {
 		final BlackGuild guild = BlackGuild.from(channel.getGuild());
 		Bot.getInstance().getEventWaiter().waitForEvent(ButtonInteractionEvent.class, answerEvent -> answerEvent.getGuild() != null && answerEvent.getGuild().getIdLong() == channel.getGuild().getIdLong() && answerEvent.getMessage().getIdLong() == game.getMessage().getIdLong() && game.isPlayer(answerEvent.getUser().getId()), answerEvent -> {
 			answerEvent.deferEdit().queue();
@@ -54,12 +57,12 @@ public class TicTacToeCommand extends SlashCommand {
 
 			final Message message = game.getMessage();
 			if (id.equalsIgnoreCase("leave")) {
-				message.editMessage(getTranslation("usergaveup", author, guild).replace("%user%", author.getAsMention()))
+				message.editMessage(cmde.getTranslation("usergaveup").replace("%user%", author.getAsMention()))
 					.setComponents(game.getRows().stream().map(row -> row.getButtons().stream().map(Button::asDisabled).toList()).map(ActionRow::of).toList()).queue();
 				TicTacToeGameManager.deleteGame(game);
 				return;
 			} else if (!author.getId().equals(game.currentPlayer == FieldType.X ? game.getPlayerX().getId() : game.getPlayerY().getId())) {
-				this.rerun(game, channel);
+				this.rerun(cmde, game, channel);
 				return;
 			}
 
@@ -70,15 +73,15 @@ public class TicTacToeCommand extends SlashCommand {
 			final TicTacToePlayer player = game.currentPlayer == FieldType.X ? game.getPlayerX() : game.getPlayerY();
 
 			if (temp[coords.getFirst()][coords.getSecond()] != FieldType.EMPTY) {
-				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + player.getAsMention() + " | " + getTranslation("fieldoccupied", author, guild)).queue();
-				this.rerun(game, channel);
+				message.editMessage(cmde.getTranslation("tictactoe") + " | " + cmde.getTranslation("currentplayer") + " " + player.getAsMention() + " | " + cmde.getTranslation("fieldoccupied")).queue();
+				this.rerun(cmde, game, channel);
 				return;
 			}
 
 			temp[coords.getFirst()][coords.getSecond()] = game.currentPlayer;
 			game.setField(temp);
 
-			if (this.handleWin(game, coords)) return;
+			if (this.handleWin(game, coords, answerEvent.getJDA().getSelfUser().getId())) return;
 
 			List<ActionRow> placeAt = placeAt(game.getRows(), coords, game.currentPlayer);
 			if (game.getPlayerY().isBot()) {
@@ -88,7 +91,7 @@ public class TicTacToeCommand extends SlashCommand {
 				}).toList())).toList();
 			}
 			game.setRows(placeAt);
-			message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAt).queue();
+			message.editMessage(cmde.getTranslation("tictactoe") + " | " + cmde.getTranslation("currentplayer") + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAt).queue();
 			game.nextUser();
 
 			if (game.getPlayerY().isBot()) {
@@ -103,22 +106,22 @@ public class TicTacToeCommand extends SlashCommand {
 				temp[coords.getFirst()][coords.getSecond()] = game.currentPlayer;
 				game.setField(temp);
 
-				if (this.handleWin(game, coords)) return;
+				if (this.handleWin(game, coords, answerEvent.getJDA().getSelfUser().getId())) return;
 
 				final List<ActionRow> placeAtBot = placeAt(game.getRows(), coords, game.currentPlayer).stream().map(row -> ActionRow.of(row.getButtons().stream().map(b -> {
 					if (b.getLabel().equals(" ")) return b.asEnabled();
 					else return b;
 				}).toList())).toList();
 				game.setRows(placeAtBot);
-				message.editMessage(getTranslation("tictactoe", author, guild) + " | " + getTranslation("currentplayer", author, guild) + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAtBot).queue();
+				message.editMessage(cmde.getTranslation("tictactoe") + " | " + cmde.getTranslation("currentplayer") + " " + (game.currentPlayer == FieldType.O ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention())).setComponents(placeAtBot).queue();
 				game.nextUser();
-				this.rerun(game, channel);
+				this.rerun(cmde, game, channel);
 			} else {
-				this.rerun(game, channel);
+				this.rerun(cmde, game, channel);
 			}
 		}, 1, TimeUnit.MINUTES, () -> {
-			Language language = Optional.ofNullable(guild.getLanguage()).orElseGet(LanguageSystem::getDefaultLanguage);
-			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed().addField(language.getTranslationNonNull("timeout"), language.getTranslationNonNull("tooktoolong"), false).build()).setActionRow().queue();
+			Language language = Optional.ofNullable(guild.getLanguage()).orElseGet(this.languageSystem::getDefaultLanguage);
+			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed(language).addField(language.getTranslationNonNull("timeout"), language.getTranslationNonNull("tooktoolong"), false).build()).setComponents().queue();
 			TicTacToeGameManager.deleteGame(game);
 		});
 	}
@@ -132,7 +135,7 @@ public class TicTacToeCommand extends SlashCommand {
 		return actionRows;
 	}
 
-	private boolean handleWin(final TicTacToe game, final Pair<Integer, Integer> coords) {
+	private boolean handleWin(final TicTacToe game, final Pair<Integer, Integer> coords, final String botId) {
 		final FieldType firstWinner = game.getWinner(coords.getFirst(), coords.getSecond());
 		if (firstWinner == null) return false;
 		else {
@@ -141,7 +144,7 @@ public class TicTacToeCommand extends SlashCommand {
 			if (firstWinner == FieldType.EMPTY) {
 				game.getMessage().editMessage("WE HAVE NO WINNER!\nu both succ, nobody won, lul").setComponents(placeAt).queue();
 			} else {
-				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + (firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention()) + "!").setComponents(placeAt).queue();
+				game.getMessage().editMessage("WE HAVE A WINNER!\nAnd the winner is....\n" + (firstWinner == FieldType.X ? game.getPlayerX().getAsMention() : game.getPlayerY().getAsMention(botId)) + "!").setComponents(placeAt).queue();
 			}
 			TicTacToeGameManager.deleteGame(game);
 			return true;
@@ -150,32 +153,73 @@ public class TicTacToeCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
-		var challenged = BlackUser.from(Objects.requireNonNull(e.getOption(USER, OptionMapping::getAsUser)));
-		if (challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
-			this.rerun(TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer()), e.getChannel().asTextChannel());
-			return;
-		} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
-			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("errorcantplayagainst", author, guild).replace("%enemy%", (challenged.isBot() ? getTranslation("bot", author, guild) : getTranslation("yourself", author, guild))), getTranslation("nofriends", author, guild), false).build()).queue();
-			return;
-		} else if (TicTacToeGameManager.isIngame(author.getId()) || TicTacToeGameManager.isIngame(challenged.getId())) {
-			e.replyEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField(getTranslation("alreadyingame", author, guild), getTranslation("nomultitasking", author, guild), false).build()).queue();
+		User challenged = e.getOption(USER, OptionMapping::getAsUser);
+
+		if (TicTacToeGameManager.isIngame(author.getId()) || (challenged != null && TicTacToeGameManager.isIngame(challenged.getId()))) {
+			e.replyEmbeds(EmbedUtils.getErrorEmbed(cmde.getLanguage(), author, guild).addField(cmde.getTranslation("alreadyingame"), cmde.getTranslation("nomultitasking"), false).build()).queue();
 			return;
 		}
-		e.reply(getTranslation("ttt_askforaccept", author, guild).replace("%challenged%", challenged.getAsMention()).replace("%challenger%", author.getAsMention()) + " " + getTranslation("answerwithyes", author, guild)).queue();
-		Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, event -> event.getChannel().getIdLong() == channel.getIdLong() && event.getAuthor().getIdLong() == challenged.getIdLong(), event -> {
-			if (event.getAuthor().isBot()) return;
-			final BlackUser eventAuthor = BlackUser.from(event.getAuthor());
-			if (eventAuthor.getId().equals(challenged.getId()))
-				if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
 
-					e.getHook().sendMessageEmbeds(cmde.success().addField(getTranslation("challengeaccepted", eventAuthor, guild), getTranslation("playingagainst", eventAuthor, guild).replace("%challenger%", author.getAsMention()), false).build()).queue();
+		if (challenged == null || challenged.getIdLong() == e.getJDA().getSelfUser().getIdLong()) {
+			TicTacToeGameManager.createGame(languageSystem, guild, e, new TicTacToePlayer(author), new TicTacToePlayer(), game -> this.rerun(cmde, game, channel));
+			return;
+		} else if (challenged.isBot() || challenged.getIdLong() == author.getIdLong()) {
+			e.replyEmbeds(EmbedUtils.getErrorEmbed(cmde.getLanguage(), author, guild).addField(cmde.getTranslation("errorcantplayagainst").replace("%enemy%", (challenged.isBot() ? cmde.getTranslation("bot") : cmde.getTranslation("yourself"))), cmde.getTranslation("nofriends"), false).build()).queue();
+			return;
+		}
 
-					// Accepted
-					final TicTacToe game = TicTacToeGameManager.createGame(e.getChannel().asTextChannel(), new TicTacToePlayer(author), new TicTacToePlayer(challenged));
-					this.rerun(game, e.getChannel().asTextChannel());
-				} else {
-					ConnectFourCommand.isDeclined(e, guild, event, author, getTranslation("declined", eventAuthor, guild), getTranslation("challengedeclined", eventAuthor, guild), getTranslation("arentyoubraveenough", eventAuthor, guild), getTranslation("answerwithyes", eventAuthor, guild));
-				}
-		}, 1, TimeUnit.MINUTES, () -> e.replyEmbeds(EmbedUtils.getErrorEmbed(challenged, guild).addField(getTranslation("timeout", challenged, guild), getTranslation("tooktoolong", author, guild), false).build()).queue());
+		final Language language = languageSystem.getLanguage(challenged, guild);
+		e.reply(language.getTranslation("ttt_askforaccept", new Placeholder("challenged", challenged.getAsMention()), new Placeholder("challenger", author.getAsMention())) + "\n" + language.getTranslation("answerwithyes"))
+			.addActionRow(
+				Button.of(ButtonStyle.SUCCESS, enrichId("yes", author.getId(), challenged.getId()), language.getTranslation("yes")),
+				Button.of(ButtonStyle.DANGER, enrichId("no", author.getId(), challenged.getId()), language.getTranslation("no"))
+			).queue();
+	}
+
+	@Override
+	public void handleButtonPress(ButtonInteractionEvent event) {
+		if (event.getUser().isBot()) return;
+
+		// format: (yes|no):challenger:challenged
+		String[] idParts = getIdParts(event.getComponentId());
+		String message = idParts[0];
+		String challengerId = idParts[1];
+		String challengedId = idParts[2];
+
+		final BlackGuild guild = BlackGuild.from(event.getGuild());
+
+		final BlackUser challenged = BlackUser.from(event.getUser());
+		final UserRespondUtils challengedResponse = new UserRespondUtilsImpl(event, guild, challenged, languageSystem.getDefaultLanguage());
+
+		// we don't care if other trolls click the button
+		// we'll acknowledge them anyway
+		if (!challenged.getId().equals(challengedId)) {
+			event.deferEdit().queue();
+			return;
+		}
+
+		if (TicTacToeGameManager.isIngame(challenged.getId()) || TicTacToeGameManager.isIngame(challengerId)) {
+			Language language = languageSystem.getLanguage(challenged, guild);
+			event.replyEmbeds(EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), challenged, guild)
+				.addField(language.getTranslationNonNull("alreadyingame"), language.getTranslationNonNull("nomultitasking"), false)
+				.build())
+			.setEphemeral(true)
+			.queue();
+			return;
+		}
+
+		// disable all buttons
+		event.getMessage().editMessageComponents(ActionRow.of(event.getMessage().getButtons().stream().map(Button::asDisabled).toList())).queue();
+
+		event.getGuild().retrieveMemberById(challengerId).queue(member -> {
+			final BlackUser challenger = BlackUser.from(member);
+			final UserRespondUtils challengerResponse = new UserRespondUtilsImpl(event, guild, challenger, languageSystem.getDefaultLanguage());
+
+			if (message.equalsIgnoreCase("yes")) {
+				TicTacToeGameManager.createGame(languageSystem, guild, event, new TicTacToePlayer(challenger), new TicTacToePlayer(challenged), game -> this.rerun(challengedResponse, game, event.getChannel().asTextChannel()));
+			} else {
+				challengerResponse.send("challengedeclined");
+			}
+		});
 	}
 }

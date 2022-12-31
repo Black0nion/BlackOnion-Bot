@@ -3,8 +3,9 @@ package com.github.black0nion.blackonionbot.commands.common;
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
 import com.github.black0nion.blackonionbot.utils.CommandReturnException;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
@@ -19,11 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 
-import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getErrorEmbed;
-import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmbed;
-
 /**
- * An util class that contains various objects related to command executions.
+ * A generic class that handels the execution of a command.
  * <br>
  * Removes a lot of boilerplate handling slash command events, like responding, passing loads of JDA objects, etc.
  * Can often times be used instead of splitting it up into multiple parameters for methods.
@@ -31,6 +29,8 @@ import static com.github.black0nion.blackonionbot.utils.EmbedUtils.getSuccessEmb
  * @see SlashCommandEvent#send(String)
  * @see SlashCommandEvent#reply(EmbedBuilder)
  * @see SlashCommandEvent#exception()
+ * @param <C> the command class that extends this class
+ * @param <E> the type of the event that is handled by this class
  */
 public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E extends GenericCommandInteractionEvent> implements UserRespondUtils {
 
@@ -44,16 +44,16 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 	protected final TranslatedEmbedBuilder errorEmbed;
 	protected Language language;
 
-	protected AbstractCommandEvent(final C cmd, final E e, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+	protected AbstractCommandEvent(final Language defaultLanguage, final C cmd, final E e, final BlackGuild guild, final BlackMember member, final BlackUser user) {
 		this.command = cmd;
 		this.event = e;
 		this.jda = e.getJDA();
 		this.guild = guild;
 		this.member = member;
 		this.user = user;
-		this.successEmbed = getSuccessEmbed(this.user, this.guild);
-		this.errorEmbed = getErrorEmbed(this.user, this.guild);
-		this.language = LanguageSystem.getLanguage(user, guild);
+		this.successEmbed = EmbedUtils.getSuccessEmbed(defaultLanguage, this.user, this.guild);
+		this.errorEmbed = EmbedUtils.getErrorEmbed(defaultLanguage, this.user, this.guild);
+		this.language = LanguageUtils.getLanguage(user, guild, defaultLanguage);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 	}
 
 	public String getPleaseUse() {
-		return LanguageSystem.getTranslation("pleaseuse", this.user, this.guild).replace("%command%", "\n" + getCommandHelp());
+		return language.getTranslation("pleaseuse", new Placeholder("%command%", "\n" + getCommandHelp()));
 	}
 
 	public String getCommandHelp() {

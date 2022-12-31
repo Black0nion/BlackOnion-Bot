@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.slash;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -11,12 +12,12 @@ public class SlashCommandEvent extends AbstractCommandEvent<SlashCommand, SlashC
 
 	private final TextChannel channel;
 
-	public SlashCommandEvent(SlashCommandInteractionEvent e, BlackGuild guild, BlackMember member, BlackUser user) {
-		this(null, e, guild, member, user);
+	public SlashCommandEvent(SlashCommandInteractionEvent e, BlackGuild guild, BlackMember member, BlackUser user, Language defaultLanguage) {
+		this(null, e, guild, member, user, defaultLanguage);
 	}
 
-	public SlashCommandEvent(SlashCommand cmd, SlashCommandInteractionEvent e, BlackGuild guild, BlackMember member, BlackUser user) {
-		super(cmd, e, guild, member, user);
+	public SlashCommandEvent(SlashCommand cmd, SlashCommandInteractionEvent e, BlackGuild guild, BlackMember member, BlackUser user, Language defaultLanguage) {
+		super(defaultLanguage, cmd, e, guild, member, user);
 		this.channel = e.getChannel().asTextChannel();
 	}
 

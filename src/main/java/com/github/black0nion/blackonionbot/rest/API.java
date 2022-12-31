@@ -2,11 +2,11 @@ package com.github.black0nion.blackonionbot.rest;
 
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
 import com.github.black0nion.blackonionbot.rest.api.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.rest.impl.get.Paths;
 import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.javalin.http.ExceptionHandler;
@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class API {
+public class API implements Reloadable {
+
 	private static final Logger logger = LoggerFactory.getLogger(API.class);
 	private final List<IHttpRoute> httpRoutes = new ArrayList<>();
 	private Javalin app;
@@ -35,11 +36,10 @@ public class API {
 		return app;
 	}
 
-	private static API instance;
-
-	@Reloadable("api")
-	private static void reload() {
-		new API(instance.config, instance.injector, instance.statsCollectorFactory);
+	@Override
+	public void reload() {
+		this.app.close();
+		start();
 	}
 
 	private final Config config;
@@ -50,8 +50,6 @@ public class API {
 	 * Automatically closes the old API instance if it exists
 	 */
 	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
-		if (instance != null && instance.getApp() != null) instance.getApp().close();
-		instance = this;
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;

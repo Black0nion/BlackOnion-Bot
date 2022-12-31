@@ -5,7 +5,8 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class TicTacToe {
@@ -21,7 +23,6 @@ public class TicTacToe {
 	TicTacToePlayer playerY;
 	FieldType[][] field;
 	public FieldType currentPlayer;
-	TextChannel channel;
 	BlackGuild guild;
 	int moves = 0;
 	private static final List<ActionRow> initialRows = new ArrayList<>();
@@ -39,11 +40,11 @@ public class TicTacToe {
 		}
 	}
 
-	public TicTacToe(final TextChannel channel, final TicTacToePlayer playerX, final TicTacToePlayer playerY) {
+	public TicTacToe(final LanguageSystem languageSystem, final IReplyCallback callback, final BlackGuild guild, final TicTacToePlayer playerX, final TicTacToePlayer playerY, Consumer<TicTacToe> onSent) {
 		this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
-		this.guild = BlackGuild.from(channel.getGuild());
+		this.guild = guild;
 
-		this.currentPlayer = ThreadLocalRandom.current().nextInt(2) == 0 ? FieldType.X : FieldType.O;
+		this.currentPlayer = playerY.isBot() || ThreadLocalRandom.current().nextInt(2) == 0 ? FieldType.X : FieldType.O;
 
 		for (int x = 0; x < TicTacToeGameManager.SIZE; x++) {
 			for (int y = 0; y < TicTacToeGameManager.SIZE; y++) {
@@ -53,8 +54,10 @@ public class TicTacToe {
 
 		final BlackUser currentUser = BlackUser.from(Objects.requireNonNull(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser())));
 
-		channel.sendMessage(LanguageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + LanguageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setComponents(this.rows).queue(success -> this.message = success);
-		this.channel = channel;
+		callback.reply(languageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + languageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setComponents(this.rows).flatMap(InteractionHook::retrieveOriginal).queue(success -> {
+			this.message = success;
+			onSent.accept(this);
+		});
 		this.playerX = playerX;
 		this.playerY = playerY;
 	}

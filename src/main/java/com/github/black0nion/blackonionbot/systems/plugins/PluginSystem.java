@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.plugins;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.BlackThread;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -20,13 +20,19 @@ import java.util.function.Consumer;
 /**
  * @author _SIM_
  */
-public class PluginSystem {
+public class PluginSystem implements Reloadable {
 
-	private static final Map<Plugin, PluginInformation> plugins = new HashMap<>();
+	private final Bot bot;
+
+	public PluginSystem(Bot bot) {
+		this.bot = bot;
+	}
+
+	private final Map<Plugin, PluginInformation> plugins = new HashMap<>();
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginSystem.class);
 
-	private static void loadPlugin(final File jarFile) {
+	private void loadPlugin(final File jarFile) {
 		logger.info("Loading '{}'", jarFile);
 		final String jarName = jarFile.getName();
 		final ScanResult scanResult = new ClassGraph().enableAnnotationInfo().overrideClasspath(jarFile.getAbsolutePath()).scan();
@@ -73,7 +79,7 @@ public class PluginSystem {
 		}
 	}
 
-	public static void disablePlugins() {
+	public void disablePlugins() {
 		plugins.forEach((plugin, info) -> {
 			ThreadGroup threadGroup = info.getThreadGroup();
 			new BlackThread(threadGroup, () -> {
@@ -107,13 +113,13 @@ public class PluginSystem {
 		plugins.clear();
 	}
 
-	@Reloadable("plugins")
-	public static void loadPlugins() {
+	@Override
+	public void reload() {
 		loadPlugins(null);
 	}
 
-	public static void loadPlugins(final Consumer<Void> callback) {
-		Bot.getInstance().getExecutor().submit(() -> {
+	public void loadPlugins(final Consumer<Void> callback) {
+		bot.getExecutor().submit(() -> {
 			final File folder = new File("plugins");
 			if (!folder.exists()) {
 				folder.mkdirs();

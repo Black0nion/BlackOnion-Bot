@@ -178,21 +178,21 @@ public class Utils {
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleSelfRights(final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 			(callback != null
-				? callback.replyEmbeds(noRights(guild, author, permissions))
-				: channel.sendMessageEmbeds(noRights(guild, author, permissions))
+				? callback.replyEmbeds(noRights(languageSystem, guild, author, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guild, author, permissions))
 			).queue();
 			return true;
 		}
 		return false;
 	}
 
-	public static MessageEmbed noRights(final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
-		return EmbedUtils.getErrorEmbed(author, guild).addField("idonthavepermissions", LanguageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
 	/**

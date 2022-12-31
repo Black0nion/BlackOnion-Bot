@@ -1,7 +1,8 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.MemberImpl;
 import com.google.common.cache.CacheBuilder;
@@ -47,9 +48,16 @@ public class BlackMember extends MemberImpl {
 		}
 	}
 
-	@Reloadable("membercache")
-	public static void clearCache() {
-		members.invalidateAll();
+	public static class MemberCacheClear implements Reloadable {
+
+		public MemberCacheClear(ReloadSystem reloadSystem) {
+			reloadSystem.registerReloadable(this);
+		}
+
+		@Override
+		public void reload() {
+			members.invalidateAll();
+		}
 	}
 
 	private final BlackGuild blackGuild;

@@ -39,7 +39,7 @@ public class DefaultInjector implements Injector {
 		try {
 			instances = getInstances(Arrays.stream(parameters).map(Parameter::getType).toArray(Class<?>[]::new));
 		} catch (IllegalArgumentException exception) {
-			throw new IllegalArgumentException("Could not create instance of " + toInstantiate.getName(), exception);
+			throw new InjectorCreateInstanceException("Could not create instance of " + toInstantiate.getName(), exception);
 		}
 
 		try {

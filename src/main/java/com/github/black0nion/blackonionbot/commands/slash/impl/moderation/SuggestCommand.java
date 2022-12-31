@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -16,11 +17,14 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
 public class SuggestCommand extends SlashCommand {
-	private static final String SUGGESTION = "suggestion";
 
-	public SuggestCommand() {
+	private static final String SUGGESTION = "suggestion";
+	private final LanguageSystem languageSystem;
+
+	public SuggestCommand(LanguageSystem languageSystem) {
 		super(builder(Commands.slash("suggest", "Used to send a suggestion.")
 			.addOption(OptionType.STRING, SUGGESTION, "The suggestion to send", true)));
+		this.languageSystem = languageSystem;
 	}
 
 	@Override
@@ -36,7 +40,7 @@ public class SuggestCommand extends SlashCommand {
 				cmde.send("invalidsuggestionschannel");
 			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
 				Permission.MESSAGE_ADD_REACTION))) {
-				e.replyEmbeds(Utils.noRights(guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_SEND,
+				e.replyEmbeds(Utils.noRights(languageSystem, guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_SEND,
 					Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
 			} else {
 				// all good, we can send the suggestion

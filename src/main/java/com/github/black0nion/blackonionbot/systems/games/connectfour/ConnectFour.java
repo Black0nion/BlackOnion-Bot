@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,7 +20,7 @@ public class ConnectFour {
 	public FieldType currentUser;
 	final MessageChannel channel;
 
-	public ConnectFour(final MessageChannel channel, final User playerX, final User playerY) {
+	public ConnectFour(Language defaultLanguage, final MessageChannel channel, final User playerX, final User playerY) {
 
 		this.field = new FieldType[ConnectFourGameManager.HEIGHT][ConnectFourGameManager.WIDTH];
 
@@ -31,7 +32,7 @@ public class ConnectFour {
 			}
 		}
 
-		channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed().setTitle("Connect 4 | Aktueller Spieler: " + Utils.escapeMarkdown((this.currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", this.getFieldString(), false).build()).queue(success -> this.messageID = success.getIdLong());
+		channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(defaultLanguage).setTitle("Connect 4 | Aktueller Spieler: " + Utils.escapeMarkdown((this.currentUser == FieldType.X ? playerX.getName() : playerY.getName()))).addField("Current State:", this.getFieldString(), false).build()).queue(success -> this.messageID = success.getIdLong());
 		this.channel = channel;
 		this.playerX = playerX;
 		this.playerY = playerY;

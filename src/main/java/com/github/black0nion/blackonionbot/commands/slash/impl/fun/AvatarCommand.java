@@ -2,6 +2,8 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.utils.Placeholder;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -27,7 +29,7 @@ public class AvatarCommand extends SlashCommand {
 			user = author;
 
 		cmde.reply(cmde.success()
-			.setTitle(cmde.getTranslation("pfpof") + " " + user.getAsTag(), user.getEffectiveAvatarUrl())
+			.setTitle(cmde.getTranslation("pfpof", new Placeholder("user", "`" + Utils.escapeMarkdown(user.getAsTag()) + "`")), user.getEffectiveAvatarUrl())
 			.setImage(user.getEffectiveAvatarUrl() + "?size=2048")
 			.setFooter(author.getName() + author.getDiscriminator(), author.getEffectiveAvatarUrl()));
 	}
