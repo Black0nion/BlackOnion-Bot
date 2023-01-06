@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.misc.enums.DrawType;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
@@ -10,9 +10,9 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
+import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
@@ -64,16 +64,21 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			if (id == -1) return;
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
-			final File file = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
-			var embed = new EmbedBuilder();
-			//TODO: Create custom embed builder
-			embed.setDescription(guild.getJoinMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()));
-			embed.setImage(FileUpload.fromData(file, "welcome.png").toString());
-			embed.setColor(Color.BLACK);
-			embed.setFooter("This message does not represent the opinion of the developers of this bot.");
-			channel.sendMessageEmbeds(embed.build()).queue();
+
+			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
+			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
+
+			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+				.setColor(Color.BLACK)
+				.setDescription(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
+				.setImage("attachment://welcome.png")
+				.setFooter("definedbyguild", author.getEffectiveAvatarUrl());
+
+			channel.sendMessageEmbeds(embed.build())
+				.addFiles(fileUpload)
+				.queue();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Error while sending join image", e);
 		}
 	}
 
@@ -86,15 +91,21 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			if (id == -1) return;
 			final TextChannel channel = guild.getTextChannelById(id);
 			if (channel == null) return;
-			final File file = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
-			var embed = new EmbedBuilder();
-			embed.setDescription(guild.getLeaveMessage().replace("%userid%", author.getAsMention()).replace("%guildid%", guild.getEscapedName()));
-			embed.setImage(FileUpload.fromData(file, "goodbye.png").toString());
-			embed.setColor(Color.BLACK);
-			embed.setFooter("This message does not represent the opinion of the developers of this bot.");
-			channel.sendMessageEmbeds(embed.build()).queue();
+
+			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
+			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
+
+			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+				.setColor(Color.BLACK)
+				.setDescription(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
+				.setImage("attachment://goodbye.png")
+				.setFooter("definedbyguild", author.getEffectiveAvatarUrl());
+
+			channel.sendMessageEmbeds(embed.build())
+				.addFiles(fileUpload)
+				.queue();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Error while sending leave image", e);
 		}
 	}
 
@@ -153,7 +164,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 
 	@NotNull
-	public static File generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
+	public static byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
 		final double separatorTransparency = 1;
 
 		final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
@@ -195,15 +206,10 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		final int width = newGraphics.getFontMetrics().stringWidth(userName);
 		newGraphics.drawString(userName, 190 + (619 - width) / 2, 145);
 
-		final File file = new File("tmp/joinleave/" + user.getId() + ".png");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", outputStream);
 
-		if (file.getParentFile() != null) {
-			file.getParentFile().mkdirs();
-		}
-
-		ImageIO.write(bufferedImage, "png", file);
-
-		return file;
+		return outputStream.toByteArray();
 	}
 
 	public @NotNull

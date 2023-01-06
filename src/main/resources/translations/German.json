@@ -71,6 +71,7 @@
   "customcommandslist": "Dieser Server hat folgende CustomCommands:",
   "defaultjoinmessage": "Willkommen, **%user%** auf **%guild%**! :)",
   "defaultleavemessage": "Auf Wiedersehen, **%user%**, auf **%guild%** :(",
+  "definedbyguild": "Diese Nachricht wurde von den Admins dieses Servers festgelegt, sie repräsentiert nicht die Meinung der Developer.",
   "delete": "Löschen",
   "didyoumean": "Meintest du %command%?",
   "discriminator": "Tag",
