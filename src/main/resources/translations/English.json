@@ -71,6 +71,7 @@
   "customcommandslist": "Dieser Server hat folgende CustomCommands:",
   "defaultjoinmessage": "Welcome, **%user%**, to **%guild%**! :)",
   "defaultleavemessage": "Good bye, **%user%**, on **%guild%** :(",
+  "definedbyguild": "This message was set by the admins of this server, it doesn't represent the opinions of the developers of this bot.",
   "delete": "Delete",
   "didyoumean": "Did you mean %command%?",
   "discriminator": "Discriminator",
