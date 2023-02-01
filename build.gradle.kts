@@ -89,7 +89,7 @@ dependencies {
 
     implementation("io.github.classgraph:classgraph:4.8.151")
 
-    implementation("org.postgresql:postgresql:42.5.0")
+    implementation("org.postgresql:postgresql:42.5.2")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     implementation("io.prometheus:simpleclient:0.16.0")
