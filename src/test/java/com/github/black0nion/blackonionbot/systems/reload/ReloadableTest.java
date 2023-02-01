@@ -10,7 +10,8 @@ class ReloadableTest extends SeparationClassNamerTest {
 
 	@Test
 	void test_getReloadName() {
-		assertEquals(SeparationClassNamer.getInstanceClass(getClass()).getSimpleName(), ((Reloadable) () -> {}).getReloadName());
+		Reloadable reloadable = () -> {};
+		assertEquals(SeparationClassNamer.getInstanceClass(reloadable).getSimpleName(), reloadable.getReloadName());
 		assertEquals(SeparationClassNamer.getInstanceClass(OnlyReloadable.class).getSimpleName(), new OnlyReloadable().getReloadName());
 		assertEquals(SeparationClassNamer.getInstanceClass(ReloadableAndInterface.class).getSimpleName(), new ReloadableAndInterface().getReloadName());
 	}

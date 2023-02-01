@@ -18,12 +18,14 @@ public class SeparationClassNamer {
 	 *     if the instance implements {@link Reloadable} and exactly one other interface, use that
 	 *     else, use the class of the passed instance
 	 * </pre>
+	 *
 	 * @return the class of the instance
 	 */
 	public static Class<?> getInstanceClass(Object instance) {
-		Class<?>[] interfaces = (instance instanceof Class<?> clazz ? clazz : instance.getClass()).getInterfaces();
+		Class<?> instanceClass = instance instanceof Class<?> clazz ? clazz : instance.getClass();
+		Class<?>[] interfaces = instanceClass.getInterfaces();
 		if (interfaces.length == 1) {
-			return interfaces[0] == Reloadable.class ? instance.getClass() : interfaces[0];
+			return interfaces[0] == Reloadable.class ? instanceClass : interfaces[0];
 		} else {
 			// ignore the Reloadable interface
 			if (interfaces.length == 2) {
@@ -31,7 +33,7 @@ public class SeparationClassNamer {
 					if (!iface.equals(Reloadable.class)) return iface;
 				}
 			}
-			return instance.getClass();
+			return instanceClass;
 		}
 	}
 }
