@@ -2,9 +2,13 @@ package com.github.black0nion.blackonionbot.utils;
 
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 
-public class SeparationClassNamer {
+/**
+ * Utility class that provides methods to get the class of an instance.
+ * This includes the case where the instance implements {@link Reloadable}.
+ */
+public class ClassDescriptor {
 
-	private SeparationClassNamer() {}
+	private ClassDescriptor() {}
 
 	/**
 	 * This method is used to get the class of the passed instance.<br>

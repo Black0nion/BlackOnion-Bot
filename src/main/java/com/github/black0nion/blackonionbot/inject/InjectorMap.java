@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.inject;
 
-import com.github.black0nion.blackonionbot.utils.SeparationClassNamer;
+import com.github.black0nion.blackonionbot.utils.ClassDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class InjectorMap extends HashMap<Class<?>, Object> implements Map<Class<
 	 */
 	public Object put(Object instance) {
 		requireNonNull(instance, "instance");
-		return put(SeparationClassNamer.getInstanceClass(instance), instance);
+		return put(ClassDescriptor.getInstanceClass(instance), instance);
 	}
 
 	public <T> T add(Class<?> key, T instance) {
