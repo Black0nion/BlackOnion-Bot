@@ -45,6 +45,17 @@ public class TranslatedEmbedBuilder extends EmbedBuilder {
 
 	@Override
 	@Nonnull
+	public TranslatedEmbedBuilder setFooter(String text, final String iconUrl) {
+		final String tempText = this.lang.getTranslation(text);
+		if (tempText != null) {
+			text = tempText;
+		}
+		super.setFooter(text, iconUrl);
+		return this;
+	}
+
+	@Override
+	@Nonnull
 	public TranslatedEmbedBuilder setTitle(String title, final String url) {
 		if (title == null) {
 			super.setTitle(null, url);
@@ -153,13 +164,6 @@ public class TranslatedEmbedBuilder extends EmbedBuilder {
 	@Nonnull
 	public TranslatedEmbedBuilder setAuthor(final String name, final String url, final String iconUrl) {
 		super.setAuthor(name, url, iconUrl);
-		return this;
-	}
-
-	@Override
-	@Nonnull
-	public TranslatedEmbedBuilder setFooter(String text, final String iconUrl) {
-		super.setFooter(text, iconUrl);
 		return this;
 	}
 
