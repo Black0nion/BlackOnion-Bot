@@ -2,7 +2,6 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.information;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -46,8 +45,8 @@ public class WeatherCommand extends SlashCommand {
 			final JSONObject weatherObject = weather.getJSONArray(("weather")).getJSONObject(0);
 			cmde.reply(cmde.success()
 				.setThumbnail("https://openweathermap.org/img/w/" + weatherObject.getString("icon") + ".png")
-				.setTitle(LanguageSystem.getTranslation("weatherfor", author, guild) + " " + weather.getString("name"), "https://openweathermap.org")
-				.addField(LanguageSystem.getTranslation("weather", author, guild) + ": ", weatherObject.getString("main"), true)
+				.setTitle(cmde.getTranslation("weatherfor") + " " + weather.getString("name"), "https://openweathermap.org")
+				.addField(cmde.getTranslation("weather") + ": ", weatherObject.getString("main"), true)
 				.addField("temperature", main.get("temp_min") + "° to " + main.get("temp_max") + "°", true)
 				.addField("humidity", main.get("humidity") + "%", true).addField("windspeed", weather.getJSONObject("wind").get("speed") + " km/h", true)
 				.addField("country", Utils.getCountryFromCode(sys.getString("country")) + " (" + sys.get("country") + ")", true)

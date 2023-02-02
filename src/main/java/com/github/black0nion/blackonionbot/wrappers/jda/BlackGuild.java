@@ -5,7 +5,8 @@ import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
@@ -13,7 +14,6 @@ import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
@@ -38,13 +38,20 @@ public class BlackGuild extends GuildImpl {
 	private static final LoadingCache<Guild, BlackGuild> guilds = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<>() {
 		@Override
 		public @NotNull BlackGuild load(final @NotNull Guild guild) {
-		return new BlackGuild(guild);
+			return new BlackGuild(guild);
 		}
 	});
 
-	@Reloadable("guildcache")
-	public static void clearCache() {
-		guilds.invalidateAll();
+	public static class GuildCacheClear implements Reloadable {
+
+		public GuildCacheClear(ReloadSystem reloadSystem) {
+			reloadSystem.registerReloadable(this);
+		}
+
+		@Override
+		public void reload() {
+			guilds.invalidateAll();
+		}
 	}
 
 	public static BlackGuild from(@Nullable final Guild guild) {
@@ -123,11 +130,6 @@ public class BlackGuild extends GuildImpl {
 	@DashboardGetter("setup.language")
 	public String getLanguageString() {
 		return this.language != null ? this.language.getLanguageCode() : null;
-	}
-
-	@DashboardSetter("setup.language")
-	public void setLanguage(final @Nullable String language) {
-		this.setLanguage(LanguageSystem.getLanguageFromName(language));
 	}
 
 	public void setLanguage(final @Nullable Language language) {

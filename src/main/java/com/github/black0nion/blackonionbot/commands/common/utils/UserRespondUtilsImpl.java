@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.common.utils;
 
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -19,11 +19,11 @@ public class UserRespondUtilsImpl implements UserRespondUtils {
 	private final TranslatedEmbedBuilder errorEmbed;
 	private final TranslatedEmbedBuilder successEmbed;
 
-	public UserRespondUtilsImpl(final IReplyCallback callback, final BlackGuild guild, final BlackUser user) {
+	public UserRespondUtilsImpl(final IReplyCallback callback, final BlackGuild guild, final BlackUser user, final Language defaultLanguage) {
 		this.callback = callback;
-		this.successEmbed = getSuccessEmbed(user, guild);
-		this.errorEmbed = getErrorEmbed(user, guild);
-		this.language = LanguageSystem.getLanguage(user, guild);
+		this.successEmbed = getSuccessEmbed(defaultLanguage, user, guild);
+		this.errorEmbed = getErrorEmbed(defaultLanguage, user, guild);
+		this.language = LanguageUtils.getLanguage(user, guild, defaultLanguage);
 	}
 
 	@Override

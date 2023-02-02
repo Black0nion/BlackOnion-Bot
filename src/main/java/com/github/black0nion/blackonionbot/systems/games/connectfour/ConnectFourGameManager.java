@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.systems.games.connectfour;
 
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
@@ -17,8 +18,8 @@ public class ConnectFourGameManager {
 	 * @param playerY UserID of Player Y
 	 * @return The new created Game
 	 */
-	public static ConnectFour createGame(final MessageChannel channel, final User playerX, final User playerY) {
-		final ConnectFour newGame = new ConnectFour(channel, playerX, playerY);
+	public static ConnectFour createGame(final Language language, final MessageChannel channel, final User playerX, final User playerY) {
+		final ConnectFour newGame = new ConnectFour(language, channel, playerX, playerY);
 		games.add(newGame);
 		return newGame;
 	}

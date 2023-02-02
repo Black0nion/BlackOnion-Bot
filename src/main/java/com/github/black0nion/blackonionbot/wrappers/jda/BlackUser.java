@@ -3,7 +3,8 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -48,9 +49,16 @@ public class BlackUser extends UserImpl {
 		}
 	}
 
-	@Reloadable("usercache")
-	public static void clearCache() {
-		USER_CACHE.invalidateAll();
+	public static class UserCacheClear implements Reloadable {
+
+		public UserCacheClear(ReloadSystem reloadSystem) {
+			reloadSystem.registerReloadable(this);
+		}
+
+		@Override
+		public void reload() {
+			USER_CACHE.invalidateAll();
+		}
 	}
 
 	@SQLSetup(after = LanguageSystem.class)

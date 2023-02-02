@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -36,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 
-import static com.github.black0nion.blackonionbot.systems.language.LanguageSystem.getLanguage;
 import static java.util.Objects.requireNonNull;
 
 public class ReactionRolesSetupCommand extends MessageCommand {
@@ -46,13 +46,15 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 
 
 	private final SQLHelperFactory sql;
+	private final LanguageSystem languageSystem;
 
-	public ReactionRolesSetupCommand(SQLHelperFactory sqlHelperFactory) {
+	public ReactionRolesSetupCommand(SQLHelperFactory sqlHelperFactory, LanguageSystem languageSystem) {
 		super(builder(Commands.message("Reaction Roles"))
 			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION)
 		);
 		this.sql = sqlHelperFactory;
+		this.languageSystem = languageSystem;
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 		// format: command|action:messageId
 		String[] split = getIdParts(event.getComponentId());
 
-		Language language = getLanguage(event.getUser(), event.getGuild());
+		Language language = languageSystem.getLanguage(event.getUser(), event.getGuild());
 		(
 		switch (split[0]) {
 			case CREATE_REACTION -> event.editComponents(ActionRow.of(EntitySelectMenu.create(event.getComponentId(), EntitySelectMenu.SelectTarget.ROLE).build()));
@@ -91,7 +93,7 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 		String id = requireNonNull(event.getComponent().getId());
 		String[] split = getIdParts(id);
 
-		Language language = getLanguage(event.getUser(), event.getGuild());
+		Language language = languageSystem.getLanguage(event.getUser(), event.getGuild());
 		event.getInteraction().replyModal(Modal
 			.create(enrichId(CREATE_REACTION, split[1], e.getValues().get(0).getId()), language.getTranslationNonNull("create"))
 				.addActionRow(TextInput.create("emoji", "Type emoji here", TextInputStyle.SHORT).build())
@@ -114,8 +116,8 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 			switch (split[0]) {
 				case CREATE_REACTION -> createReactionRole(
 						new UserRespondUtilsImpl(event,
-							BlackGuild.from(event.getGuild()),
-							BlackUser.from(event.getUser())),
+							BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()
+						),
 						event.getGuild(),
 						event.getChannel().asTextChannel(),
 						Long.parseLong(split[1]),
@@ -125,8 +127,8 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 					);
 				case REMOVE_REACTION -> removeReactionRole(
 						new UserRespondUtilsImpl(event,
-							BlackGuild.from(event.getGuild()),
-							BlackUser.from(event.getUser())),
+							BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()
+						),
 						event.getGuild(),
 						event.getChannel().asTextChannel(),
 						Long.parseLong(split[1]),

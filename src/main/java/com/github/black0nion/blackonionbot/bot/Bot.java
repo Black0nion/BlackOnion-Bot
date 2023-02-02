@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
-import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ReloadCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
@@ -17,7 +16,6 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
 import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
@@ -31,12 +29,18 @@ import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
 import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
-import com.github.black0nion.blackonionbot.systems.docker.DockerManager;
+import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystemImpl;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
+import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Paginator;
 import com.github.ygimenez.model.PaginatorBuilder;
@@ -66,7 +70,9 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Bot extends ListenerAdapter {
 
@@ -114,6 +120,7 @@ public class Bot extends ListenerAdapter {
 	private final DatabaseConnector database;
 	private final SQLHelperFactory sqlHelperFactory;
 	private final GiveawaySystem giveawaySystem;
+	private final PluginSystem pluginSystem;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -165,12 +172,14 @@ public class Bot extends ListenerAdapter {
 		config = new ConfigImpl(ConfigLoaderImpl.INSTANCE);
 		settings = new SettingsImpl(MutableConfigLoaderImpl.INSTANCE);
 
-		DockerManager.init();
 		logger.info("Starting BlackOnion-Bot in '{}' mode...", config.getRunMode());
 		//noinspection ResultOfMethodCallIgnored
 		new File("files").mkdirs();
 
+		ReloadSystem reloadSystem = new ReloadSystem();
+
 		InjectorMap injectorMap = new InjectorMap();
+		injectorMap.add(reloadSystem);
 		injectorMap.add(this);
 		injectorMap.add(featureFlags);
 		injectorMap.add(config);
@@ -191,31 +200,43 @@ public class Bot extends ListenerAdapter {
 
 		Injector injector = new DefaultInjector(config, injectorMap);
 
-		slashCommandBase = new SlashCommandBase(config, injector);
+		LanguageSystem languageSystem = new LanguageSystemImpl(reloadSystem);
+		injectorMap.add(languageSystem);
+
+		EmbedUtils embedUtils = new EmbedUtils(languageSystem);
+		injectorMap.add(embedUtils);
+
+		slashCommandBase = new SlashCommandBase(config, injector, reloadSystem);
 		injectorMap.add(slashCommandBase);
 
-		giveawaySystem = new GiveawaySystem(sqlHelperFactory);
+		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem);
 		injectorMap.add(giveawaySystem);
+
+		new BlackGuild.GuildCacheClear(reloadSystem);
+		new BlackUser.UserCacheClear(reloadSystem);
+		new BlackMember.MemberCacheClear(reloadSystem);
+
+		this.pluginSystem = new PluginSystem(this);
+		reloadSystem.registerReloadable(pluginSystem);
 
 		final JDABuilder builder = JDABuilder.createDefault(config.getToken(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 			.disableCache(EnumSet.of(CacheFlag.CLIENT_STATUS, CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS))
 			.enableCache(CacheFlag.VOICE_STATE)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
-			.enableIntents(GatewayIntent.GUILD_MEMBERS)
+			.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
 			.setMaxReconnectDelay(32)
 			.addEventListeners(
 				slashCommandBase,
 				this,
 				new ReactionRoleSystem(sqlHelperFactory),
-				new JoinLeaveSystem(config, settings),
-				new AutoRolesSystem(),
+				new JoinLeaveSystem(config, settings, languageSystem, embedUtils),
+				new AutoRolesSystem(languageSystem),
+				new AntiSpoilerSystem(languageSystem, embedUtils),
 				statisticsManager,
 				eventWaiter
 			);
 
-		LanguageSystem.init();
 		// the constructor already needs the initialized hashmap
-		ReloadCommand.initReloadableMethods();
 		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
 		builder.setActivity(ActivityCommand.getActivity(settings));
 
@@ -251,10 +272,9 @@ public class Bot extends ListenerAdapter {
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(() -> new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize)))
-			.addAndGetSelf(PluginSystem::loadPlugins)
-			.addAndGetSelf(ConsoleCommands::run)
-			.addAndGetSelf(() -> new Prometheus(config));
+			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize))))
+			.addAndGetSelf(() -> pluginSystem.loadPlugins(null))
+			.addAndGetSelf(() -> reloadSystem.registerReloadable(new Prometheus(config)));
 
 		ExecutorService asyncStartup = Executors.newFixedThreadPool(
 			runnables.size(),
@@ -268,6 +288,7 @@ public class Bot extends ListenerAdapter {
 				LoggerFactory.getLogger(r.getClass()).error("Error while starting up", e);
 			}
 		}));
+		new ConsoleCommands(reloadSystem, this).start();
 
 		statisticsManager.start();
 
@@ -276,7 +297,7 @@ public class Bot extends ListenerAdapter {
 
 	public void shutdown() {
 		logger.info("Shutting down...");
-		PluginSystem.disablePlugins();
+		pluginSystem.disablePlugins();
 		// shutdown executors
 		executor.shutdown();
 		scheduledExecutor.shutdown();
@@ -298,11 +319,6 @@ public class Bot extends ListenerAdapter {
 
 		slashCommandBase.updateCommandsDev(readyJda);
 		executor.submit(giveawaySystem::init);
-	}
-
-	@Reloadable("commands")
-	private static void updateCommands() {
-		instance.slashCommandBase.addCommands();
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -23,15 +23,15 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-public class HangmanCommand extends SlashCommand {
+public class HangmanCommand extends SlashCommand implements Reloadable {
 
 	private static final HashMap<Language, List<String>> hangmanWords = new HashMap<>();
 
 	private static final List<Long> ingamePlayers = new ArrayList<>();
 
-	public HangmanCommand() {
+	public HangmanCommand(LanguageSystem languageSystem) {
 		super("hangman", "Used to play hangman");
-		for (final Language language : LanguageSystem.getLanguages().values()) {
+		for (final Language language : languageSystem.getLanguages().values()) {
 			final String translation = language.getTranslation("hangmanwords");
 			if (translation != null) {
 				hangmanWords.put(language, Arrays.asList(translation.toLowerCase().split(",")));
@@ -140,8 +140,8 @@ public class HangmanCommand extends SlashCommand {
 		return true;
 	}
 
-	@Reloadable("hangman")
-	public static void reload() {
+	@Override
+	public void reload() {
 		ingamePlayers.clear();
 	}
 }

@@ -1,7 +1,6 @@
 package com.github.black0nion.blackonionbot.wrappers;
 
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
@@ -19,10 +18,6 @@ public class TranslatedEmbedBuilder extends EmbedBuilder {
 
 	public TranslatedEmbedBuilder(final Language lang) {
 		this.lang = lang;
-	}
-
-	public TranslatedEmbedBuilder() {
-		this.lang = LanguageSystem.getDefaultLanguage();
 	}
 
 	public TranslatedEmbedBuilder(final TranslatedEmbedBuilder embed) {

@@ -8,7 +8,6 @@ import com.github.black0nion.blackonionbot.commands.common.Category;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Pair;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -33,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+// TODO: recode without event waiter
 public class HelpCommand extends SlashCommand {
 
 	private static final String COMMAND_OR_CATEGORY = "command_or_category";
@@ -66,9 +66,8 @@ public class HelpCommand extends SlashCommand {
 		if (command != null) {
 			for (final Pair<Long, AbstractCommand<?, ?>> entry : slashCommandBase.getCommands().values()) {
 				final AbstractCommand<?, ?> cmd = entry.getSecond();
-				if (!(cmd instanceof SlashCommand)) continue;
+				if (!(cmd instanceof SlashCommand slashCommand)) continue;
 
-				SlashCommand slashCommand = (SlashCommand) cmd;
 				if (!slashCommand.isHidden(author) && cmd.getName().equalsIgnoreCase(command)) {
 					cmde.success("help", cmde.getCommandHelp(slashCommand), cmde.getTranslationOrEmpty("help" + cmd.getName().toLowerCase()));
 					return;
@@ -130,13 +129,12 @@ public class HelpCommand extends SlashCommand {
 		Bot.getInstance().getEventWaiter().waitForEvent(ButtonInteractionEvent.class, event -> msg.getChannel().asTextChannel().getIdLong() == event.getChannel().getIdLong() && msg.getIdLong() == event.getMessageIdLong() && !event.getUser().isBot() && event.getUser().getIdLong() == author.getIdLong(), event -> {
 			final Button button = event.getButton();
 
-			final BlackGuild guild = cmde.getGuild();
 			final BlackUser user = cmde.getUser();
 
-			final EmbedBuilder builder = cmde.success().setDescription(LanguageSystem.getTranslation("onlyexecutorcancontrol", user, guild));
+			final EmbedBuilder builder = cmde.success().setDescription(cmde.getTranslation("onlyexecutorcancontrol"));
 
 			if (Objects.equals(button.getId(), "overview")) {
-				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + LanguageSystem.getTranslation("modules", user, guild));
+				builder.setTitle(cmde.getTranslation("help") + " | " + cmde.getTranslation("modules"));
 
 				final Category[] cats = Category.values();
 				for (int i = 0; i <= cats.length; i++) {
@@ -155,14 +153,14 @@ public class HelpCommand extends SlashCommand {
 					if (commandsInCategory.length() <= 2) {
 						continue;
 					}
-					builder.addField(Utils.firstLetterUppercase((category != null ? category.name() : LanguageSystem.getTranslation("modules", user, guild)).toLowerCase()), commandsInCategory.substring(1), false);
+					builder.addField(Utils.firstLetterUppercase((category != null ? category.name() : cmde.getTranslation("modules")).toLowerCase()), commandsInCategory.substring(1), false);
 				}
 			} else if (Objects.equals(button.getId(), "close")) {
 				msg.delete().queue();
 				return;
 			} else {
 				final Category category = Category.valueOf(button.getId());
-				builder.setTitle(LanguageSystem.getTranslation("help", user, guild) + " | " + category.name().toUpperCase());
+				builder.setTitle(cmde.getTranslation("help") + " | " + category.name().toUpperCase());
 				for (final Map.Entry<String, Pair<Long, AbstractCommand<?, ?>>> entry : slashCommandBase.getCommands().entrySet()) {
 					var command = entry.getValue().getSecond();
 					if (command instanceof SlashCommand cmd && !cmd.isHidden(user) && (command.getCategory() == category)) {

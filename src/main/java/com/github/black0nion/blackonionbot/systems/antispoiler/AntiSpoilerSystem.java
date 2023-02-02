@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.systems.antispoiler;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -19,10 +20,19 @@ import javax.annotation.Nullable;
 import static com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem.AntiSpoilerType.*;
 
 public class AntiSpoilerSystem extends ListenerAdapter {
+
+    private final LanguageSystem languageSystem;
+    private final EmbedUtils embedUtils;
+
+    public AntiSpoilerSystem(LanguageSystem languageSystem, EmbedUtils embedUtils) {
+        this.languageSystem = languageSystem;
+        this.embedUtils = embedUtils;
+    }
+
     /**
      * @return if the message contained a spoiler
      */
-    public static boolean removeSpoilers(@Nullable MessageReceivedEvent event, @Nullable MessageUpdateEvent event1) {
+    public boolean removeSpoilers(@Nullable MessageReceivedEvent event, @Nullable MessageUpdateEvent event1) {
         final Message msg = event != null ? event.getMessage() : event1.getMessage();
         final String message = msg.getContentRaw();
         final BlackUser author = BlackUser.from(event != null ? event.getAuthor() : event1.getAuthor());
@@ -32,17 +42,15 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         return handleSystem(guild, msg, message, author, channel, message, type);
     }
 
-    public static boolean handleSystem(BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type) {
+    public boolean handleSystem(BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type) {
         if (type != OFF) {
             long count = message.chars().filter(c -> c == '|').count();
             if (count < 4) return false;
 
-            if (Utils.handleSelfRights(guild, author, channel, null, Permission.MESSAGE_MANAGE)) return false;
+            if (Utils.handleSelfRights(languageSystem, guild, author, channel, null, Permission.MESSAGE_MANAGE)) return false;
 
             msg.delete().queue();
             if (type == DELETE) return true;
-
-            if (Utils.handleSelfRights(guild, author, channel, null, Permission.MANAGE_WEBHOOKS)) return true;
 
             while (count >= 4) {
                 newMessage = newMessage.replaceFirst("\\|\\|", "");
@@ -72,7 +80,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
                     e.printStackTrace();
                 }
             } else {
-                channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
+                channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, guild).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
             }
         }
         return false;
@@ -80,12 +88,12 @@ public class AntiSpoilerSystem extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (removeSpoilers(event, null)) event.getMessage().delete().queue();
+        removeSpoilers(event, null);
     }
 
     @Override
     public void onMessageUpdate(@Nonnull MessageUpdateEvent event) {
-        if (removeSpoilers(null, event)) event.getMessage().delete().queue();
+        removeSpoilers(null, event);
     }
 
     public enum AntiSpoilerType {

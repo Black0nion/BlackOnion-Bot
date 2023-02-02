@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
+import com.github.black0nion.blackonionbot.commands.common.Category;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommand;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
@@ -13,12 +14,14 @@ import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
 import com.github.black0nion.blackonionbot.inject.Injector;
-import com.github.black0nion.blackonionbot.commands.common.Category;
+import com.github.black0nion.blackonionbot.inject.InjectorCreateInstanceException;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
-import com.github.black0nion.blackonionbot.misc.Reloadable;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
 import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -60,7 +63,7 @@ import java.util.stream.Collectors;
  *<br>
  * It'll handle things like permissions, command auto-complete, executing commands, etc.
  */
-public class SlashCommandBase extends ListenerAdapter {
+public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 
 	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
 
@@ -93,11 +96,14 @@ public class SlashCommandBase extends ListenerAdapter {
 
 	private final Config config;
 	private final Injector injector;
+	private final ReloadSystem reloadSystem;
 
-	public SlashCommandBase(Config config, Injector injector) {
+	public SlashCommandBase(Config config, Injector injector, ReloadSystem reloadSystem) {
 		instance = this; // NOSONAR
 		this.config = config;
 		this.injector = injector;
+		this.reloadSystem = reloadSystem;
+		reloadSystem.registerReloadable(this);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -120,6 +126,14 @@ public class SlashCommandBase extends ListenerAdapter {
 				final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
 
+				if (newInstance instanceof Reloadable reloadable) {
+					// unregister if the command already exists
+					if (reloadSystem.isRegistered(reloadable.getReloadName())) reloadSystem.unregisterReloadableByName(reloadable.getReloadName());
+
+					// add new instance
+					this.reloadSystem.registerReloadable(reloadable);
+				}
+
 				if (newInstance instanceof SlashCommand slashCommand) {
 					SlashCommandData data = slashCommand.getData();
 					if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
@@ -128,6 +142,8 @@ public class SlashCommandBase extends ListenerAdapter {
 				}
 
 				addCommand(newInstance);
+			} catch (InjectorCreateInstanceException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Could not create instance of " + command.getName(), e);
 			}
@@ -190,9 +206,10 @@ public class SlashCommandBase extends ListenerAdapter {
 		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
 	}
 
-	@Reloadable("dev commands")
-	private static void updateCommandsDev() {
-		getInstance().updateCommandsDev(Bot.getInstance().getJDA());
+	@Override
+	public void reload() {
+		addCommands();
+		updateCommandsDev(this.injector.getInstance(Bot.class).getJDA());
 	}
 
 	public void updateCommandsDev(JDA jda) {
@@ -308,7 +325,8 @@ public class SlashCommandBase extends ListenerAdapter {
 			return;
 		}
 
-		if (Utils.handleSelfRights(guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
+		LanguageSystem languageSystem = injector.getInstance(LanguageSystem.class);
+		if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
 			final AbstractCommand<?, ?> command = commands.get(event.getName()).getSecond();
 			if (!clazz.isAssignableFrom(command.getClass())) return;
@@ -316,8 +334,8 @@ public class SlashCommandBase extends ListenerAdapter {
 			final C cmd = clazz.cast(command);
 
 			AbstractCommandEvent<?, ?> cmde;
-			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author);
-			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author);
+			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
+			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
 			final boolean disabled = !guild.isCommandActivated(cmd);
@@ -336,7 +354,7 @@ public class SlashCommandBase extends ListenerAdapter {
 
 			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : Permission.EMPTY_PERMISSIONS;
 			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : Permission.EMPTY_PERMISSIONS;
-			if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions)) return;
+			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(requiredPermissions)) {
 				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(author)) return;
@@ -344,11 +362,11 @@ public class SlashCommandBase extends ListenerAdapter {
 				return;
 			}
 
-			if (Utils.handleSelfRights(guild, author, channel, event, requiredBotPermissions))
+			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions))
 				return;
 
 			if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
-				event.replyEmbeds(EmbedUtils.premiumRequired(author, guild)).queue();
+				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, guild)).queue();
 				return;
 			}
 

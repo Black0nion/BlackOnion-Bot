@@ -43,10 +43,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 	private final Config config;
 	private final Settings settings;
+	private final LanguageSystem languageSystem;
+	private final EmbedUtils embedUtils;
 
-	public JoinLeaveSystem(Config config, Settings settings) {
+	public JoinLeaveSystem(Config config, Settings settings, LanguageSystem languageSystem, EmbedUtils embedUtils) {
 		this.config = config;
 		this.settings = settings;
+		this.languageSystem = languageSystem;
+		this.embedUtils = embedUtils;
 		try {
 			defaultBackGround = ImageIO.read(Objects.requireNonNull(this.getClass().getResource("/background.png")));
 		} catch (final Exception e) {
@@ -68,7 +72,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
 
-			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
 				.setDescription(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
 				.setImage("attachment://welcome.png")
@@ -95,7 +99,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
 
-			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
 				.setDescription(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
 				.setImage("attachment://goodbye.png")
@@ -124,24 +128,24 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 				try {
 					final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
-					guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getSuccessEmbed().addField("addedtoguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
+					guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getSuccessEmbed().addField("addedtoguild", languageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 
 				if (config.getRunMode() == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
-					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
+					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
 					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());
 					return;
 				}
 
 				author.openPrivateChannel().queue(channel ->
-					channel.sendMessageEmbeds(EmbedUtils.getSuccessEmbed(author, guild)
+					channel.sendMessageEmbeds(embedUtils.getSuccessEmbed(author, guild)
 						.setTitle("thankyouforadding")
 						.addField(
-							LanguageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", "/help"),
-							LanguageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
+							languageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", "/help"),
+							languageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
 						.build()
 					).queue());
 			});
@@ -156,7 +160,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 
 			try {
 				final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
-				guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(EmbedUtils.getErrorEmbed().addField("removedfromguild", LanguageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getErrorEmbed().addField("removedfromguild", languageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
@@ -164,7 +168,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 
 	@NotNull
-	public static byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
+	public byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
 		final double separatorTransparency = 1;
 
 		final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
@@ -198,7 +202,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		newGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		newGraphics.setFont(new Font("Arial", Font.PLAIN, 60));
 		newGraphics.setColor(Color.BLACK);
-		final String message = drawType == DrawType.JOIN ? LanguageSystem.getTranslation("welcome", user, guild) : LanguageSystem.getTranslation("goodbye", user, guild);
+		final String message = drawType == DrawType.JOIN ? languageSystem.getTranslation("welcome", user, guild) : languageSystem.getTranslation("goodbye", user, guild);
 		newGraphics.drawString(message, 205, 75);
 		newGraphics.setColor(textColor);
 		final String userName = user.getName();
