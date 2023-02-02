@@ -72,7 +72,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
 
-			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
 				.setDescription(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
 				.setImage("attachment://welcome.png")
@@ -99,7 +99,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
 
-			var embed = new TranslatedEmbedBuilder(LanguageSystem.getLanguage(author, guild))
+			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
 				.setDescription(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
 				.setImage("attachment://goodbye.png")
@@ -168,7 +168,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 
 	@NotNull
-	public static byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
+	public byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
 		final double separatorTransparency = 1;
 
 		final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
