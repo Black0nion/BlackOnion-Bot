@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.discord.user;
+package com.github.black0nion.blackonionbot.config.discord.api;
 
 import com.github.black0nion.blackonionbot.config.discord.api.SettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;

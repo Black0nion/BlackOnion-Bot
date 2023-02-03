@@ -8,7 +8,7 @@ public interface Setting<T> {
 	T getValue();
 
 	void setValue(T value);
-	void setParsedValue(String value);
+	void setParsedValue(Object value);
 
 	Validator<T>[] getValidators();
 }

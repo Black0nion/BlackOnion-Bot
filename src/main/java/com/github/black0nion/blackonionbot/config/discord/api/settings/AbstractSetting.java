@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.config.discord.api.settings;
 
-import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
 import com.github.black0nion.blackonionbot.config.common.parse.ParseFactory;
 import com.github.black0nion.blackonionbot.config.discord.api.validation.Validator;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public abstract class AbstractSetting<T> implements Setting<T> {
 
@@ -12,13 +12,13 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Nullable
 	private final Validator<T>[] validators;
 	private T value;
-	private final ParseFactory<T> parseFactory;
+	private final List<ParseFactory<?, T>> parseFactories;
 
 	@SafeVarargs
-	protected AbstractSetting(String name, T value, @Nullable ParseFactory<T> parseFactory, @Nullable Validator<T>... validators) {
+	protected AbstractSetting(String name, T value, @Nullable ParseFactory<?, T>[] parseFactories, @Nullable Validator<T>... validators) {
 		this.name = name;
 		this.validators = validators;
-		this.parseFactory = parseFactory;
+		this.parseFactories = List.of(parseFactories);
 		setValue(value);
 	}
 
@@ -47,9 +47,14 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	}
 
 	@Override
-	public void setParsedValue(String value) {
-		if (parseFactory != null) {
-			setValue(parseFactory.parse(value));
+	public void setParsedValue(Object value) {
+		if (value == null) {
+			throw new IllegalArgumentException("Value is null");
+		}
+		for (ParseFactory<?, T> parseFactory : parseFactories) {
+			if (parseFactory.getInputClass() == value.getClass())
+				return;
+			}
 		}
 		throw new ParseException("No parse factory for setting " + name);
 	}
@@ -65,5 +70,10 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 				}
 			}
 		}
+	}
+
+	@SafeVarargs
+	public static <T> ParseFactory<?, T>[] parsers(ParseFactory<?, T>... parseFactories) {
+		return parseFactories;
 	}
 }

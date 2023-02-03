@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.config.discord.user;
 
+import com.github.black0nion.blackonionbot.config.discord.api.AbstractSettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.StringSetting;
 import net.dv8tion.jda.api.entities.User;
 
