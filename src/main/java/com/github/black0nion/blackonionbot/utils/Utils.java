@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -48,12 +49,14 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 public class Utils {
+
+	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
 	private Utils() {}
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
@@ -380,12 +383,13 @@ public class Utils {
 	 * @return the value of the supplier or null if the supplier throws an exception
 	 */
 	@Nullable
-	public static <T> T tryGet(Supplier<T> getter) {
+	public static <T> T tryGet(ThrowableSupplier<T> getter) {
 		try {
 			return getter.get();
 		} catch (Exception e) {
-			return null;
+			logger.error("Error while getting value", e);
 		}
+		return null;
 	}
 
 	public static <T> T parseToT(String value, Class<T> clazz) {

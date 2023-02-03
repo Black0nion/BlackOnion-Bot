@@ -1,20 +1,31 @@
 package com.github.black0nion.blackonionbot.config.discord.impl.settings;
 
-import com.github.black0nion.blackonionbot.config.common.parse.ParseFactory;
-import com.github.black0nion.blackonionbot.config.common.parse.ParseFactoryImpl;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSetting;
-import com.github.black0nion.blackonionbot.config.discord.api.validation.Validator;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class BooleanSetting extends AbstractSetting<Boolean> {
 
-	public static final ParseFactory<String, Boolean> PARSER = new ParseFactoryImpl<>(Boolean.class, input -> switch (input.toLowerCase()) {
-		case "true", "yes", "y", "1" -> true;
-		case "false", "no", "n", "0" -> false;
-		default -> throw new IllegalArgumentException("Invalid boolean value: " + input);
-	});
+	public BooleanSetting(String name, Boolean value) {
+		super(name, value, Boolean.class, false);
+	}
 
-	@SafeVarargs
-	public BooleanSetting(String name, Boolean value, Validator<Boolean>... validators) {
-		super(name, value, parsers(PARSER), validators); // NOSONAR what do you want from me
+	@Override
+	protected Boolean parse(@Nonnull Object value) throws Exception {
+		if (value instanceof Boolean bool) return bool;
+
+		return switch (((String) value).toLowerCase()) {
+			case "true" -> true;
+			case "false" -> false;
+			default -> throw new IllegalArgumentException("Invalid boolean value: " + value);
+		};
+	}
+
+	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Boolean.class);
+
+	@Override
+	public List<Class<?>> canParse() {
+		return CAN_PARSE;
 	}
 }

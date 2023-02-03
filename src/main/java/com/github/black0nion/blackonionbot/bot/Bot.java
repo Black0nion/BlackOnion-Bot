@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
@@ -254,6 +255,9 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 			return;
 		}
+		UserSettingsRepo settingsRepo = new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l));
+		slashCommandBase.setUserSettingsRepo(settingsRepo);
+
 		logger.info("JDA started successfully!");
 
 		slashCommandBase.addCommands();

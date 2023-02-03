@@ -1,4 +1,4 @@
-package com.github.black0nion.blackonionbot.config.discord.api;
+package com.github.black0nion.blackonionbot.config.discord.api.container;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 

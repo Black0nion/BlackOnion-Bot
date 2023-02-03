@@ -10,6 +10,8 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.information.HelpCommand;
+import com.github.black0nion.blackonionbot.config.discord.api.repo.SettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
@@ -66,6 +68,7 @@ import java.util.stream.Collectors;
 public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 
 	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
+	private SettingsRepo<UserSettings> userSettingsRepo;
 
 	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
 		return commandsInCategory;
@@ -104,6 +107,11 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		this.injector = injector;
 		this.reloadSystem = reloadSystem;
 		reloadSystem.registerReloadable(this);
+	}
+
+	public void setUserSettingsRepo(SettingsRepo<UserSettings> userSettingsRepo) {
+		if (this.userSettingsRepo != null) throw new IllegalStateException("UserSettingsRepo already set!");
+		this.userSettingsRepo = userSettingsRepo;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -318,6 +326,14 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			FileUtils.appendToFile("files/logs/commandUsages.log", log);
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 		}
+
+		final UserSettings userSettings = Utils.tryGet(() -> userSettingsRepo
+			.getSettings(author.getIdLong()));
+
+
+		System.out.println(userSettings.getJoinMessage());
+
+		if (true) return;
 
 		if (locked) {
 			// haha funni

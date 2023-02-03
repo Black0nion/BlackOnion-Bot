@@ -1,26 +1,21 @@
 package com.github.black0nion.blackonionbot.config.discord.user;
 
-import com.github.black0nion.blackonionbot.config.discord.api.AbstractSettingsContainer;
+import com.github.black0nion.blackonionbot.config.discord.api.container.AbstractSettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.StringSetting;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.RestAction;
 
-import java.util.function.Function;
+import java.sql.ResultSet;
+import java.util.function.LongFunction;
 
-public class UserSettingsImpl extends AbstractSettingsContainer implements UserSettings {
+public class UserSettingsImpl extends AbstractSettingsContainer<User> implements UserSettings {
 
-	private final StringSetting joinMessage;
-	private final Function<Long, User> userGetter;
+	private final StringSetting joinMessage = addSetting(new StringSetting("joinMessage", "Welcome %user% to %guild%!"));
 
-	public UserSettingsImpl(long id, Function<Long, User> userGetter) {
-		super(id);
+	public UserSettingsImpl(long id, LongFunction<RestAction<User>> userGetter, ResultSet resultSet) throws Exception {
+		super(id, userGetter);
 
-		this.userGetter = userGetter;
-
-		this.joinMessage = addSetting(new StringSetting("joinMessage", "Welcome %user% to %guild%!"));
-	}
-
-	public User retrieveUser() {
-		return userGetter.apply(getIdentifier());
+		this.loadSettings(resultSet);
 	}
 
 	@Override
