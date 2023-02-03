@@ -70,6 +70,17 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 	}
 
 	@Override
+	public <T> Setting<T> getSetting(String name) {
+		for (Setting<?> setting : settings) {
+			if (setting.getName().equals(name)) {
+				//noinspection unchecked
+				return (Setting<T>) setting;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public String toString() {
 		return "AbstractSettingsContainer{" +
 			"id=" + id +

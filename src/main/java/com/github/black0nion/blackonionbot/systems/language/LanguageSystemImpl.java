@@ -89,7 +89,7 @@ public class LanguageSystemImpl implements LanguageSystem, Reloadable {
 
 	@Nullable
 	@Override
-	public Language getLanguageFromName(final String name) {
+	public Language getLanguageFromCode(final String name) {
 		if (name == null || !languages.containsKey(name.toUpperCase())) return null;
 		return languages.get(name.toUpperCase());
 	}

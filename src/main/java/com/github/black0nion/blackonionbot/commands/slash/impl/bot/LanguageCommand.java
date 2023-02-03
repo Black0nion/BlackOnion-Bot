@@ -57,7 +57,7 @@ public class LanguageCommand extends SlashCommand {
 		if (!subcommand.equalsIgnoreCase("list"))
 			subcommandGroup = cmde.getSubcommandGroup();
 		if (subcommand.equalsIgnoreCase("set"))
-			Checks.notNull(lang = languageSystem.getLanguageFromName(e.getOption("language", OptionMapping::getAsString)), "Language");
+			Checks.notNull(lang = languageSystem.getLanguageFromCode(e.getOption("language", OptionMapping::getAsString)), "Language");
 
 		if (subcommand.equalsIgnoreCase("list")) {
 			cmde.send("languagelist", new Placeholder("langs", languageSystem.getLanguageString()));

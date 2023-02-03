@@ -11,4 +11,6 @@ public interface SettingsContainer {
 	long getIdentifier();
 
 	List<? extends Setting<?>> getSettings(); // NOSONAR stfu i need this dynamicness
+
+	<T> Setting<T> getSetting(String name);
 }

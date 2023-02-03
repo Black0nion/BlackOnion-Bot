@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.config.discord.api.repo.AbstractSetti
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
+import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.ThrowableSupplier;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -13,6 +14,8 @@ import java.sql.ResultSet;
 import java.util.function.LongFunction;
 
 public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
+
+	private final LanguageSystem languageSystem;
 
 	@SQLSetup
 	public static void setup(SQLHelperFactory sqlHelperFactory) {
@@ -24,12 +27,13 @@ public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
 		}
 	}
 
-	public UserSettingsRepo(SQLHelperFactory sqlHelperFactory, LongFunction<RestAction<User>> entityGetter) {
+	public UserSettingsRepo(SQLHelperFactory sqlHelperFactory, LongFunction<RestAction<User>> entityGetter, LanguageSystem languageSystem) {
 		super("user_settings", sqlHelperFactory, entityGetter);
+		this.languageSystem = languageSystem;
 	}
 
 	@Override
 	protected UserSettings loadSettingsImpl(long id, SQLHelper helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception {
-		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get());
+		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get(), languageSystem);
 	}
 }

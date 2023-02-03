@@ -85,8 +85,6 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 		} catch (Exception e) {
 			throw new ParseException(e);
 		}
-
-		throw new ParseException("No parse factory for setting " + name);
 	}
 
 	/**

@@ -18,7 +18,7 @@ public interface LanguageSystem {
 	Language getDefaultLanguage();
 
 	@Nullable
-	Language getLanguageFromName(String name);
+	Language getLanguageFromCode(String name);
 
 	String getTranslation(@Nullable String key, @Nullable BlackUser author, @Nullable BlackGuild guild);
 
