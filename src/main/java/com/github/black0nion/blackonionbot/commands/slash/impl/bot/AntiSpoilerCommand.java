@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -30,7 +31,7 @@ public class AntiSpoilerCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings) {
 		var status = e.getOption(STATUS, OptionMapping::getAsString);
 
 		final AntiSpoilerSystem.AntiSpoilerType parsedType = AntiSpoilerSystem.AntiSpoilerType.parse(status);

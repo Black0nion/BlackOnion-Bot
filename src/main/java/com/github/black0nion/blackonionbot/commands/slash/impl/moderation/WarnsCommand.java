@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 import com.github.black0nion.blackonionbot.bot.BotInformation;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -46,7 +47,7 @@ public class WarnsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings) {
 		switch (cmde.getSubcommandName()) {
 			case ID -> handleId(cmde);
 			case USER -> handleUser(cmde);

@@ -68,4 +68,12 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 	public List<Setting<?>> getSettings() {
 		return settings;
 	}
+
+	@Override
+	public String toString() {
+		return "AbstractSettingsContainer{" +
+			"id=" + id +
+			", settings=" + settings +
+			'}';
+	}
 }

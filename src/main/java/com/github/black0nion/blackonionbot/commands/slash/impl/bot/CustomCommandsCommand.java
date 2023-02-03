@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandResponsePlaintext;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -107,7 +108,7 @@ public class CustomCommandsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
 		var option = e.getOption(OPTION, OptionMapping::getAsString);
 		switch (Objects.requireNonNull(option)) {
 			case LIST ->

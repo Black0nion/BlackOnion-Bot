@@ -106,7 +106,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	public String toString() {
 		return "AbstractSetting{" +
 			"name='" + name + '\'' +
-			", value=" + value +
+			", value=" + getType().getSimpleName() + "[" + value + "]" +
 			", nullable=" + nullable +
 			", validators=" + Arrays.toString(validators) +
 			'}';

@@ -330,11 +330,6 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		final UserSettings userSettings = Utils.tryGet(() -> userSettingsRepo
 			.getSettings(author.getIdLong()));
 
-
-		System.out.println(userSettings.getJoinMessage());
-
-		if (true) return;
-
 		if (locked) {
 			// haha funni
 			event.reply("https://tenor.com/view/you-got-banned-banned-banned-message-mickey-mouse-club-gif-17668002").queue();
@@ -389,7 +384,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			commandPool.submit(() -> {
 				try {
 					if (cmd instanceof SlashCommand slashCommand) {
-						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel);
+						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel, userSettings);
 					} else if (cmd instanceof MessageCommand messageCommand) {
 						messageCommand.execute((MessageCommandEvent) cmde, (MessageContextInteractionEvent) event, member, author, guild, channel, ((MessageContextInteractionEvent) event).getTarget());
 					}
