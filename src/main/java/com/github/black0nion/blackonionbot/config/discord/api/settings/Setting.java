@@ -16,6 +16,7 @@ public interface Setting<T> {
 	Object toDatabaseValue();
 
 	void setValue(T value);
+	void setValueBypassing(T value);
 
 	/**
 	 * @return the classes that can be parsed to the right setting type
@@ -25,6 +26,11 @@ public interface Setting<T> {
 		return canParse().contains(clazz);
 	}
 	void setParsedValue(Object value) throws ParseException;
+
+	/**
+	 * Sets the value without saving it to the database
+	 */
+	void setParsedValueBypassing(Object value) throws ParseException;
 
 	Validator<T>[] getValidators();
 }

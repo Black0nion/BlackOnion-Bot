@@ -1,15 +1,15 @@
 package com.github.black0nion.blackonionbot.config.discord.impl.settings;
 
-import com.github.black0nion.blackonionbot.config.discord.api.container.SettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSetting;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 public class BooleanSetting extends AbstractSetting<Boolean> {
 
-	public BooleanSetting(SettingsContainer container, String name, Boolean value) {
-		super(container, name, value, Boolean.class, false);
+	public BooleanSetting(SettingsSaver settingsSaver, String name, Boolean value) {
+		super(settingsSaver, name, value, Boolean.class, false);
 	}
 
 	@Override
@@ -21,11 +21,6 @@ public class BooleanSetting extends AbstractSetting<Boolean> {
 			case "false" -> false;
 			default -> throw new IllegalArgumentException("Invalid boolean value: " + value);
 		};
-	}
-
-	@Override
-	public Object toDatabaseValue() {
-		return getValue();
 	}
 
 	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Boolean.class);

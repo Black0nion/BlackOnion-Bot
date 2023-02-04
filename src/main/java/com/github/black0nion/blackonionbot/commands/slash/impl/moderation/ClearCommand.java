@@ -107,15 +107,13 @@ public class ClearCommand extends SlashCommand {
 						final List<Message> messages = new ArrayList<>();
 						int i = msgsize + 1;
 						for (final Message m : msgs.getRetrievedHistory()) {
-							if (m.getTimeCreated().isAfter(lastValidTime)) break;
+							if (!m.getTimeCreated().isAfter(lastValidTime)) break;
 
 							if (!m.isPinned()) {
 								messages.add(m);
 							}
 
-							if (--i <= 0) {
-								break;
-							}
+							if (--i <= 0) break;
 						}
 
 						ClearCommand.deleteMessages(cmde, channel, msgsize, messages);
@@ -130,6 +128,7 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int expectedCount, @NotNull List<Message> messages) {
+		// TODO: display error when no message is found
 		channel.deleteMessages(messages).queue(success -> {
 			if (messages.size() < expectedCount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),

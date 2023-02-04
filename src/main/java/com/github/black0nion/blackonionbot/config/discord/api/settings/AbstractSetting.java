@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.config.discord.api.validation.Validat
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.sql.SQLException;
 import java.util.Arrays;
 
 public abstract class AbstractSetting<T> implements Setting<T> {
@@ -27,7 +26,8 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 		this.type = type;
 		this.nullable = nullable;
 		this.validators = validators;
-		setValue(defaultValue);
+		validate(defaultValue);
+		setValueBypassing(defaultValue);
 	}
 
 	@Override
@@ -37,6 +37,11 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 
 	@Override
 	public T getValue() {
+		return value;
+	}
+
+	@Override
+	public Object toDatabaseValue() {
 		return value;
 	}
 
@@ -69,7 +74,8 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	/**
 	 * Only use this if you know what you are doing (e.g. when loading from the database)
 	 */
-	public void saveValueBypassingSave(T value) {
+	@Override
+	public void setValueBypassing(T value) {
 		this.value = value;
 	}
 
@@ -80,22 +86,36 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 
 	@Override
 	public void setParsedValue(Object value) throws ParseException {
+		try {
+			saveValue(pleaseParse(value));
+		} catch (ParseException | SettingSaveException ex) {
+			throw ex;
+		} catch (Exception e) {
+			throw new ParseException(e);
+		}
+	}
+
+	@Override
+	public void setParsedValueBypassing(Object value) throws ParseException {
+		setValueBypassing(pleaseParse(value));
+	}
+
+	private T pleaseParse(Object value) {
 		if (value == null) {
 			if (nullable) {
 				saveValue(null);
-				return;
+				return null;
 			}
 			throw new IllegalArgumentException("Value is null");
 		}
 
 		if (this.type.isAssignableFrom(value.getClass())) {
 			setValue(this.type.cast(value));
-			return;
+			return null;
 		}
 
 		try {
-			T parsedValue = parse(value);
-			setValue(parsedValue);
+			return parse(value);
 		} catch (ParseException ex) {
 			throw ex;
 		} catch (Exception e) {

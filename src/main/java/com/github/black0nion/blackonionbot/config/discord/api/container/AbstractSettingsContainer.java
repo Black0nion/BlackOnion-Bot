@@ -1,9 +1,12 @@
 package com.github.black0nion.blackonionbot.config.discord.api.container;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingSaveException;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,37 +19,69 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 	protected final List<Setting<?>> settings = new LinkedList<>();
 	protected final long id;
 	protected final LongFunction<RestAction<E>> entityGetter;
+	protected final SettingsSaver settingsSaver;
+	private boolean firstRun = false;
 
-	protected AbstractSettingsContainer(long id, LongFunction<RestAction<E>> entityGetter) {
+	protected AbstractSettingsContainer(String tableName, long id, LongFunction<RestAction<E>> entityGetter, SQLHelperFactory sqlHelperFactory) {
 		this.id = id;
 		this.entityGetter = entityGetter;
+		this.settingsSaver = setting -> {
+			try {
+				if (firstRun) {
+					// save all settings to the database
+					String[] columns = settings.stream().map(Setting::getName).toArray(String[]::new);
+					String placeholders = String.join(",", columns).replaceAll("[^,]+", "?");
+
+					Object[] values = settings.stream().map(Setting::toDatabaseValue).toArray();
+					Object[] args = new Object[values.length + 1];
+					args[0] = id;
+					System.arraycopy(values, 0, args, 1, columns.length);
+
+					sqlHelperFactory.run("INSERT INTO " + tableName + " (identifier," + String.join(",", columns) + ") VALUES (?," + placeholders + ")", args);
+
+					firstRun = false;
+				} else {
+					sqlHelperFactory.run("UPDATE " + tableName + " SET " + setting.getName() + " = ? WHERE identifier = ?", setting.toDatabaseValue(), id);
+				}
+			} catch (SQLException e) {
+				throw new SettingSaveException(setting, e);
+			}
+		};
 	}
 
 	protected void loadSettings(ResultSet resultSet) throws Exception {
-		if (!resultSet.isBeforeFirst()) return;
+		if (!resultSet.isBeforeFirst()) {
+			LoggerFactory.getLogger(getClass()).debug("No settings found in database for {}", this);
+			resultSet.close();
+			firstRun = true;
+			return;
+		}
 		resultSet.next();
 
 		for (Setting<?> setting : settings) {
-			if (setting.getType().equals(String.class))
-				setting.setParsedValue(resultSet.getString(setting.getName()));
-			else if (setting.getType().equals(Integer.class))
-				setting.setParsedValue(resultSet.getInt(setting.getName()));
-			else if (setting.getType().equals(Long.class))
-				setting.setParsedValue(resultSet.getLong(setting.getName()));
-			else if (setting.getType().equals(Boolean.class))
-				setting.setParsedValue(resultSet.getBoolean(setting.getName()));
-			else if (setting.getType().equals(Double.class))
-				setting.setParsedValue(resultSet.getDouble(setting.getName()));
-			else if (setting.getType().equals(Float.class))
-				setting.setParsedValue(resultSet.getFloat(setting.getName()));
-			else if (setting.getType().equals(Short.class))
-				setting.setParsedValue(resultSet.getShort(setting.getName()));
-			else if (setting.getType().equals(Byte.class))
-				setting.setParsedValue(resultSet.getByte(setting.getName()));
-			else if (setting.getType().equals(Character.class))
-				setting.setParsedValue(resultSet.getString(setting.getName()).charAt(0));
+			// Check if the column exists
+			resultSet.findColumn(setting.getName());
+
+			if (setting.canParse(String.class))
+				setting.setParsedValueBypassing(resultSet.getString(setting.getName()));
+			else if (setting.canParse(Integer.class))
+				setting.setParsedValueBypassing(resultSet.getInt(setting.getName()));
+			else if (setting.canParse(Long.class))
+				setting.setParsedValueBypassing(resultSet.getLong(setting.getName()));
+			else if (setting.canParse(Boolean.class))
+				setting.setParsedValueBypassing(resultSet.getBoolean(setting.getName()));
+			else if (setting.canParse(Double.class))
+				setting.setParsedValueBypassing(resultSet.getDouble(setting.getName()));
+			else if (setting.canParse(Float.class))
+				setting.setParsedValueBypassing(resultSet.getFloat(setting.getName()));
+			else if (setting.canParse(Short.class))
+				setting.setParsedValueBypassing(resultSet.getShort(setting.getName()));
+			else if (setting.canParse(Byte.class))
+				setting.setParsedValueBypassing(resultSet.getByte(setting.getName()));
+			else if (setting.canParse(Character.class))
+				setting.setParsedValueBypassing(resultSet.getString(setting.getName()).charAt(0));
 			else
-				throw new SQLException("Unknown type: " + setting.getType());
+				throw new IllegalArgumentException("Cannot parse setting " + setting);
 		}
 		resultSet.close();
 	}

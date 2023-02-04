@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.requests.RestAction;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.function.LongFunction;
 
 public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
@@ -19,12 +20,10 @@ public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
 	private final LanguageSystem languageSystem;
 
 	@SQLSetup
-	public static void setup(SQLHelperFactory sqlHelperFactory) {
-		try (SQLHelper helper = sqlHelperFactory.create("CREATE TABLE IF NOT EXISTS user_settings (identifier BIGINT PRIMARY KEY, joinMessage VARCHAR(255) NOT NULL)");
+	public static void setup(SQLHelperFactory sqlHelperFactory) throws SQLException {
+		try (SQLHelper helper = sqlHelperFactory.create("CREATE TABLE IF NOT EXISTS user_settings (identifier BIGINT PRIMARY KEY, language VARCHAR(5), FOREIGN KEY (language) REFERENCES language (code))");
 				PreparedStatement ps = helper.create()) {
 			ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -34,7 +33,7 @@ public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
 	}
 
 	@Override
-	protected UserSettings loadSettingsImpl(long id, SQLHelperFactory helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception {
-		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get(), helper, TABLE_NAME, languageSystem);
+	protected UserSettings loadSettingsImpl(long id, SQLHelperFactory helper, ThrowableSupplier<ResultSet> resultSetSupplier, SQLHelperFactory factory) throws Exception {
+		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get(), factory, languageSystem);
 	}
 }
