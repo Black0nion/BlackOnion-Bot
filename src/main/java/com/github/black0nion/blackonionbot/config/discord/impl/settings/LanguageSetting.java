@@ -15,8 +15,8 @@ public class LanguageSetting extends AbstractSetting<Language> {
 	private final LanguageSystem languageSystem;
 
 	@SafeVarargs
-	public LanguageSetting(String name, LanguageSystem languageSystem, boolean nullable, @Nullable Validator<Language>... validators) {
-		super(name, languageSystem.getDefaultLanguage(), Language.class, nullable, validators);
+	public LanguageSetting(String name, LanguageSystem languageSystem, @Nullable Validator<Language>... validators) {
+		super(name, languageSystem.getDefaultLanguage(), Language.class, true, validators);
 		this.languageSystem = languageSystem;
 	}
 
@@ -28,6 +28,12 @@ public class LanguageSetting extends AbstractSetting<Language> {
 	}
 
 	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Language.class);
+
+	@Override
+	@Nullable
+	public Language getValue() {
+		return super.getValue();
+	}
 
 	@Override
 	public List<Class<?>> canParse() {

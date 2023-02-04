@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.common;
 
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
 import com.github.black0nion.blackonionbot.utils.CommandReturnException;
@@ -40,20 +41,22 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 	protected final BlackGuild guild;
 	protected final BlackMember member;
 	protected final BlackUser user;
+	protected final UserSettings userSettings;
 	protected final TranslatedEmbedBuilder successEmbed;
 	protected final TranslatedEmbedBuilder errorEmbed;
 	protected Language language;
 
-	protected AbstractCommandEvent(final Language defaultLanguage, final C cmd, final E e, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+	protected AbstractCommandEvent(final Language defaultLanguage, final C cmd, final E e, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings) {
 		this.command = cmd;
 		this.event = e;
 		this.jda = e.getJDA();
 		this.guild = guild;
 		this.member = member;
 		this.user = user;
+		this.userSettings = userSettings;
 		this.successEmbed = EmbedUtils.getSuccessEmbed(defaultLanguage, this.user, this.guild);
 		this.errorEmbed = EmbedUtils.getErrorEmbed(defaultLanguage, this.user, this.guild);
-		this.language = LanguageUtils.getLanguage(user, guild, defaultLanguage);
+		this.language = LanguageUtils.getLanguage(userSettings, guild, defaultLanguage);
 	}
 
 	@Override

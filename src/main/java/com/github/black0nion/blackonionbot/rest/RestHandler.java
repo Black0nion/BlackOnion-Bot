@@ -78,9 +78,12 @@ public class RestHandler implements Handler {
 		}
 		//endregion
 
-		// Objects.toString to make it null safe
 		Object result = route.handle(ctx, body, session, session != null ? session.getUser() : null);
-		if (result instanceof JSONObject json) {
+		if (result == null) {
+			if (ctx.status() == HttpStatus.OK)
+				ctx.status(HttpStatus.NO_CONTENT);
+			return;
+		} else if (result instanceof JSONObject json) {
 			ctx.contentType(ContentType.APPLICATION_JSON);
 			result = json.toString();
 		}

@@ -255,7 +255,7 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 			return;
 		}
-		UserSettingsRepo settingsRepo = new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem);
+		UserSettingsRepo settingsRepo = injectorMap.add(new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
 		slashCommandBase.setUserSettingsRepo(settingsRepo);
 
 		logger.info("JDA started successfully!");

@@ -63,7 +63,7 @@ public class CustomCommandsCommand extends SlashCommand {
 		}
 	}
 
-	private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+	private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success()
 				.addField("messagetosend", "inputmessage", false)
 				.setDescription(cmde.getTranslation("leavetutorial"))
@@ -78,11 +78,11 @@ public class CustomCommandsCommand extends SlashCommand {
 					}
 
 					final CustomCommand customCommand = new CustomCommand(cmde.getGuild().getIdLong(), command, new CustomCommandResponsePlaintext(contentRaw));
-					askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), customCommand, slashCommandInteractionEvent, guild, member, user);
+					askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage(), userSettings), customCommand, slashCommandInteractionEvent, guild, member, user, userSettings);
 				}));
 	}
 
-	private void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+	private void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
@@ -97,7 +97,7 @@ public class CustomCommandsCommand extends SlashCommand {
 			} else if (contentRaw.equalsIgnoreCase("false")) {
 				reply = false;
 			} else {
-				askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), customCommand, slashCommandInteractionEvent, guild, member, user);
+				askForReply(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage(), userSettings), customCommand, slashCommandInteractionEvent, guild, member, user, userSettings);
 				return;
 			}
 
@@ -109,7 +109,7 @@ public class CustomCommandsCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
-		var option = e.getOption(OPTION, OptionMapping::getAsString);
+		var option = cmde.getOption(OPTION, OptionMapping::getAsString);
 		switch (Objects.requireNonNull(option)) {
 			case LIST ->
 				cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
@@ -126,12 +126,12 @@ public class CustomCommandsCommand extends SlashCommand {
 					return;
 				}
 
-				this.askForType(command, cmde, e, guild, member, author);
+				this.askForType(command, cmde, e, guild, member, author, userSettings);
 			}
 			case DELETE -> {
-				final String command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
+				final String command = cmde.getOption(COMMAND_NAME, OptionMapping::getAsString);
 				if (guild.getCustomCommands().containsKey(command)) {
-					this.askForType(command, cmde, e, guild, member, author);
+					this.askForType(command, cmde, e, guild, member, author, userSettings);
 				} else {
 					cmde.error("notfound", "commandnotfound");
 				}
@@ -153,7 +153,7 @@ public class CustomCommandsCommand extends SlashCommand {
 		}));
 	}
 
-	private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user) {
+	private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 			if (contentRaw.startsWith("/") || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {
@@ -162,11 +162,11 @@ public class CustomCommandsCommand extends SlashCommand {
 			}
 
 			if (contentRaw.equalsIgnoreCase("raw") || contentRaw.equalsIgnoreCase("message")) {
-				askForRaw(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), slashCommandInteractionEvent, guild, member, user);
+				askForRaw(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage(), userSettings), slashCommandInteractionEvent, guild, member, user, userSettings);
 			} else if (contentRaw.equalsIgnoreCase("embed")) {
 				// TODO: add embed
 			} else {
-				this.askForType(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage()), slashCommandInteractionEvent, guild, member, user);
+				this.askForType(command, new SlashCommandEvent(this, slashCommandInteractionEvent, guild, member, user, languageSystem.getDefaultLanguage(), userSettings), slashCommandInteractionEvent, guild, member, user, userSettings);
 			}
 		}));
 	}

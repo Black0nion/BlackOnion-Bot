@@ -345,8 +345,8 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			final C cmd = clazz.cast(command);
 
 			AbstractCommandEvent<?, ?> cmde;
-			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
-			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
+			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings);
+			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings);
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
 			final boolean disabled = !guild.isCommandActivated(cmd);

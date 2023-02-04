@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 
@@ -15,6 +16,17 @@ public class LanguageUtils {
 			final Language userLang = author.getLanguage();
 			if (userLang != null) return userLang;
 		}
+		if (guild != null) {
+			final Language guildLang = guild.getLanguage();
+			if (guildLang != null) return guildLang;
+		}
+		return defaultLanguage;
+	}
+
+	public static Language getLanguage(@Nonnull final UserSettings userSettings, @Nullable final BlackGuild guild, @Nonnull Language defaultLanguage) {
+		final Language userLang = userSettings.getLanguage().getValue();
+		if (userLang != null) return userLang;
+
 		if (guild != null) {
 			final Language guildLang = guild.getLanguage();
 			if (guildLang != null) return guildLang;

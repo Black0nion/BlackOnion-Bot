@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.message;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -16,8 +17,8 @@ public class MessageCommandEvent extends AbstractCommandEvent<MessageCommand, Me
 	private final TextChannel channel;
 	private final Message message;
 
-	public MessageCommandEvent(MessageCommand cmd, MessageContextInteractionEvent event, BlackGuild guild, BlackMember member, BlackUser user, Language defaultLanguage) {
-		super(defaultLanguage, cmd, event, guild, member, user);
+	public MessageCommandEvent(MessageCommand cmd, MessageContextInteractionEvent event, BlackGuild guild, BlackMember member, BlackUser user, Language defaultLanguage, UserSettings userSettings) {
+		super(defaultLanguage, cmd, event, guild, member, user, userSettings);
 		// never null according to the docs
 		this.channel = requireNonNull(event.getChannel()).asTextChannel();
 		this.message = event.getTarget();

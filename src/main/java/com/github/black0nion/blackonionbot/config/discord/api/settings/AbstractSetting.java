@@ -77,6 +77,11 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 			throw new IllegalArgumentException("Value is null");
 		}
 
+		if (this.type.isAssignableFrom(value.getClass())) {
+			setValue(this.type.cast(value));
+			return;
+		}
+
 		try {
 			T parsedValue = parse(value);
 			setValue(parsedValue);
@@ -88,13 +93,26 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	}
 
 	/**
+	 * Sets the value, bypassing the validation
+	 * Also notifies the settings container of the change
+	 */
+	private void saveValue(T value) {
+		this.value = value;
+	}
+
+	/**
 	 * @throws IllegalArgumentException if the value is not valid (according to the validators)
 	 */
 	private void validate(@Nonnull T value) {
+		// check if the value is of the right type (can include subtypes)
+		if (!type.isAssignableFrom(value.getClass()) && !this.canParse(value.getClass())) {
+			throw new IllegalArgumentException("Value '" + value + "' is not of the right type for setting '" + name + "' (expected " + type.getSimpleName() + ")");
+		}
+
 		if (this.validators != null) {
 			for (Validator<T> validator : validators) {
 				if (!validator.test(value)) {
-					throw new IllegalArgumentException("Value " + value + " is not valid for setting " + name);
+					throw new IllegalArgumentException("Value '" + value + "' is not valid for setting '" + name + "' according to validator '" + validator + "'");
 				}
 			}
 		}

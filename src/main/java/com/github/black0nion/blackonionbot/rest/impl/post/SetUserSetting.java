@@ -1,0 +1,65 @@
+package com.github.black0nion.blackonionbot.rest.impl.post;
+
+import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
+import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
+import io.javalin.http.BadRequestResponse;
+import io.javalin.http.Context;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
+
+public class SetUserSetting implements IPostRoute {
+
+	private final UserSettingsRepo userSettingsRepo;
+
+	public SetUserSetting(UserSettingsRepo userSettingsRepo) {
+		this.userSettingsRepo = userSettingsRepo;
+	}
+
+	@Override
+	public Object handle(Context ctx, JSONObject body, RestSession session, DiscordUser user) throws Exception {
+		String name = body.getString("name");
+
+		Setting<Object> setting = userSettingsRepo.getSettings(Long.parseLong(user.getUser().getId()))
+			.getSetting(name);
+
+		if (setting == null) {
+			throw new BadRequestResponse("No setting found with name: " + name);
+		}
+
+		final String value = "value";
+		Object toSet;
+		if (setting.canParse(Long.class)) {
+			toSet = body.getLong(value);
+		} else if (setting.canParse(Boolean.class)) {
+			toSet = body.getBoolean(value);
+		} else if (setting.canParse(String.class)) {
+			toSet = body.getString(value);
+		} else if (setting.canParse(Integer.class)) {
+			toSet = body.getInt(value);
+		} else if (setting.canParse(Double.class)) {
+			toSet = body.getDouble(value);
+		} else if (setting.canParse(Float.class)) {
+			toSet = body.getFloat(value);
+		} else {
+			throw new BadRequestResponse("No parser found for : " + setting.getType().getSimpleName());
+		}
+
+		setting.setParsedValue(toSet);
+
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public String url() {
+		return "user_settings";
+	}
+
+	@Override
+	public String[] requiredBodyParameters() {
+		return new String[] { "name", "value" };
+	}
+}

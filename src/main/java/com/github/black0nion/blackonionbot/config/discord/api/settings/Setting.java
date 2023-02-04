@@ -19,6 +19,9 @@ public interface Setting<T> {
 	 * @return the classes that can be parsed to the right setting type
 	 */
 	List<Class<?>> canParse();
+	default boolean canParse(Class<?> clazz) {
+		return canParse().contains(clazz);
+	}
 	void setParsedValue(Object value) throws ParseException;
 
 	Validator<T>[] getValidators();

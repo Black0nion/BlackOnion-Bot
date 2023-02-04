@@ -95,6 +95,7 @@ public class DiscordUser {
 			throw new UncheckedIOException(e);
 		}
 	}, 10, TimeUnit.MINUTES);
+
 	/**
 	 * @return the guilds as discord's json response or null
 	 * @throws IOException if the request fails - this is a UncheckedIOException because Suppliers don't allow you to throw Exceptions
