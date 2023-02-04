@@ -62,8 +62,6 @@ dependencies {
 
     implementation("com.github.Mokulu:discord-oauth2-api:1.0.2")
 
-    implementation("com.github.walkyst:lavaplayer-fork:1.3.99.1")
-
     implementation("io.javalin:javalin-bundle:5.1.4")
 
     implementation("org.json:json:20220924")
@@ -75,8 +73,6 @@ dependencies {
     implementation("com.vdurmont:emoji-java:5.1.1")
 
     implementation("org.reflections:reflections:0.10.2")
-
-    implementation("commons-validator:commons-validator:1.7")
 
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
