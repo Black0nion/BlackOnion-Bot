@@ -13,6 +13,8 @@ public interface Setting<T> {
 
 	T getValue();
 
+	Object toDatabaseValue();
+
 	void setValue(T value);
 
 	/**

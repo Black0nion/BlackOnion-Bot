@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.config.discord.api.container;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.requests.RestAction;
 

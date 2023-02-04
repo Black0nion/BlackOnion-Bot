@@ -15,6 +15,7 @@ import java.util.function.LongFunction;
 
 public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
 
+	public static final String TABLE_NAME = "user_settings";
 	private final LanguageSystem languageSystem;
 
 	@SQLSetup
@@ -28,12 +29,12 @@ public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
 	}
 
 	public UserSettingsRepo(SQLHelperFactory sqlHelperFactory, LongFunction<RestAction<User>> entityGetter, LanguageSystem languageSystem) {
-		super("user_settings", sqlHelperFactory, entityGetter);
+		super(TABLE_NAME, sqlHelperFactory, entityGetter);
 		this.languageSystem = languageSystem;
 	}
 
 	@Override
-	protected UserSettings loadSettingsImpl(long id, SQLHelper helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception {
-		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get(), languageSystem);
+	protected UserSettings loadSettingsImpl(long id, SQLHelperFactory helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception {
+		return new UserSettingsImpl(id, entityGetter, resultSetSupplier.get(), helper, TABLE_NAME, languageSystem);
 	}
 }

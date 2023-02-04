@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.config.discord.api.container;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface SettingsContainer {
@@ -13,4 +14,6 @@ public interface SettingsContainer {
 	List<? extends Setting<?>> getSettings(); // NOSONAR stfu i need this dynamicness
 
 	<T> Setting<T> getSetting(String name);
+
+	void updateSetting(Setting<?> setting) throws SQLException;
 }

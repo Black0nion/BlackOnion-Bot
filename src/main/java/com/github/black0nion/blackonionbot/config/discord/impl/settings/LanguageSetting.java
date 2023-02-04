@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.config.discord.impl.settings;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSetting;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
 import com.github.black0nion.blackonionbot.config.discord.api.validation.Validator;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -15,8 +16,8 @@ public class LanguageSetting extends AbstractSetting<Language> {
 	private final LanguageSystem languageSystem;
 
 	@SafeVarargs
-	public LanguageSetting(String name, LanguageSystem languageSystem, @Nullable Validator<Language>... validators) {
-		super(name, languageSystem.getDefaultLanguage(), Language.class, true, validators);
+	public LanguageSetting(SettingsSaver saver, String name, LanguageSystem languageSystem, @Nullable Validator<Language>... validators) {
+		super(saver, name, languageSystem.getDefaultLanguage(), Language.class, true, validators);
 		this.languageSystem = languageSystem;
 	}
 
@@ -25,6 +26,11 @@ public class LanguageSetting extends AbstractSetting<Language> {
 		if (value instanceof Language language) return language;
 
 		return languageSystem.getLanguageFromCode((String) value);
+	}
+
+	@Override
+	public Object toDatabaseValue() {
+		return getValue() == null ? null : this.getValue().getLanguageCode();
 	}
 
 	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Language.class);

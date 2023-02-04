@@ -35,11 +35,11 @@ public abstract class AbstractSettingsRepo<T extends SettingsContainer, E extend
 		return cache.get(identifier, this::loadSettings);
 	}
 
-	protected abstract T loadSettingsImpl(long id, SQLHelper helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception; // NOSONAR will get wrapped in a SettingsLoadingException
+	protected abstract T loadSettingsImpl(long id, SQLHelperFactory helper, ThrowableSupplier<ResultSet> resultSetSupplier) throws Exception; // NOSONAR will get wrapped in a SettingsLoadingException
 
 	private T loadSettings(long identifier) {
 		try (SQLHelper helper = sqlHelperFactory.create("SELECT * FROM " + tableName + " WHERE identifier = ?", identifier)) {
-			return loadSettingsImpl(identifier, helper, () -> helper.create().executeQuery());
+			return loadSettingsImpl(identifier, sqlHelperFactory, () -> helper.create().executeQuery());
 		} catch (Exception e) {
 			throw new SettingsLoadingException(e);
 		}

@@ -5,9 +5,12 @@ import com.github.black0nion.blackonionbot.config.discord.api.validation.Validat
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public abstract class AbstractSetting<T> implements Setting<T> {
+
+	private final SettingsSaver settingsSaver;
 
 	private final String name;
 	private T value;
@@ -18,7 +21,8 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	private final Validator<T>[] validators;
 
 	@SafeVarargs
-	protected AbstractSetting(String name, T defaultValue, Class<T> type, boolean nullable, @Nullable Validator<T>... validators) {
+	protected AbstractSetting(SettingsSaver settingsSaver, String name, T defaultValue, Class<T> type, boolean nullable, @Nullable Validator<T>... validators) {
+		this.settingsSaver = settingsSaver;
 		this.name = name;
 		this.type = type;
 		this.nullable = nullable;
@@ -53,12 +57,19 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	public void setValue(T value) {
 		if (value == null) {
 			if (nullable) {
-				this.value = null;
+				saveValue(null);
 				return;
 			}
 			throw new IllegalArgumentException("Value is null");
 		}
 		validate(value);
+		saveValue(value);
+	}
+
+	/**
+	 * Only use this if you know what you are doing (e.g. when loading from the database)
+	 */
+	public void saveValueBypassingSave(T value) {
 		this.value = value;
 	}
 
@@ -71,7 +82,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	public void setParsedValue(Object value) throws ParseException {
 		if (value == null) {
 			if (nullable) {
-				this.value = null;
+				saveValue(null);
 				return;
 			}
 			throw new IllegalArgumentException("Value is null");
@@ -96,8 +107,9 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	 * Sets the value, bypassing the validation
 	 * Also notifies the settings container of the change
 	 */
-	private void saveValue(T value) {
+	private void saveValue(T value) throws SettingSaveException {
 		this.value = value;
+		settingsSaver.accept(this);
 	}
 
 	/**
