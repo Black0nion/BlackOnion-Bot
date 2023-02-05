@@ -62,7 +62,7 @@ dependencies {
 
     implementation("com.github.Mokulu:discord-oauth2-api:1.0.2")
 
-    implementation("io.javalin:javalin-bundle:5.1.4")
+    implementation("io.javalin:javalin-bundle:5.3.2")
 
     implementation("org.json:json:20220924")
 
