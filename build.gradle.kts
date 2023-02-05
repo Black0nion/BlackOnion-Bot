@@ -77,7 +77,7 @@ dependencies {
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
 
-    implementation("ch.qos.logback:logback-classic:1.4.4")
+    implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("uk.org.lidalia:sysout-over-slf4j:1.0.2")
     implementation("io.prometheus:simpleclient_logback:0.16.0")
     implementation("com.github.loki4j:loki-logback-appender:1.3.2")
