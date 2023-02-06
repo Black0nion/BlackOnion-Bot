@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.config.discord.user;
 
 import com.github.black0nion.blackonionbot.config.discord.api.container.AbstractSettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.LanguageSetting;
+import com.github.black0nion.blackonionbot.config.discord.impl.settings.LanguageSettingImpl;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.entities.User;
@@ -20,7 +21,7 @@ public class UserSettingsImpl extends AbstractSettingsContainer<User> implements
 	public UserSettingsImpl(long id, LongFunction<RestAction<User>> userGetter, ResultSet resultSet, SQLHelperFactory helperFactory, LanguageSystem languageSystem) throws Exception {
 		super(TABLE_NAME, id, userGetter, helperFactory);
 
-		language = addSetting(new LanguageSetting(settingsSaver, "language", languageSystem));
+		language = addSetting(new LanguageSettingImpl(settingsSaver, "language", languageSystem));
 
 		this.loadSettings(resultSet);
 	}
