@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.information;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
@@ -33,7 +34,7 @@ public class WeatherCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final String city = e.getOption(CITY_NAME, OptionMapping::getAsString);
 		try {
 			final JSONObject weather = getWeather(city);

@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.systems.language.Language;
@@ -41,7 +42,7 @@ public class HangmanCommand extends SlashCommand implements Reloadable {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		if (ingamePlayers.contains(author.getIdLong())) {
 			cmde.error("alreadyingame", "nomultitasking");
 			return;

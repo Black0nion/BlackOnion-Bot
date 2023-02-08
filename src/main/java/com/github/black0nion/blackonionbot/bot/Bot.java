@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
@@ -208,7 +209,8 @@ public class Bot extends ListenerAdapter {
 		injectorMap.add(embedUtils);
 
 		slashCommandBase = new SlashCommandBase(config, injector, reloadSystem);
-		injectorMap.add(slashCommandBase);
+		injectorMap.add(SlashCommandBase.class, slashCommandBase);
+		injectorMap.add(CommandRegistry.class, slashCommandBase);
 
 		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem);
 		injectorMap.add(giveawaySystem);
@@ -255,10 +257,12 @@ public class Bot extends ListenerAdapter {
 			System.exit(-1);
 			return;
 		}
-		UserSettingsRepo settingsRepo = injectorMap.add(new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
-		slashCommandBase.setUserSettingsRepo(settingsRepo);
-
 		logger.info("JDA started successfully!");
+
+		UserSettingsRepo userSettingsRepo = injectorMap.add(new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
+		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
+		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
+		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
 
 		slashCommandBase.addCommands();
 

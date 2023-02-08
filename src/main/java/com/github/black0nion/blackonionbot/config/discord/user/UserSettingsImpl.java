@@ -14,14 +14,14 @@ import java.util.function.LongFunction;
 
 import static com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo.TABLE_NAME;
 
-public class UserSettingsImpl extends AbstractSettingsContainer<User> implements UserSettings {
+public class UserSettingsImpl extends AbstractSettingsContainer<RestAction<User>> implements UserSettings {
 
 	private final LanguageSetting language;
 
 	public UserSettingsImpl(long id, LongFunction<RestAction<User>> userGetter, ResultSet resultSet, SQLHelperFactory helperFactory, LanguageSystem languageSystem) throws Exception {
 		super(TABLE_NAME, id, userGetter, helperFactory);
 
-		language = addSetting(new LanguageSettingImpl(settingsSaver, "language", languageSystem));
+		language = addSetting(new LanguageSettingImpl.Builder(settingsSaver, "language", languageSystem));
 
 		this.loadSettings(resultSet);
 	}

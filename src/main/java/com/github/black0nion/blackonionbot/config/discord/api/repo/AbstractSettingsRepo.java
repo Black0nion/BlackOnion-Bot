@@ -8,24 +8,26 @@ import com.github.black0nion.blackonionbot.config.discord.exception.SettingsLoad
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.utils.ThrowableSupplier;
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.sql.ResultSet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 
-public abstract class AbstractSettingsRepo<T extends SettingsContainer, E extends ISnowflake> implements SettingsRepo<T> {
+/**
+ * @param <T> The type of the settings container
+ * @param <E> The type of the entity, e.g. {@link net.dv8tion.jda.api.entities.User} or {@link net.dv8tion.jda.api.entities.Guild Guild}. This can also be a {@link net.dv8tion.jda.api.requests.RestAction RestAction}
+ */
+public abstract class AbstractSettingsRepo<T extends SettingsContainer, E> implements SettingsRepo<T> {
 
 	private final String tableName;
 	protected final SQLHelperFactory sqlHelperFactory;
-	protected final LongFunction<RestAction<E>> entityGetter;
+	protected final LongFunction<E> entityGetter;
 
 	private final Cache<Long, T> cache = Caffeine.newBuilder()
 		.expireAfterAccess(1, TimeUnit.HOURS)
 		.build();
 
-	protected AbstractSettingsRepo(String tableName, SQLHelperFactory sqlHelperFactory, LongFunction<RestAction<E>> entityGetter) {
+	protected AbstractSettingsRepo(String tableName, SQLHelperFactory sqlHelperFactory, LongFunction<E> entityGetter) {
 		this.tableName = tableName;
 		this.sqlHelperFactory = sqlHelperFactory;
 		this.entityGetter = entityGetter;

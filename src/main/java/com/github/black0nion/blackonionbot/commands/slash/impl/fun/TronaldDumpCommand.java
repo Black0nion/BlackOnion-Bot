@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
@@ -22,7 +23,7 @@ public class TronaldDumpCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		Bot.getInstance().getHttpClient().sendAsync(HttpRequest.newBuilder(URI.create("https://tronalddump.io/random/quote")).header("Accept", "application/json").build(), HttpResponse.BodyHandlers.ofString())
 			.thenApply(HttpResponse::body).thenAccept(response ->
 				cmde.reply(cmde.success()

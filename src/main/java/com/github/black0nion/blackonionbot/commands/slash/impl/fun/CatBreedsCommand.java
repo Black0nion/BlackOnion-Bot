@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -55,7 +56,7 @@ public class CatBreedsCommand extends SlashCommand {
 	}, 1, TimeUnit.DAYS);
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		try {
 			JSONArray response = breedsCache.get();
 

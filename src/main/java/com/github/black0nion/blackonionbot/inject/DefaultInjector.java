@@ -18,7 +18,6 @@ public class DefaultInjector implements Injector {
 		requireNonNull(config, "config");
 		requireNonNull(injectorMap, "injectorMap");
 		this.injectorMap = injectorMap;
-		injectorMap.put(Injector.class, this);
 
 		if (!injectorMap.containsKey(Config.class)) {
 			injectorMap.put(Config.class, config);
@@ -72,5 +71,12 @@ public class DefaultInjector implements Injector {
 	@Override
 	public <T> T getInstance(Class<T> wantedClass) {
 		return injectorMap.getInstance(wantedClass);
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultInjector{" +
+				"injectorMap=" + injectorMap +
+				'}';
 	}
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
-public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils {
+public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils, NamedCommand {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 

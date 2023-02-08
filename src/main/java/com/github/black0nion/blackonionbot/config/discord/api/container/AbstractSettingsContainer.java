@@ -1,28 +1,31 @@
 package com.github.black0nion.blackonionbot.config.discord.api.container;
 
+import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSettingBuilder;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingSaveException;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.LongFunction;
 
-public abstract class AbstractSettingsContainer<E extends ISnowflake> implements SettingsContainer {
+/**
+ * @param <E> The type of the entity, e.g. {@link net.dv8tion.jda.api.entities.User} or {@link net.dv8tion.jda.api.entities.Guild Guild}. This can also be a {@link net.dv8tion.jda.api.requests.RestAction RestAction}
+ */
+public abstract class AbstractSettingsContainer<E> implements SettingsContainer {
 
 	protected final List<Setting<?>> settings = new LinkedList<>();
 	protected final long id;
-	protected final LongFunction<RestAction<E>> entityGetter;
+	protected final LongFunction<E> entityGetter;
 	protected final SettingsSaver settingsSaver;
 	private boolean firstRun = false;
 
-	protected AbstractSettingsContainer(String tableName, long id, LongFunction<RestAction<E>> entityGetter, SQLHelperFactory sqlHelperFactory) {
+	protected AbstractSettingsContainer(String tableName, long id, LongFunction<E> entityGetter, SQLHelperFactory sqlHelperFactory) {
 		this.id = id;
 		this.entityGetter = entityGetter;
 		this.settingsSaver = setting -> {
@@ -62,9 +65,7 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 			// Check if the column exists
 			resultSet.findColumn(setting.getName());
 
-			if (setting.canParse(String.class))
-				setting.setParsedValueBypassing(resultSet.getString(setting.getName()));
-			else if (setting.canParse(Integer.class))
+			if (setting.canParse(Integer.class))
 				setting.setParsedValueBypassing(resultSet.getInt(setting.getName()));
 			else if (setting.canParse(Long.class))
 				setting.setParsedValueBypassing(resultSet.getLong(setting.getName()));
@@ -80,6 +81,8 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 				setting.setParsedValueBypassing(resultSet.getByte(setting.getName()));
 			else if (setting.canParse(Character.class))
 				setting.setParsedValueBypassing(resultSet.getString(setting.getName()).charAt(0));
+			else if (setting.canParse(String.class))
+				setting.setParsedValueBypassing(resultSet.getString(setting.getName()));
 			else
 				throw new IllegalArgumentException("Cannot parse setting " + setting);
 		}
@@ -91,12 +94,17 @@ public abstract class AbstractSettingsContainer<E extends ISnowflake> implements
 		return id;
 	}
 
+	public <T extends Setting<?>> T addSetting(AbstractSettingBuilder<?, T, ?> settingBuilder) {
+		return addSetting(settingBuilder.build());
+	}
+
 	public <T extends Setting<?>> T addSetting(T setting) {
+		Objects.requireNonNull(setting, "Setting cannot be null");
 		settings.add(setting);
 		return setting;
 	}
 
-	public RestAction<E> retrieveEntity() {
+	public E retrieveEntity() {
 		return entityGetter.apply(id);
 	}
 

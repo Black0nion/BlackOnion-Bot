@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.slash;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
@@ -17,12 +18,11 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
  * This class represents a SlashCommand that can be executed by users.
- * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, BlackMember, BlackUser, BlackGuild, TextChannel, UserSettings) execute} method.
+ * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, BlackMember, BlackUser, BlackGuild, TextChannel, UserSettings, GuildSettings) execute} method.
  * <p>
  * Implement a command by doing this:
  * <pre>{@code
@@ -77,7 +77,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	}
 	//endregion
 
-	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings) throws SQLException;
+	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
 
 	protected void updateAutoComplete(Map.Entry<String, StartsWithArrayList> entry) {
 		Checks.notNull(entry, "Entry");

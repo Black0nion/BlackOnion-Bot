@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -52,8 +53,8 @@ public class ToggleCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings) {
-		final AbstractCommand<?, ?> command = SlashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+		final AbstractCommand<?, ?> command = slashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
 		if (command == null || (command instanceof SlashCommand slashCommand && slashCommand.isHidden(author))) {
 			cmde.send("commandnotfound");
 			return;
@@ -66,12 +67,11 @@ public class ToggleCommand extends SlashCommand {
 
 		Boolean newStatus = e.getOption("on", OptionMapping::getAsBoolean);
 		if (newStatus == null) {
-			cmde.send("commandstatus", new Placeholder("cmd", command.getName()), new Placeholder("status", cmde.getTranslation(guild.isCommandActivated(command) ? "on" : "off")));
+			cmde.send("commandstatus", new Placeholder("cmd", command.getName()), new Placeholder("status", cmde.getTranslation(guildSettings.isCommandActivated(command) ? "on" : "off")));
 		} else {
-			if (guild.setCommandActivated(command, newStatus)) {
-				final String commandName = command.getName().toUpperCase();
-				cmde.success("commandtoggled", "commandisnow", new Placeholder(COMMAND, commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
-			}
+			guildSettings.setCommandActivated(command, newStatus);
+			final String commandName = command.getName().toUpperCase();
+			cmde.success("commandtoggled", "commandisnow", new Placeholder(COMMAND, commandName), new Placeholder("status", cmde.getTranslation(newStatus ? "on" : "off")));
 		}
 	}
 }

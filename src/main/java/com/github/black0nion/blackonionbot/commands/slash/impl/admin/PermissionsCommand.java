@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.admin;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -48,7 +49,7 @@ public class PermissionsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final String mode = cmde.getSubcommandName();
 
 		if (Utils.equalsOneIgnoreCase(mode, "add", "remove", "list")) {

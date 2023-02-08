@@ -1,15 +1,18 @@
 package com.github.black0nion.blackonionbot.config.discord.impl.settings;
 
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSetting;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSettingBuilder;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 public class BooleanSettingImpl extends AbstractSetting<Boolean> implements BooleanSetting {
 
-	public BooleanSettingImpl(SettingsSaver settingsSaver, String name, Boolean value) {
-		super(settingsSaver, name, value, Boolean.class, false);
+	public BooleanSettingImpl(SettingsSaver settingsSaver, String name, Boolean value, Permission[] permissions, CustomPermission[] customPermissions) {
+		super(settingsSaver, name, value, Boolean.class, false, permissions, customPermissions);
 	}
 
 	@Override
@@ -28,5 +31,22 @@ public class BooleanSettingImpl extends AbstractSetting<Boolean> implements Bool
 	@Override
 	public List<Class<?>> canParse() {
 		return CAN_PARSE;
+	}
+
+	public static class Builder extends AbstractSettingBuilder<Boolean, BooleanSetting, Builder> {
+
+		public Builder(SettingsSaver saver, String name) {
+			super(saver, name, Boolean.class);
+		}
+
+		public Builder(SettingsSaver saver, String name, boolean defaultValue) {
+			super(saver, name, Boolean.class);
+			this.defaultValue = defaultValue;
+		}
+
+		@Override
+		public BooleanSetting build() {
+			return new BooleanSettingImpl(settingsSaver, name, defaultValue, permissions, customPermissions);
+		}
 	}
 }

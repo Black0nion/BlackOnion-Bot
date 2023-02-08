@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -53,7 +54,7 @@ public class CatCommand extends SlashCommand {
 	private final Map<String, String> nameToId = new HashMap<>();
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		String breed = e.getOption("breed", OptionMapping::getAsString);
 		// check if breed is already a breed id, if it's not, check if it's a breed name
 		if (breed != null && !nameToId.isEmpty() && !nameToId.containsValue(breed)) {

@@ -1,12 +1,8 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
-import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
-import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
@@ -14,6 +10,8 @@ import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
@@ -28,7 +26,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class BlackGuild extends GuildImpl {
@@ -214,39 +211,6 @@ public class BlackGuild extends GuildImpl {
 
 	public @Nullable List<String> getDisabledCommands() {
 		return this.disabledCommands;
-	}
-
-	public void setDisabledCommands(final String[] disabledCommands) {
-		this.setDisabledCommands(Arrays.stream(disabledCommands)
-			.map(SlashCommandBase::getCommand)
-			.filter(Objects::nonNull)
-			.map(AbstractCommand::getName)
-			.collect(Collectors.toList()));
-	}
-
-	public void setDisabledCommands(final List<String> disabledCommands) {
-		this.disabledCommands = disabledCommands;
-	}
-
-	public boolean isCommandActivated(final AbstractCommand<?, ?> cmd) {
-		return this.disabledCommands == null || !this.disabledCommands.contains(cmd.getName());
-	}
-
-	public boolean setCommandActivated(final AbstractCommand<?, ?> cmd, final boolean activated) {
-		if (!cmd.isToggleable()) return false;
-		if (this.disabledCommands == null) {
-			if (activated) return true;
-			else this.disabledCommands = new ArrayList<>();
-		}
-
-		if (!activated) {
-			this.disabledCommands.add(cmd.getName());
-		} else {
-			this.disabledCommands.remove(cmd.getName());
-		}
-
-		this.setDisabledCommands(this.disabledCommands);
-		return true;
 	}
 
 	public AntiSpoilerSystem.AntiSpoilerType getAntiSpoilerType() {

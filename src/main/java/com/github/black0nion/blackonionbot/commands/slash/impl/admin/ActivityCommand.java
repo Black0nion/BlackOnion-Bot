@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.admin;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -44,7 +45,7 @@ public class ActivityCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		if (cmde.getSubcommandName().equalsIgnoreCase("set")) {
 			final String text = e.getOption("text", OptionMapping::getAsString);
 			Activity.ActivityType type = parse(e.getOption("type", OptionMapping::getAsString));

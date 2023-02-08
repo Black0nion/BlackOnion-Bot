@@ -14,14 +14,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.LongFunction;
 
-public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, User> {
+public class UserSettingsRepo extends AbstractSettingsRepo<UserSettings, RestAction<User>> {
 
 	public static final String TABLE_NAME = "user_settings";
 	private final LanguageSystem languageSystem;
 
 	@SQLSetup
 	public static void setup(SQLHelperFactory sqlHelperFactory) throws SQLException {
-		try (SQLHelper helper = sqlHelperFactory.create("CREATE TABLE IF NOT EXISTS user_settings (identifier BIGINT PRIMARY KEY, language VARCHAR(5), FOREIGN KEY (language) REFERENCES language (code))");
+		try (SQLHelper helper = sqlHelperFactory.create("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (identifier BIGINT PRIMARY KEY, language VARCHAR(5), FOREIGN KEY (language) REFERENCES language (code))");
 				PreparedStatement ps = helper.create()) {
 			ps.executeUpdate();
 		}

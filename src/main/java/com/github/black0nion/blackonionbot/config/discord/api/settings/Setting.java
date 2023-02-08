@@ -1,10 +1,15 @@
 package com.github.black0nion.blackonionbot.config.discord.api.settings;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
 import com.github.black0nion.blackonionbot.config.discord.api.validation.Validator;
+import com.github.black0nion.blackonionbot.config.discord.impl.settings.SettingSerializer;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import net.dv8tion.jda.api.Permission;
 
 import java.util.List;
 
+@JsonSerialize(using = SettingSerializer.class)
 public interface Setting<T> {
 
 	String getName();
@@ -14,6 +19,10 @@ public interface Setting<T> {
 	T getValue();
 
 	Object toDatabaseValue();
+
+	default Object toSerializedValue() {
+		return getValue();
+	}
 
 	void setValue(T value);
 	void setValueBypassing(T value);
@@ -33,4 +42,7 @@ public interface Setting<T> {
 	void setParsedValueBypassing(Object value) throws ParseException;
 
 	Validator<T>[] getValidators();
+
+	Permission[] getRequiredPermissions();
+	CustomPermission[] getRequiredCustomPermissions();
 }

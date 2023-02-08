@@ -7,6 +7,7 @@ import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.commands.common.Category;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
@@ -62,7 +63,7 @@ public class HelpCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, @NotNull BlackUser author, BlackGuild guild, @NotNull TextChannel channel, UserSettings userSettings) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackMember member, @NotNull BlackUser author, BlackGuild guild, @NotNull TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
 		if (command != null) {
 			for (final Pair<Long, AbstractCommand<?, ?>> entry : slashCommandBase.getCommands().values()) {

@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.commands.slash.impl.admin.BanUsageCom
 import com.github.black0nion.blackonionbot.commands.slash.impl.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.information.HelpCommand;
 import com.github.black0nion.blackonionbot.config.discord.api.repo.SettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
@@ -65,10 +66,11 @@ import java.util.stream.Collectors;
  *<br>
  * It'll handle things like permissions, command auto-complete, executing commands, etc.
  */
-public class SlashCommandBase extends ListenerAdapter implements Reloadable {
+public class SlashCommandBase extends ListenerAdapter implements Reloadable, CommandRegistry {
 
 	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
 	private SettingsRepo<UserSettings> userSettingsRepo;
+	private SettingsRepo<GuildSettings> guildSettingsRepo;
 
 	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
 		return commandsInCategory;
@@ -112,6 +114,11 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 	public void setUserSettingsRepo(SettingsRepo<UserSettings> userSettingsRepo) {
 		if (this.userSettingsRepo != null) throw new IllegalStateException("UserSettingsRepo already set!");
 		this.userSettingsRepo = userSettingsRepo;
+	}
+
+	public void setGuildSettingsRepo(SettingsRepo<GuildSettings> guildSettingsRepo) {
+		if (this.guildSettingsRepo != null) throw new IllegalStateException("GuildSettingsRepo already set!");
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -204,12 +211,14 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends SlashCommand> T getCommand(Class<T> clazz) {
 		return (T) commandInstances.get(clazz);
 	}
 
 	@Nullable
-	public static AbstractCommand<?, ?> getCommand(String name) {
+	@Override
+	public AbstractCommand<?, ?> getCommand(String name) {
 		if (name == null) return null;
 		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
 	}
@@ -327,8 +336,8 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 		}
 
-		final UserSettings userSettings = Utils.tryGet(() -> userSettingsRepo
-			.getSettings(author.getIdLong()));
+		final UserSettings userSettings = userSettingsRepo.getSettings(author.getIdLong());
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild.getIdLong());
 
 		if (locked) {
 			// haha funni
@@ -349,7 +358,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings);
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
-			final boolean disabled = !guild.isCommandActivated(cmd);
+			final boolean disabled = guildSettings.getDisabledCommands().contains(cmd);
 			if (disabled) {
 				cmde.send("commanddisabled", new Placeholder("cmd", cmd.getName()));
 				return;
@@ -384,7 +393,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			commandPool.submit(() -> {
 				try {
 					if (cmd instanceof SlashCommand slashCommand) {
-						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel, userSettings);
+						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel, userSettings, guildSettings);
 					} else if (cmd instanceof MessageCommand messageCommand) {
 						messageCommand.execute((MessageCommandEvent) cmde, (MessageContextInteractionEvent) event, member, author, guild, channel, ((MessageContextInteractionEvent) event).getTarget());
 					}

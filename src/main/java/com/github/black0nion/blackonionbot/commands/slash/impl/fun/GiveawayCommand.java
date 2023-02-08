@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
@@ -62,7 +63,7 @@ public class GiveawayCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case "create" -> createGiveaway(cmde, e, author, guild, channel);
 			case "end" -> endGiveaway(cmde, e, member, author, guild, channel);

@@ -5,6 +5,7 @@ import com.github.black0nion.blackonionbot.commands.common.utils.UserRespondUtil
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.games.tictactoe.TicTacToe;
@@ -153,7 +154,7 @@ public class TicTacToeCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		User challenged = e.getOption(USER, OptionMapping::getAsUser);
 
 		if (TicTacToeGameManager.isIngame(author.getId()) || (challenged != null && TicTacToeGameManager.isIngame(challenged.getId()))) {

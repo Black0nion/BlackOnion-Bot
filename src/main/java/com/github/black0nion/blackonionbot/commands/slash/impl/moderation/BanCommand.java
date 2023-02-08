@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -56,7 +57,7 @@ public class BanCommand extends SlashCommand {
 	//endregion
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		var userOptionMapping = e.getOption(USER);
 		var banUser = Objects.requireNonNull(userOptionMapping, "The user is null").getAsUser();
 		var banMember = userOptionMapping.getAsMember();

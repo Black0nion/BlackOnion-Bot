@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -49,7 +50,7 @@ public class LanguageCommand extends SlashCommand {
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		String subcommandGroup = null;
 		String subcommand = cmde.getSubcommandName();
 		Language lang = null;

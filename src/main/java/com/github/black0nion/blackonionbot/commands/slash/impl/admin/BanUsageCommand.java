@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.admin;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
@@ -61,7 +62,7 @@ public class BanUsageCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild executedGuild, TextChannel channel, UserSettings userSettings) throws SQLException {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild executedGuild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final User user = e.getOption("targetuser", OptionMapping::getAsUser);
 		final String guildIdString = e.getOption("targetguild", OptionMapping::getAsString);
 

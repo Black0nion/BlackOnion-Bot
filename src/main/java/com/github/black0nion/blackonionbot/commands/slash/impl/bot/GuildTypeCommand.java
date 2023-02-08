@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
@@ -37,7 +38,7 @@ public class GuildTypeCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		long guildID = Long.parseLong(Objects.requireNonNull(e.getOption("guildid", OptionMapping::getAsString)));
 		final Guild mentionedGuild = e.getJDA().getGuildById(guildID);
 		final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);

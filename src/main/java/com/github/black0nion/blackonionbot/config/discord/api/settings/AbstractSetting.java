@@ -2,6 +2,8 @@ package com.github.black0nion.blackonionbot.config.discord.api.settings;
 
 import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
 import com.github.black0nion.blackonionbot.config.discord.api.validation.Validator;
+import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,15 +21,26 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Nullable
 	private final Validator<T>[] validators;
 
+	private final Permission[] permissions;
+	private final CustomPermission[] customPermissions;
+
 	@SafeVarargs
-	protected AbstractSetting(SettingsSaver settingsSaver, String name, T defaultValue, Class<T> type, boolean nullable, @Nullable Validator<T>... validators) {
+	protected AbstractSetting(SettingsSaver settingsSaver, String name, T defaultValue, Class<T> type, boolean nullable, Permission[] permissions, CustomPermission[] customPermissions, @Nullable Validator<T>... validators) {
 		this.settingsSaver = settingsSaver;
 		this.name = name;
 		this.type = type;
 		this.nullable = nullable;
+		this.permissions = permissions;
+		this.customPermissions = customPermissions;
 		this.validators = validators;
-		validate(defaultValue);
-		setValueBypassing(defaultValue);
+		if (defaultValue != null) {
+			validate(defaultValue);
+			this.value = defaultValue;
+		} else if (!nullable) {
+			throw new IllegalArgumentException("Default value is null");
+		} else {
+			this.value = null;
+		}
 	}
 
 	@Override
@@ -53,6 +66,16 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Override
 	public Validator<T>[] getValidators() {
 		return validators;
+	}
+
+	@Override
+	public Permission[] getRequiredPermissions() {
+		return permissions;
+	}
+
+	@Override
+	public CustomPermission[] getRequiredCustomPermissions() {
+		return customPermissions;
 	}
 
 	/**
