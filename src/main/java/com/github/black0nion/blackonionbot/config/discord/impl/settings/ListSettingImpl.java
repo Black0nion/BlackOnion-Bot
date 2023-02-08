@@ -13,17 +13,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting<L> implements ListSetting<T, L> {
 
 	private final Function<String, T> parseFunction;
 	private final Function<T, String> serializeFunction;
+	private final Supplier<L> listSupplier;
 
 	@SafeVarargs
 	protected ListSettingImpl(SettingsSaver settingsSaver,
 		String name,
 		L defaultValue,
+		Supplier<L> listSupplier,
 		Function<String, T> parseFunction,
 		Function<T, String> serializeFunction,
 		Class<L> type,
@@ -31,7 +34,8 @@ public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting
 		CustomPermission[] customPermissions,
 		@Nullable Validator<L>... validators
 	) {
-		super(settingsSaver, name, defaultValue, type, false, permissions, customPermissions, validators);
+		super(settingsSaver, name, defaultValue != null ? defaultValue : listSupplier.get(), type, false, permissions, customPermissions, validators);
+		this.listSupplier = listSupplier;
 		Objects.requireNonNull(parseFunction, "parseFunction");
 		Objects.requireNonNull(serializeFunction, "serializeFunction");
 		this.parseFunction = parseFunction;
@@ -46,8 +50,10 @@ public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting
 		}
 
 		if (value instanceof String str) {
+			if (str.isEmpty()) return listSupplier.get();
+
 			String[] split = str.split(",");
-			L list = getType().getConstructor().newInstance();
+			L list = listSupplier.get();
 			for (String s : split) {
 				list.add(parseFunction.apply(s));
 			}
@@ -77,11 +83,13 @@ public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting
 
 	public static final class Builder<T, L extends Collection<T>> extends AbstractSettingBuilder<L, ListSetting<T, L>, Builder<T, L>> {
 
+		private final Supplier<L> emptyListSupplier;
 		private final Function<String, T> parseFunction;
 		private final Function<T, String> serializeFunction;
 
-		public Builder(SettingsSaver saver, String name, Class<? extends Collection> listType, Function<String, T> parseFunction, Function<T, String> serializeFunction) {
+		public Builder(SettingsSaver saver, String name, Class<? extends Collection> listType, Supplier<L> emptyListSupplier, Function<String, T> parseFunction, Function<T, String> serializeFunction) {
 			super(saver, name, (Class<L>) listType);
+			this.emptyListSupplier = emptyListSupplier;
 			this.parseFunction = parseFunction;
 			this.serializeFunction = serializeFunction;
 		}
@@ -93,7 +101,7 @@ public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting
 
 		@Override
 		public ListSetting<T, L> build() {
-			return new ListSettingImpl<>(settingsSaver, name, defaultValue, parseFunction, serializeFunction, type, permissions, customPermissions, validators);
+			return new ListSettingImpl<>(settingsSaver, name, defaultValue, emptyListSupplier, parseFunction, serializeFunction, type, permissions, customPermissions, validators);
 		}
 	}
 }

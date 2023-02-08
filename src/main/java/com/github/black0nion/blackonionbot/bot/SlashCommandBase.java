@@ -220,7 +220,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 	@Override
 	public AbstractCommand<?, ?> getCommand(String name) {
 		if (name == null) return null;
-		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
+		return Utils.tryGet(() -> commands.get(name).getSecond());
 	}
 
 	@Override

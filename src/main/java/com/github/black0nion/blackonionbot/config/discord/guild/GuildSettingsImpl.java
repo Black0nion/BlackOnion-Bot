@@ -54,7 +54,7 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 
 		language = addSetting(new LanguageSettingImpl.Builder(settingsSaver, "language", languageSystem));
 		disabledCommands = addSetting(
-			new ListSettingImpl.Builder<NamedCommand, Set<NamedCommand>>(settingsSaver, "disabled_commands", Set.class, commandRegistry::getCommand, NamedCommand::getName)
+			new ListSettingImpl.Builder<NamedCommand, Set<NamedCommand>>(settingsSaver, "disabled_commands", Set.class, HashSet::new, commandRegistry::getCommand, NamedCommand::getName)
 				.defaultValue(new HashSet<>())
 				.permissions(Permission.ADMINISTRATOR)
 		);
@@ -108,7 +108,6 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 		return antiSpoiler;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands() {
 		return disabledCommands;
