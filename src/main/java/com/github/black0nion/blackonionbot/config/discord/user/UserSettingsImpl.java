@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.ResultSet;
 import java.util.function.LongFunction;
 
-import static com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo.TABLE_NAME;
+import static com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepoImpl.TABLE_NAME;
 
 public class UserSettingsImpl extends AbstractSettingsContainer<RestAction<User>> implements UserSettings {
 

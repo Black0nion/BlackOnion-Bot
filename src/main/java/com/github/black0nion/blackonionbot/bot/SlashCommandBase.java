@@ -10,9 +10,10 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.information.HelpCommand;
-import com.github.black0nion.blackonionbot.config.discord.api.repo.SettingsRepo;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
@@ -69,8 +70,8 @@ import java.util.stream.Collectors;
 public class SlashCommandBase extends ListenerAdapter implements Reloadable, CommandRegistry {
 
 	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
-	private SettingsRepo<UserSettings> userSettingsRepo;
-	private SettingsRepo<GuildSettings> guildSettingsRepo;
+	private UserSettingsRepo userSettingsRepo;
+	private GuildSettingsRepo guildSettingsRepo;
 
 	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
 		return commandsInCategory;
@@ -111,12 +112,12 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		reloadSystem.registerReloadable(this);
 	}
 
-	public void setUserSettingsRepo(SettingsRepo<UserSettings> userSettingsRepo) {
+	public void setUserSettingsRepo(UserSettingsRepo userSettingsRepo) {
 		if (this.userSettingsRepo != null) throw new IllegalStateException("UserSettingsRepo already set!");
 		this.userSettingsRepo = userSettingsRepo;
 	}
 
-	public void setGuildSettingsRepo(SettingsRepo<GuildSettings> guildSettingsRepo) {
+	public void setGuildSettingsRepo(GuildSettingsRepo guildSettingsRepo) {
 		if (this.guildSettingsRepo != null) throw new IllegalStateException("GuildSettingsRepo already set!");
 		this.guildSettingsRepo = guildSettingsRepo;
 	}
@@ -336,8 +337,8 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 		}
 
-		final UserSettings userSettings = userSettingsRepo.getSettings(author.getIdLong());
-		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild.getIdLong());
+		final UserSettings userSettings = userSettingsRepo.getSettings(author);
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 
 		if (locked) {
 			// haha funni
@@ -385,7 +386,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions))
 				return;
 
-			if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
+			if (cmd.isPremiumCommand() && !guildSettings.getGuildType().getValue().higherThanOrEqual(GuildType.PREMIUM)) {
 				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, guild)).queue();
 				return;
 			}

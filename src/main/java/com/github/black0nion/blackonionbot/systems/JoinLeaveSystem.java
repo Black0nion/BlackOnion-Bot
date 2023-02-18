@@ -1,6 +1,7 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.misc.enums.DrawType;
@@ -45,12 +46,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	private final Settings settings;
 	private final LanguageSystem languageSystem;
 	private final EmbedUtils embedUtils;
+	private final GuildSettingsRepo guildSettingsRepo;
 
-	public JoinLeaveSystem(Config config, Settings settings, LanguageSystem languageSystem, EmbedUtils embedUtils) {
+	public JoinLeaveSystem(Config config, Settings settings, LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo) {
 		this.config = config;
 		this.settings = settings;
 		this.languageSystem = languageSystem;
 		this.embedUtils = embedUtils;
+		this.guildSettingsRepo = guildSettingsRepo;
 		try {
 			defaultBackGround = ImageIO.read(Objects.requireNonNull(this.getClass().getResource("/background.png")));
 		} catch (final Exception e) {
@@ -133,7 +136,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 					e.printStackTrace();
 				}
 
-				if (config.getRunMode() == RunMode.BETA && !guild.getGuildType().higherThanOrEqual(GuildType.BETA)) {
+				if (config.getRunMode() == RunMode.BETA && !guildSettingsRepo.getSettings(guild).getGuildType().getValue().higherThanOrEqual(GuildType.BETA)) {
 					guild.leave().queue();
 					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
 					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());

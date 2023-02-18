@@ -4,7 +4,6 @@ import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.misc.ConfigGetter;
 import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
 import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
@@ -70,7 +69,6 @@ public class BlackGuild extends GuildImpl {
 	}
 
 	private Language language;
-	private GuildType guildType;
 	private AntiSpoilerSystem.AntiSpoilerType antiSpoilerType;
 	private List<String> antiSwearWhitelist;
 	private String joinMessage;
@@ -129,19 +127,6 @@ public class BlackGuild extends GuildImpl {
 
 	public void setLanguage(final @Nullable Language language) {
 		this.language = language;
-	}
-
-	@DashboardGetter("setup.guildtype")
-	public GuildType getGuildType() {
-		return this.guildType;
-	}
-
-	public void setGuildType(final GuildType type) {
-		this.guildType = type;
-	}
-
-	public boolean isPremium() {
-		return this.getGuildType().higherThanOrEqual(GuildType.PREMIUM);
 	}
 
 	@DashboardGetter("utils.joinleave.join.message")
@@ -286,7 +271,6 @@ public class BlackGuild extends GuildImpl {
 		return "BlackGuild{" +
 			"selfBlackMember=" + selfBlackMember +
 			", language=" + language +
-			", guildType=" + guildType +
 			", antiSpoilerType=" + antiSpoilerType +
 			", antiSwearWhitelist=" + antiSwearWhitelist +
 			", joinMessage='" + joinMessage + '\'' +

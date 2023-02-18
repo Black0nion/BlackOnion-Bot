@@ -3,7 +3,8 @@ package com.github.black0nion.blackonionbot.bot;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
-import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepoImpl;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepoImpl;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
@@ -232,7 +233,6 @@ public class Bot extends ListenerAdapter {
 				slashCommandBase,
 				this,
 				new ReactionRoleSystem(sqlHelperFactory),
-				new JoinLeaveSystem(config, settings, languageSystem, embedUtils),
 				new AntiSpoilerSystem(languageSystem, embedUtils),
 				statisticsManager,
 				eventWaiter
@@ -258,11 +258,12 @@ public class Bot extends ListenerAdapter {
 		}
 		logger.info("JDA started successfully!");
 
-		UserSettingsRepo userSettingsRepo = injectorMap.add(new UserSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
-		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
+		UserSettingsRepoImpl userSettingsRepo = injectorMap.add(new UserSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
+		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
 		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
 		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
 
+		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo));
 		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
 
 		slashCommandBase.addCommands();

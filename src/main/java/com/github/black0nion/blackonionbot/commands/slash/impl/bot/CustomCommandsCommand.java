@@ -116,7 +116,7 @@ public class CustomCommandsCommand extends SlashCommand {
 				cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
 			case CREATE -> {
 				final String command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
-				final int maxCount = guild.getGuildType().getMaxCustomCommands();
+				final int maxCount = guildSettings.getGuildType().getValue().getMaxCustomCommands();
 				if (guild.getCustomCommands().size() >= maxCount) {
 					cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
 					return;

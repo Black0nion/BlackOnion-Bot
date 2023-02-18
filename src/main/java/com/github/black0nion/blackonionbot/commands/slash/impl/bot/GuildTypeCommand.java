@@ -50,14 +50,14 @@ public class GuildTypeCommand extends SlashCommand {
 		}
 
 		if (newGuildType == null) {
-			cmde.send("guildtypeis", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", mentionedBlackGuild.getGuildType().name()));
+			cmde.send("guildtypeis", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", guildSettings.getGuildType().getValue().name()));
 			return;
 		}
 
 		final GuildType parsedGuildType = GuildType.parse(newGuildType);
 		if (parsedGuildType == null) throw new IllegalArgumentException("Invalid guild type");
 
-		mentionedBlackGuild.setGuildType(parsedGuildType);
+		guildSettings.getGuildType().setValue(parsedGuildType);
 		cmde.send("guildtypesetto", new Placeholder("guild", mentionedBlackGuild.getEscapedName() + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
 	}
 }
