@@ -80,8 +80,6 @@ public class BlackGuild extends GuildImpl {
 	@Nullable
 	private List<String> disabledCommands;
 	private long suggestionsChannel;
-	private List<Long> autoRoles;
-	private boolean loop;
 	private HashMap<String, CustomCommand> customCommands;
 	private final List<Warn> warns = new ArrayList<>();
 
@@ -256,35 +254,10 @@ public class BlackGuild extends GuildImpl {
 		return this.selfBlackMember;
 	}
 
-	public void removeAutoRole(final long roleId) {
-		this.autoRoles.remove(roleId);
-	}
-
-	public void addAutoRole(final long roleId) {
-		if (!this.autoRoles.contains(roleId)) {
-			this.autoRoles.add(roleId);
-		}
-	}
-
-	public void setAutoRoles(final List<Long> autoRoles) {
-		this.autoRoles = autoRoles;
-	}
-
-	public List<Long> getAutoRoles() {
-		return this.autoRoles;
-	}
-
 	public void setSelfBlackMember(final BlackMember selfBlackMember) {
 		this.selfBlackMember = selfBlackMember;
 	}
 
-	public boolean loopActivated() {
-		return this.loop;
-	}
-
-	public void setLoop(final boolean loop) {
-		this.loop = loop;
-	}
 
 	/**
 	 * @return the customCommands
@@ -322,8 +295,6 @@ public class BlackGuild extends GuildImpl {
 			", leaveChannel=" + leaveChannel +
 			", disabledCommands=" + disabledCommands +
 			", suggestionsChannel=" + suggestionsChannel +
-			", autoRoles=" + autoRoles +
-			", loop=" + loop +
 			", customCommands=" + customCommands +
 			'}';
 	}

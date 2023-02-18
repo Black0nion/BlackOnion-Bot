@@ -46,8 +46,12 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	private final EnumSetting<AntiSpoilerSystem.AntiSpoilerType> antiSpoiler = addSetting(
 		new EnumSettingImpl.Builder<>(settingsSaver, "anti_spoiler", AntiSpoilerSystem.AntiSpoilerType.class)
 			.defaultValue(AntiSpoilerSystem.AntiSpoilerType.OFF)
-			.permissions(Permission.ADMINISTRATOR));
+			.permissions(Permission.MANAGE_CHANNEL));
 	private final ListSetting<NamedCommand, Set<NamedCommand>> disabledCommands;
+	private final ListSetting<Long, Set<Long>> autoRoles = addSetting(
+		new ListSettingImpl.Builder<Long, Set<Long>>(settingsSaver, "auto_roles", Set.class, HashSet::new, Long::parseLong, Number::toString)
+			.defaultValue(new HashSet<>())
+			.permissions(Permission.MANAGE_ROLES));
 
 	public GuildSettingsImpl(long id, LongFunction<Guild> guildGetter, ResultSet resultSet, SQLHelperFactory helperFactory, LanguageSystem languageSystem, CommandRegistry commandRegistry) throws Exception {
 		super(TABLE_NAME, id, guildGetter, helperFactory);
@@ -111,5 +115,10 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	@Override
 	public ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands() {
 		return disabledCommands;
+	}
+
+	@Override
+	public ListSetting<Long, Set<Long>> getAutoRoles() {
+		return autoRoles;
 	}
 }

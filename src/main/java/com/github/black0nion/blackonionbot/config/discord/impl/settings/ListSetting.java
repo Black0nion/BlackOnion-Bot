@@ -14,6 +14,11 @@ public interface ListSetting<T, L extends Collection<T>> extends Setting<L> {
 		return true;
 	}
 
+	default void removeAll(L removedRoles) {
+		getValue().removeAll(removedRoles);
+		setValue(getValue());
+	}
+
 	default boolean remove(T value) {
 		boolean result = getValue().remove(value);
 		if (!result) return false;

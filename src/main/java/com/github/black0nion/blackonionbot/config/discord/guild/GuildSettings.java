@@ -36,7 +36,9 @@ public interface GuildSettings extends SettingsContainer, DisabledCommandsHelper
 			"guild_type VARCHAR(20)," +
 			"anti_spoiler VARCHAR(20)," +
 			"disabled_commands VARCHAR(500)," +
-			"suggestions_channel BIGINT" +
+			"suggestions_channel BIGINT," +
+
+			"auto_roles VARCHAR(500)" +
 			")");
 			 PreparedStatement ps = helper.create()) {
 			ps.executeUpdate();
@@ -56,4 +58,6 @@ public interface GuildSettings extends SettingsContainer, DisabledCommandsHelper
 	EnumSetting<GuildType> getGuildType();
 	EnumSetting<AntiSpoilerSystem.AntiSpoilerType> getAntiSpoiler();
 	ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands();
+
+	ListSetting<Long, Set<Long>> getAutoRoles();
 }

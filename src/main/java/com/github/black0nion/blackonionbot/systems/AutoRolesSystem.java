@@ -1,37 +1,42 @@
 package com.github.black0nion.blackonionbot.systems;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.black0nion.blackonionbot.config.discord.api.repo.SettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.impl.settings.ListSetting;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import com.github.black0nion.blackonionbot.utils.Utils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class AutoRolesSystem extends ListenerAdapter {
 
 	private final LanguageSystem languageSystem;
+	private final SettingsRepo<GuildSettings> guildSettingsRepo;
 
-	public AutoRolesSystem(LanguageSystem languageSystem) {
+	public AutoRolesSystem(LanguageSystem languageSystem, SettingsRepo<GuildSettings> guildSettingsRepo) {
 		this.languageSystem = languageSystem;
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	@Override
 	public void onGuildMemberJoin(final GuildMemberJoinEvent event) {
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
 		final BlackUser user = BlackUser.from(event.getUser());
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild.getIdLong());
 
-		final List<Long> autoroles = guild.getAutoRoles();
-		final List<Long> removedRoles = new ArrayList<>();
+		final ListSetting<Long, Set<Long>> autoroles = guildSettings.getAutoRoles();
+		final Set<Long> removedRoles = new HashSet<>();
 
 		if (Utils.handleSelfRights(languageSystem, guild, user, null, null, Permission.MANAGE_ROLES)) return;
 
-		for (final long roleid : autoroles) {
+		for (final long roleid : autoroles.getValue()) {
 			final Role role = guild.getRoleById(roleid);
 			if (role == null)
 				removedRoles.add(roleid);
@@ -41,7 +46,6 @@ public class AutoRolesSystem extends ListenerAdapter {
 
 		if (!removedRoles.isEmpty()) {
 			autoroles.removeAll(removedRoles);
-			guild.setAutoRoles(autoroles);
 		}
- 	}
+	}
 }

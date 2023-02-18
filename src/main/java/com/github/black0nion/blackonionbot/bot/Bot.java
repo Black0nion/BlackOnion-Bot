@@ -233,7 +233,6 @@ public class Bot extends ListenerAdapter {
 				this,
 				new ReactionRoleSystem(sqlHelperFactory),
 				new JoinLeaveSystem(config, settings, languageSystem, embedUtils),
-				new AutoRolesSystem(languageSystem),
 				new AntiSpoilerSystem(languageSystem, embedUtils),
 				statisticsManager,
 				eventWaiter
@@ -263,6 +262,8 @@ public class Bot extends ListenerAdapter {
 		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepo(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
 		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
 		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
+
+		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
 
 		slashCommandBase.addCommands();
 

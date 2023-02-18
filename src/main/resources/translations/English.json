@@ -16,7 +16,8 @@
   "autorolecreated": "AutoRole created!",
   "autorolecreatedinfo": "When a user joins, he will get the role %role%!",
   "autoroledeleted": "AutoRole deleted!",
-  "autoroledeletedinfo": "When a user joins, he won't get the role %role% anymore!",
+  "autoroledeletedinfo": "When a user joins, they won't get the role %role% anymore!",
+  "autorolelist": "Registered AutoRoles",
   "availableconfigs": "Availible Configs: %configs%",
   "badges": "Badges",
   "ban": "Ban",
@@ -216,8 +217,8 @@
   "messagetosend": "Nachricht zu senden",
   "metadata": {
     "code": "EN",
-    "name": "English",
-    "default": true
+    "default": "true",
+    "name": "English"
   },
   "minonemin": "Giveaways have to be longer than one minute!",
   "missingpermissions": "Missing Permissions!\nRequired Permissions: %perms%",
