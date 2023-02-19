@@ -74,6 +74,10 @@ public class Utils {
 	}
 
 	public static String escapeMarkdown(final String text) {
+		if (text == null || text.isEmpty() || text.equals("*") || text.equals("_") || text.equals("~") || text.equals("`")) {
+			return text;
+		}
+
 		return text
 			.replace("\\(\\*|_|`|~|\\)", "$1")
 			.replace("(\\*|_|`|~|\\)", "\\$1");

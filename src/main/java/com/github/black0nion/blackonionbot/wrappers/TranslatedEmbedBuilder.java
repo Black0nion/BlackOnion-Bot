@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TranslatedEmbedBuilder extends EmbedBuilder {
 
-	private final Language lang;
+	private Language lang;
 	private String title = null;
 	private String url = null;
 	private Color color = null;
@@ -30,6 +30,10 @@ public class TranslatedEmbedBuilder extends EmbedBuilder {
 
 	public Language getLang() {
 		return this.lang;
+	}
+
+	public void setLanguage(Language language) {
+		this.lang = language;
 	}
 
 	@Override
@@ -85,6 +89,11 @@ public class TranslatedEmbedBuilder extends EmbedBuilder {
 	@Nonnull
 	public TranslatedEmbedBuilder addField(final String name, final String value) {
 		return this.addField(name, value, false);
+	}
+
+	public TranslatedEmbedBuilder addFieldUntranslated(final String name, final String value, boolean inline) {
+		super.addField(name, value, inline);
+		return this;
 	}
 
 	@Override

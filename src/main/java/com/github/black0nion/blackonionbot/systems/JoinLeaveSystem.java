@@ -1,13 +1,18 @@
 package com.github.black0nion.blackonionbot.systems;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.misc.enums.DrawType;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
+import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -15,6 +20,7 @@ import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -47,13 +53,15 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	private final LanguageSystem languageSystem;
 	private final EmbedUtils embedUtils;
 	private final GuildSettingsRepo guildSettingsRepo;
+	private final UserSettingsRepo userSettingsRepo;
 
-	public JoinLeaveSystem(Config config, Settings settings, LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo) {
+	public JoinLeaveSystem(Config config, Settings settings, LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo, UserSettingsRepo userSettingsRepo) {
 		this.config = config;
 		this.settings = settings;
 		this.languageSystem = languageSystem;
 		this.embedUtils = embedUtils;
 		this.guildSettingsRepo = guildSettingsRepo;
+		this.userSettingsRepo = userSettingsRepo;
 		try {
 			defaultBackGround = ImageIO.read(Objects.requireNonNull(this.getClass().getResource("/background.png")));
 		} catch (final Exception e) {
@@ -65,19 +73,20 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(final @NotNull GuildMemberJoinEvent event) {
 		try {
-			final BlackGuild guild = BlackGuild.from(event.getGuild());
-			final BlackUser author = BlackUser.from(event.getUser());
-			final long id = guild.getJoinChannel();
-			if (id == -1) return;
-			final TextChannel channel = guild.getTextChannelById(id);
-			if (channel == null) return;
+			final User author = event.getUser();
+			final Guild guild = event.getGuild();
 
-			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.JOIN);
+			final UserSettings userSettings = userSettingsRepo.getSettings(author);
+			final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+
+			final TextChannel channel = guildSettings.getJoinChannel().getValue();
+
+			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.JOIN);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
 
 			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
-				.setDescription(guild.getJoinMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
+				.setDescription(guildSettings.getJoinMessage().getValue(new Placeholder("user", author.getAsTag()), new Placeholder("guild", Utils.escapeMarkdown(guild.getName()))))
 				.setImage("attachment://welcome.png")
 				.setFooter("definedbyguild", author.getEffectiveAvatarUrl());
 
@@ -92,19 +101,20 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRemove(final @NotNull GuildMemberRemoveEvent event) {
 		try {
-			final BlackGuild guild = BlackGuild.from(event.getGuild());
-			final BlackUser author = BlackUser.from(event.getUser());
-			final long id = guild.getLeaveChannel();
-			if (id == -1) return;
-			final TextChannel channel = guild.getTextChannelById(id);
-			if (channel == null) return;
+			final User author = event.getUser();
+			final Guild guild = event.getGuild();
 
-			final byte[] bytes = generateImage(Color.BLACK, author, guild, DrawType.LEAVE);
+			final UserSettings userSettings = userSettingsRepo.getSettings(author);
+			final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+
+			final TextChannel channel = guildSettings.getLeaveChannel().getValue();
+
+			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.LEAVE);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
 
 			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
 				.setColor(Color.BLACK)
-				.setDescription(guild.getLeaveMessage().replace("%user%", author.getAsMention()).replace("%guild%", guild.getEscapedName()))
+				.setDescription(guildSettings.getLeaveMessage().getValue(new Placeholder("user", author.getAsTag()), new Placeholder("guild", Utils.escapeMarkdown(guild.getName()))))
 				.setImage("attachment://goodbye.png")
 				.setFooter("definedbyguild", author.getEffectiveAvatarUrl());
 
@@ -171,7 +181,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 
 	@NotNull
-	public byte[] generateImage(@NotNull final Color textColor, final @NotNull BlackUser user, final @NotNull BlackGuild guild, final DrawType drawType) throws Exception {
+	public byte[] generateImage(@NotNull final Color textColor, final @NotNull User user, final @NotNull Guild guild, final UserSettings userSettings, final GuildSettings guildSettings, final DrawType drawType) throws Exception {
 		final double separatorTransparency = 1;
 
 		final BufferedImage bufferedImage = Utils.deepCopy(defaultBackGround);
@@ -205,9 +215,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 		newGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		newGraphics.setFont(new Font("Arial", Font.PLAIN, 60));
 		newGraphics.setColor(Color.BLACK);
-		final String message = drawType == DrawType.JOIN ? languageSystem.getTranslation("welcome", user, guild) : languageSystem.getTranslation("goodbye", user, guild);
+
+		final Language language = LanguageUtils.getLanguage(userSettings, guildSettings, languageSystem.getDefaultLanguage());
+		final String message = drawType == DrawType.JOIN
+			? language.getTranslation("defaultjoinmessage", new Placeholder("guild", guild.getName()), new Placeholder("user", user.getName()))
+			: language.getTranslation("defaultleavemessage", new Placeholder("guild", guild.getName()), new Placeholder("user", user.getName()));
 		newGraphics.drawString(message, 205, 75);
 		newGraphics.setColor(textColor);
+
 		final String userName = user.getName();
 		newGraphics.setFont(new Font("Arial Unicode MS", Font.BOLD, 68 - userName.length()));
 		final int width = newGraphics.getFontMetrics().stringWidth(userName);

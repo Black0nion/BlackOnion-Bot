@@ -2,13 +2,10 @@ package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
-import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
-import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
-import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
-import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.impls.UserImpl;
 import com.google.common.cache.CacheBuilder;
@@ -61,18 +58,13 @@ public class BlackUser extends UserImpl {
 		}
 	}
 
-	@SQLSetup(after = LanguageSystem.class)
-	public static void setup(SQLHelperFactory sql) throws SQLException {
-		sql.run("CREATE TABLE IF NOT EXISTS usersettings (id BIGINT PRIMARY KEY NOT NULL, language VARCHAR(2), permissions VARCHAR(255), FOREIGN KEY (language) REFERENCES language (code))");
-	}
-
 	private Language language;
 	private List<CustomPermission> permissions;
 
 	private BlackUser(final User user) throws SQLException {
 		super(user);
 
-		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permissions) AS permissions FROM usersettings WHERE id = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
+		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permissions) AS permissions FROM user_settings WHERE identifier = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
 			if (rs.next()) {
 				permissions = CustomPermission.parseListToList(rs.getString("permissions"));
 			}

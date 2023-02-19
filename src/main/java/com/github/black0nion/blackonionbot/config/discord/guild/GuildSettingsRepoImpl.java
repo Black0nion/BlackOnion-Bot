@@ -24,6 +24,11 @@ public class GuildSettingsRepoImpl extends AbstractSettingsRepo<GuildSettings, G
 	}
 
 	@Override
+	public String getReloadName() {
+		return "GuildSettingsRepo";
+	}
+
+	@Override
 	protected GuildSettings loadSettingsImpl(long id, SQLHelperFactory helper, ThrowableSupplier<ResultSet> resultSetSupplier, SQLHelperFactory factory) throws Exception {
 		return new GuildSettingsImpl(id, entityGetter, resultSetSupplier.get(), factory, languageSystem, commandRegistry);
 	}

@@ -8,11 +8,18 @@ import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import net.dv8tion.jda.api.Permission;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonSerialize(using = SettingSerializer.class)
 public interface Setting<T> {
 
 	String getName();
+
+	boolean isNullable();
+
+	default String getPrettyName() {
+		return getName().replace("_", " ");
+	}
 
 	Class<T> getType();
 
@@ -23,6 +30,15 @@ public interface Setting<T> {
 	default Object toSerializedValue() {
 		return getValue();
 	}
+
+	/**
+	 * @return the value as a mention, to be displayed <i>on discord</i>
+	 */
+	default String getAsMention() {
+		return Objects.toString(getValue());
+	}
+
+	void reset();
 
 	void setValue(T value);
 	void setValueBypassing(T value);

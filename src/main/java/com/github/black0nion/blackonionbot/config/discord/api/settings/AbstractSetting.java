@@ -15,6 +15,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 
 	private final String name;
 	private T value;
+	private final T defaultValue;
 
 	private final Class<T> type;
 	private final boolean nullable;
@@ -33,6 +34,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 		this.permissions = permissions;
 		this.customPermissions = customPermissions;
 		this.validators = validators;
+		this.defaultValue = defaultValue;
 		if (defaultValue != null) {
 			validate(defaultValue);
 			this.value = defaultValue;
@@ -46,6 +48,11 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public boolean isNullable() {
+		return nullable;
 	}
 
 	@Override
@@ -76,6 +83,11 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Override
 	public CustomPermission[] getRequiredCustomPermissions() {
 		return customPermissions;
+	}
+
+	@Override
+	public void reset() {
+		setValue(defaultValue);
 	}
 
 	/**

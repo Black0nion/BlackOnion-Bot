@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -26,10 +27,12 @@ public interface GuildSettings extends SettingsContainer, DisabledCommandsHelper
 			"FOREIGN KEY (language) REFERENCES language (code)," +
 
 			"join_message_activated BOOLEAN," +
+			"join_channel BIGINT," +
 			"join_image_activated BOOLEAN," +
 			"join_message VARCHAR(500)," +
 
 			"leave_message_activated BOOLEAN," +
+			"leave_channel BIGINT," +
 			"leave_image_activated BOOLEAN," +
 			"leave_message VARCHAR(500)," +
 
@@ -48,10 +51,12 @@ public interface GuildSettings extends SettingsContainer, DisabledCommandsHelper
 	LanguageSetting getLanguage();
 
 	BooleanSetting joinMessageActivated();
+	ChannelSetting<TextChannel> getJoinChannel();
 	BooleanSetting joinImageActivated();
 	StringSetting getJoinMessage();
 
 	BooleanSetting leaveMessageActivated();
+	ChannelSetting<TextChannel> getLeaveChannel();
 	BooleanSetting leaveImageActivated();
 	StringSetting getLeaveMessage();
 

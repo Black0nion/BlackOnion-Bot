@@ -50,4 +50,12 @@ public abstract class AbstractSettingsRepo<T extends SettingsContainer, G, E ext
 			throw new SettingsLoadingException(e);
 		}
 	}
+
+	@Override // NOSONAR stfu i literally added "abstract"
+	public abstract String getReloadName(); // NOSONAR stfu i literally added "abstract"
+
+	@Override
+	public void reload() {
+		cache.invalidateAll();
+	}
 }

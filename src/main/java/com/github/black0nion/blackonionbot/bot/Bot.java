@@ -263,7 +263,10 @@ public class Bot extends ListenerAdapter {
 		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
 		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
 
-		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo));
+		reloadSystem.registerReloadable(userSettingsRepo);
+		reloadSystem.registerReloadable(guildSettingsRepo);
+
+		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
 
 		slashCommandBase.addCommands();

@@ -112,4 +112,8 @@ public enum CustomPermission {
 		}
 		return false;
 	}
+
+	public static boolean hasRights(final CustomPermission[] requiredPermissions, final CustomPermission[] permissions) {
+		return Arrays.stream(requiredPermissions).allMatch(perm -> hasRights(perm, Arrays.asList(permissions)));
+	}
 }

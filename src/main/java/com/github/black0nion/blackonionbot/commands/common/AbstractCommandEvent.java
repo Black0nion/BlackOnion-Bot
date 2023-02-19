@@ -79,6 +79,8 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 	// useful in the LanguageCommand
 	public void setLanguage(Language language) {
 		this.language = language;
+		this.successEmbed.setLanguage(language);
+		this.errorEmbed.setLanguage(language);
 	}
 
 	public String getPleaseUse() {

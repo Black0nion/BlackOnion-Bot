@@ -11,6 +11,7 @@ import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -22,22 +23,21 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 
 	private final LanguageSetting language;
 
-
 	private final BooleanSetting joinMessageActivated = addSetting(
 		new BooleanSettingImpl.Builder(settingsSaver, "join_message_activated", false));
+	private final ChannelSetting<TextChannel> joinChannel;
 	private final BooleanSetting joinImageActivated = addSetting(
 		new BooleanSettingImpl.Builder(settingsSaver, "join_image_activated", false));
 	private final StringSetting joinMessage = addSetting(
 		new StringSettingImpl.Builder(settingsSaver, "join_message", "Welcome %user% to %guild%!"));
 
-
 	private final BooleanSetting leaveMessageActivated = addSetting(
 		new BooleanSettingImpl.Builder(settingsSaver, "leave_message_activated", false));
+	private final ChannelSetting<TextChannel> leaveChannel;
 	private final BooleanSetting leaveImageActivated = addSetting(
 		new BooleanSettingImpl.Builder(settingsSaver, "leave_image_activated", false));
 	private final StringSetting leaveMessage = addSetting(
 		new StringSettingImpl.Builder(settingsSaver, "leave_message", "Goodbye %user%!"));
-
 
 	private final EnumSetting<GuildType> guildType = addSetting(
 		new EnumSettingImpl.Builder<>(settingsSaver, "guild_type", GuildType.class)
@@ -63,6 +63,14 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 				.permissions(Permission.ADMINISTRATOR)
 		);
 
+		joinChannel = addSetting(
+			new ChannelSettingImpl.Builder<>(settingsSaver, "welcome_channel", TextChannel.class, () -> guildGetter.apply(id))
+				.permissions(Permission.MANAGE_CHANNEL));
+
+		leaveChannel = addSetting(
+			new ChannelSettingImpl.Builder<>(settingsSaver, "leave_channel", TextChannel.class, () -> guildGetter.apply(id))
+				.permissions(Permission.MANAGE_CHANNEL));
+
 		this.loadSettings(resultSet);
 	}
 
@@ -78,6 +86,11 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	}
 
 	@Override
+	public ChannelSetting<TextChannel> getJoinChannel() {
+		return joinChannel;
+	}
+
+	@Override
 	public BooleanSetting joinImageActivated() {
 		return joinImageActivated;
 	}
@@ -90,6 +103,11 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	@Override
 	public BooleanSetting leaveMessageActivated() {
 		return leaveMessageActivated;
+	}
+
+	@Override
+	public ChannelSetting<TextChannel> getLeaveChannel() {
+		return leaveChannel;
 	}
 
 	@Override
