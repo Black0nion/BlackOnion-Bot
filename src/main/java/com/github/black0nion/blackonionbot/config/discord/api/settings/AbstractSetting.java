@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Set;
 
 public abstract class AbstractSetting<T> implements Setting<T> {
 
@@ -22,11 +23,11 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	@Nullable
 	private final Validator<T>[] validators;
 
-	private final Permission[] permissions;
-	private final CustomPermission[] customPermissions;
+	private final Set<Permission> permissions;
+	private final Set<CustomPermission> customPermissions;
 
 	@SafeVarargs
-	protected AbstractSetting(SettingsSaver settingsSaver, String name, T defaultValue, Class<T> type, boolean nullable, Permission[] permissions, CustomPermission[] customPermissions, @Nullable Validator<T>... validators) {
+	protected AbstractSetting(SettingsSaver settingsSaver, String name, T defaultValue, Class<T> type, boolean nullable, Set<Permission> permissions, Set<CustomPermission> customPermissions, @Nullable Validator<T>... validators) {
 		this.settingsSaver = settingsSaver;
 		this.name = name;
 		this.type = type;
@@ -76,12 +77,12 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	}
 
 	@Override
-	public Permission[] getRequiredPermissions() {
+	public Set<Permission> getRequiredPermissions() {
 		return permissions;
 	}
 
 	@Override
-	public CustomPermission[] getRequiredCustomPermissions() {
+	public Set<CustomPermission> getRequiredCustomPermissions() {
 		return customPermissions;
 	}
 

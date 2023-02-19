@@ -102,7 +102,7 @@ public enum CustomPermission {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	public static boolean hasRights(final CustomPermission requiredPermission, final List<CustomPermission> permissions) {
+	public static boolean hasRights(final CustomPermission requiredPermission, final Collection<CustomPermission> permissions) {
 		if (permissions.contains(requiredPermission)) return true;
 		if (!permissions.isEmpty()) {
 			for (final CustomPermission perm : requiredPermission.links) {
@@ -113,7 +113,11 @@ public enum CustomPermission {
 		return false;
 	}
 
-	public static boolean hasRights(final CustomPermission[] requiredPermissions, final CustomPermission[] permissions) {
+	public static boolean hasRights(final CustomPermission[] permissions, final CustomPermission[] requiredPermissions) {
 		return Arrays.stream(requiredPermissions).allMatch(perm -> hasRights(perm, Arrays.asList(permissions)));
+	}
+
+	public static boolean hasRights(final Collection<CustomPermission> permissions, final Collection<CustomPermission> requiredPermissions) {
+		return requiredPermissions.stream().allMatch(perm -> hasRights(perm, permissions));
 	}
 }

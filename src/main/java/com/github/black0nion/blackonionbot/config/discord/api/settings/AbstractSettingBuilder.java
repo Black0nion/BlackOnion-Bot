@@ -4,6 +4,15 @@ import com.github.black0nion.blackonionbot.config.discord.api.validation.Validat
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import net.dv8tion.jda.api.Permission;
 
+import javax.annotation.Nonnull;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
+
 @SuppressWarnings("unchecked")
 public abstract class AbstractSettingBuilder<T, S extends Setting<T>, B extends AbstractSettingBuilder<T, S, B>> {
 
@@ -13,8 +22,8 @@ public abstract class AbstractSettingBuilder<T, S extends Setting<T>, B extends 
 	protected T defaultValue;
 	protected boolean nullable;
 	protected Validator<T>[] validators;
-	protected Permission[] permissions;
-	protected CustomPermission[] customPermissions;
+	protected Set<Permission> permissions = EnumSet.noneOf(Permission.class);
+	protected Set<CustomPermission> customPermissions = EnumSet.noneOf(CustomPermission.class);
 
 	protected AbstractSettingBuilder(SettingsSaver saver, String name, Class<T> type) {
 		this.settingsSaver = saver;
@@ -41,37 +50,27 @@ public abstract class AbstractSettingBuilder<T, S extends Setting<T>, B extends 
 		return (B) this;
 	}
 
-	public B permissions(Permission... permissions) {
-		this.permissions = permissions;
+	public B permissions(@Nonnull Permission... permissions) {
+		requireNonNull(customPermissions, "permissions");
+		this.permissions = EnumSet.copyOf(List.of(permissions));
 		return (B) this;
 	}
 
-	public B addPermissions(Permission... permissions) {
-		if (this.permissions == null) {
-			this.permissions = permissions;
-		} else {
-			Permission[] newPermissions = new Permission[this.permissions.length + permissions.length];
-			System.arraycopy(this.permissions, 0, newPermissions, 0, this.permissions.length);
-			System.arraycopy(permissions, 0, newPermissions, this.permissions.length, permissions.length);
-			this.permissions = newPermissions;
-		}
+	public B addPermissions(@Nonnull Permission... permissions) {
+		requireNonNull(permissions, "permissions");
+		Collections.addAll(this.permissions, permissions);
 		return (B) this;
 	}
 
-	public B customPermissions(CustomPermission... customPermissions) {
-		this.customPermissions = customPermissions;
+	public B customPermissions(@Nonnull CustomPermission... customPermissions) {
+		requireNonNull(customPermissions, "customPermissions");
+		this.customPermissions = EnumSet.copyOf(List.of(customPermissions));
 		return (B) this;
 	}
 
-	public B addCustomPermissions(CustomPermission... customPermissions) {
-		if (this.customPermissions == null) {
-			this.customPermissions = customPermissions;
-		} else {
-			CustomPermission[] newCustomPermissions = new CustomPermission[this.customPermissions.length + customPermissions.length];
-			System.arraycopy(this.customPermissions, 0, newCustomPermissions, 0, this.customPermissions.length);
-			System.arraycopy(customPermissions, 0, newCustomPermissions, this.customPermissions.length, customPermissions.length);
-			this.customPermissions = newCustomPermissions;
-		}
+	public B addCustomPermissions(@Nonnull CustomPermission... customPermissions) {
+		requireNonNull(customPermissions, "customPermissions");
+		Collections.addAll(this.customPermissions, customPermissions);
 		return (B) this;
 	}
 

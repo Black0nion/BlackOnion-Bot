@@ -10,22 +10,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public class StringSettingImpl extends AbstractSetting<String> implements StringSetting {
 
-	@SafeVarargs
-	public StringSettingImpl(SettingsSaver settingsSaver, String name, String defaultValue, Permission[] permissions, CustomPermission[] customPermissions, @Nullable Validator<String>... validators) {
+	public StringSettingImpl(
+		SettingsSaver settingsSaver,
+		String name,
+		String defaultValue,
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
+		@Nullable Validator<String>[] validators
+	) {
 		super(settingsSaver, name, defaultValue, String.class, false, permissions, customPermissions, validators);
 	}
 
-	@SafeVarargs
-	public StringSettingImpl(SettingsSaver settingsSaver,
+	public StringSettingImpl(
+		SettingsSaver settingsSaver,
 		String name,
 		String defaultValue,
 		boolean nullable,
-		Permission[] permissions,
-		CustomPermission[] customPermissions,
-		@Nullable Validator<String>... validators
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
+		@Nullable Validator<String>[] validators
 	) {
 		super(settingsSaver, name, defaultValue, String.class, nullable, permissions, customPermissions, validators);
 	}

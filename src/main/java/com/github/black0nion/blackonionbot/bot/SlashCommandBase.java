@@ -366,7 +366,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			}
 
 			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
-				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredCustomPermissions())));
+				cmde.send("missingpermissions", new Placeholder("perms", Utils.getCustomPermissionString(cmd.getRequiredCustomPermissions())));
 				return;
 			}
 

@@ -210,12 +210,25 @@ public class Utils {
 	 * }</pre>
 	 */
 	public static String getPermissionString(final Permission... permissions) {
-		if (permissions.length == 0) return "```\n```";
-		final List<Permission> sortedPermissions = Arrays.stream(permissions)
+		return getPermissionString(Arrays.asList(permissions));
+	}
+
+	/**
+	 * Returned format:
+	 * <pre>{@code
+	 *     - DO_THINGS
+	 *     - DO_OTHER_THINGS
+	 * }</pre>
+	 */
+	public static String getPermissionString(final Collection<Permission> permissions) {
+		if (permissions.isEmpty()) return "```\n```";
+
+		final List<Permission> sortedPermissions = permissions.stream()
 			.filter(Objects::nonNull)
 			.distinct()
 			.sorted(Comparator.comparing(Permission::getName))
 			.toList();
+
 		StringBuilder output = new StringBuilder("```");
 		for (Permission permission : sortedPermissions) {
 			output.append("\n- ").append(permission.getName());
@@ -223,13 +236,19 @@ public class Utils {
 		return output + "\n```";
 	}
 
-	public static String getPermissionString(final CustomPermission... permissions) {
-		if (permissions.length == 0) return "```\n```";
-		final List<CustomPermission> sortedPermissions = Arrays.stream(permissions)
+	public static String getCustomPermissionString(final CustomPermission... permissions) {
+		return getCustomPermissionString(Arrays.asList(permissions));
+	}
+
+	public static String getCustomPermissionString(final Collection<CustomPermission> permissions) {
+		if (permissions.isEmpty()) return "```\n```";
+
+		final List<CustomPermission> sortedPermissions = permissions.stream()
 			.filter(Objects::nonNull)
 			.distinct()
 			.sorted(Comparator.comparing(CustomPermission::getName))
 			.toList();
+
 		StringBuilder output = new StringBuilder("```");
 		for (CustomPermission permission : sortedPermissions) {
 			output.append("\n- ").append(permission.getName());

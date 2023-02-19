@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.Permission;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @JsonSerialize(using = SettingSerializer.class)
 public interface Setting<T> {
@@ -59,6 +60,6 @@ public interface Setting<T> {
 
 	Validator<T>[] getValidators();
 
-	Permission[] getRequiredPermissions();
-	CustomPermission[] getRequiredCustomPermissions();
+	Set<Permission> getRequiredPermissions();
+	Set<CustomPermission> getRequiredCustomPermissions();
 }

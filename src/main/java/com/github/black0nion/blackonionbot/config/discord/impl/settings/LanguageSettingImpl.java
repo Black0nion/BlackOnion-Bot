@@ -12,14 +12,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public class LanguageSettingImpl extends AbstractSetting<Language> implements LanguageSetting {
 
 	@NotNull
 	private final LanguageSystem languageSystem;
 
-	@SafeVarargs
-	public LanguageSettingImpl(SettingsSaver saver, String name, LanguageSystem languageSystem, Permission[] permissions, CustomPermission[] customPermissions, @Nullable Validator<Language>... validators) {
+	public LanguageSettingImpl(
+		SettingsSaver saver,
+		String name,
+		LanguageSystem languageSystem,
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
+		@Nullable Validator<Language>[] validators
+	) {
 		super(saver, name, languageSystem.getDefaultLanguage(), Language.class, true, permissions, customPermissions, validators);
 		this.languageSystem = languageSystem;
 	}

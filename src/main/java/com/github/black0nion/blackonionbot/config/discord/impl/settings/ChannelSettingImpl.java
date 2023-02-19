@@ -12,13 +12,24 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ChannelSettingImpl<C extends GuildChannel> extends AbstractSetting<C> implements ChannelSetting<C> {
 
 	private final Supplier<Guild> guildGetter;
 
-	protected ChannelSettingImpl(SettingsSaver settingsSaver, String name, C defaultValue, Class<C> type, boolean nullable, Permission[] permissions, CustomPermission[] customPermissions, @Nullable Validator<C>[] validators, Supplier<Guild> guildGetter) {
+	protected ChannelSettingImpl(
+		SettingsSaver settingsSaver,
+		String name,
+		C defaultValue,
+		Class<C> type,
+		boolean nullable,
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
+		@Nullable Validator<C>[] validators,
+		Supplier<Guild> guildGetter
+	) {
 		super(settingsSaver, name, defaultValue, type, nullable, permissions, customPermissions, validators);
 		this.guildGetter = guildGetter;
 	}

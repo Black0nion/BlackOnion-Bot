@@ -121,8 +121,8 @@ public class ConfigCommand extends SlashCommand {
 		if (setting.getRequiredPermissions() != null && !cmde.getMember().hasPermission(setting.getRequiredPermissions())) {
 			cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(setting.getRequiredPermissions())));
 			return;
-		} else if (setting.getRequiredCustomPermissions() != null && !CustomPermission.hasRights(setting.getRequiredCustomPermissions(), userSettings.getPermissions().getAsArray(CustomPermission[]::new))) {
-			cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(setting.getRequiredCustomPermissions())));
+		} else if (setting.getRequiredCustomPermissions() != null && !CustomPermission.hasRights(userSettings.getPermissions().getValue(), setting.getRequiredCustomPermissions())) {
+			cmde.send("missingpermissions", new Placeholder("perms", Utils.getCustomPermissionString(setting.getRequiredCustomPermissions())));
 			return;
 		}
 

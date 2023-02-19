@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,17 +23,17 @@ public class ListSettingImpl<T, L extends Collection<T>> extends AbstractSetting
 	private final Function<T, String> serializeFunction;
 	private final Supplier<L> listSupplier;
 
-	@SafeVarargs
-	protected ListSettingImpl(SettingsSaver settingsSaver,
+	protected ListSettingImpl(
+		SettingsSaver settingsSaver,
 		String name,
 		L defaultValue,
 		Supplier<L> listSupplier,
 		Function<String, T> parseFunction,
 		Function<T, String> serializeFunction,
 		Class<L> type,
-		Permission[] permissions,
-		CustomPermission[] customPermissions,
-		@Nullable Validator<L>... validators
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
+		@Nullable Validator<L>[] validators
 	) {
 		super(settingsSaver, name, defaultValue != null ? defaultValue : listSupplier.get(), type, false, permissions, customPermissions, validators);
 		this.listSupplier = listSupplier;

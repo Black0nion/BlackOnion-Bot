@@ -8,10 +8,17 @@ import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Set;
 
 public class BooleanSettingImpl extends AbstractSetting<Boolean> implements BooleanSetting {
 
-	public BooleanSettingImpl(SettingsSaver settingsSaver, String name, Boolean value, Permission[] permissions, CustomPermission[] customPermissions) {
+	public BooleanSettingImpl(
+		SettingsSaver settingsSaver,
+		String name,
+		Boolean value,
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions
+	) {
 		super(settingsSaver, name, value, Boolean.class, false, permissions, customPermissions);
 	}
 

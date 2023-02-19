@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public class EnumSettingImpl<E extends Enum<E>> extends AbstractSetting<E> implements EnumSetting<E> {
 
@@ -19,8 +20,8 @@ public class EnumSettingImpl<E extends Enum<E>> extends AbstractSetting<E> imple
 		E defaultValue,
 		Class<E> type,
 		boolean nullable,
-		Permission[] permissions,
-		CustomPermission[] customPermissions,
+		Set<Permission> permissions,
+		Set<CustomPermission> customPermissions,
 		@Nullable Validator<E>... validators)
 	{
 		super(settingsSaver, name, defaultValue, type, nullable, permissions, customPermissions, validators);
