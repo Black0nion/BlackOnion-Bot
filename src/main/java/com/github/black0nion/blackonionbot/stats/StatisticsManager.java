@@ -23,6 +23,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class StatisticsManager extends ListenerAdapter {
@@ -59,7 +60,9 @@ public class StatisticsManager extends ListenerAdapter {
 	}
 
 	public void start() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
+		try (ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor()) {
+			ex.scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
+		}
 	}
 
 	public static final Gauge UPTIME = Gauge.build()

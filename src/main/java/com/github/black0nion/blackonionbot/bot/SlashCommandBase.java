@@ -22,7 +22,6 @@ import com.github.black0nion.blackonionbot.inject.InjectorCreateInstanceExceptio
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
@@ -169,8 +168,6 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
 		Optional.ofNullable(getCommand(HelpCommand.class)).ifPresent(HelpCommand::updateAutoComplete);
-
-		Bot.getInstance().getExecutor().submit(Dashboard::init);
 	}
 
 	@Nonnull

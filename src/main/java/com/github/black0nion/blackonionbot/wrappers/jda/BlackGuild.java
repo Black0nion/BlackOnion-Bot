@@ -1,13 +1,8 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.misc.ConfigGetter;
-import com.github.black0nion.blackonionbot.misc.ConfigSetter;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardGetter;
-import com.github.black0nion.blackonionbot.systems.dashboard.DashboardSetter;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
@@ -16,7 +11,6 @@ import com.github.black0nion.blackonionbot.wrappers.jda.impls.GuildImpl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
@@ -69,14 +63,6 @@ public class BlackGuild extends GuildImpl {
 	}
 
 	private Language language;
-	private AntiSpoilerSystem.AntiSpoilerType antiSpoilerType;
-	private List<String> antiSwearWhitelist;
-	private String joinMessage;
-	private long joinChannel;
-	private String leaveMessage;
-	private long leaveChannel;
-	@Nullable
-	private List<String> disabledCommands;
 	private long suggestionsChannel;
 	private HashMap<String, CustomCommand> customCommands;
 	private final List<Warn> warns = new ArrayList<>();
@@ -120,104 +106,12 @@ public class BlackGuild extends GuildImpl {
 		return this.language;
 	}
 
-	@DashboardGetter("setup.language")
 	public String getLanguageString() {
 		return this.language != null ? this.language.getLanguageCode() : null;
 	}
 
 	public void setLanguage(final @Nullable Language language) {
 		this.language = language;
-	}
-
-	@DashboardGetter("utils.joinleave.join.message")
-	public String getJoinMessage() {
-		return this.joinMessage;
-	}
-
-	@DashboardSetter("utils.joinleave.join.message")
-	public void setJoinMessage(final String newMessage) {
-		this.joinMessage = newMessage;
-	}
-
-	@DashboardGetter(value = "utils.joinleave.join.channel", nullable = true)
-	public long getJoinChannel() {
-		return this.joinChannel;
-	}
-
-	@DashboardSetter(value = "utils.joinleave.join.channel", nullable = true)
-	public void setJoinChannel(final TextChannel channel) {
-		if (channel == null) {
-			this.setJoinChannel(-1);
-		} else {
-			this.setJoinChannel(channel.getIdLong());
-		}
-	}
-
-	public void setJoinChannel(final long joinChannel) {
-		this.joinChannel = joinChannel;
-	}
-
-	@DashboardGetter("utils.joinleave.leave.message")
-	public String getLeaveMessage() {
-		return this.leaveMessage;
-	}
-
-	@DashboardSetter("utils.joinleave.leave.message")
-	public void setLeaveMessage(final String leaveMessage) {
-		this.leaveMessage = leaveMessage;
-	}
-
-	@DashboardGetter(value = "utils.joinleave.leave.channel", nullable = true)
-	public long getLeaveChannel() {
-		return this.leaveChannel;
-	}
-
-	@ConfigGetter(key = "leavechannel", requiredPermissions = { Permission.MANAGE_SERVER }, description = "Set the Channel the Message on leave should be sent to")
-	public TextChannel getLeaveChannelAsChannel() {
-		if (this.leaveChannel == -1) return null;
-		return this.guild.getTextChannelById(this.leaveChannel);
-	}
-
-	@DashboardSetter(value = "utils.joinleave.leave.channel", nullable = true)
-	@ConfigSetter(argumentsDescription = { "The Channel where the message should get sent to" }, key = "leavechannel", requiredPermissions = { Permission.MANAGE_SERVER }, nullable = true)
-	public void setLeaveChannel(final TextChannel channel) {
-		if (channel == null) {
-			this.setLeaveChannel(-1);
-		} else {
-			this.setLeaveChannel(channel.getIdLong());
-		}
-	}
-
-	public void setLeaveChannel(final long leaveChannel) {
-		this.leaveChannel = leaveChannel;
-	}
-
-	public @Nullable List<String> getDisabledCommands() {
-		return this.disabledCommands;
-	}
-
-	public AntiSpoilerSystem.AntiSpoilerType getAntiSpoilerType() {
-		return this.antiSpoilerType != null ? this.antiSpoilerType : AntiSpoilerSystem.AntiSpoilerType.OFF;
-	}
-
-	public void setAntiSpoilerType(final AntiSpoilerSystem.AntiSpoilerType antiSpoilerType) {
-		this.antiSpoilerType = antiSpoilerType;
-	}
-
-	public List<String> getAntiSwearWhitelist() {
-		return this.antiSwearWhitelist;
-	}
-
-	public void setAntiSwearWhitelist(final List<String> antiSwearWhitelist) {
-		this.antiSwearWhitelist = antiSwearWhitelist;
-	}
-
-	public void addToAntiSwearWhitelist(final String toAdd) {
-		this.antiSwearWhitelist.add(toAdd);
-	}
-
-	public void removeFromAntiSwearWhitelist(final String toRemove) {
-		this.antiSwearWhitelist.remove(toRemove);
 	}
 
 	public long getSuggestionsChannel() {
@@ -271,13 +165,6 @@ public class BlackGuild extends GuildImpl {
 		return "BlackGuild{" +
 			"selfBlackMember=" + selfBlackMember +
 			", language=" + language +
-			", antiSpoilerType=" + antiSpoilerType +
-			", antiSwearWhitelist=" + antiSwearWhitelist +
-			", joinMessage='" + joinMessage + '\'' +
-			", joinChannel=" + joinChannel +
-			", leaveMessage='" + leaveMessage + '\'' +
-			", leaveChannel=" + leaveChannel +
-			", disabledCommands=" + disabledCommands +
 			", suggestionsChannel=" + suggestionsChannel +
 			", customCommands=" + customCommands +
 			'}';

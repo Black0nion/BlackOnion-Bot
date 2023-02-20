@@ -46,12 +46,6 @@ public class LanguageSettingImpl extends AbstractSetting<Language> implements La
 	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Language.class);
 
 	@Override
-	@Nullable
-	public Language getValue() {
-		return super.getValue();
-	}
-
-	@Override
 	public List<Class<?>> canParse() {
 		return CAN_PARSE;
 	}
