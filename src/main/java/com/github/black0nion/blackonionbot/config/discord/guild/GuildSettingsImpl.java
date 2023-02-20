@@ -3,6 +3,8 @@ package com.github.black0nion.blackonionbot.config.discord.guild;
 import com.github.black0nion.blackonionbot.bot.CommandRegistry;
 import com.github.black0nion.blackonionbot.commands.common.NamedCommand;
 import com.github.black0nion.blackonionbot.config.discord.api.container.AbstractSettingsContainer;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSettingBuilder;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.*;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
@@ -72,6 +74,14 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 				.permissions(Permission.MANAGE_CHANNEL));
 
 		this.loadSettings(resultSet);
+	}
+
+	@Override
+	public <T extends Setting<?>> T addSetting(AbstractSettingBuilder<?, T, ?> settingBuilder) {
+		if (settingBuilder.getPermissions().isEmpty()) {
+			settingBuilder.permissions(Permission.MANAGE_SERVER);
+		}
+		return super.addSetting(settingBuilder);
 	}
 
 	@NotNull

@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import java.util.Set;
+
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
 public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils, NamedCommand {
@@ -22,9 +25,9 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 
 	protected Category category;
 	protected final Progress progress;
-	protected final Permission[] requiredPermissions;
-	protected final Permission[] requiredBotPermissions;
-	protected final CustomPermission[] requiredCustomPermissions;
+	protected final Set<Permission> requiredPermissions;
+	protected final Set<Permission> requiredBotPermissions;
+	protected final Set<CustomPermission> requiredCustomPermissions;
 	protected final boolean isToggleable;
 	protected final boolean shouldAutoRegister;
 	protected final boolean isPremium;
@@ -86,15 +89,17 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		return progress;
 	}
 
-	public Permission[] getRequiredPermissions() {
+	public Set<Permission> getRequiredPermissions() {
 		return requiredPermissions;
 	}
 
-	public Permission[] getRequiredBotPermissions() {
+	@Nonnull
+	public Set<Permission> getRequiredBotPermissions() {
 		return requiredBotPermissions;
 	}
 
-	public CustomPermission[] getRequiredCustomPermissions() {
+	@Nonnull
+	public Set<CustomPermission> getRequiredCustomPermissions() {
 		return requiredCustomPermissions;
 	}
 

@@ -5,18 +5,17 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.ThrowableSupplier;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.sql.ResultSet;
 import java.util.function.LongFunction;
 
 import static com.github.black0nion.blackonionbot.config.discord.user.UserSettings.TABLE_NAME;
 
-public class UserSettingsRepoImpl extends AbstractSettingsRepo<UserSettings, RestAction<User>, User> implements UserSettingsRepo {
+public class UserSettingsRepoImpl extends AbstractSettingsRepo<UserSettings, User> implements UserSettingsRepo {
 
 	private final LanguageSystem languageSystem;
 
-	public UserSettingsRepoImpl(SQLHelperFactory sqlHelperFactory, LongFunction<RestAction<User>> entityGetter, LanguageSystem languageSystem) {
+	public UserSettingsRepoImpl(SQLHelperFactory sqlHelperFactory, LongFunction<User> entityGetter, LanguageSystem languageSystem) {
 		super(TABLE_NAME, sqlHelperFactory, entityGetter);
 		this.languageSystem = languageSystem;
 	}

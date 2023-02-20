@@ -1,8 +1,5 @@
 package com.github.black0nion.blackonionbot.wrappers.jda;
 
-import com.github.black0nion.blackonionbot.bot.Bot;
-import com.github.black0nion.blackonionbot.database.SQLHelper;
-import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
@@ -17,10 +14,6 @@ import net.dv8tion.jda.api.entities.User;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -59,16 +52,9 @@ public class BlackUser extends UserImpl {
 	}
 
 	private Language language;
-	private List<CustomPermission> permissions;
 
-	private BlackUser(final User user) throws SQLException {
+	private BlackUser(final User user) {
 		super(user);
-
-		try (SQLHelper sq = Bot.getInstance().getSqlHelperFactory().create("SELECT UPPER(permissions) AS permissions FROM user_settings WHERE identifier = ?", getIdLong()); ResultSet rs = sq.executeQuery()) {
-			if (rs.next()) {
-				permissions = CustomPermission.parseListToList(rs.getString("permissions"));
-			}
-		}
 	}
 
 	@Nullable
@@ -78,53 +64,6 @@ public class BlackUser extends UserImpl {
 
 	public void setLanguage(final @Nullable Language language) {
 		this.language = language;
-	}
-
-	public List<CustomPermission> getPermissions() {
-		return this.permissions;
-	}
-
-	public boolean hasPermission(final CustomPermission... permissions) {
-		if (permissions == null || permissions.length == 0) return true;
-		if (this.permissions == null || this.permissions.isEmpty()) return false;
-		for (final CustomPermission requiredPerm : permissions) {
-			if (!this.hasPermission(requiredPerm)) return false;
-		}
-		return true;
-	}
-
-	public boolean hasPermission(final CustomPermission permission) {
-		return CustomPermission.hasRights(permission, this.permissions);
-	}
-
-	public void addPermissions(final CustomPermission... permissions) {
-		this.addPermissions(Arrays.asList(permissions));
-	}
-
-	public void addPermissions(final List<CustomPermission> permissions) {
-		final List<CustomPermission> perms = this.permissions;
-		for (final CustomPermission perm : permissions) {
-			if (!perms.contains(perm)) {
-				perms.add(perm);
-			}
-		}
-		this.setPermissions(perms);
-	}
-
-	public void removePermissions(final CustomPermission... permissions) {
-		this.removePermissions(Arrays.asList(permissions));
-	}
-
-	public void removePermissions(final List<CustomPermission> permissions) {
-		final List<CustomPermission> perms = this.permissions;
-		for (final CustomPermission perm : permissions) {
-			perms.remove(perm);
-		}
-		this.setPermissions(perms);
-	}
-
-	public void setPermissions(final List<CustomPermission> permissions) {
-		this.permissions = permissions;
 	}
 
 	public String getEscapedName() {
@@ -140,7 +79,6 @@ public class BlackUser extends UserImpl {
 		return "BlackUser{" +
 			"fullName=" + this.getFullName() +
 			"language=" + language +
-			", permissions=" + permissions +
 			'}';
 	}
 }

@@ -198,7 +198,31 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * Pass null as the channel argument to check self permissions.
+	 * USED FOR SELF PERMISSIONS!
+	 *
+	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
+	 * @return missing permissions?
+	 */
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Collection<Permission> permissions) {
+		if (channel == null) {
+			return !guild.getSelfMember().hasPermission(permissions);
+		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
+			(callback != null
+				? callback.replyEmbeds(noRights(languageSystem, guild, author, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guild, author, permissions))
+			).queue();
+			return true;
+		}
+		return false;
+	}
+
 	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	}
+
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Collection<Permission> missingPermissions) {
 		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 

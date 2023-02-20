@@ -17,7 +17,7 @@ import java.util.function.LongFunction;
 /**
  * @param <E> The type of the entity, e.g. {@link net.dv8tion.jda.api.entities.User} or {@link net.dv8tion.jda.api.entities.Guild Guild}. This can also be a {@link net.dv8tion.jda.api.requests.RestAction RestAction}
  */
-public abstract class AbstractSettingsContainer<E> implements SettingsContainer {
+public abstract class AbstractSettingsContainer<E> implements SettingsContainer<E> {
 
 	protected final List<Setting<?>> settings = new LinkedList<>();
 	protected final long id;
@@ -104,6 +104,7 @@ public abstract class AbstractSettingsContainer<E> implements SettingsContainer 
 		return setting;
 	}
 
+	@Override
 	public E retrieveEntity() {
 		return entityGetter.apply(id);
 	}

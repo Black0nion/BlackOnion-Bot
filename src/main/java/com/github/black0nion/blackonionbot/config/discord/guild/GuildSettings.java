@@ -8,6 +8,7 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.sql.PreparedStatement;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Set;
 
 @SuppressWarnings("CheckStyle")
-public interface GuildSettings extends SettingsContainer, DisabledCommandsHelper {
+public interface GuildSettings extends SettingsContainer<Guild>, DisabledCommandsHelper {
 
 	String TABLE_NAME = "guild_settings";
 

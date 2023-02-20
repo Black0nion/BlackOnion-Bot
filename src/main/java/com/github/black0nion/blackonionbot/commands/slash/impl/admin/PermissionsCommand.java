@@ -19,10 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PermissionsCommand extends SlashCommand {
@@ -59,7 +56,7 @@ public class PermissionsCommand extends SlashCommand {
 				return;
 			}
 			if (mode.equalsIgnoreCase("list")) {
-				final List<CustomPermission> perms = user.getPermissions();
+				final Set<CustomPermission> perms = userSettings.getPermissions().getValue();
 				cmde.send("permissionsof",
 					new Placeholder("user", user.getFullNameEscaped()),
 					new Placeholder("perms", !perms.isEmpty() ? perms.stream()
@@ -76,13 +73,13 @@ public class PermissionsCommand extends SlashCommand {
 				if (permission == null && !Objects.equals(permissionString, "all"))
 					throw new NullPointerException("CustomPermission is null!");
 				if (permission != null)
-					user.removePermissions(permission);
+					userSettings.getPermissions().remove(permission);
 				else
-					user.setPermissions(new ArrayList<>());
+					userSettings.getPermissions().reset();
 				cmde.send("permissionsremoved", new Placeholder("perms", permissionString), new Placeholder("user", user.getFullName()));
 			} else if (mode.equalsIgnoreCase("add")) {
 				if (permission == null) throw new NullPointerException("CustomPermission is null!");
-				user.addPermissions(permission);
+				userSettings.getPermissions().add(permission);
 				cmde.send("permissionsadded", new Placeholder("perms", permissionString), new Placeholder("user", user.getFullName()));
 			}
 		} else {

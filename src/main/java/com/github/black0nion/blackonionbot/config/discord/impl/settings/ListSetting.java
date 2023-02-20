@@ -3,7 +3,6 @@ package com.github.black0nion.blackonionbot.config.discord.impl.settings;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 
 import java.util.Collection;
-import java.util.function.IntFunction;
 
 public interface ListSetting<T, L extends Collection<T>> extends Setting<L> {
 	default boolean add(T value) {
@@ -33,7 +32,8 @@ public interface ListSetting<T, L extends Collection<T>> extends Setting<L> {
 		return getValue().contains(value);
 	}
 
-	default T[] getAsArray(IntFunction<T[]> generator) {
-		return getValue().toArray(generator);
+	default boolean containsAll(L values) {
+		return getValue().containsAll(values);
 	}
+
 }

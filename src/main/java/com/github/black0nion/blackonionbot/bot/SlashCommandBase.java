@@ -152,7 +152,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 
 				if (newInstance instanceof SlashCommand slashCommand) {
 					SlashCommandData data = slashCommand.getData();
-					if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
+					if (newInstance.getRequiredCustomPermissions().isEmpty()) {
 						commandsArr.put(serializeCommand(slashCommand, data));
 					}
 				}
@@ -365,7 +365,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 				return;
 			}
 
-			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
+			if (!userSettings.getPermissions().containsAll(cmd.getRequiredCustomPermissions())) {
 				cmde.send("missingpermissions", new Placeholder("perms", Utils.getCustomPermissionString(cmd.getRequiredCustomPermissions())));
 				return;
 			}
@@ -373,12 +373,12 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getFullCommandName().replace(" ", "/"), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
-			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : Permission.EMPTY_PERMISSIONS;
-			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : Permission.EMPTY_PERMISSIONS;
+			final Set<Permission> requiredBotPermissions = cmd.getRequiredBotPermissions();
+			final Set<Permission> requiredPermissions = cmd.getRequiredPermissions();
 			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(requiredPermissions)) {
-				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(author)) return;
+				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(userSettings)) return;
 				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredPermissions())));
 				return;
 			}

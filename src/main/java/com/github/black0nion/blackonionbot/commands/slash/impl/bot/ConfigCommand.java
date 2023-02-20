@@ -66,7 +66,7 @@ public class ConfigCommand extends SlashCommand {
 		String optionName = event.getFocusedOption().getName();
 		String optionValue = event.getFocusedOption().getValue();
 		if (optionName.equals("setting")) {
-			SettingsContainer settingsContainer = getSettingsContainer(requireNonNull(event.getSubcommandGroup()), userSettingsRepo, event.getUser().getIdLong(), guildSettingsRepo, event.getGuild().getIdLong());
+			SettingsContainer<?> settingsContainer = getSettingsContainer(requireNonNull(event.getSubcommandGroup()), userSettingsRepo, event.getUser().getIdLong(), guildSettingsRepo, event.getGuild().getIdLong());
 
 			event.replyChoices(settingsContainer.getSettings().stream()
 				.map(Setting::getName)
@@ -80,7 +80,7 @@ public class ConfigCommand extends SlashCommand {
 
 	@Override
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
-		SettingsContainer settingsContainer = getSettingsContainer(cmde.getSubcommandGroup(), userSettings, guildSettings);
+		SettingsContainer<?> settingsContainer = getSettingsContainer(cmde.getSubcommandGroup(), userSettings, guildSettings);
 
 		switch (cmde.getSubcommandName()) {
 			case "list" -> listCommand(cmde, settingsContainer);
@@ -90,7 +90,7 @@ public class ConfigCommand extends SlashCommand {
 		}
 	}
 
-	private static void listCommand(SlashCommandEvent cmde, SettingsContainer settingsContainer) {
+	private static void listCommand(SlashCommandEvent cmde, SettingsContainer<?> settingsContainer) {
 		TranslatedEmbedBuilder builder = cmde.getDefaultSuccessEmbed();
 		for (Setting<?> setting : settingsContainer.getSettings()) {
 			builder.addFieldUntranslated(setting.getPrettyName(), setting.getAsMention(), true);
@@ -98,7 +98,7 @@ public class ConfigCommand extends SlashCommand {
 		cmde.reply(builder);
 	}
 
-	private static void getCommand(SlashCommandEvent cmde, SettingsContainer settingsContainer) {
+	private static void getCommand(SlashCommandEvent cmde, SettingsContainer<?> settingsContainer) {
 		Setting<?> setting = settingsContainer.getSetting(cmde.getOption("setting", OptionMapping::getAsString));
 
 		if (setting == null) {
@@ -110,7 +110,7 @@ public class ConfigCommand extends SlashCommand {
 			.addFieldUntranslated(setting.getPrettyName(), setting.getAsMention(), true));
 	}
 
-	private static void setCommand(SlashCommandEvent cmde, SettingsContainer settingsContainer, UserSettings userSettings) {
+	private static void setCommand(SlashCommandEvent cmde, SettingsContainer<?> settingsContainer, UserSettings userSettings) {
 		Setting<?> setting = settingsContainer.getSetting(cmde.getOption("setting", OptionMapping::getAsString));
 
 		if (setting == null) {
@@ -146,7 +146,7 @@ public class ConfigCommand extends SlashCommand {
 	}
 
 
-	private static SettingsContainer getSettingsContainer(String containerName, UserSettings userSettings, GuildSettings guildSettings) {
+	private static SettingsContainer<?> getSettingsContainer(String containerName, UserSettings userSettings, GuildSettings guildSettings) {
 		return switch (containerName) {
 			case "user" -> userSettings;
 			case "guild" -> guildSettings;
@@ -155,7 +155,7 @@ public class ConfigCommand extends SlashCommand {
 		};
 	}
 
-	private static SettingsContainer getSettingsContainer(String containerName, UserSettingsRepo userSettingsRepo, long userId, GuildSettingsRepo guildSettingsRepo, long guildId) {
+	private static SettingsContainer<?> getSettingsContainer(String containerName, UserSettingsRepo userSettingsRepo, long userId, GuildSettingsRepo guildSettingsRepo, long guildId) {
 		return switch (containerName) {
 			case "user" -> userSettingsRepo.getSettings(userId);
 			case "guild" -> guildSettingsRepo.getSettings(guildId);

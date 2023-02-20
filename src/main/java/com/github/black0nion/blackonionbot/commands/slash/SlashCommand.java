@@ -4,7 +4,7 @@ import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -46,7 +46,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	/**
 	 * option name : choices
 	 */
-	private final Map<String, StartsWithArrayList> autoCompletes = new HashMap<>();
+	private final Map<String, StartsWithLinkedList> autoCompletes = new HashMap<>();
 
 
 	//region Constructors
@@ -79,7 +79,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 
 	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
 
-	protected void updateAutoComplete(Map.Entry<String, StartsWithArrayList> entry) {
+	protected void updateAutoComplete(Map.Entry<String, StartsWithLinkedList> entry) {
 		Checks.notNull(entry, "Entry");
 		this.updateAutoComplete(entry.getKey(), entry.getValue());
 	}
@@ -88,11 +88,11 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 		Checks.notNull(option, "Option");
 		Checks.notNull(values, "Values");
 		Checks.notEmpty(values, "Values");
-		autoCompletes.put(option, values instanceof StartsWithArrayList value ? value : new StartsWithArrayList(values));
+		autoCompletes.put(option, values instanceof StartsWithLinkedList value ? value : new StartsWithLinkedList(values));
 	}
 
 	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
-		StartsWithArrayList autoComplete = autoCompletes.get(event.getFocusedOption().getName());
+		StartsWithLinkedList autoComplete = autoCompletes.get(event.getFocusedOption().getName());
 		Checks.notNull(autoComplete, "AutoComplete Choices");
 		List<String> options = autoComplete.getElementsStartingWith(event.getFocusedOption().getValue(), true);
 		event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).limit(25).toList()).queue();
@@ -101,8 +101,8 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	/**
 	 * @return if the user doesn't have the required {@link SlashCommand#requiredCustomPermissions}. REQUIRES ALL PERMISSIONS!
 	 */
-	public boolean isHidden(final BlackUser user) {
-		return !user.hasPermission(this.requiredCustomPermissions);
+	public boolean isHidden(final UserSettings userSettings) {
+		return !userSettings.getPermissions().containsAll(this.requiredCustomPermissions);
 	}
 
 	@Nonnull
@@ -121,9 +121,9 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 			"data=" + data +
 			", category=" + category +
 			", progress=" + progress +
-			", requiredPermissions=" + Arrays.toString(requiredPermissions) +
-			", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) +
-			", requiredCustomPermissions=" + Arrays.toString(requiredCustomPermissions) +
+			", requiredPermissions=" + requiredPermissions +
+			", requiredBotPermissions=" + requiredBotPermissions +
+			", requiredCustomPermissions=" + requiredCustomPermissions +
 			", isToggleable=" + isToggleable +
 			", shouldAutoRegister=" + shouldAutoRegister +
 			", isPremium=" + isPremium +

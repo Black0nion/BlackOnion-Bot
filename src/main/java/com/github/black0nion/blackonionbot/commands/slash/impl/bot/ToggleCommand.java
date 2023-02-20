@@ -9,6 +9,7 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.ChainableAtomicReference;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ToggleCommand extends SlashCommand {
 
@@ -45,17 +47,18 @@ public class ToggleCommand extends SlashCommand {
 		ChainableAtomicReference<AbstractCommand<?, ?>> currentCommand = new ChainableAtomicReference<>();
 		this.updateAutoComplete(COMMAND, slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
-				((currentCommand.setAndGet(e.getValue().getSecond())).getRequiredCustomPermissions() == null
-					|| currentCommand.get().getRequiredCustomPermissions().length == 0)
-					&& currentCommand.get().isToggleable())
+			{
+				currentCommand.setAndGet(e.getValue().getSecond());
+				return currentCommand.get().getRequiredCustomPermissions().isEmpty() && currentCommand.get().isToggleable();
+			})
 			.map(Map.Entry::getKey)
-			.toList());
+			.collect(Collectors.toCollection(StartsWithLinkedList::new)));
 	}
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final AbstractCommand<?, ?> command = slashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
-		if (command == null || (command instanceof SlashCommand slashCommand && slashCommand.isHidden(author))) {
+		if (command == null || (command instanceof SlashCommand slashCommand && slashCommand.isHidden(userSettings))) {
 			cmde.send("commandnotfound");
 			return;
 		}

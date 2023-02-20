@@ -2,6 +2,8 @@ package com.github.black0nion.blackonionbot.systems.antispoiler;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -23,10 +25,12 @@ public class AntiSpoilerSystem extends ListenerAdapter {
 
     private final LanguageSystem languageSystem;
     private final EmbedUtils embedUtils;
+    private final GuildSettingsRepo guildSettingsRepo;
 
-    public AntiSpoilerSystem(LanguageSystem languageSystem, EmbedUtils embedUtils) {
+    public AntiSpoilerSystem(LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo) {
         this.languageSystem = languageSystem;
         this.embedUtils = embedUtils;
+        this.guildSettingsRepo = guildSettingsRepo;
     }
 
     /**
@@ -38,7 +42,10 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         final BlackUser author = BlackUser.from(event != null ? event.getAuthor() : event1.getAuthor());
         final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
         final BlackGuild guild = BlackGuild.from(event != null ? event.getGuild() : event1.getGuild());
-        final AntiSpoilerType type = guild.getAntiSpoilerType();
+
+        final GuildSettings settings = guildSettingsRepo.getSettings(guild);
+        final AntiSpoilerType type = settings.getAntiSpoiler().getValue();
+
         return handleSystem(guild, msg, message, author, channel, message, type);
     }
 

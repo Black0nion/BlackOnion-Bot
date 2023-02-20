@@ -62,6 +62,10 @@ public abstract class AbstractSettingBuilder<T, S extends Setting<T>, B extends 
 		return (B) this;
 	}
 
+	public Set<Permission> getPermissions() {
+		return permissions;
+	}
+
 	public B customPermissions(@Nonnull CustomPermission... customPermissions) {
 		requireNonNull(customPermissions, "customPermissions");
 		this.customPermissions = EnumSet.copyOf(List.of(customPermissions));

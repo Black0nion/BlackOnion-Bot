@@ -11,7 +11,7 @@ import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandRe
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
@@ -58,7 +58,7 @@ public class CustomCommandsCommand extends SlashCommand {
 	// TODO: test
 	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
 		if (event.getSubcommandName().equals(DELETE) && event.getFocusedOption().getName().equals(COMMAND_NAME)) {
-			List<String> elements = new StartsWithArrayList(BlackGuild.from(event.getGuild()).getCustomCommands().keySet())
+			List<String> elements = new StartsWithLinkedList(BlackGuild.from(event.getGuild()).getCustomCommands().keySet())
 				.getElementsStartingWith(event.getFocusedOption().getValue());
 			event.replyChoices(elements.stream().map(e -> new Command.Choice(e, e)).toList()).queue();
 		}

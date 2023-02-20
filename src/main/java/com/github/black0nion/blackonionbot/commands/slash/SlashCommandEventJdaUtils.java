@@ -13,7 +13,16 @@ import static java.util.Objects.requireNonNull;
 public interface SlashCommandEventJdaUtils extends SlashCommandEventUtilsBase {
 
 	default String getCommandHelp(SlashCommand command) {
-		return "/" + command.getData().getName() + " " + command.getData().getOptions().stream().map(data -> data.getName() + " : " + data.getType().name()).collect(Collectors.joining(", "));
+		return "/" + command.getData().getName() + " " + command.getData().getOptions().stream()
+			.map(data -> {
+				boolean isRequired = data.isRequired();
+				return (isRequired ? "<" : "[")
+					+ data.getName()
+					+ ": "
+					+ data.getType().name()
+					+ (isRequired ? ">" : "]");
+			})
+			.collect(Collectors.joining(" "));
 	}
 
 	@Nonnull

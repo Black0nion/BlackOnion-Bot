@@ -233,7 +233,6 @@ public class Bot extends ListenerAdapter {
 				slashCommandBase,
 				this,
 				new ReactionRoleSystem(sqlHelperFactory),
-				new AntiSpoilerSystem(languageSystem, embedUtils),
 				statisticsManager,
 				eventWaiter
 			);
@@ -258,7 +257,7 @@ public class Bot extends ListenerAdapter {
 		}
 		logger.info("JDA started successfully!");
 
-		UserSettingsRepoImpl userSettingsRepo = injectorMap.add(new UserSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l), languageSystem));
+		UserSettingsRepoImpl userSettingsRepo = injectorMap.add(new UserSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l).complete(), languageSystem));
 		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
 		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
 		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
@@ -268,6 +267,7 @@ public class Bot extends ListenerAdapter {
 
 		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
+		jda.addEventListener(new AntiSpoilerSystem(languageSystem, embedUtils, guildSettingsRepo));
 
 		slashCommandBase.addCommands();
 

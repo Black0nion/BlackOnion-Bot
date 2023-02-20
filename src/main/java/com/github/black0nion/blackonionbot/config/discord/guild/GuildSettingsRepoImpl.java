@@ -12,7 +12,7 @@ import java.util.function.LongFunction;
 
 import static com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings.TABLE_NAME;
 
-public class GuildSettingsRepoImpl extends AbstractSettingsRepo<GuildSettings, Guild, Guild> implements GuildSettingsRepo {
+public class GuildSettingsRepoImpl extends AbstractSettingsRepo<GuildSettings, Guild> implements GuildSettingsRepo {
 
 	private final LanguageSystem languageSystem;
 	private final CommandRegistry commandRegistry;

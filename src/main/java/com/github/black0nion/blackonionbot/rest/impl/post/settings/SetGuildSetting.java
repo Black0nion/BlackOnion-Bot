@@ -1,6 +1,9 @@
-package com.github.black0nion.blackonionbot.rest.impl.post;
+package com.github.black0nion.blackonionbot.rest.impl.post.settings;
 
+import com.github.black0nion.blackonionbot.config.discord.SettingsUtils;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
@@ -10,15 +13,19 @@ import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.ForbiddenResponse;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-public class SetUserSetting implements IPostRoute {
+public class SetGuildSetting implements IPostRoute {
 
 	private final UserSettingsRepo userSettingsRepo;
+	private final GuildSettingsRepo guildSettingsRepo;
 
-	public SetUserSetting(UserSettingsRepo userSettingsRepo) {
+	public SetGuildSetting(UserSettingsRepo userSettingsRepo, GuildSettingsRepo guildSettingsRepo) {
 		this.userSettingsRepo = userSettingsRepo;
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	@Override
@@ -26,8 +33,20 @@ public class SetUserSetting implements IPostRoute {
 		String name = body.getString("name");
 
 		UserSettings userSettings = userSettingsRepo.getSettings(Long.parseLong(user.getUser().getId()));
+		GuildSettings guildSettings = guildSettingsRepo.getSettings(Long.parseLong(ctx.pathParam("guildId")));
 
-		Setting<Object> setting = userSettings
+		Guild guild = guildSettings.retrieveEntity();
+		Member member;
+		try {
+			// this method will be run in a seperate thread, therefore we can use synchronous methods
+			member = guild.retrieveMemberById(user.getUser().getId()).complete();
+		} catch (Exception e) {
+			// we use a try catch here, because the user might not be in the guild
+			// unfortunately, `complete` does not have a way to specify a `ErrorHandler`
+			throw new ForbiddenResponse("You are not a member of this guild");
+		}
+
+		Setting<Object> setting = guildSettings
 			.getSetting(name);
 
 		if (setting == null) {
@@ -38,33 +57,17 @@ public class SetUserSetting implements IPostRoute {
 			throw new ForbiddenResponse("You don't have the required custom permissions to change this setting");
 		}
 
-		final String value = "value";
-		Object toSet;
-		if (setting.canParse(Long.class)) {
-			toSet = body.getLong(value);
-		} else if (setting.canParse(Boolean.class)) {
-			toSet = body.getBoolean(value);
-		} else if (setting.canParse(String.class)) {
-			toSet = body.getString(value);
-		} else if (setting.canParse(Integer.class)) {
-			toSet = body.getInt(value);
-		} else if (setting.canParse(Double.class)) {
-			toSet = body.getDouble(value);
-		} else if (setting.canParse(Float.class)) {
-			toSet = body.getFloat(value);
-		} else {
-			throw new BadRequestResponse("No parser found for : " + setting.getType().getSimpleName());
+		if (!setting.getRequiredPermissions().isEmpty() && !member.hasPermission(setting.getRequiredPermissions())) {
+			throw new ForbiddenResponse("You don't have the required permissions to change this setting");
 		}
 
-		setting.setParsedValue(toSet);
-
-		return null;
+		return SettingsUtils.parsePassedValue(body, setting);
 	}
 
 	@NotNull
 	@Override
 	public String url() {
-		return "user_settings";
+		return "settings/guild/{guildId}";
 	}
 
 	@Override

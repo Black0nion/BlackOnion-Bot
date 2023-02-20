@@ -3,12 +3,13 @@ package com.github.black0nion.blackonionbot.commands.common;
 import com.github.black0nion.blackonionbot.commands.Progress;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandBuilder;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 public abstract class AbstractCommandBuilder<T extends AbstractCommandBuilder<?, ?>, D extends CommandData> {
 
@@ -17,9 +18,9 @@ public abstract class AbstractCommandBuilder<T extends AbstractCommandBuilder<?,
 
 	private Category category = Category.OTHER;
 	private Progress progress = Progress.DONE;
-	private Permission[] requiredPermissions = Permission.EMPTY_PERMISSIONS;
-	private Permission[] requiredBotPermissions = Permission.EMPTY_PERMISSIONS;
-	private CustomPermission[] requiredCustomPermissions = {};
+	private Set<Permission> requiredPermissions = EnumSet.noneOf(Permission.class);
+	private Set<Permission> requiredBotPermissions = EnumSet.noneOf(Permission.class);
+	private Set<CustomPermission> requiredCustomPermissions = EnumSet.noneOf(CustomPermission.class);
 	private boolean isToggleable = true;
 	private boolean shouldAutoRegister = true;
 	private boolean isPremium = false;
@@ -56,15 +57,11 @@ public abstract class AbstractCommandBuilder<T extends AbstractCommandBuilder<?,
 		return self;
 	}
 
-	public boolean isVisible(final BlackUser user) {
-		return user.hasPermission(this.requiredCustomPermissions);
-	}
-
 	/**
 	 * Sets the required permissions for this command to {@link CustomPermission#ADMIN} and {@link SlashCommandBuilder#isEphemeral} to true.
 	 */
 	public T setHidden() {
-		this.requiredCustomPermissions = new CustomPermission[] { CustomPermission.ADMIN };
+		this.requiredCustomPermissions = EnumSet.of(CustomPermission.ADMIN);
 		this.isEphemeral = true;
 		return self;
 	}
@@ -81,35 +78,39 @@ public abstract class AbstractCommandBuilder<T extends AbstractCommandBuilder<?,
 		return this.setHidden();
 	}
 
-	public Permission[] getRequiredPermissions() {
+	public Set<Permission> getRequiredPermissions() {
 		return this.requiredPermissions;
 	}
 
 	public T setRequiredPermissions(final Permission... requiredPermissions) {
-		this.requiredPermissions = Objects.requireNonNullElse(requiredPermissions, Permission.EMPTY_PERMISSIONS);
+		if (requiredPermissions != null) this.requiredPermissions = EnumSet.copyOf(this.requiredPermissions);
+		else this.requiredPermissions = EnumSet.noneOf(Permission.class);
 		return self;
 	}
 
-	public Permission[] getRequiredBotPermissions() {
+	public Set<Permission> getRequiredBotPermissions() {
 		return this.requiredBotPermissions;
 	}
 
 	public T setRequiredBotPermissions(final Permission... requiredBotPermissions) {
-		this.requiredBotPermissions = Objects.requireNonNullElse(requiredBotPermissions, Permission.EMPTY_PERMISSIONS);
+		if (requiredBotPermissions != null) this.requiredBotPermissions = EnumSet.copyOf(this.requiredBotPermissions);
+		else this.requiredBotPermissions = EnumSet.noneOf(Permission.class);
 		return self;
 	}
 
 	public T permissions(final CustomPermission... permissions) {
-		this.requiredCustomPermissions = permissions;
+		if (permissions != null) this.requiredCustomPermissions = EnumSet.copyOf(this.requiredCustomPermissions);
+		else this.requiredCustomPermissions = EnumSet.noneOf(CustomPermission.class);
 		return self;
 	}
 
 	public T addCustomPermissions(final CustomPermission... permissions) {
-		this.requiredCustomPermissions = ArrayUtils.addAll(this.requiredCustomPermissions, permissions);
+		if (permissions != null) Collections.addAll(this.requiredCustomPermissions, permissions);
+		else this.requiredCustomPermissions = EnumSet.noneOf(CustomPermission.class);
 		return self;
 	}
 
-	public CustomPermission[] getRequiredCustomPermissions() {
+	public Set<CustomPermission> getRequiredCustomPermissions() {
 		return this.requiredCustomPermissions;
 	}
 

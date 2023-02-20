@@ -7,13 +7,14 @@ import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.annotation.Nonnull;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Set;
 
-public interface UserSettings extends SettingsContainer {
+public interface UserSettings extends SettingsContainer<User> {
 
 	String TABLE_NAME = "user_settings";
 
