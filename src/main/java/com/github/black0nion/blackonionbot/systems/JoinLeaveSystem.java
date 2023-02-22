@@ -17,8 +17,9 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.audit.ActionType;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -29,6 +30,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.JOIN);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
 
-			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
+			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(userSettings, guildSettings))
 				.setColor(Color.BLACK)
 				.setDescription(guildSettings.getJoinMessage().getValue(new Placeholder("user", author.getAsTag()), new Placeholder("guild", Utils.escapeMarkdown(guild.getName()))))
 				.setImage("attachment://welcome.png")
@@ -112,7 +114,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.LEAVE);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
 
-			var embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(author, guild))
+			EmbedBuilder embed = new TranslatedEmbedBuilder(languageSystem.getLanguage(userSettings, guildSettings))
 				.setColor(Color.BLACK)
 				.setDescription(guildSettings.getLeaveMessage().getValue(new Placeholder("user", author.getAsTag()), new Placeholder("guild", Utils.escapeMarkdown(guild.getName()))))
 				.setImage("attachment://goodbye.png")
@@ -127,41 +129,79 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	}
 
 	/**
-	 * Called when the bot gets added to a new guildid
+	 * Called when the bot gets added to a new guild
 	 */
 	@Override
 	public void onGuildJoin(final @NotNull GuildJoinEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
-			final BlackGuild guild = BlackGuild.from(event.getGuild());
+			final Guild guild = event.getGuild();
 
-			guild.retrieveOwner().queue(user -> {
-				final BlackUser author = BlackUser.from(user.getUser());
+			final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 
-				logger.info("I got added to the guildid {} (G: {}) with owner {} (U: {})", guild.getName(), guild.getId(), author.getName(), author.getId());
+			guild.retrieveAuditLogs()
+				.type(ActionType.BOT_ADD)
+				.limit(5)
+				.queue(entries -> {
+					User tmpAddUser = null;
+					UserSettings tmpUserSettings = null;
+					for (final AuditLogEntry entry : entries) {
+						if (entry.getTargetId().equals(event.getJDA().getSelfUser().getId())) {
+							tmpAddUser = entry.getUser();
+							tmpUserSettings = userSettingsRepo.getSettings(tmpAddUser);
 
-				try {
-					final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
-					guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getSuccessEmbed().addField("addedtoguild", languageSystem.getDefaultLanguage().getTranslation("guildstatsjoin", new Placeholder("name", guild.getEscapedName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount()), new Placeholder("owner", author.getEscapedName() + "(U:" + author.getId() + ")")), false).build()).queue();
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+							break;
+						}
+					}
 
-				if (config.getRunMode() == RunMode.BETA && !guildSettingsRepo.getSettings(guild).getGuildType().getValue().higherThanOrEqual(GuildType.BETA)) {
-					guild.leave().queue();
-					author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, guild).addField("notbeta", "betatutorial", false).build()).queue());
-					logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());
-					return;
-				}
+					@Nullable
+					User addUser = tmpAddUser;
+					@Nullable
+					UserSettings userSettings = tmpUserSettings;
 
-				author.openPrivateChannel().queue(channel ->
-					channel.sendMessageEmbeds(embedUtils.getSuccessEmbed(author, guild)
-						.setTitle("thankyouforadding")
-						.addField(
-							languageSystem.getTranslation("commandtohelp", author, guild).replace("%command%", "/help"),
-							languageSystem.getTranslation("changelanguage", author, guild).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
-						.build()
-					).queue());
-			});
+					if (addUser != null)
+						logger.info("I got added to the guild {} (G:{}) by {} (U:{})", guild.getName(), guild.getId(), addUser.getName(), addUser.getId());
+					else
+						logger.info("I got added to the guild {} (G:{})", guild.getName(), guild.getId());
+
+					if (config.getRunMode() == RunMode.BETA && !guildSettingsRepo.getSettings(guild).getGuildType().getValue().higherThanOrEqual(GuildType.BETA)) {
+						guild.leave().queue();
+						addUser.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(embedUtils.getErrorEmbed(addUser, userSettings, guildSettings).addField("notbeta", "betatutorial", false).build()).queue());
+						logger.error("{} (G: {}) added me but is not a beta guildid!", guild.getName(), guild.getId());
+						return;
+					}
+
+					if (addUser != null) {
+						addUser.openPrivateChannel().queue(channel ->
+							channel.sendMessageEmbeds(embedUtils.getSuccessEmbed(addUser, userSettings, guildSettings)
+								.setTitle("thankyouforadding")
+								.addField(
+									languageSystem.getTranslation("commandtohelp", userSettings, guildSettings).replace("%command%", "/help"),
+									languageSystem.getTranslation("changelanguage", userSettings, guildSettings).replace("%usercmd%", "/language user").replace("%guildcmd%", "/language guild"), false)
+								.build()
+							).queue());
+					}
+
+					if (settings.getLogsChannel() == -1) return;
+					try {
+						final Guild devGuild = event.getJDA().getGuildById(config.getDevGuild());
+						guild.retrieveOwner().flatMap(owner ->
+							devGuild.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getSuccessEmbed()
+								.addField("addedtoguild",
+									languageSystem.getDefaultLanguage()
+										.getTranslation("guildstatsjoin",
+											new Placeholder("name", Utils.escapeMarkdown(guild.getName()) + " (G: " + guild.getId() + ")"),
+											new Placeholder("usercount", guild.getMemberCount()),
+											new Placeholder("adduser", addUser != null ? (Utils.escapeMarkdown(addUser.getName()) + " (U: " + addUser.getId() + ")") : "empty"),
+											new Placeholder("owner", owner != null ? (Utils.escapeMarkdown(owner.getUser().getName()) + " (U: " + owner.getUser().getId() + ")") : "empty")
+										),
+									false)
+								.build()
+							)
+						).queue();
+					} catch (final Exception e) {
+						logger.error("Error while sending join message", e);
+					}
+				});
 		});
 	}
 
@@ -169,13 +209,19 @@ public class JoinLeaveSystem extends ListenerAdapter {
 	public void onGuildLeave(final GuildLeaveEvent event) {
 		Bot.getInstance().getExecutor().submit(() -> {
 			final Guild guild = event.getGuild();
-			logger.info("I got removed from the guildid {} (G: {})", guild.getName(), guild.getId());
+			logger.info("I got removed from the guild {} (G:{})", guild.getName(), guild.getId());
 
+			if (settings.getLogsChannel() == -1) return;
 			try {
-				final Guild guildById = event.getJDA().getGuildById(config.getDevGuild());
-				guildById.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getErrorEmbed().addField("removedfromguild", languageSystem.getDefaultLanguage().getTranslation("guildstatsleave", new Placeholder("name", guild.getName() + "(G:" + guild.getId() + ")"), new Placeholder("usercount", guild.getMemberCount())), false).build()).queue();
+				final Guild devGuild = event.getJDA().getGuildById(config.getDevGuild());
+				devGuild.getTextChannelById(settings.getLogsChannel()).sendMessageEmbeds(embedUtils.getErrorEmbed()
+					.setTitle(null)
+					.addField("removedfromguild", languageSystem.getDefaultLanguage().getTranslation("guildstatsleave",
+						new Placeholder("name", guild.getName() + " (G: " + guild.getId() + ")"),
+						new Placeholder("usercount", guild.getMemberCount())
+					), false).build()).queue();
 			} catch (final Exception e) {
-				e.printStackTrace();
+				logger.error("Error while sending leave message", e);
 			}
 		});
 	}

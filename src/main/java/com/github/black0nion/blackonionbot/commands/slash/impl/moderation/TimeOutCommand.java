@@ -117,7 +117,7 @@ public class TimeOutCommand extends SlashCommand {
 
 			cmde.send(message, await::done);
 			timeOutMember.getUser().openPrivateChannel()
-				.flatMap(channel -> channel.sendMessage(cmde.getTranslation("timedoutu", new Placeholder("guild", cmde.getGuild().getEscapedName()), new Placeholder("reason", reason))))
+				.flatMap(channel -> channel.sendMessage(cmde.getTranslation("timedoutu", new Placeholder("guild", Utils.escapeMarkdown(cmde.getGuild().getName())), new Placeholder("reason", reason))))
 				.queue(null, Utils.getCantSendHandler(await, message, cmde));
 		}, cmde::exception);
 	}

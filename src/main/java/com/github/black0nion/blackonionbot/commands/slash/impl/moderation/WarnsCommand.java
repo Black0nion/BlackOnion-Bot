@@ -61,7 +61,9 @@ public class WarnsCommand extends SlashCommand {
 		var warnId = cmde.getEvent().getOption(WARN_ID, OptionMapping::getAsLong);
 
 		if (warnId != null) {
-			Warn warn = cmde.getGuild().getWarn(warnId);
+			// TODO: reimplement
+			// Warn warn = cmde.getGuild().getWarn(warnId);
+			Warn warn = null;
 			StringBuilder result = new StringBuilder("empty");
 			if (warn != null) {
 				result = new StringBuilder()
@@ -95,7 +97,8 @@ public class WarnsCommand extends SlashCommand {
 	}
 
 	private static void handleAll(SlashCommandEvent cmde) {
-		sendWarns(cmde, cmde.getGuild().getWarns());
+		// TODO: reimplement
+		// sendWarns(cmde, cmde.getGuild().getWarns());
 	}
 
 	private static void sendWarns(SlashCommandEvent cmde, List<Warn> warns) {

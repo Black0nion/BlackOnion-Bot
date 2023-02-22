@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.commands.common;
 
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
@@ -10,12 +11,12 @@ import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +39,15 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 	protected C command;
 	protected final E event;
 	protected final JDA jda;
-	protected final BlackGuild guild;
-	protected final BlackMember member;
-	protected final BlackUser user;
+	protected final Guild guild;
+	protected final Member member;
+	protected final User user;
 	protected final UserSettings userSettings;
 	protected final TranslatedEmbedBuilder successEmbed;
 	protected final TranslatedEmbedBuilder errorEmbed;
 	protected Language language;
 
-	protected AbstractCommandEvent(final Language defaultLanguage, final C cmd, final E e, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings) {
+	protected AbstractCommandEvent(final Language defaultLanguage, final C cmd, final E e, final Guild guild, final Member member, final User user, final UserSettings userSettings, final GuildSettings guildSettings) {
 		this.command = cmd;
 		this.event = e;
 		this.jda = e.getJDA();
@@ -54,9 +55,9 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 		this.member = member;
 		this.user = user;
 		this.userSettings = userSettings;
-		this.successEmbed = EmbedUtils.getSuccessEmbed(defaultLanguage, this.user, this.guild);
-		this.errorEmbed = EmbedUtils.getErrorEmbed(defaultLanguage, this.user, this.guild);
-		this.language = LanguageUtils.getLanguage(userSettings, guild, defaultLanguage);
+		this.successEmbed = EmbedUtils.getSuccessEmbed(defaultLanguage, this.user, userSettings, guildSettings);
+		this.errorEmbed = EmbedUtils.getErrorEmbed(defaultLanguage, this.user, userSettings, guildSettings);
+		this.language = LanguageUtils.getLanguage(userSettings, guildSettings, defaultLanguage);
 	}
 
 	@Override
@@ -108,15 +109,15 @@ public abstract class AbstractCommandEvent<C extends AbstractCommand<?, ?>, E ex
 		return this.command;
 	}
 
-	public BlackUser getUser() {
+	public User getUser() {
 		return this.user;
 	}
 
-	public BlackGuild getGuild() {
+	public Guild getGuild() {
 		return this.guild;
 	}
 
-	public BlackMember getMember() {
+	public Member getMember() {
 		return this.member;
 	}
 

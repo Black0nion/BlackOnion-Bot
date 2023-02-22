@@ -41,9 +41,6 @@ import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Paginator;
 import com.github.ygimenez.model.PaginatorBuilder;
@@ -130,11 +127,6 @@ public class Bot extends ListenerAdapter {
 		return executor;
 	}
 
-	public ScheduledExecutorService getScheduledExecutor() {
-		return scheduledExecutor;
-	}
-
-
 	public EventWaiter getEventWaiter() {
 		return eventWaiter;
 	}
@@ -216,10 +208,6 @@ public class Bot extends ListenerAdapter {
 		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem);
 		injectorMap.add(giveawaySystem);
 
-		new BlackGuild.GuildCacheClear(reloadSystem);
-		new BlackUser.UserCacheClear(reloadSystem);
-		new BlackMember.MemberCacheClear(reloadSystem);
-
 		this.pluginSystem = new PluginSystem(this);
 		reloadSystem.registerReloadable(pluginSystem);
 
@@ -241,7 +229,7 @@ public class Bot extends ListenerAdapter {
 		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
 		builder.setActivity(ActivityCommand.getActivity(settings));
 
-		if (featureFlags.bot_shutdownBeforeConnection.getValue()) {
+		if (Boolean.TRUE.equals(featureFlags.bot_shutdownBeforeConnection.getValue())) {
 			logger.warn("Shutting down before connecting to Discord due to the 'bot.shutdownBeforeConnection' feature flag");
 			System.exit(0);
 		}
@@ -267,7 +255,7 @@ public class Bot extends ListenerAdapter {
 
 		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
-		jda.addEventListener(new AntiSpoilerSystem(languageSystem, embedUtils, guildSettingsRepo));
+		jda.addEventListener(new AntiSpoilerSystem(languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 
 		slashCommandBase.addCommands();
 

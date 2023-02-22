@@ -4,6 +4,8 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
@@ -26,11 +28,13 @@ public class AntiSpoilerSystem extends ListenerAdapter {
     private final LanguageSystem languageSystem;
     private final EmbedUtils embedUtils;
     private final GuildSettingsRepo guildSettingsRepo;
+    private final UserSettingsRepo userSettingsRepo;
 
-    public AntiSpoilerSystem(LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo) {
+    public AntiSpoilerSystem(LanguageSystem languageSystem, EmbedUtils embedUtils, GuildSettingsRepo guildSettingsRepo, UserSettingsRepo userSettingsRepo) {
         this.languageSystem = languageSystem;
         this.embedUtils = embedUtils;
         this.guildSettingsRepo = guildSettingsRepo;
+        this.userSettingsRepo = userSettingsRepo;
     }
 
     /**
@@ -43,18 +47,20 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
         final BlackGuild guild = BlackGuild.from(event != null ? event.getGuild() : event1.getGuild());
 
-        final GuildSettings settings = guildSettingsRepo.getSettings(guild);
-        final AntiSpoilerType type = settings.getAntiSpoiler().getValue();
+        final UserSettings userSettings = userSettingsRepo.getSettings(author);
 
-        return handleSystem(guild, msg, message, author, channel, message, type);
+        final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+        final AntiSpoilerType type = guildSettings.getAntiSpoiler().getValue();
+
+        return handleSystem(event, guild, msg, message, author, channel, message, type, guildSettings, userSettings);
     }
 
-    public boolean handleSystem(BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type) {
+    public boolean handleSystem(MessageReceivedEvent event, BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type, GuildSettings guildSettings, UserSettings userSettings) {
         if (type != OFF) {
             long count = message.chars().filter(c -> c == '|').count();
             if (count < 4) return false;
 
-            if (Utils.handleSelfRights(languageSystem, guild, author, channel, null, Permission.MESSAGE_MANAGE)) return false;
+            if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, null, Permission.MESSAGE_MANAGE)) return false;
 
             msg.delete().queue();
             if (type == DELETE) return true;
@@ -87,7 +93,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
                     e.printStackTrace();
                 }
             } else {
-                channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, guild).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
+                channel.sendMessageEmbeds(embedUtils.getErrorEmbed(author, userSettings, guildSettings).addField("erroroccurred", "somethingwentwrong", false).build()).queue();
             }
         }
         return false;

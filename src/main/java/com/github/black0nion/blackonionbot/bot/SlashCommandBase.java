@@ -344,7 +344,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		}
 
 		LanguageSystem languageSystem = injector.getInstance(LanguageSystem.class);
-		if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
+		if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
 			final AbstractCommand<?, ?> command = commands.get(event.getName()).getSecond();
 			if (!clazz.isAssignableFrom(command.getClass())) return;
@@ -352,8 +352,8 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			final C cmd = clazz.cast(command);
 
 			AbstractCommandEvent<?, ?> cmde;
-			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings);
-			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings);
+			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
+			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
 			final boolean disabled = guildSettings.getDisabledCommands().contains(cmd);
@@ -372,7 +372,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 
 			final Set<Permission> requiredBotPermissions = cmd.getRequiredBotPermissions();
 			final Set<Permission> requiredPermissions = cmd.getRequiredPermissions();
-			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions)) return;
+			if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(requiredPermissions)) {
 				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(userSettings)) return;
@@ -380,11 +380,11 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 				return;
 			}
 
-			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions))
+			if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, requiredBotPermissions))
 				return;
 
 			if (cmd.isPremiumCommand() && !guildSettings.getGuildType().getValue().higherThanOrEqual(GuildType.PREMIUM)) {
-				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, guild)).queue();
+				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, userSettings, guildSettings)).queue();
 				return;
 			}
 

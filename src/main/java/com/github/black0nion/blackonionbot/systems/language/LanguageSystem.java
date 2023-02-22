@@ -1,9 +1,7 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -11,16 +9,16 @@ import java.util.Map;
 public interface LanguageSystem {
 	Map<String, Language> getLanguages();
 
-	Language getLanguage(User user, Guild guild);
-
-	Language getLanguage(@Nullable BlackUser user, @Nullable BlackGuild guild);
+	default Language getLanguage(@Nullable UserSettings userSettings, @Nullable GuildSettings guildSettings) {
+		return LanguageUtils.getLanguage(userSettings, guildSettings, getDefaultLanguage());
+	}
 
 	Language getDefaultLanguage();
 
 	@Nullable
 	Language getLanguageFromCode(String name);
 
-	String getTranslation(@Nullable String key, @Nullable BlackUser author, @Nullable BlackGuild guild);
+	String getTranslation(@Nullable String key, @Nullable UserSettings userSettings, @Nullable GuildSettings guildSettings);
 
 	String getLanguageString();
 }

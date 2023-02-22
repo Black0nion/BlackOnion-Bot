@@ -4,10 +4,15 @@ import com.github.black0nion.blackonionbot.commands.common.utils.UserRespondUtil
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommand;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
+import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
@@ -47,14 +52,18 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 
 	private final SQLHelperFactory sql;
 	private final LanguageSystem languageSystem;
+	private final UserSettingsRepo userSettingsRepo;
+	private final GuildSettingsRepo guildSettingsRepo;
 
-	public ReactionRolesSetupCommand(SQLHelperFactory sqlHelperFactory, LanguageSystem languageSystem) {
+	public ReactionRolesSetupCommand(SQLHelperFactory sqlHelperFactory, LanguageSystem languageSystem, UserSettingsRepo userSettingsRepo, GuildSettingsRepo guildSettingsRepo) {
 		super(builder(Commands.message("Reaction Roles"))
 			.setRequiredPermissions(Permission.MANAGE_ROLES)
 			.setRequiredBotPermissions(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION)
 		);
 		this.sql = sqlHelperFactory;
 		this.languageSystem = languageSystem;
+		this.userSettingsRepo = userSettingsRepo;
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	@Override
@@ -73,7 +82,10 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 		// format: command|action:messageId
 		String[] split = getIdParts(event.getComponentId());
 
-		Language language = languageSystem.getLanguage(event.getUser(), event.getGuild());
+		final UserSettings userSettings = userSettingsRepo.getSettings(event.getUser());
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(event.getGuild());
+
+		Language language = languageSystem.getLanguage(userSettings, guildSettings);
 		(
 		switch (split[0]) {
 			case CREATE_REACTION -> event.editComponents(ActionRow.of(EntitySelectMenu.create(event.getComponentId(), EntitySelectMenu.SelectTarget.ROLE).build()));
@@ -89,11 +101,14 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 	public void handleSelectMenuInteraction(GenericSelectMenuInteractionEvent<?, ?> event) {
 		if (!(event instanceof EntitySelectInteractionEvent e)) return;
 
+		final UserSettings userSettings = userSettingsRepo.getSettings(event.getUser());
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(event.getGuild());
+
 		// format: command|action:messageId
 		String id = requireNonNull(event.getComponent().getId());
 		String[] split = getIdParts(id);
 
-		Language language = languageSystem.getLanguage(event.getUser(), event.getGuild());
+		Language language = languageSystem.getLanguage(userSettings, guildSettings);
 		event.getInteraction().replyModal(Modal
 			.create(enrichId(CREATE_REACTION, split[1], e.getValues().get(0).getId()), language.getTranslationNonNull("create"))
 				.addActionRow(TextInput.create("emoji", "Type emoji here", TextInputStyle.SHORT).build())
@@ -112,12 +127,13 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 			? Emoji.fromCustom(emojiMatcher.group(1), Long.parseLong(emojiMatcher.group(2)), emojiRaw.startsWith("<a:"))
 			: Emoji.fromUnicode(emojiRaw);
 
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(event.getGuild());
+		final UserSettings userSettings = userSettingsRepo.getSettings(event.getUser());
+
 		try {
 			switch (split[0]) {
 				case CREATE_REACTION -> createReactionRole(
-						new UserRespondUtilsImpl(event,
-							BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()
-						),
+						new UserRespondUtilsImpl(event, guildSettings, event.getUser(), userSettings, languageSystem.getDefaultLanguage()),
 						event.getGuild(),
 						event.getChannel().asTextChannel(),
 						Long.parseLong(split[1]),
@@ -126,16 +142,14 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 						requireNonNull(event.getGuild()).getRoleById(split[2])
 					);
 				case REMOVE_REACTION -> removeReactionRole(
-						new UserRespondUtilsImpl(event,
-							BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()
-						),
+						new UserRespondUtilsImpl(event, guildSettings, event.getUser(), userSettings, languageSystem.getDefaultLanguage()),
 						event.getGuild(),
 						event.getChannel().asTextChannel(),
 						Long.parseLong(split[1]),
 						emoji,
 						Utils.serializeEmoji(emoji)
 					);
-				default -> throw new IllegalStateException("Unexpected value: " + split[0]);
+				default -> throw new NotImplementedException("Subcommand saved in id " + split[0]);
 			}
 		} catch (SQLException e) {
 			logger.error("Failed to create reaction role", e);

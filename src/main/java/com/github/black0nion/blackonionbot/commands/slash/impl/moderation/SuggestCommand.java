@@ -42,7 +42,7 @@ public class SuggestCommand extends SlashCommand {
 				cmde.send("invalidsuggestionschannel");
 			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
 				Permission.MESSAGE_ADD_REACTION))) {
-				e.replyEmbeds(Utils.noRights(languageSystem, guild, guild.getSelfBlackMember().getBlackUser(), Permission.MESSAGE_SEND,
+				e.replyEmbeds(Utils.noRights(languageSystem, guildSettings, guild.getSelfMember().getUser(), null, Permission.MESSAGE_SEND,
 					Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
 			} else {
 				// all good, we can send the suggestion

@@ -5,12 +5,12 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import com.google.common.collect.Lists;
@@ -185,13 +185,13 @@ public class Utils {
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleSelfRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final Guild guild, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 			(callback != null
-				? callback.replyEmbeds(noRights(languageSystem, guild, author, permissions))
-				: channel.sendMessageEmbeds(noRights(languageSystem, guild, author, permissions))
+				? callback.replyEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
 			).queue();
 			return true;
 		}
@@ -205,25 +205,25 @@ public class Utils {
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleSelfRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Collection<Permission> permissions) {
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final Guild guild, final GuildSettings guildSettings, final User author, @Nullable final UserSettings userSettings, final TextChannel channel, @Nullable IReplyCallback callback, final Collection<Permission> permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 			(callback != null
-				? callback.replyEmbeds(noRights(languageSystem, guild, author, permissions))
-				: channel.sendMessageEmbeds(noRights(languageSystem, guild, author, permissions))
+				? callback.replyEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
 			).queue();
 			return true;
 		}
 		return false;
 	}
 
-	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
-		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final Permission... missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, userSettings, guildSettings).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", userSettings, guildSettings) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
-	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Collection<Permission> missingPermissions) {
-		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final Collection<Permission> missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, userSettings, guildSettings).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", userSettings, guildSettings) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
 	/**
