@@ -13,8 +13,7 @@ import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -62,7 +61,7 @@ public class BanUsageCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild executedGuild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, BlackGuild executedGuild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final User user = e.getOption("targetuser", OptionMapping::getAsUser);
 		final String guildIdString = e.getOption("targetguild", OptionMapping::getAsString);
 

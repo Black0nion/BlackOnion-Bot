@@ -9,9 +9,9 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -50,7 +50,7 @@ public class LanguageCommand extends SlashCommand {
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, @NotNull BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, @NotNull User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		String subcommandGroup = null;
 		String subcommand = cmde.getSubcommandName();
 		Language lang = null;
@@ -64,26 +64,26 @@ public class LanguageCommand extends SlashCommand {
 			cmde.send("languagelist", new Placeholder("langs", languageSystem.getLanguageString()));
 		} else if (subcommandGroup.equalsIgnoreCase("user")) {
 			if (subcommand.equalsIgnoreCase("get")) {
-				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(author.getLanguage())
+				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(userSettings.getLanguage().getValue())
 					.map(Language::getFullName)
 					.orElse(cmde.getTranslation("empty"))
 				));
 			} else if (subcommand.equalsIgnoreCase("set")) {
 				// can't be null because of the checks above
-				author.setLanguage(lang);
+				userSettings.getLanguage().setValue(lang);
 				cmde.setLanguage(lang);
 				cmde.send("languageupdated", new Placeholder("newlang", lang.getFullName()));
 			} else throw new NotImplementedException("Subcommand");
 		} else if (subcommandGroup.equalsIgnoreCase("guild")) {
 			if (subcommand.equalsIgnoreCase("get")) {
-				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(guild.getLanguage())
+				cmde.send("currentlanguage", new Placeholder("language", Optional.ofNullable(guildSettings.getLanguage().getValue())
 					.map(Language::getFullName)
 					.orElse(cmde.getTranslation("empty"))
 				));
 			} else if (subcommand.equalsIgnoreCase("set")) {
 				cmde.handlePerms(Permission.MANAGE_SERVER);
 				// can't be null because of the checks above
-				guild.setLanguage(lang);
+				guildSettings.getLanguage().setValue(lang);
 				cmde.setLanguage(lang);
 				cmde.send("languageupdated", new Placeholder("newlang", lang.getFullName()));
 			} else throw new NotImplementedException("Subcommand");

@@ -10,9 +10,9 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
@@ -43,7 +43,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
     public boolean removeSpoilers(@Nullable MessageReceivedEvent event, @Nullable MessageUpdateEvent event1) {
         final Message msg = event != null ? event.getMessage() : event1.getMessage();
         final String message = msg.getContentRaw();
-        final BlackUser author = BlackUser.from(event != null ? event.getAuthor() : event1.getAuthor());
+        final User author = event != null ? event.getAuthor() : event1.getAuthor();
         final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
         final BlackGuild guild = BlackGuild.from(event != null ? event.getGuild() : event1.getGuild());
 
@@ -55,7 +55,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
         return handleSystem(event, guild, msg, message, author, channel, message, type, guildSettings, userSettings);
     }
 
-    public boolean handleSystem(MessageReceivedEvent event, BlackGuild guild, Message msg, String message, BlackUser author, TextChannel channel, String newMessage, AntiSpoilerType type, GuildSettings guildSettings, UserSettings userSettings) {
+    public boolean handleSystem(MessageReceivedEvent event, BlackGuild guild, Message msg, String message, User author, TextChannel channel, String newMessage, AntiSpoilerType type, GuildSettings guildSettings, UserSettings userSettings) {
         if (type != OFF) {
             long count = message.chars().filter(c -> c == '|').count();
             if (count < 4) return false;
@@ -79,7 +79,7 @@ public class AntiSpoilerSystem extends ListenerAdapter {
                         try {
                             WebhookClient client = Utils.makeWebhookClient(Utils.getWebhook(channel, webhooks));
                             final WebhookMessageBuilder builder = new WebhookMessageBuilder();
-                            builder.setUsername(author.getEscapedEffectiveName());
+                            builder.setUsername(Utils.escapeMarkdown(author.getAsTag()));
                             builder.setContent(finalNewMessage);
                             builder.setAvatarUrl(author.getAvatarUrl());
                             client.send(builder.build());

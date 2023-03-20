@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.utils.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TicTacToeBot {
 

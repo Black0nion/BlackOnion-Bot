@@ -13,7 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.black0nion.blackonionbot.misc.enums.OperatingSystem.*;
+import static com.github.black0nion.blackonionbot.misc.enums.OperatingSystem.LINUX;
+import static com.github.black0nion.blackonionbot.misc.enums.OperatingSystem.WINDOWS;
 
 public class BotInformation {
 	private BotInformation() {}

@@ -27,11 +27,11 @@ import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.*;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -308,9 +308,9 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		if (event.getUser().isBot() || (event.getGuild() != null && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY)))
 			return;
 
-		final BlackUser author = BlackUser.from(event.getUser());
+		final User author = event.getUser();
 		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		final BlackMember member = BlackMember.from(event.getMember());
+		final Member member = event.getMember();
 
 		assert guild != null && member != null;
 
@@ -320,7 +320,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			final String log = EmojiParser.parseToAliases(guild.getDebugMessage()
 				+ " > "
 				+ channel.getName()
-				+ "(C:" + channel.getId() + ") | " + author.getDebugMessage()
+				+ "(C:" + channel.getId() + ") | " + Utils.getDebugMessage(author)
 				+ ": (E:" + event.getId() + ")"
 				+ event.getFullCommandName().replace(" ", "/") + " "
 				+ event.getOptions().stream()

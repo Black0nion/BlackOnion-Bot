@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;

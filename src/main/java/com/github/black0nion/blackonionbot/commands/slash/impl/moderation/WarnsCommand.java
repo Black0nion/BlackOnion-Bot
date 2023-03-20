@@ -9,12 +9,12 @@ import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Page;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -48,7 +48,7 @@ public class WarnsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case ID -> handleId(cmde);
 			case USER -> handleUser(cmde);
@@ -83,13 +83,15 @@ public class WarnsCommand extends SlashCommand {
 		var warnMember = cmde.getEvent().getOption(USER, OptionMapping::getAsMember);
 
 		if (warnMember != null) {
-			var blackMember = BlackMember.from(cmde.getGuild().retrieveMemberById(warnMember.getId()).submit().join());
+			var blackMember = cmde.getGuild().retrieveMemberById(warnMember.getId()).submit().join();
 			if (blackMember == null) {
 				cmde.send("memberisnull");
 				return;
 			}
 
-			final List<Warn> warns = blackMember.getWarns();
+			// TODO: get warns
+			//  final List<Warn> warns = blackMember.getWarns();
+			final List<Warn> warns = new ArrayList<>();
 			sendWarns(cmde, warns);
 		} else {
 			cmde.send("notamember");

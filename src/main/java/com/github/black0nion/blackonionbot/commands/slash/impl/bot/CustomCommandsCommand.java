@@ -7,14 +7,16 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommand;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandRepository;
 import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandResponsePlaintext;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -28,6 +30,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -40,8 +43,9 @@ public class CustomCommandsCommand extends SlashCommand {
 	private static final String DELETE = "delete";
 	private final SlashCommandBase slashCommandBase;
 	private final LanguageSystem languageSystem;
+	private final CustomCommandRepository customCommandRepository;
 
-	public CustomCommandsCommand(SlashCommandBase slashCommandBase, LanguageSystem languageSystem) {
+	public CustomCommandsCommand(SlashCommandBase slashCommandBase, LanguageSystem languageSystem, CustomCommandRepository customCommandRepository) {
 		super(builder(Commands.slash("customcommand", "Used to manage custom commands.")
 			.addSubcommands(
 				new SubcommandData(LIST, "List all custom commands"),
@@ -52,19 +56,22 @@ public class CustomCommandsCommand extends SlashCommand {
 			)));
 		this.slashCommandBase = slashCommandBase;
 		this.languageSystem = languageSystem;
+		this.customCommandRepository = customCommandRepository;
 	}
 
 	@Override
 	// TODO: test
 	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
+		Guild guild = Objects.requireNonNull(event.getGuild());
 		if (event.getSubcommandName().equals(DELETE) && event.getFocusedOption().getName().equals(COMMAND_NAME)) {
-			List<String> elements = new StartsWithLinkedList(BlackGuild.from(event.getGuild()).getCustomCommands().keySet())
+			List<String> elements = new StartsWithLinkedList(customCommandRepository.getCustomCommands(guild).keySet())
 				.getElementsStartingWith(event.getFocusedOption().getValue());
+
 			event.replyChoices(elements.stream().map(e -> new Command.Choice(e, e)).toList()).queue();
 		}
 	}
 
-	private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings, final GuildSettings guildSettings) {
+	private void askForRaw(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final Member member, final User user, final UserSettings userSettings, final GuildSettings guildSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success()
 				.addField("messagetosend", "inputmessage", false)
 				.setDescription(cmde.getTranslation("leavetutorial"))
@@ -83,7 +90,7 @@ public class CustomCommandsCommand extends SlashCommand {
 				}));
 	}
 
-	private void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings, GuildSettings guildSettings) {
+	private void askForReply(final String command, final @NotNull SlashCommandEvent cmde, final @NotNull CustomCommand customCommand, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final Member member, final User user, final UserSettings userSettings, GuildSettings guildSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("shouldreply", "shouldanswer", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 
@@ -110,20 +117,21 @@ public class CustomCommandsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		var option = cmde.getOption(OPTION, OptionMapping::getAsString);
+		Map<String, CustomCommand> customCommands = customCommandRepository.getCustomCommands(guild);
+
 		switch (Objects.requireNonNull(option)) {
-			case LIST ->
-				cmde.success("customcommandslist", guild.getCustomCommands().values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
+			case LIST -> cmde.success("customcommandslist", customCommands.values().stream().map(val -> "- `" + val.getCommand() + "`").collect(Collectors.joining("\n")));
 			case CREATE -> {
-				final String command = e.getOption(COMMAND_NAME, OptionMapping::getAsString);
+				final String command = cmde.getOption(COMMAND_NAME, OptionMapping::getAsString);
 				final int maxCount = guildSettings.getGuildType().getValue().getMaxCustomCommands();
-				if (guild.getCustomCommands().size() >= maxCount) {
+				if (customCommands.size() >= maxCount) {
 					cmde.error("toomanycustomcommands", "maxcustomcommands", new Placeholder("count", maxCount));
 					return;
 				}
 
-				if (slashCommandBase.getCommand(command) != null || guild.getCustomCommands().containsKey(command)) {
+				if (slashCommandBase.getCommand(command) != null || customCommands.containsKey(command)) {
 					cmde.error("alreadyexisting", "commandexisting");
 					return;
 				}
@@ -132,7 +140,7 @@ public class CustomCommandsCommand extends SlashCommand {
 			}
 			case DELETE -> {
 				final String command = cmde.getOption(COMMAND_NAME, OptionMapping::getAsString);
-				if (guild.getCustomCommands().containsKey(command)) {
+				if (customCommands.containsKey(command)) {
 					this.askForType(command, cmde, e, guild, member, author, userSettings, guildSettings);
 				} else {
 					cmde.error("notfound", "commandnotfound");
@@ -156,7 +164,7 @@ public class CustomCommandsCommand extends SlashCommand {
 		}));
 	}
 
-	private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final BlackMember member, final BlackUser user, final UserSettings userSettings, GuildSettings guildSettings) {
+	private void askForType(final @NotNull String command, final @NotNull SlashCommandEvent cmde, final SlashCommandInteractionEvent slashCommandInteractionEvent, final BlackGuild guild, final Member member, final User user, final UserSettings userSettings, GuildSettings guildSettings) {
 		slashCommandInteractionEvent.replyEmbeds(cmde.success().addField("inputtype", "validtypes", false).setDescription(cmde.getTranslation("leavetutorial")).setAuthor(cmde.getTranslation("customcommandsetup", new Placeholder("cmd", command)), slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl()).build()).queue(msg -> Bot.getInstance().getEventWaiter().waitForEvent(MessageReceivedEvent.class, e -> e.getChannelType() == ChannelType.TEXT && e.getChannel().getIdLong() == cmde.getChannel().getIdLong() && e.getAuthor().getIdLong() == cmde.getUser().getIdLong(), e -> {
 			final String contentRaw = e.getMessage().getContentRaw();
 			if (contentRaw.startsWith("/") || Utils.equalsOneIgnoreCase(contentRaw, "exit", "leave", "cancel")) {

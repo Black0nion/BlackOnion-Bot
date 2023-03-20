@@ -1,12 +1,13 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -38,10 +39,12 @@ public class GiveawaySystem {
 
 	private final SQLHelperFactory sql;
 	private final LanguageSystem languageSystem;
+	private final GuildSettingsRepo guildSettingsRepo;
 
-	public GiveawaySystem(SQLHelperFactory sql, LanguageSystem languageSystem) {
+	public GiveawaySystem(SQLHelperFactory sql, LanguageSystem languageSystem, GuildSettingsRepo guildSettingsRepo) {
 		this.sql = sql;
 		this.languageSystem = languageSystem;
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	private final List<Giveaway> giveaways = new ArrayList<>();
@@ -108,9 +111,10 @@ public class GiveawaySystem {
 
 	public void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
 		try {
+			GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
-				Language lang = Utils.gOD(guild.getLanguage(), languageSystem.getDefaultLanguage());
+				Language lang = guildSettings.getLanguage().getOrDefault();
 				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.reply(lang.getTranslationNonNull("nowinner")).queue();
 					updateGiveawayMessage(msg, lang);

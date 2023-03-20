@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.config.mutable.impl;
 
+import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
 import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
-import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 

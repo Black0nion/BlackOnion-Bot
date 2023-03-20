@@ -43,6 +43,11 @@ public class LanguageSettingImpl extends AbstractSetting<Language> implements La
 		return getValue() == null ? null : this.getValue().getLanguageCode();
 	}
 
+	@Override
+	public Language getOrDefault() {
+		return getValue() == null ? languageSystem.getDefaultLanguage() : getValue();
+	}
+
 	private static final List<Class<?>> CAN_PARSE = List.of(String.class, Language.class);
 
 	@Override

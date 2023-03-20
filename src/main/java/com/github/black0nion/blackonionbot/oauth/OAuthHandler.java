@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.oauth;
 
-import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
-import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.api.DiscordAuthCodeToTokens;
+import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
+import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.mokulu.discord.oauth.DiscordAPI;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.concurrent.ExecutionException;
 
-import static com.github.black0nion.blackonionbot.oauth.OAuthAPI.*;
+import static com.github.black0nion.blackonionbot.oauth.OAuthAPI.TOKEN_PATTERN;
 
 public class OAuthHandler {
 

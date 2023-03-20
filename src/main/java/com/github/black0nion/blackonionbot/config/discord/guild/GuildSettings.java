@@ -66,4 +66,6 @@ public interface GuildSettings extends SettingsContainer<Guild>, DisabledCommand
 	ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands();
 
 	ListSetting<Long, Set<Long>> getAutoRoles();
+
+	ChannelSetting<TextChannel> getSuggestionsChannel();
 }

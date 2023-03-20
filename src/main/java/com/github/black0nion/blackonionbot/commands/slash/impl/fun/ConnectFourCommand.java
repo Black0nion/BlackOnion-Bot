@@ -14,9 +14,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,7 +25,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ConnectFourCommand extends SlashCommand {
@@ -44,7 +41,7 @@ public class ConnectFourCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		User challenged = cmde.getOption(USER, OptionMapping::getAsUser);
 		UserSettings challengedSettings = userSettingsRepo.getSettings(challenged);
 
@@ -64,7 +61,7 @@ public class ConnectFourCommand extends SlashCommand {
 			final UserSettings answerUserSettings = userSettingsRepo.getSettings(answerUser);
 			if (!answerUser.isBot() && answerUser.getId().equals(challenged.getId())) {
 				if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
-					e.replyEmbeds(EmbedUtils.getSuccessEmbed(cmde.getLanguage(), answerUser, answerUserSettings, guildSettings).addField(languageSystem.getTranslation("challengeaccepted", answerUserSettings, guildSettings), languageSystem.getTranslation("playingagainst", answerUserSettings, guildSettings).replace("%challenger%", author.getEscapedName()), false).build()).queue();
+					e.replyEmbeds(EmbedUtils.getSuccessEmbed(cmde.getLanguage(), answerUser, answerUserSettings, guildSettings).addField(languageSystem.getTranslation("challengeaccepted", answerUserSettings, guildSettings), languageSystem.getTranslation("playingagainst", answerUserSettings, guildSettings).replace("%challenger%", Utils.escapeMarkdown(author.getName())), false).build()).queue();
 
 					final ConnectFour game = ConnectFourGameManager.createGame(languageSystem.getDefaultLanguage(), channel, author, challenged);
 					this.rerun(game, cmde, guildSettings);
@@ -131,7 +128,7 @@ public class ConnectFourCommand extends SlashCommand {
 			}
 			this.rerun(game, cmde, guildSettings);
 		}, 1, TimeUnit.MINUTES, () -> {
-			Language lang = Optional.ofNullable(guildSettings.getLanguage().getValue()).orElseGet(this.languageSystem::getDefaultLanguage);
+			Language lang = guildSettings.getLanguage().getOrDefault();
 			game.getMessage().editMessageEmbeds(EmbedUtils.getErrorEmbed(lang)
 					.addField("timeout", "tooktoolong", false)
 					.build()

@@ -6,8 +6,8 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,11 +18,14 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a SlashCommand that can be executed by users.
- * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, BlackMember, BlackUser, BlackGuild, TextChannel, UserSettings, GuildSettings) execute} method.
+ * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, Member, User, BlackGuild, TextChannel, UserSettings, GuildSettings) execute} method.
  * <p>
  * Implement a command by doing this:
  * <pre>{@code
@@ -77,7 +80,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	}
 	//endregion
 
-	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
+	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final Member member, final User author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
 
 	protected void updateAutoComplete(Map.Entry<String, StartsWithLinkedList> entry) {
 		Checks.notNull(entry, "Entry");

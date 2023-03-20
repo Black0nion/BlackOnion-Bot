@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
 import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
-import com.github.black0nion.blackonionbot.config.common.Flags;
 import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
+import com.github.black0nion.blackonionbot.config.common.Flags;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
 import com.github.black0nion.blackonionbot.utils.Utils;
 
 import java.util.List;

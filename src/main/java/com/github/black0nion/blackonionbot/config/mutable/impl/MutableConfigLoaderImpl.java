@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.config.mutable.impl;
 
-import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
-import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
-import com.github.black0nion.blackonionbot.config.common.exception.ConfigSavingException;
 import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.common.Flags;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigLoadingException;
+import com.github.black0nion.blackonionbot.config.common.exception.ConfigSavingException;
+import com.github.black0nion.blackonionbot.config.mutable.api.MutableConfigLoader;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;

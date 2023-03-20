@@ -1,16 +1,15 @@
 package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
+import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.Warn;
-import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
-import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -18,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClearWarnCommand extends SlashCommand {
@@ -32,30 +32,29 @@ public class ClearWarnCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
-		Member memb = e.getOption(USER, OptionMapping::getAsMember);
-		if (memb == null) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+		Member targetMember = e.getOption(USER, OptionMapping::getAsMember);
+		if (targetMember == null) {
 			cmde.send("notamember");
 			return;
 		}
 
-		var warnMember = BlackMember.from(memb);
-		if (warnMember == null)
-			throw new NullPointerException("warnMember is null");
-
 		var warnId = e.getOption(WARN_ID, OptionMapping::getAsLong);
 
 		if (warnId == null) {
-			// delete all warns
-			warnMember.clearWarns();
-			cmde.send("warnsdeleted", new Placeholder("user", warnMember.getUser().getAsMention()));
+			// TODO: delete all warns
+			// warnMember.clearWarns();
+			cmde.send("warnsdeleted", new Placeholder("user", targetMember.getUser().getAsMention()));
 			return;
 		}
 
-		final List<Warn> memberWarns = warnMember.getWarns();
+		// TODO: get warns
+		// final List<Warn> memberWarns = targetMember.getWarns();
+		final List<Warn> memberWarns = new ArrayList<>();
 		for (final Warn warn : memberWarns) {
 			if (warn.id() == warnId) {
-				warnMember.deleteWarn(warn);
+				// TODO: delete warn
+				// warnMember.deleteWarn(warn);
 				cmde.send("warndeleted");
 				return;
 			}

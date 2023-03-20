@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
-import javax.annotation.Nullable;
-
 import net.dv8tion.jda.api.entities.User;
+
+import javax.annotation.Nullable;
 
 public class TicTacToePlayer {
 	public User user = null;

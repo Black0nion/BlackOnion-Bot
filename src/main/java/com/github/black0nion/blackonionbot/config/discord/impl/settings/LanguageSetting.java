@@ -12,4 +12,6 @@ public interface LanguageSetting extends Setting<Language> {
 	default String getTranslation(String key, Placeholder... args) {
 		return getValue().getTranslation(key, args);
 	}
+
+	Language getOrDefault();
 }

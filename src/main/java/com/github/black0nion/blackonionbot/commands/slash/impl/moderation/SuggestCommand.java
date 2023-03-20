@@ -7,9 +7,9 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -30,29 +30,24 @@ public class SuggestCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		var suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
-		final long suggestionsChannelId = guild.getSuggestionsChannel();
+		final TextChannel suggestionsChannel = guildSettings.getSuggestionsChannel().getValue();
 
-		if (suggestionsChannelId == -1) {
+		if (suggestionsChannel == null) {
 			cmde.send("invalidsuggestionschannel");
+		} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
+			Permission.MESSAGE_ADD_REACTION))) {
+			e.replyEmbeds(Utils.noRights(languageSystem, guildSettings, guild.getSelfMember().getUser(), null, Permission.MESSAGE_SEND,
+				Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
 		} else {
-			final TextChannel suggestionsChannel = guild.getTextChannelById(suggestionsChannelId);
-			if (suggestionsChannel == null) {
-				cmde.send("invalidsuggestionschannel");
-			} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
-				Permission.MESSAGE_ADD_REACTION))) {
-				e.replyEmbeds(Utils.noRights(languageSystem, guildSettings, guild.getSelfMember().getUser(), null, Permission.MESSAGE_SEND,
-					Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
-			} else {
-				// all good, we can send the suggestion
-				suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle(SUGGESTION).setDescription(String.join(" ", suggestion)).build())
-					.queue(msg -> {
-						msg.addReaction(Emoji.fromUnicode("U+1F44D")).queue();
-						msg.addReaction(Emoji.fromUnicode("U+1F44E")).queue();
-					});
-				cmde.send("suggestionsucess");
-			}
+			// all good, we can send the suggestion
+			suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle(SUGGESTION).setDescription(String.join(" ", suggestion)).build())
+				.queue(msg -> {
+					msg.addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+					msg.addReaction(Emoji.fromUnicode("U+1F44E")).queue();
+				});
+			cmde.send("suggestionsucess");
 		}
 	}
 }

@@ -33,6 +33,7 @@ import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandRepositoryImpl;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystemImpl;
@@ -119,8 +120,9 @@ public class Bot extends ListenerAdapter {
 	private final Settings settings;
 	private final DatabaseConnector database;
 	private final SQLHelperFactory sqlHelperFactory;
-	private final GiveawaySystem giveawaySystem;
+	private volatile GiveawaySystem giveawaySystem;
 	private final PluginSystem pluginSystem;
+	private final StatisticsManager statisticsManager;
 
 	//region Getters
 	public ExecutorService getExecutor() {
@@ -184,8 +186,10 @@ public class Bot extends ListenerAdapter {
 		sqlHelperFactory = database.getSqlHelperFactory();
 		injectorMap.add(sqlHelperFactory);
 
+		injectorMap.add(new CustomCommandRepositoryImpl(sqlHelperFactory));
+
 		SessionHandler sessionHandler = injectorMap.add(new DatabaseSessionHandler(sqlHelperFactory));
-		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
+		statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
 
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
@@ -204,9 +208,6 @@ public class Bot extends ListenerAdapter {
 		slashCommandBase = new SlashCommandBase(config, injector, reloadSystem);
 		injectorMap.add(SlashCommandBase.class, slashCommandBase);
 		injectorMap.add(CommandRegistry.class, slashCommandBase);
-
-		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem);
-		injectorMap.add(giveawaySystem);
 
 		this.pluginSystem = new PluginSystem(this);
 		reloadSystem.registerReloadable(pluginSystem);
@@ -253,6 +254,9 @@ public class Bot extends ListenerAdapter {
 		reloadSystem.registerReloadable(userSettingsRepo);
 		reloadSystem.registerReloadable(guildSettingsRepo);
 
+		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem, guildSettingsRepo);
+		injectorMap.add(giveawaySystem);
+
 		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
 		jda.addEventListener(new AntiSpoilerSystem(languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
@@ -291,8 +295,6 @@ public class Bot extends ListenerAdapter {
 		}));
 		new ConsoleCommands(reloadSystem, this).start();
 
-		statisticsManager.start();
-
 		logger.info("Successfully started the application tasks in {} ms!", System.currentTimeMillis() - startTime);
 	}
 
@@ -318,8 +320,15 @@ public class Bot extends ListenerAdapter {
 		selfUserId = readyJda.getSelfUser().getIdLong();
 		logger.info("Connected to {}#{} in {}ms.", readyJda.getSelfUser().getName(), readyJda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
+		statisticsManager.start();
+
 		slashCommandBase.updateCommandsDev(readyJda);
-		executor.submit(giveawaySystem::init);
+		executor.submit(() -> {
+			while (giveawaySystem == null) {
+				Thread.onSpinWait();
+			}
+			giveawaySystem.init();
+		});
 	}
 
 	@Override

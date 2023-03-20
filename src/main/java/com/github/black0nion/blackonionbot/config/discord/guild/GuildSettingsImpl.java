@@ -55,6 +55,8 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 			.defaultValue(new HashSet<>())
 			.permissions(Permission.MANAGE_ROLES));
 
+	private final ChannelSetting<TextChannel> suggestionsChannel;
+
 	public GuildSettingsImpl(long id, LongFunction<Guild> guildGetter, ResultSet resultSet, SQLHelperFactory helperFactory, LanguageSystem languageSystem, CommandRegistry commandRegistry) throws Exception {
 		super(TABLE_NAME, id, guildGetter, helperFactory);
 
@@ -71,6 +73,10 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 
 		leaveChannel = addSetting(
 			new ChannelSettingImpl.Builder<>(settingsSaver, "leave_channel", TextChannel.class, () -> guildGetter.apply(id))
+				.permissions(Permission.MANAGE_CHANNEL));
+
+		suggestionsChannel = addSetting(
+			new ChannelSettingImpl.Builder<>(settingsSaver, "suggestions_channel", TextChannel.class, () -> guildGetter.apply(id))
 				.permissions(Permission.MANAGE_CHANNEL));
 
 		this.loadSettings(resultSet);
@@ -148,5 +154,10 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	@Override
 	public ListSetting<Long, Set<Long>> getAutoRoles() {
 		return autoRoles;
+	}
+
+	@Override
+	public ChannelSetting<TextChannel> getSuggestionsChannel() {
+		return suggestionsChannel;
 	}
 }
