@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -58,7 +57,8 @@ public class PollCommand extends SlashCommand {
 	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel pollChannel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		TranslatedEmbedBuilder embed = cmde.success();
 		embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
-		embed.setFooter("Poll created by " + Utils.escapeMarkdown(author.getAsTag()) + "#" + author.getDiscriminator(), author.getAvatarUrl());
+		// we don't care about the author's language so we get it from guildSettings
+		embed.setFooter(guildSettings.getLanguage().getOrDefault().getTranslation("pollcreatedby", new Placeholder("user", author.getAsMention())), author.getEffectiveAvatarUrl());
 
 		boolean hadNullOption = false;
 		int index = 0;

@@ -78,11 +78,11 @@ public class PermissionsCommand extends SlashCommand {
 					userSettings.getPermissions().remove(permission);
 				else
 					userSettings.getPermissions().reset();
-				cmde.send("permissionsremoved", new Placeholder("perms", permissionString), new Placeholder("user", user.getAsTag()));
+				cmde.send("permissionsremoved", new Placeholder("perms", permissionString), new Placeholder("user", Utils.escapeMarkdown(user.getAsTag())));
 			} else if (mode.equalsIgnoreCase("add")) {
 				if (permission == null) throw new NullPointerException("CustomPermission is null!");
 				userSettings.getPermissions().add(permission);
-				cmde.send("permissionsadded", new Placeholder("perms", permissionString), new Placeholder("user", user.getAsTag()));
+				cmde.send("permissionsadded", new Placeholder("perms", permissionString), new Placeholder("user", Utils.escapeMarkdown(user.getAsTag())));
 			}
 		} else {
 			cmde.sendPleaseUse();

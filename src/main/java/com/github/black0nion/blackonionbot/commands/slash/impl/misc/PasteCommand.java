@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PasteCommand extends SlashCommand {
-	public static final Pattern CODEBLOCK_PATTERN = Pattern.compile("\\s*```([a-z]+\\n)?\\s*([\\s\\S]*?)\\s*```\\s*");
+	private static final Pattern CODEBLOCK_PATTERN = Pattern.compile("\\s*```([a-z]+\\n)?\\s*([\\s\\S]*?)\\s*```\\s*");
 	private static final String TEXT = "text";
 
 	public PasteCommand() {

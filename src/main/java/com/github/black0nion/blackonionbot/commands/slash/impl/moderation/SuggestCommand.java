@@ -31,15 +31,13 @@ public class SuggestCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
-		var suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
+		String suggestion = e.getOption(SUGGESTION, OptionMapping::getAsString);
 		final TextChannel suggestionsChannel = guildSettings.getSuggestionsChannel().getValue();
 
 		if (suggestionsChannel == null) {
 			cmde.send("invalidsuggestionschannel");
-		} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND,
-			Permission.MESSAGE_ADD_REACTION))) {
-			e.replyEmbeds(Utils.noRights(languageSystem, guildSettings, guild.getSelfMember().getUser(), null, Permission.MESSAGE_SEND,
-				Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
+		} else if (!(guild.getSelfMember().hasPermission(suggestionsChannel, Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION))) {
+			e.replyEmbeds(Utils.noRights(languageSystem, guildSettings, guild.getSelfMember().getUser(), null, Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION)).setEphemeral(true).queue();
 		} else {
 			// all good, we can send the suggestion
 			suggestionsChannel.sendMessageEmbeds(cmde.success().setTitle(SUGGESTION).setDescription(String.join(" ", suggestion)).build())

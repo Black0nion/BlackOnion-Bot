@@ -78,10 +78,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final User author = event.getUser();
 			final Guild guild = event.getGuild();
 
-			final UserSettings userSettings = userSettingsRepo.getSettings(author);
 			final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+			if (!guildSettings.joinMessageActivated().getValue()) return;
+
+			final UserSettings userSettings = userSettingsRepo.getSettings(author);
 
 			final TextChannel channel = guildSettings.getJoinChannel().getValue();
+
+			if (channel == null) return;
 
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.JOIN);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "welcome.png");
@@ -106,10 +110,14 @@ public class JoinLeaveSystem extends ListenerAdapter {
 			final User author = event.getUser();
 			final Guild guild = event.getGuild();
 
-			final UserSettings userSettings = userSettingsRepo.getSettings(author);
 			final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+			if (!guildSettings.leaveMessageActivated().getValue()) return;
+
+			final UserSettings userSettings = userSettingsRepo.getSettings(author);
 
 			final TextChannel channel = guildSettings.getLeaveChannel().getValue();
+
+			if (channel == null) return;
 
 			final byte[] bytes = generateImage(Color.BLACK, author, guild, userSettings, guildSettings, DrawType.LEAVE);
 			FileUpload fileUpload = FileUpload.fromData(bytes, "goodbye.png");
@@ -121,7 +129,7 @@ public class JoinLeaveSystem extends ListenerAdapter {
 				.setFooter("definedbyguild", author.getEffectiveAvatarUrl());
 
 			channel.sendMessageEmbeds(embed.build())
-				.addFiles(fileUpload)
+				//.addFiles(fileUpload)
 				.queue();
 		} catch (final Exception e) {
 			logger.error("Error while sending leave image", e);

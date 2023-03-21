@@ -118,8 +118,7 @@ public class WarnsCommand extends SlashCommand {
 		}
 		final List<Page> finalList = pages;
 		if (pages != null) cmde.reply((MessageEmbed) pages.get(0).getContent(),
-			message ->
-				Pages.paginate(message, finalList, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == cmde.getUser().getIdLong()));
+			message -> Pages.paginate(message, finalList, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == cmde.getUser().getIdLong()));
 		else cmde.send("nowarns");
 	}
 }

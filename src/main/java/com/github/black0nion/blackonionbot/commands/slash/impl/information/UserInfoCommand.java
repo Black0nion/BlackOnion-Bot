@@ -35,22 +35,24 @@ public class UserInfoCommand extends SlashCommand {
 		this.userSettingsRepo = userSettingsRepo;
 	}
 
-	@NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User statsUser, final @Nullable Member member) {
-		UserSettings userSettings = userSettingsRepo.getSettings(statsUser);
-		Language language = userSettings.getLanguage().getValue();
+	@NotNull EmbedBuilder getUserInfo(final @NotNull SlashCommandEvent cmde, final @NotNull User user, final @Nullable Member member) {
+		UserSettings userSettings = userSettingsRepo.getSettings(user);
+		Language language = null;
+		if (userSettings != null)
+			language = userSettings.getLanguage().getValue();
 
-		final String avatarUrl = statsUser.getAvatarUrl();
-		final String[] flags = statsUser.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
+		final String avatarUrl = user.getAvatarUrl();
+		final String[] flags = user.getFlags().stream().map(UserFlag::getName).toArray(String[]::new);
 		final TranslatedEmbedBuilder builder = cmde.success()
 			.setTitle("userinfo")
-			.setThumbnail(avatarUrl != null ? avatarUrl : statsUser.getDefaultAvatarUrl())
-			.addField("name", Utils.escapeMarkdown(statsUser.getName()), true)
-			.addField("discriminator", statsUser.getDiscriminator(), true)
-			.addField("userid", statsUser.getId(), true)
+			.setThumbnail(avatarUrl != null ? avatarUrl : user.getDefaultAvatarUrl())
+			.addField("name", Utils.escapeMarkdown(user.getName()), true)
+			.addField("discriminator", user.getDiscriminator(), true)
+			.addField("userid", user.getId(), true)
 			.addField("badges", (flags.length != 0 ? String.join("\n", flags) : "empty"), false)
 			.addField("language", language != null ? language.getName() + " (" + language.getLanguageCode() + ")" : "nopreference", true)
-			.addField("created", statsUser.getTimeCreated().format(TIME_PATTERN), true)
-			.addField("bot", statsUser.isBot() ? "yes" : "no", true);
+			.addField("created", user.getTimeCreated().format(TIME_PATTERN), true)
+			.addField("isbot", user.isBot() ? "yes" : "no", true);
 
 		if (member != null) {
 			builder.addField("joined", member.getTimeJoined().format(TIME_PATTERN), true);

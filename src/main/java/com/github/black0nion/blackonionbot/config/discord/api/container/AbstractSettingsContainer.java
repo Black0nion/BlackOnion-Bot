@@ -65,7 +65,8 @@ public abstract class AbstractSettingsContainer<E> implements SettingsContainer<
 			// Check if the column exists
 			resultSet.findColumn(setting.getName());
 
-			if (setting.canParse(Integer.class))
+			// TODO: this can't work
+			if (setting.canParse(Integer.class) && resultSet.getInt(setting.getName()) != 0)
 				setting.setParsedValueBypassing(resultSet.getInt(setting.getName()));
 			else if (setting.canParse(Long.class))
 				setting.setParsedValueBypassing(resultSet.getLong(setting.getName()));

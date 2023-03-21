@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChannelSettingImpl<C extends GuildChannel> extends AbstractSetting<C> implements ChannelSetting<C> {
 
@@ -34,20 +36,32 @@ public class ChannelSettingImpl<C extends GuildChannel> extends AbstractSetting<
 		this.guildGetter = guildGetter;
 	}
 
+	private static final Pattern GUILD_CHANNEL_PATTERN = Pattern.compile("<#(\\d+)>");
+
 	@Override
 	protected C parse(@NotNull Object value) throws Exception {
 		if (getType().isAssignableFrom(value.getClass())) {
 			return getType().cast(value);
 		} else if (value instanceof Long l) {
 			return guildGetter.get().getChannelById(getType(), l);
+		} else if (value instanceof String s) {
+			Matcher matcher = GUILD_CHANNEL_PATTERN.matcher(s);
+			if (matcher.matches()) {
+				return guildGetter.get().getChannelById(getType(), matcher.group(1));
+			}
 		}
 		return null;
 	}
 
-	private final List<Class<?>> canParse = List.of(Long.class, getType());
+	private final List<Class<?>> canParse = List.of(Long.class, getType(), String.class);
 	@Override
 	public List<Class<?>> canParse() {
 		return canParse;
+	}
+
+	@Override
+	public Object toDatabaseValue() {
+		return getValue().getIdLong();
 	}
 
 	public static class Builder<C extends GuildChannel> extends AbstractSettingBuilder<C, ChannelSettingImpl<C>, Builder<C>> {
