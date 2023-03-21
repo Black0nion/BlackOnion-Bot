@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -55,7 +55,7 @@ public class PollCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel pollChannel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel pollChannel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		TranslatedEmbedBuilder embed = cmde.success();
 		embed.setTitle(e.getOption(TOPIC, OptionMapping::getAsString));
 		embed.setFooter("Poll created by " + Utils.escapeMarkdown(author.getAsTag()) + "#" + author.getDiscriminator(), author.getAvatarUrl());

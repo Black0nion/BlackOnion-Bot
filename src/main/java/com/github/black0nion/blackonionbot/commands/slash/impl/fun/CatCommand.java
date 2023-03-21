@@ -7,7 +7,7 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -28,11 +28,12 @@ import java.util.Map;
 
 public class CatCommand extends SlashCommand {
 
+	public static final String BREED_OPTION = "breed";
 	private final SlashCommandBase cmdBase;
 
 	public CatCommand(Bot bot, SlashCommandBase cmdBase) {
 		super(builder(Commands.slash("cat", "cato")
-			.addOption(OptionType.STRING, "breed", "The breed of the cat to show", false, true))
+			.addOption(OptionType.STRING, BREED_OPTION, "The breed of the cat to show", false, true))
 		);
 		this.cmdBase = cmdBase;
 
@@ -47,15 +48,15 @@ public class CatCommand extends SlashCommand {
 				results.add(jsonObjectForThisPage.getString("name"));
 				nameToId.put(jsonObjectForThisPage.getString("name"), jsonObjectForThisPage.getString("id"));
 			}
-			this.updateAutoComplete("breed", results);
+			this.updateAutoComplete(BREED_OPTION, results);
 		});
 	}
 
 	private final Map<String, String> nameToId = new HashMap<>();
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
-		String breed = e.getOption("breed", OptionMapping::getAsString);
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+		String breed = e.getOption(BREED_OPTION, OptionMapping::getAsString);
 		// check if breed is already a breed id, if it's not, check if it's a breed name
 		if (breed != null && !nameToId.isEmpty() && !nameToId.containsValue(breed)) {
 			breed = nameToId.get(breed);

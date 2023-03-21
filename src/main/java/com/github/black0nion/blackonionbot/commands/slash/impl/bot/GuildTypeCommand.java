@@ -7,7 +7,6 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -39,19 +38,18 @@ public class GuildTypeCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		long guildID = Long.parseLong(Objects.requireNonNull(e.getOption("guildid", OptionMapping::getAsString)));
 		final Guild mentionedGuild = e.getJDA().getGuildById(guildID);
-		final BlackGuild mentionedBlackGuild = BlackGuild.from(mentionedGuild);
 		final @Nullable String newGuildType = e.getOption(GUILDTYPE, OptionMapping::getAsString);
 
-		if (mentionedBlackGuild == null) {
+		if (mentionedGuild == null) {
 			cmde.send("thisguildnotfound");
 			return;
 		}
 
 		if (newGuildType == null) {
-			cmde.send("guildtypeis", new Placeholder("guild", Utils.escapeMarkdown(mentionedBlackGuild.getName()) + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", guildSettings.getGuildType().getValue().name()));
+			cmde.send("guildtypeis", new Placeholder("guild", Utils.escapeMarkdown(mentionedGuild.getName()) + " (" + mentionedGuild.getId() + ")"), new Placeholder("guildtype", guildSettings.getGuildType().getValue().name()));
 			return;
 		}
 
@@ -59,6 +57,6 @@ public class GuildTypeCommand extends SlashCommand {
 		if (parsedGuildType == null) throw new IllegalArgumentException("Invalid guild type");
 
 		guildSettings.getGuildType().setValue(parsedGuildType);
-		cmde.send("guildtypesetto", new Placeholder("guild", Utils.escapeMarkdown(mentionedBlackGuild.getName()) + " (" + mentionedBlackGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
+		cmde.send("guildtypesetto", new Placeholder("guild", Utils.escapeMarkdown(mentionedGuild.getName()) + " (" + mentionedGuild.getId() + ")"), new Placeholder("guildtype", parsedGuildType.name()));
 	}
 }

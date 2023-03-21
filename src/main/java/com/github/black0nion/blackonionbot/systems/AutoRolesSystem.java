@@ -5,8 +5,8 @@ import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRep
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.ListSetting;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -27,7 +27,7 @@ public class AutoRolesSystem extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberJoin(final GuildMemberJoinEvent event) {
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
+		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 

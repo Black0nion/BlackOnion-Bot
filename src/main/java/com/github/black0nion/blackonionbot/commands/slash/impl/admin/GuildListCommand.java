@@ -5,7 +5,6 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
@@ -30,7 +29,9 @@ public class GuildListCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, BlackGuild eventGuild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild eventGuild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+		e.deferReply().queue();
+
 		final List<Page> pages = new ArrayList<>();
 		final EmbedBuilder baseEmbed = cmde.success()
 			.setTitle("Guilds")
@@ -39,7 +40,6 @@ public class GuildListCommand extends SlashCommand {
 		boolean found = false;
 		for (Guild guild : e.getJDA().getGuilds()) {
 			found = true;
-			logger.info("'{}'", guild.getOwner());
 			@Nullable
 			User owner = Optional.ofNullable(guild.getOwner())
 				.map(Member::getUser)
@@ -56,11 +56,10 @@ public class GuildListCommand extends SlashCommand {
 			}
 		}
 		pages.add(new InteractPage(currentEmbed.appendDescription("\n```").build()));
-		// TODO: Fix or test
 		if (!found)
 			cmde.send("noguildsfound");
 		else {
-			cmde.reply((MessageEmbed) pages.get(0).getContent(), success -> success.retrieveOriginal().queue(message -> Pages.paginate(message, pages, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong())));
+			cmde.reply((MessageEmbed) pages.get(0).getContent(), message -> Pages.paginate(message, pages, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == author.getIdLong()));
 		}
 	}
 }

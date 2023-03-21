@@ -15,7 +15,6 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -63,7 +62,7 @@ public class ReactionRolesSetupCommand extends MessageCommand {
 	}
 
 	@Override
-	public void execute(MessageCommandEvent cmde, MessageContextInteractionEvent e, Member member, User author, BlackGuild guild, TextChannel channel, Message message) throws SQLException {
+	public void execute(MessageCommandEvent cmde, MessageContextInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, Message message) throws SQLException {
 		String messageId = message.getId();
 
 		e.replyComponents(ActionRow.of(

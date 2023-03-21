@@ -8,10 +8,10 @@ import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.Warn;
 import com.github.black0nion.blackonionbot.utils.NotImplementedException;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Page;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -48,7 +48,7 @@ public class WarnsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case ID -> handleId(cmde);
 			case USER -> handleUser(cmde);
@@ -118,8 +118,8 @@ public class WarnsCommand extends SlashCommand {
 		}
 		final List<Page> finalList = pages;
 		if (pages != null) cmde.reply((MessageEmbed) pages.get(0).getContent(),
-			success -> success.retrieveOriginal().queue(message ->
-				Pages.paginate(message, finalList, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == cmde.getUser().getIdLong())));
+			message ->
+				Pages.paginate(message, finalList, true, 2, TimeUnit.MINUTES, true, u -> u.getIdLong() == cmde.getUser().getIdLong()));
 		else cmde.send("nowarns");
 	}
 }

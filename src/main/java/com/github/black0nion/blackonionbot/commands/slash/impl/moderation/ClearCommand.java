@@ -6,8 +6,8 @@ import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -44,7 +44,7 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, BlackGuild guild, @NotNull TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, Guild guild, @NotNull TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case "count" -> deleteCount(cmde, e, channel);
 			case "until" -> deleteUntil(cmde, e, channel);
@@ -54,7 +54,7 @@ public class ClearCommand extends SlashCommand {
 
 	private static void deleteCount(SlashCommandEvent cmde, SlashCommandInteractionEvent e, TextChannel channel) {
 		try {
-			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
+			final Integer amount = e.getOption(AMOUNT, OptionMapping::getAsInt);
 
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {

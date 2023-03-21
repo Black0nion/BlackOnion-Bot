@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * This class represents a SlashCommand that can be executed by users.
- * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, Member, User, BlackGuild, TextChannel, UserSettings, GuildSettings) execute} method.
+ * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, Member, User, Guild, TextChannel, UserSettings, GuildSettings) execute} method.
  * <p>
  * Implement a command by doing this:
  * <pre>{@code
@@ -80,7 +80,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	}
 	//endregion
 
-	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final Member member, final User author, final BlackGuild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
+	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final Member member, final User author, final Guild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
 
 	protected void updateAutoComplete(Map.Entry<String, StartsWithLinkedList> entry) {
 		Checks.notNull(entry, "Entry");

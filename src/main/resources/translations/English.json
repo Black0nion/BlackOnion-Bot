@@ -14,7 +14,7 @@
   "antispoilerstatuschanged": "The AntiSpoiler status got changed!",
   "arentyoubraveenough": "You're to feared of loosing?",
   "autorolecreated": "AutoRole created!",
-  "autorolecreatedinfo": "When a user joins, he will get the role %role%!",
+  "autorolecreatedinfo": "When a user joins, they will get the role %role%!",
   "autoroledeleted": "AutoRole deleted!",
   "autoroledeletedinfo": "When a user joins, they won't get the role %role% anymore!",
   "autorolelist": "Registered AutoRoles",

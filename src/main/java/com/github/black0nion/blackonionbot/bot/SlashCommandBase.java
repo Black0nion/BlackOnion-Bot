@@ -26,10 +26,10 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.*;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -309,7 +309,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 			return;
 
 		final User author = event.getUser();
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
+		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 
 		assert guild != null && member != null;
@@ -317,7 +317,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(FeatureFlags.class), injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
 
 		if (config.getRunMode() == RunMode.DEV) {
-			final String log = EmojiParser.parseToAliases(guild.getDebugMessage()
+			final String log = EmojiParser.parseToAliases(Utils.getDebugMessage(guild)
 				+ " > "
 				+ channel.getName()
 				+ "(C:" + channel.getId() + ") | " + Utils.getDebugMessage(author)

@@ -6,8 +6,8 @@ import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.ListSetting;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -42,10 +42,10 @@ public class AutoRolesCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull BlackGuild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, @NotNull Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
-			case CREATE_COMMAND -> setCreateCommand(cmde, e, guild, guildSettings);
-			case REMOVE_COMMAND -> setRemoveCommand(cmde, e, guild, guildSettings);
+			case CREATE_COMMAND -> setCreateCommand(cmde, e, guildSettings);
+			case REMOVE_COMMAND -> setRemoveCommand(cmde, e, guildSettings);
 			case LIST_COMMAND -> cmde.success("autorolelist", "%roles%", new Placeholder("roles", guildSettings.getAutoRoles().getValue().stream()
 				.map(guild::getRoleById)
 				.filter(Objects::nonNull)
@@ -55,7 +55,7 @@ public class AutoRolesCommand extends SlashCommand {
 		}
 	}
 
-	public void setCreateCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild, GuildSettings guildSettings) {
+	public void setCreateCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, GuildSettings guildSettings) {
 		var role = e.getOption(CREATE_ROLE, OptionMapping::getAsRole);
 		var roleId = Objects.requireNonNull(role).getIdLong();
 		final ListSetting<Long, Set<Long>> autoRoles = guildSettings.getAutoRoles();
@@ -68,7 +68,7 @@ public class AutoRolesCommand extends SlashCommand {
 		cmde.success("autorolecreated", "autorolecreatedinfo", new Placeholder("role", role.getAsMention()));
 	}
 
-	public void setRemoveCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull BlackGuild guild, GuildSettings guildSettings) {
+	public void setRemoveCommand(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, GuildSettings guildSettings) {
 		var role = e.getOption(REMOVE_ROLE, OptionMapping::getAsRole);
 		var roleId = Objects.requireNonNull(role).getIdLong();
 		final ListSetting<Long, Set<Long>> autoRoles = guildSettings.getAutoRoles();

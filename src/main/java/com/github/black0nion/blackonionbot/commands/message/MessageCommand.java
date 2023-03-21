@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.commands.message;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -24,7 +24,7 @@ public abstract class MessageCommand extends AbstractCommand<MessageCommandBuild
 		super(builder, config);
 	}
 
-	public abstract void execute(final MessageCommandEvent cmde, final MessageContextInteractionEvent e, final Member member, final User author, final BlackGuild guild, final TextChannel channel, final Message message) throws SQLException;
+	public abstract void execute(final MessageCommandEvent cmde, final MessageContextInteractionEvent e, final Member member, final User author, final Guild guild, final TextChannel channel, final Message message) throws SQLException;
 
 	@Nonnull
 	protected static MessageCommandBuilder builder(@Nonnull CommandData data) {

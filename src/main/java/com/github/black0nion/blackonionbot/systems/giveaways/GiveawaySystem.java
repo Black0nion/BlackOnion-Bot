@@ -8,13 +8,9 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.SelfUser;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +93,7 @@ public class GiveawaySystem {
 	 * Adds an existing giveaway to the {@link #scheduler Giveaway Scheduler}
 	 */
 	public void scheduleGiveaway(final Giveaway giveaway) {
-		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
+		final Guild guild = Bot.getInstance().getJDA().getGuildById(giveaway.guildId());
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
 			if (msg == null) {
@@ -109,7 +105,7 @@ public class GiveawaySystem {
 		});
 	}
 
-	public void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
+	public void endGiveaway(final Giveaway giveaway, final Message msg, final Guild guild) {
 		try {
 			GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
