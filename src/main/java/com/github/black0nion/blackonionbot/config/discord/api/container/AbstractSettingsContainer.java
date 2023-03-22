@@ -1,10 +1,12 @@
 package com.github.black0nion.blackonionbot.config.discord.api.container;
 
+import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSettingBuilder;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingSaveException;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.SettingsSaver;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
+import com.github.black0nion.blackonionbot.utils.Utils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
@@ -65,27 +67,9 @@ public abstract class AbstractSettingsContainer<E> implements SettingsContainer<
 			// Check if the column exists
 			resultSet.findColumn(setting.getName());
 
-			// TODO: this can't work
-			if (setting.canParse(Integer.class) && resultSet.getInt(setting.getName()) != 0)
-				setting.setParsedValueBypassing(resultSet.getInt(setting.getName()));
-			else if (setting.canParse(Long.class))
-				setting.setParsedValueBypassing(resultSet.getLong(setting.getName()));
-			else if (setting.canParse(Boolean.class))
-				setting.setParsedValueBypassing(resultSet.getBoolean(setting.getName()));
-			else if (setting.canParse(Double.class))
-				setting.setParsedValueBypassing(resultSet.getDouble(setting.getName()));
-			else if (setting.canParse(Float.class))
-				setting.setParsedValueBypassing(resultSet.getFloat(setting.getName()));
-			else if (setting.canParse(Short.class))
-				setting.setParsedValueBypassing(resultSet.getShort(setting.getName()));
-			else if (setting.canParse(Byte.class))
-				setting.setParsedValueBypassing(resultSet.getByte(setting.getName()));
-			else if (setting.canParse(Character.class))
-				setting.setParsedValueBypassing(resultSet.getString(setting.getName()).charAt(0));
-			else if (setting.canParse(String.class))
-				setting.setParsedValueBypassing(resultSet.getString(setting.getName()));
-			else
-				throw new IllegalArgumentException("Cannot parse setting " + setting);
+			Object parsed = Utils.parseValue(setting, resultSet);
+			if (parsed == null && !setting.isNullable()) throw new ParseException("Setting " + setting.getName() + " cannot be null");
+			setting.setParsedValueBypassing(parsed);
 		}
 		resultSet.close();
 	}

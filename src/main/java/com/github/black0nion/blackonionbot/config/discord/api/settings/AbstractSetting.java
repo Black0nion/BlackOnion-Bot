@@ -109,6 +109,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 
 	/**
 	 * Only use this if you know what you are doing (e.g. when loading from the database)
+	 * This will not save the value to the database!
 	 */
 	@Override
 	public void setValueBypassing(T value) {
@@ -120,6 +121,9 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 	 */
 	protected abstract T parse(@Nonnull Object value) throws Exception; // NOSONAR will get wrapped in a ParseException
 
+	/**
+	 * Parse the value and set <b>save</b> it
+	 */
 	@Override
 	public void setParsedValue(Object value) throws ParseException {
 		try {
@@ -146,8 +150,7 @@ public abstract class AbstractSetting<T> implements Setting<T> {
 		}
 
 		if (this.type.isAssignableFrom(value.getClass())) {
-			setValue(this.type.cast(value));
-			return null;
+			return this.type.cast(value);
 		}
 
 		try {

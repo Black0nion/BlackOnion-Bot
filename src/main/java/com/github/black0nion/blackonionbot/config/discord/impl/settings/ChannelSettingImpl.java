@@ -64,6 +64,14 @@ public class ChannelSettingImpl<C extends GuildChannel> extends AbstractSetting<
 		return getValue().getIdLong();
 	}
 
+	@Override
+	public String getAsMention() {
+		if (getValue() == null) {
+			return "null";
+		}
+		return getValue().getAsMention();
+	}
+
 	public static class Builder<C extends GuildChannel> extends AbstractSettingBuilder<C, ChannelSettingImpl<C>, Builder<C>> {
 		private final Supplier<Guild> guildGetter;
 

@@ -5,6 +5,8 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
@@ -45,6 +47,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
@@ -548,5 +552,45 @@ public class Utils {
 
 	public static String getDebugMessage(User user) {
 		return user.getName() + "#" + user.getDiscriminator() + "(U:" + user.getId() + ")";
+	}
+
+	public static Object parseValue(Setting<?> setting, ResultSet resultSet) {
+		if (setting.canParse(Integer.class)) {
+			try {
+				return resultSet.getInt(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Long.class)) {
+			try {
+				return resultSet.getLong(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Boolean.class)) {
+			try {
+				return resultSet.getBoolean(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Double.class)) {
+			try {
+				return resultSet.getDouble(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Float.class)) {
+			try {
+				return resultSet.getFloat(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(String.class)) {
+			try {
+				return resultSet.getString(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		throw new ParseException("Could not parse value for setting " + setting.getName());
 	}
 }
