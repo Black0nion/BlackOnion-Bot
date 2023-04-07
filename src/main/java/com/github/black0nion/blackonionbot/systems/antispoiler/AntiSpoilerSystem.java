@@ -44,6 +44,9 @@ public class AntiSpoilerSystem extends ListenerAdapter {
 		final Message msg = event != null ? event.getMessage() : event1.getMessage();
 		final String message = msg.getContentRaw();
 		final User author = event != null ? event.getAuthor() : event1.getAuthor();
+
+		if (author.isBot()) return false;
+
 		final TextChannel channel = event != null ? event.getChannel().asTextChannel() : event1.getChannel().asTextChannel();
 		final Guild guild = event != null ? event.getGuild() : event1.getGuild();
 
