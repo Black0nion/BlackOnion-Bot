@@ -6,6 +6,8 @@ import io.mokulu.discord.oauth.model.Guild;
 import io.mokulu.discord.oauth.model.TokensResponse;
 import io.mokulu.discord.oauth.model.User;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,7 +18,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class DiscordUser {
+public class OAuthUser {
+
+	private static final Logger logger = LoggerFactory.getLogger(OAuthUser.class);
 
 	private static final int EXPIRATION_TIME = 604800; // 7 days
 
@@ -24,11 +28,10 @@ public class DiscordUser {
 	private String refreshToken;
 	private long expiresAt;
 	private DiscordAPI api;
-	protected User user;
+	private User user;
+	private final long userId;
 
-	protected DiscordUser() {}
-
-	public DiscordUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
+	public OAuthUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
 		if (accessToken == null || api == null) {
 			throw new IllegalArgumentException("Invalid parameters!");
 		} else if (!OAuthAPI.TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !OAuthAPI.TOKEN_PATTERN.matcher(refreshToken).matches())) {
@@ -38,16 +41,33 @@ public class DiscordUser {
 		this.refreshToken = refreshToken;
 		this.api = api;
 		this.user = api.fetchUser();
+		this.userId = Long.parseLong(user.getId());
 		this.expiresAt = System.currentTimeMillis() + EXPIRATION_TIME;
 	}
 
 
 	public User getUser() {
-		return user;
+		try {
+			if (user == null)
+				user = api.fetchUser();
+
+			return user;
+		} catch (IOException e) {
+			logger.error("Failed to fetch user", e);
+		}
+		return null;
+	}
+
+	public long getId() {
+		return userId;
+	}
+
+	public String getIdString() {
+		return String.valueOf(userId);
 	}
 
 	public JSONObject getUserAsJson() {
-		return user == null ? null : userToJson(user);
+		return getUser() == null ? null : userToJson(getUser());
 	}
 
 	public static JSONObject userToJson(@Nonnull User user) {
@@ -68,13 +88,13 @@ public class DiscordUser {
 		return api;
 	}
 
-	public DiscordUser refreshAll() throws IOException {
+	public OAuthUser refreshAll() throws IOException {
 		refreshTokens();
 		refreshUser();
 		return this;
 	}
 
-	public DiscordUser refreshTokens() throws IOException {
+	public OAuthUser refreshTokens() throws IOException {
 		TokensResponse tokensResponse = OAuthAPI.getInstance().getOAuthApi().refreshTokens(this.refreshToken);
 		this.accessToken = tokensResponse.getAccessToken();
 		this.refreshToken = tokensResponse.getRefreshToken();
@@ -83,7 +103,7 @@ public class DiscordUser {
 		return this;
 	}
 
-	public DiscordUser refreshUser() throws IOException {
+	public OAuthUser refreshUser() throws IOException {
 		this.user = api.fetchUser();
 		return this;
 	}

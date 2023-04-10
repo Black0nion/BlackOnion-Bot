@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.rest;
 
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
@@ -45,14 +46,16 @@ public class API implements Reloadable {
 	private final Config config;
 	private final Injector injector;
 	private final StatsCollectorFactory statsCollectorFactory;
+	private final JWTVerifier jwtVerifier;
 
 	/**
 	 * Automatically closes the old API instance if it exists
 	 */
-	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory) {
+	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory, JWTVerifier jwtVerifier) {
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;
+		this.jwtVerifier = jwtVerifier;
 		start();
 	}
 
@@ -129,7 +132,7 @@ public class API implements Reloadable {
 				"\n   \"status\": " + (http != null ? http.getStatus() : 500) +
 				"\n}").contentType(ContentType.APPLICATION_JSON);
 
-			if (ctx.status() == HttpStatus.TOO_MANY_REQUESTS) {
+			if (ctx.status() == HttpStatus.TOO_MANY_REQUESTS && logger.isWarnEnabled()) {
 				logger.warn("IP {} exceeded rate limit for {} which is {}", ctx.ip(), ctx.path(),
 					// oh my god why am I introducing such code
 					http != null && http.getMessage() != null ? http.getMessage().replaceFirst("Rate limit exceeded - Server allows ", "").replace(".", "") : "unknown"
@@ -147,7 +150,7 @@ public class API implements Reloadable {
 		for (final IHttpRoute req : httpRoutes) {
 			final String url = "/api/" + req.url();
 
-			app.addHandler(req.type(), url, new RestHandler(req));
+			app.addHandler(req.type(), url, new RestHandler(req, jwtVerifier));
 		}
 		logger.info("Mapped {} routes", httpRoutes.size());
 		startServer();

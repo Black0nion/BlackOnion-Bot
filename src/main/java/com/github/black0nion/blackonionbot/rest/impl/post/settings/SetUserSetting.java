@@ -5,7 +5,7 @@ import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.http.BadRequestResponse;
@@ -23,7 +23,7 @@ public class SetUserSetting implements IPostRoute {
 	}
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, RestSession session, DiscordUser user) throws Exception {
+	public Object handle(Context ctx, JSONObject body, RestSession session, OAuthUser user) throws Exception {
 		String name = body.getString("name");
 
 		UserSettings userSettings = userSettingsRepo.getSettings(Long.parseLong(user.getUser().getId()));

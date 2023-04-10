@@ -3,7 +3,7 @@ package com.github.black0nion.blackonionbot.rest.impl.get;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
@@ -26,7 +26,7 @@ public class Stats implements IGetRoute {
 	}
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
+	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, OAuthUser user) throws Exception {
 		return new JSONObject()
 			.put("commands", slashCommandBase.getCommandCount())
 			.put("code_stats", new JSONObject()
@@ -51,10 +51,5 @@ public class Stats implements IGetRoute {
 	@Override
 	public @Nonnull String url() {
 		return "stats";
-	}
-
-	@Override
-	public boolean isJson() {
-		return true;
 	}
 }

@@ -1,7 +1,8 @@
 package com.github.black0nion.blackonionbot.rest.sessions;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import java.util.InputMismatchException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A wrapper for server-side REST Sessions.
@@ -9,7 +10,7 @@ import java.util.concurrent.ExecutionException;
  */
 public non-sealed class RestSession extends AbstractSession {
 
-	public RestSession(String sessionId) throws ExecutionException, InputMismatchException {
-		super(sessionId);
+	public RestSession(DecodedJWT jwt) throws InputMismatchException {
+		super(jwt);
 	}
 }

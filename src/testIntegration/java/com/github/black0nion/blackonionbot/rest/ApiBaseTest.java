@@ -1,5 +1,6 @@
 package com.github.black0nion.blackonionbot.rest;
 
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.NullInjector;
 import com.github.black0nion.blackonionbot.stats.StatsCollectorFactory;
@@ -17,7 +18,7 @@ class ApiBaseTest {
 	@BeforeEach
 	public void init() {
 		when(CONFIG.getApiPort()).thenReturn(8080);
-		API api = new API(CONFIG, new NullInjector(), new StatsCollectorFactory(ignored -> {})) {
+		API api = new API(CONFIG, new NullInjector(), new StatsCollectorFactory(ignored -> {}), mock(JWTVerifier.class)) {
 			@Override
 			protected void startServer() {
 				// overriden to prevent starting the server (required for JavalinTest)

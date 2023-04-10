@@ -1,29 +1,48 @@
 package com.github.black0nion.blackonionbot.rest.impl.post;
 
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
-import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
-import com.github.black0nion.blackonionbot.utils.Utils;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.mokulu.discord.oauth.DiscordAPI;
+import io.mokulu.discord.oauth.DiscordOAuth;
+import io.mokulu.discord.oauth.model.TokensResponse;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
-import java.util.InputMismatchException;
+import java.time.Instant;
 
 public class Login implements IPostRoute {
 
-	private final OAuthHandler handler;
+	// 7 days
+	private static final int JWT_VALID_FOR = 60 * 60 * 24 * 7;
+	private final Algorithm algorithm;
+	private final DiscordOAuth discordOAuth;
 
-	public Login(OAuthHandler handler) {
-		this.handler = handler;
+	public Login(Algorithm algorithm, DiscordOAuth discordOAuth) {
+		this.algorithm = algorithm;
+		this.discordOAuth = discordOAuth;
 	}
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
-		return Utils.replaceException(() -> handler.loginWithDiscord(ctx.header("code")), InputMismatchException.class, BadRequestResponse.class);
+	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, OAuthUser user) throws Exception {
+		String code = ctx.queryParam("code");
+		if (code == null) {
+			throw new BadRequestResponse("Missing code parameter");
+		}
+
+		TokensResponse tokens = discordOAuth.getTokens(code);
+		user = new OAuthUser(tokens.getAccessToken(), tokens.getRefreshToken(), new DiscordAPI(tokens.getAccessToken()));
+
+		return JWT.create()
+			.withExpiresAt(Instant.now().plusSeconds(JWT_VALID_FOR))
+			.withIssuer("BlackOnion-Bot")
+			.withSubject(user.getIdString())
+			.sign(algorithm);
 	}
 
 	@Override
@@ -34,10 +53,5 @@ public class Login implements IPostRoute {
 	@Override
 	public boolean requiresLogin() {
 		return false;
-	}
-
-	@Override
-	public String[] requiredHeaders() {
-		return new String[] { "code" };
 	}
 }
