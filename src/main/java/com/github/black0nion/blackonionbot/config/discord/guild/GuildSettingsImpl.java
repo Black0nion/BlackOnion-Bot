@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.config.discord.guild;
 
 import com.github.black0nion.blackonionbot.bot.CommandRegistry;
-import com.github.black0nion.blackonionbot.commands.common.NamedCommand;
+import com.github.black0nion.blackonionbot.commands.common.Command;
 import com.github.black0nion.blackonionbot.config.discord.api.container.AbstractSettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.AbstractSettingBuilder;
 import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
@@ -49,7 +49,7 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 		new EnumSettingImpl.Builder<>(settingsSaver, "anti_spoiler", AntiSpoilerSystem.AntiSpoilerType.class)
 			.defaultValue(AntiSpoilerSystem.AntiSpoilerType.OFF)
 			.permissions(Permission.MANAGE_CHANNEL));
-	private final ListSetting<NamedCommand, Set<NamedCommand>> disabledCommands;
+	private final ListSetting<Command, Set<Command>> disabledCommands;
 	private final ListSetting<Long, Set<Long>> autoRoles = addSetting(
 		new ListSettingImpl.Builder<Long, Set<Long>>(settingsSaver, "auto_roles", Set.class, HashSet::new, Long::parseLong, Number::toString)
 			.defaultValue(new HashSet<>())
@@ -62,7 +62,7 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 
 		language = addSetting(new LanguageSettingImpl.Builder(settingsSaver, "language", languageSystem));
 		disabledCommands = addSetting(
-			new ListSettingImpl.Builder<NamedCommand, Set<NamedCommand>>(settingsSaver, "disabled_commands", Set.class, HashSet::new, commandRegistry::getCommand, NamedCommand::getName)
+			new ListSettingImpl.Builder<Command, Set<Command>>(settingsSaver, "disabled_commands", Set.class, HashSet::new, commandRegistry::getCommand, Command::getName)
 				.defaultValue(new HashSet<>())
 				.permissions(Permission.ADMINISTRATOR)
 		);
@@ -147,7 +147,7 @@ public class GuildSettingsImpl extends AbstractSettingsContainer<Guild> implemen
 	}
 
 	@Override
-	public ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands() {
+	public ListSetting<Command, Set<Command>> getDisabledCommands() {
 		return disabledCommands;
 	}
 

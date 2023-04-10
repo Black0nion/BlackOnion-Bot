@@ -1,6 +1,6 @@
 package com.github.black0nion.blackonionbot.config.discord.guild;
 
-import com.github.black0nion.blackonionbot.commands.common.NamedCommand;
+import com.github.black0nion.blackonionbot.commands.common.Command;
 import com.github.black0nion.blackonionbot.config.discord.api.container.SettingsContainer;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.*;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
@@ -63,7 +63,7 @@ public interface GuildSettings extends SettingsContainer<Guild>, DisabledCommand
 
 	EnumSetting<GuildType> getGuildType();
 	EnumSetting<AntiSpoilerSystem.AntiSpoilerType> getAntiSpoiler();
-	ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands();
+	ListSetting<Command, Set<Command>> getDisabledCommands();
 
 	ListSetting<Long, Set<Long>> getAutoRoles();
 

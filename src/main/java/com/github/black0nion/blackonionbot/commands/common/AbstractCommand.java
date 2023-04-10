@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
-public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils, NamedCommand {
+public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils, Command {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -51,14 +51,17 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		this.config = config;
 	}
 
+	@Override
 	public void handleButtonPress(ButtonInteractionEvent event) {
 		// NOOP
 	}
 
+	@Override
 	public void handleModalInteraction(ModalInteractionEvent event) {
 		// NOOP
 	}
 
+	@Override
 	public void handleSelectMenuInteraction(GenericSelectMenuInteractionEvent<?, ?> event) {
 		// NOOP
 	}
@@ -68,6 +71,7 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		return isEphemeral;
 	}
 
+	@Override
 	public D getData() {
 		return data;
 	}
@@ -77,44 +81,53 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		return data.getName();
 	}
 
+	@Override
 	public Category getCategory() {
 		return category;
 	}
 
+	@Override
 	public void setCategory(Category category) {
 		this.category = category;
 	}
 
+	@Override
 	public Progress getProgress() {
 		return progress;
 	}
 
+	@Override
 	public Set<Permission> getRequiredPermissions() {
 		return requiredPermissions;
 	}
 
+	@Override
 	@Nonnull
 	public Set<Permission> getRequiredBotPermissions() {
 		return requiredBotPermissions;
 	}
 
+	@Override
 	@Nonnull
 	public Set<CustomPermission> getRequiredCustomPermissions() {
 		return requiredCustomPermissions;
-	}
-
-	public boolean isToggleable() {
-		return isToggleable;
 	}
 
 	public boolean shouldAutoRegister() {
 		return shouldAutoRegister;
 	}
 
+	@Override
 	public boolean isPremiumCommand() {
 		return isPremium;
 	}
 
+	@Override
+	public boolean isToggleable() {
+		return isToggleable;
+	}
+
+	@Override
 	public boolean isAdminGuild() {
 		return isAdminGuild;
 	}

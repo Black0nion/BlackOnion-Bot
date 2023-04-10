@@ -1,31 +1,31 @@
 package com.github.black0nion.blackonionbot.config.discord.guild;
 
-import com.github.black0nion.blackonionbot.commands.common.NamedCommand;
+import com.github.black0nion.blackonionbot.commands.common.Command;
 import com.github.black0nion.blackonionbot.config.discord.impl.settings.ListSetting;
 
 import java.util.Set;
 
 public interface DisabledCommandsHelper {
-	ListSetting<NamedCommand, Set<NamedCommand>> getDisabledCommands();
+	ListSetting<Command, Set<Command>> getDisabledCommands();
 
-	default boolean isCommandActivated(NamedCommand command) {
+	default boolean isCommandActivated(Command command) {
 		return !isCommandDisabled(command);
 	}
 
-	default boolean isCommandDisabled(NamedCommand command) {
+	default boolean isCommandDisabled(Command command) {
 		return getDisabledCommands().contains(command);
 	}
 
-	default boolean disableCommand(NamedCommand command) {
+	default boolean disableCommand(Command command) {
 		return getDisabledCommands().add(command);
 	}
 
-	default boolean enableCommand(NamedCommand command) {
+	default boolean enableCommand(Command command) {
 		return getDisabledCommands().remove(command);
 	}
 
 
-	default boolean setCommandActivated(NamedCommand command, boolean activated) {
+	default boolean setCommandActivated(Command command, boolean activated) {
 		if (activated) {
 			return enableCommand(command);
 		} else {
@@ -33,7 +33,7 @@ public interface DisabledCommandsHelper {
 		}
 	}
 
-	default boolean toggleCommand(NamedCommand command) {
+	default boolean toggleCommand(Command command) {
 		if (isCommandDisabled(command)) {
 			return enableCommand(command);
 		} else {

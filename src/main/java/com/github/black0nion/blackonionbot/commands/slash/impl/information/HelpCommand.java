@@ -3,9 +3,8 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.information;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
 import com.github.black0nion.blackonionbot.commands.Progress;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommandBuilder;
 import com.github.black0nion.blackonionbot.commands.common.Category;
+import com.github.black0nion.blackonionbot.commands.common.Command;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
@@ -52,7 +51,7 @@ public class HelpCommand extends SlashCommand {
 	public void updateAutoComplete() {
 		List<String> result = slashCommandBase.getCommands().entrySet().stream()
 			.filter(e -> {
-				AbstractCommand<? extends AbstractCommandBuilder<?, ?>, ?> currentCommand = e.getValue().getSecond();
+				Command currentCommand = e.getValue().getSecond();
 				return currentCommand.getRequiredCustomPermissions().isEmpty() && currentCommand.isToggleable();
 			})
 			.map(Map.Entry::getKey)
@@ -67,8 +66,8 @@ public class HelpCommand extends SlashCommand {
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, @NotNull Member member, @NotNull User author, Guild guild, @NotNull TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		var command = e.getOption(COMMAND_OR_CATEGORY, OptionMapping::getAsString);
 		if (command != null) {
-			for (final Pair<Long, AbstractCommand<?, ?>> entry : slashCommandBase.getCommands().values()) {
-				final AbstractCommand<?, ?> cmd = entry.getSecond();
+			for (final Pair<Long, Command> entry : slashCommandBase.getCommands().values()) {
+				final Command cmd = entry.getSecond();
 				if (!(cmd instanceof SlashCommand slashCommand)) continue;
 
 				if (!slashCommand.isHidden(userSettings) && cmd.getName().equalsIgnoreCase(command)) {
@@ -80,7 +79,7 @@ public class HelpCommand extends SlashCommand {
 			final Category category = Category.parse(command);
 			if (category != null) {
 				final EmbedBuilder builder = cmde.success().setTitle(cmde.getTranslation("help") + " | " + category.name());
-				for (final AbstractCommand<?, ?> c : slashCommandBase.getCommandsInCategory().get(category)) {
+				for (final Command c : slashCommandBase.getCommandsInCategory().get(category)) {
 					if (c instanceof SlashCommand slashCommand)
 						builder.addField(cmde.getCommandHelp(slashCommand), cmde.getTranslationOrEmpty("help" + c.getName()), false);
 				}
@@ -100,7 +99,7 @@ public class HelpCommand extends SlashCommand {
 				} else {
 					category = cats[i - 1];
 					if (slashCommandBase.getCommandsInCategory().containsKey(category)) {
-						for (final AbstractCommand<?, ?> c : slashCommandBase.getCommandsInCategory().get(category)) {
+						for (final Command c : slashCommandBase.getCommandsInCategory().get(category)) {
 							if (c instanceof SlashCommand slashCommand && !slashCommand.isHidden(userSettings))
 								commandsInCategory.append(", ").append(c.getName());
 						}
@@ -145,7 +144,7 @@ public class HelpCommand extends SlashCommand {
 						commandsInCategory = new StringBuilder(", " + cmde.getTranslationOrEmpty("helpmodules"));
 					} else {
 						category = cats[i - 1];
-						for (final AbstractCommand<?, ?> c : slashCommandBase.getCommandsInCategory().get(category)) {
+						for (final Command c : slashCommandBase.getCommandsInCategory().get(category)) {
 							if (c instanceof SlashCommand slashCommand && !slashCommand.isHidden(userSettings))
 								commandsInCategory.append(", ").append(c.getName());
 						}
@@ -162,7 +161,7 @@ public class HelpCommand extends SlashCommand {
 			} else {
 				final Category category = Category.valueOf(button.getId());
 				builder.setTitle(cmde.getTranslation("help") + " | " + category.name().toUpperCase());
-				for (final Map.Entry<String, Pair<Long, AbstractCommand<?, ?>>> entry : slashCommandBase.getCommands().entrySet()) {
+				for (final Map.Entry<String, Pair<Long, Command>> entry : slashCommandBase.getCommands().entrySet()) {
 					var command = entry.getValue().getSecond();
 					if (command instanceof SlashCommand cmd && !cmd.isHidden(userSettings) && (command.getCategory() == category)) {
 						if (command.getProgress() != Progress.DONE) continue;
@@ -175,7 +174,7 @@ public class HelpCommand extends SlashCommand {
 					if (pr == Progress.DONE) {
 						continue;
 					}
-					for (final Map.Entry<String, Pair<Long, AbstractCommand<?, ?>>> entry : slashCommandBase.getCommands().entrySet()) {
+					for (final Map.Entry<String, Pair<Long, Command>> entry : slashCommandBase.getCommands().entrySet()) {
 						var cmd = entry.getValue().getSecond();
 						if (!(cmd instanceof SlashCommand slashCommand) || slashCommand.isHidden(userSettings) || (cmd.getCategory() != category) || (cmd.getProgress() != pr)) {
 							continue;

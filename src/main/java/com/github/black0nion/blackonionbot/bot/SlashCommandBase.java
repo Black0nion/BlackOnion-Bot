@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
 import com.github.black0nion.blackonionbot.commands.common.Category;
+import com.github.black0nion.blackonionbot.commands.common.Command;
+import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommand;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
@@ -68,21 +68,21 @@ import java.util.stream.Collectors;
  */
 public class SlashCommandBase extends ListenerAdapter implements Reloadable, CommandRegistry {
 
-	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
+	private final Map<Category, List<Command>> commandsInCategory = new EnumMap<>(Category.class);
 	private UserSettingsRepo userSettingsRepo;
 	private GuildSettingsRepo guildSettingsRepo;
 
-	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
+	public Map<Category, List<Command>> getCommandsInCategory() {
 		return commandsInCategory;
 	}
 
-	private final Map<String, Pair<Long, AbstractCommand<?, ?>>> commands = new HashMap<>();
+	private final Map<String, Pair<Long, Command>> commands = new HashMap<>();
 
-	public Map<String, Pair<Long, AbstractCommand<?, ?>>> getCommands() {
+	public Map<String, Pair<Long, Command>> getCommands() {
 		return commands;
 	}
 
-	private final Map<Class<? extends AbstractCommand<?, ?>>, AbstractCommand<?, ?>> commandInstances = new HashMap<>();
+	private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
 
 	private JSONObject commandsJson;
 
@@ -121,7 +121,6 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void addCommands() {
 		commandCount = 0;
 		commands.clear();
@@ -130,13 +129,13 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		commandsJson = new JSONObject();
 		final JSONArray commandsArr = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
-		final Set<Class<? extends AbstractCommand>> annotated = reflections.getSubTypesOf(AbstractCommand.class);
+		final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
 
-		for (final Class<? extends AbstractCommand> command : annotated) {
+		for (final Class<? extends Command> command : annotated) {
 			if (Modifier.isAbstract(command.getModifiers())) continue;
 
 			try {
-				final AbstractCommand newInstance = injector.createInstance(command, AbstractCommand.class);
+				final Command newInstance = injector.createInstance(command, Command.class);
 				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
@@ -210,13 +209,13 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends SlashCommand> T getCommand(Class<T> clazz) {
+	public <T extends Command> T getCommand(Class<T> clazz) {
 		return (T) commandInstances.get(clazz);
 	}
 
 	@Nullable
 	@Override
-	public AbstractCommand<?, ?> getCommand(String name) {
+	public Command getCommand(String name) {
 		if (name == null) return null;
 		return Utils.tryGet(() -> commands.get(name).getSecond());
 	}
@@ -234,7 +233,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 				.ifPresentOrElse(guild -> guild.updateCommands()
 					.addCommands(commands.values().stream()
 						.map(Pair::getSecond)
-						.map(AbstractCommand::getData)
+						.map(Command::getData)
 						.toList())
 					.queue(cmds -> logger.info("Successfully updated {} dev commands!", cmds.size())),
 					() -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
@@ -304,7 +303,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		onCommandInteraction(event, Objects.requireNonNull(event.getChannel()).asTextChannel(), MessageCommand.class);
 	}
 
-	public <E extends GenericCommandInteractionEvent, C extends AbstractCommand<?, ?>> void onCommandInteraction(final E event, TextChannel channel, Class<C> clazz) {
+	public <E extends GenericCommandInteractionEvent, C extends Command> void onCommandInteraction(final E event, TextChannel channel, Class<C> clazz) {
 		if (event.getUser().isBot() || (event.getGuild() != null && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY)))
 			return;
 
@@ -346,12 +345,12 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		LanguageSystem languageSystem = injector.getInstance(LanguageSystem.class);
 		if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
-			final AbstractCommand<?, ?> command = commands.get(event.getName()).getSecond();
+			final Command command = commands.get(event.getName()).getSecond();
 			if (!clazz.isAssignableFrom(command.getClass())) return;
 
 			final C cmd = clazz.cast(command);
 
-			AbstractCommandEvent<?, ?> cmde;
+			UserRespondUtils cmde;
 			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
 			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
@@ -403,18 +402,17 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable, Com
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addCommand(final AbstractCommand<?, ?> c) {
+	private void addCommand(final Command c) {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
 		commands.computeIfAbsent(c.getData().getName(), s -> {
 			final Category category = c.getCategory();
-			final List<AbstractCommand<?, ?>> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
+			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
 			// no clue what the fuck the error message means tbh
-			commandInstances.put((Class<? extends AbstractCommand<?, ?>>) c.getClass(), c);
+			commandInstances.put(c.getClass(), c);
 			commandCount++;
 			return new Pair<>(null, c);
 		});

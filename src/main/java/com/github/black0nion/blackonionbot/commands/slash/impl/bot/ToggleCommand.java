@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.commands.slash.impl.bot;
 
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
+import com.github.black0nion.blackonionbot.commands.common.Command;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
@@ -44,7 +44,7 @@ public class ToggleCommand extends SlashCommand {
 	}
 
 	public void updateAutoComplete() {
-		ChainableAtomicReference<AbstractCommand<?, ?>> currentCommand = new ChainableAtomicReference<>();
+		ChainableAtomicReference<Command> currentCommand = new ChainableAtomicReference<>();
 		this.updateAutoComplete(COMMAND, slashCommandBase.getCommands().entrySet().stream()
 			.filter(e ->
 			{
@@ -57,7 +57,7 @@ public class ToggleCommand extends SlashCommand {
 
 	@Override
 	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, @NotNull User author, @NotNull Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
-		final AbstractCommand<?, ?> command = slashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
+		final Command command = slashCommandBase.getCommand(e.getOption(COMMAND, OptionMapping::getAsString));
 		if (command == null || (command instanceof SlashCommand slashCommand && slashCommand.isHidden(userSettings))) {
 			cmde.send("commandnotfound");
 			return;
