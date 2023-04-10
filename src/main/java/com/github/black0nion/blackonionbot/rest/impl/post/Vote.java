@@ -2,7 +2,7 @@ package com.github.black0nion.blackonionbot.rest.impl.post;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
@@ -37,7 +37,7 @@ public class Vote implements IPostRoute {
 	}
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser dcUser) throws Exception {
+	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, OAuthUser dcUser) throws Exception {
 		final String ip = ctx.header("X-Real-IP") != null ? ctx.header("X-Real-IP") : ctx.ip();
 		assert ip != null;
 		if (!ip.equals("159.203.105.187") || !config.getTopggAuth().equals(ctx.header("authorization"))) {

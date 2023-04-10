@@ -1,5 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
@@ -19,12 +22,7 @@ import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
-import com.github.black0nion.blackonionbot.oauth.OAuthHandler;
-import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
-import com.github.black0nion.blackonionbot.oauth.impl.DiscordAuthCodeToTokensImpl;
 import com.github.black0nion.blackonionbot.rest.API;
-import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
-import com.github.black0nion.blackonionbot.rest.sessions.DatabaseSessionHandler;
 import com.github.black0nion.blackonionbot.stats.JettyCollector;
 import com.github.black0nion.blackonionbot.stats.Prometheus;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
@@ -39,6 +37,7 @@ import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystemImpl;
 import com.github.black0nion.blackonionbot.systems.plugins.PluginSystem;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.utils.AuthUtils;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
@@ -49,6 +48,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import io.mokulu.discord.oauth.DiscordOAuth;
 import marcono1234.gson.recordadapter.RecordTypeAdapterFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -69,6 +69,8 @@ import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -188,14 +190,7 @@ public class Bot extends ListenerAdapter {
 
 		injectorMap.add(new CustomCommandRepositoryImpl(sqlHelperFactory));
 
-		SessionHandler sessionHandler = injectorMap.add(new DatabaseSessionHandler(sqlHelperFactory));
 		statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
-
-		AbstractSession.setSessionHandler(sessionHandler);
-		injectorMap.add(new OAuthHandler(
-			sessionHandler,
-			injectorMap.add(new DiscordAuthCodeToTokensImpl(sessionHandler)))
-		);
 
 		Injector injector = new DefaultInjector(config, injectorMap);
 
@@ -229,6 +224,19 @@ public class Bot extends ListenerAdapter {
 		// the constructor already needs the initialized hashmap
 		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
 		builder.setActivity(ActivityCommand.getActivity(settings));
+
+		DiscordOAuth discordOAuth = new DiscordOAuth(config.getDiscordappClientId(), config.getDiscordappClientSecret(), config.getDiscordappRedirectUrl(), new String[] {"guilds", "identify"});
+		injectorMap.add(discordOAuth);
+
+		ECPublicKey publicKey = (ECPublicKey) AuthUtils.readPublicKeyFromFile(AuthUtils.PUBLIC_KEY_LOCATION, "EC");
+		ECPrivateKey privateKey = (ECPrivateKey) AuthUtils.readPrivateKeyFromFile(AuthUtils.PRIVATE_KEY_LOCATION, "EC");
+
+		Algorithm algorithm = Algorithm.ECDSA256(publicKey, privateKey);
+		injectorMap.add(Algorithm.class, algorithm);
+
+		JWTVerifier verifier = JWT.require(algorithm)
+			.withIssuer("BlackOnion-Bot")
+			.build();
 
 		if (Boolean.TRUE.equals(featureFlags.bot_shutdownBeforeConnection.getValue())) {
 			logger.warn("Shutting down before connecting to Discord due to the 'bot.shutdownBeforeConnection' feature flag");
@@ -277,7 +285,7 @@ public class Bot extends ListenerAdapter {
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize))))
+			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize), verifier)))
 			.addAndGetSelf(() -> pluginSystem.loadPlugins(null))
 			.addAndGetSelf(() -> reloadSystem.registerReloadable(new Prometheus(config)));
 
@@ -290,7 +298,9 @@ public class Bot extends ListenerAdapter {
 			try {
 				r.run();
 			} catch (Exception e) {
-				LoggerFactory.getLogger(r.getClass()).error("Error while starting up", e);
+				logger.error("Failed to start async startup task!", e);
+				asyncStartup.shutdown();
+				System.exit(-1);
 			}
 		}));
 		new ConsoleCommands(reloadSystem, this).start();

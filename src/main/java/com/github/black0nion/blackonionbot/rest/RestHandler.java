@@ -1,14 +1,14 @@
 package com.github.black0nion.blackonionbot.rest;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.beust.jcommander.internal.Lists;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
-import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.utils.Time;
 import io.javalin.http.*;
 import io.javalin.http.util.NaiveRateLimit;
 import org.json.JSONObject;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -16,9 +16,11 @@ import java.util.*;
 public class RestHandler implements Handler {
 
 	private final IHttpRoute route;
+	private final JWTVerifier jwtVerifier;
 
-	public RestHandler(IHttpRoute route) {
+	public RestHandler(IHttpRoute route, JWTVerifier jwtVerifier) {
 		this.route = route;
+		this.jwtVerifier = jwtVerifier;
 	}
 
 	@Override
@@ -59,17 +61,17 @@ public class RestHandler implements Handler {
 		//region Session
 		RestSession session = null;
 		if (route.requiresLogin()) {
-			final String sessionId = ctx.header("sessionid");
-			if (sessionId == null) throw new BadRequestResponse("No SessionID provided");
-			if (!sessionId.matches(AbstractSession.SESSIONID_REGEX)) throw new BadRequestResponse("Invalid SessionID");
+			final String authHeader = ctx.header("Authorization");
+			if (authHeader == null) throw new BadRequestResponse("No JWT provided");
+
+			if (!authHeader.startsWith("Bearer ")) throw new BadRequestResponse("Invalid JWT Header");
 			try {
-				session = new RestSession(sessionId);
+				String jwtRaw = authHeader.substring("Bearer ".length());
+				session = new RestSession(jwtVerifier.verify(jwtRaw));
 			} catch (InputMismatchException e) {
-				throw new UnauthorizedResponse("Unknown Session");
-			} catch (NullPointerException e) {
-				// not a field because it's incredibly unlikely to happen
-				LoggerFactory.getLogger(API.class).error("Session ID is null, shouldn't happen because of the filter before!");
-				throw e;
+				throw new UnauthorizedResponse("Unknown JWT");
+			} catch (JWTVerificationException e) {
+				throw new UnauthorizedResponse("Invalid JWT");
 			}
 
 			if (session.getUser() == null) {

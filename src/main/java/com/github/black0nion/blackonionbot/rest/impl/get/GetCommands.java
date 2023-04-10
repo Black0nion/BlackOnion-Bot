@@ -1,7 +1,7 @@
 package com.github.black0nion.blackonionbot.rest.impl.get;
 
 import com.github.black0nion.blackonionbot.bot.SlashCommandBase;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.http.Context;
@@ -25,7 +25,7 @@ public class GetCommands implements IGetRoute {
 	}
 
 	@Override
-	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, DiscordUser user) throws Exception {
+	public Object handle(Context ctx, JSONObject body, @Nullable RestSession session, OAuthUser user) throws Exception {
 		return slashCommandBase.getCommandsJson();
 	}
 
