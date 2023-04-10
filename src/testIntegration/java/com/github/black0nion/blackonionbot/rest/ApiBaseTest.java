@@ -18,7 +18,7 @@ class ApiBaseTest {
 	@BeforeEach
 	public void init() {
 		when(CONFIG.getApiPort()).thenReturn(8080);
-		API api = new API(CONFIG, new NullInjector(), new StatsCollectorFactory(ignored -> {}), mock(JWTVerifier.class)) {
+		API api = new API(CONFIG, new NullInjector(), new StatsCollectorFactory(ignored -> {}), mock(JWTVerifier.class), l -> null) {
 			@Override
 			protected void startServer() {
 				// overriden to prevent starting the server (required for JavalinTest)

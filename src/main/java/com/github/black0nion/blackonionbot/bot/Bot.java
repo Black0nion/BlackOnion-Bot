@@ -18,10 +18,13 @@ import com.github.black0nion.blackonionbot.config.mutable.api.Settings;
 import com.github.black0nion.blackonionbot.config.mutable.impl.MutableConfigLoaderImpl;
 import com.github.black0nion.blackonionbot.config.mutable.impl.SettingsImpl;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
+import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.inject.DefaultInjector;
 import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
+import com.github.black0nion.blackonionbot.misc.exception.OAuthUserNotFoundException;
+import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.stats.JettyCollector;
 import com.github.black0nion.blackonionbot.stats.Prometheus;
@@ -48,6 +51,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import io.mokulu.discord.oauth.DiscordAPI;
 import io.mokulu.discord.oauth.DiscordOAuth;
 import marcono1234.gson.recordadapter.RecordTypeAdapterFactory;
 import net.dv8tion.jda.api.JDA;
@@ -71,6 +75,8 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -246,6 +252,7 @@ public class Bot extends ListenerAdapter {
 		logger.info("Starting JDA...");
 		try {
 			this.jda = builder.build();
+			injectorMap.add(JDA.class, jda);
 		} catch (final Exception e) {
 			logger.error("Failed to connect to the bot! Please make sure to provide the token correctly in either the environment variables or the .env file.", e);
 			logger.error("Terminating bot.");
@@ -285,7 +292,21 @@ public class Bot extends ListenerAdapter {
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize), verifier)))
+			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize), verifier, userid -> {
+				try (SQLHelper sql = sqlHelperFactory.create("SELECT * FROM sessions WHERE user_id = ?", userid); ResultSet rs = sql.executeQuery()) {
+					if (rs.next()) {
+						return new OAuthUser(
+							rs.getString("access_token"),
+							rs.getString("refresh_token"),
+							rs.getLong("expires_at"),
+							new DiscordAPI(rs.getString("access_token"))
+						);
+					}
+				} catch (SQLException | IOException e) {
+					throw new OAuthUserNotFoundException(e);
+				}
+				return null;
+			})))
 			.addAndGetSelf(() -> pluginSystem.loadPlugins(null))
 			.addAndGetSelf(() -> reloadSystem.registerReloadable(new Prometheus(config)));
 

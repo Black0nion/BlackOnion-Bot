@@ -2,6 +2,7 @@ package com.github.black0nion.blackonionbot.rest.impl.post;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.oauth.OAuthUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
@@ -18,14 +19,16 @@ import java.time.Instant;
 
 public class Login implements IPostRoute {
 
-	// 7 days
+	// 7 days in seconds
 	private static final int JWT_VALID_FOR = 60 * 60 * 24 * 7;
 	private final Algorithm algorithm;
 	private final DiscordOAuth discordOAuth;
+	private final SQLHelperFactory sqlHelperFactory;
 
-	public Login(Algorithm algorithm, DiscordOAuth discordOAuth) {
+	public Login(Algorithm algorithm, DiscordOAuth discordOAuth, SQLHelperFactory sqlHelperFactory) {
 		this.algorithm = algorithm;
 		this.discordOAuth = discordOAuth;
+		this.sqlHelperFactory = sqlHelperFactory;
 	}
 
 	@Override
@@ -35,8 +38,23 @@ public class Login implements IPostRoute {
 			throw new BadRequestResponse("Missing code parameter");
 		}
 
+		long requestTime = System.currentTimeMillis();
 		TokensResponse tokens = discordOAuth.getTokens(code);
-		user = new OAuthUser(tokens.getAccessToken(), tokens.getRefreshToken(), new DiscordAPI(tokens.getAccessToken()));
+		String accessToken = tokens.getAccessToken();
+		String refreshToken = tokens.getRefreshToken();
+		long expiresAt = requestTime + tokens.getExpiresIn();
+
+		user = new OAuthUser(accessToken, refreshToken, expiresAt, new DiscordAPI(accessToken));
+
+		sqlHelperFactory.run("INSERT INTO sessions (user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET access_token = ?, refresh_token = ?, expires_at = ?",
+			user.getId(),
+			accessToken,
+			refreshToken,
+			expiresAt,
+			accessToken,
+			refreshToken,
+			expiresAt
+		);
 
 		return JWT.create()
 			.withExpiresAt(Instant.now().plusSeconds(JWT_VALID_FOR))

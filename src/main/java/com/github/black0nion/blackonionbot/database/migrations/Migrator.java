@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class Migrator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
-	private static final int CURRENT_VERSION = 69;
+	private static final int CURRENT_VERSION = 70;
 	// VERSION_DESCRIPTION-OF-THE-MIGRATION.sql
 	private static final Pattern MIGRATION_FILES_PATTERN = Pattern.compile("^(\\d+)_(.*)\\.sql$");
 

@@ -22,16 +22,15 @@ public class OAuthUser {
 
 	private static final Logger logger = LoggerFactory.getLogger(OAuthUser.class);
 
-	private static final int EXPIRATION_TIME = 604800; // 7 days
-
 	private String accessToken;
 	private String refreshToken;
+	// unit: seconds (epoch)
 	private long expiresAt;
 	private DiscordAPI api;
 	private User user;
 	private final long userId;
 
-	public OAuthUser(String accessToken, String refreshToken, DiscordAPI api) throws IllegalArgumentException, IOException {
+	public OAuthUser(String accessToken, String refreshToken, long expiresAt, DiscordAPI api) throws IllegalArgumentException, IOException {
 		if (accessToken == null || api == null) {
 			throw new IllegalArgumentException("Invalid parameters!");
 		} else if (!OAuthAPI.TOKEN_PATTERN.matcher(accessToken).matches() || (refreshToken != null && !OAuthAPI.TOKEN_PATTERN.matcher(refreshToken).matches())) {
@@ -42,7 +41,7 @@ public class OAuthUser {
 		this.api = api;
 		this.user = api.fetchUser();
 		this.userId = Long.parseLong(user.getId());
-		this.expiresAt = System.currentTimeMillis() + EXPIRATION_TIME;
+		this.expiresAt = expiresAt;
 	}
 
 
@@ -95,11 +94,12 @@ public class OAuthUser {
 	}
 
 	public OAuthUser refreshTokens() throws IOException {
+		long requestStart = System.currentTimeMillis();
 		TokensResponse tokensResponse = OAuthAPI.getInstance().getOAuthApi().refreshTokens(this.refreshToken);
 		this.accessToken = tokensResponse.getAccessToken();
 		this.refreshToken = tokensResponse.getRefreshToken();
 		this.api = new DiscordAPI(this.accessToken);
-		this.expiresAt = System.currentTimeMillis() + EXPIRATION_TIME;
+		this.expiresAt = requestStart / 1000 + tokensResponse.getExpiresIn();
 		return this;
 	}
 

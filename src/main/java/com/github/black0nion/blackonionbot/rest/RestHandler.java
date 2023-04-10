@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.rest;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.beust.jcommander.internal.Lists;
+import com.github.black0nion.blackonionbot.oauth.OAuthUserLoader;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.utils.Time;
@@ -17,10 +18,12 @@ public class RestHandler implements Handler {
 
 	private final IHttpRoute route;
 	private final JWTVerifier jwtVerifier;
+	private final OAuthUserLoader loadUserFromDb;
 
-	public RestHandler(IHttpRoute route, JWTVerifier jwtVerifier) {
+	public RestHandler(IHttpRoute route, JWTVerifier jwtVerifier, OAuthUserLoader loadUserFromDb) {
 		this.route = route;
 		this.jwtVerifier = jwtVerifier;
+		this.loadUserFromDb = loadUserFromDb;
 	}
 
 	@Override
@@ -37,7 +40,7 @@ public class RestHandler implements Handler {
 		headers.putAll(ctx.headerMap());
 
 		List<String> requiredHeaders = Lists.newArrayList(route.requiredHeaders());
-		if (route.requiresLogin()) requiredHeaders.add("sessionid");
+		if (route.requiresLogin()) requiredHeaders.add("Authorization");
 
 		if (!headers.keySet().containsAll(requiredHeaders)) {
 			requiredHeaders.removeAll(headers.keySet());
@@ -67,7 +70,7 @@ public class RestHandler implements Handler {
 			if (!authHeader.startsWith("Bearer ")) throw new BadRequestResponse("Invalid JWT Header");
 			try {
 				String jwtRaw = authHeader.substring("Bearer ".length());
-				session = new RestSession(jwtVerifier.verify(jwtRaw));
+				session = new RestSession(jwtVerifier.verify(jwtRaw), loadUserFromDb);
 			} catch (InputMismatchException e) {
 				throw new UnauthorizedResponse("Unknown JWT");
 			} catch (JWTVerificationException e) {
