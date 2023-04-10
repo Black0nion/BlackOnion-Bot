@@ -3,6 +3,7 @@ package com.github.black0nion.blackonionbot.rest;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.inject.Injector;
+import com.github.black0nion.blackonionbot.oauth.OAuthUserLoader;
 import com.github.black0nion.blackonionbot.rest.api.IHttpRoute;
 import com.github.black0nion.blackonionbot.rest.api.IWebSocketEndpoint;
 import com.github.black0nion.blackonionbot.rest.impl.get.Paths;
@@ -47,15 +48,17 @@ public class API implements Reloadable {
 	private final Injector injector;
 	private final StatsCollectorFactory statsCollectorFactory;
 	private final JWTVerifier jwtVerifier;
+	private final OAuthUserLoader loadUserFromDb;
 
 	/**
 	 * Automatically closes the old API instance if it exists
 	 */
-	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory, JWTVerifier jwtVerifier) {
+	public API(Config config, Injector injector, StatsCollectorFactory statsCollectorFactory, JWTVerifier jwtVerifier, OAuthUserLoader loadUserFromDb) {
 		this.config = config;
 		this.injector = injector;
 		this.statsCollectorFactory = statsCollectorFactory;
 		this.jwtVerifier = jwtVerifier;
+		this.loadUserFromDb = loadUserFromDb;
 		start();
 	}
 
@@ -150,7 +153,7 @@ public class API implements Reloadable {
 		for (final IHttpRoute req : httpRoutes) {
 			final String url = "/api/" + req.url();
 
-			app.addHandler(req.type(), url, new RestHandler(req, jwtVerifier));
+			app.addHandler(req.type(), url, new RestHandler(req, jwtVerifier, loadUserFromDb));
 		}
 		logger.info("Mapped {} routes", httpRoutes.size());
 		startServer();
