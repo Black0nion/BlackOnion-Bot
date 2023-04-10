@@ -39,16 +39,24 @@ public class OAuthUser {
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.api = api;
-		this.user = api.fetchUser();
+		refreshUser();
 		this.userId = Long.parseLong(user.getId());
 		this.expiresAt = expiresAt;
+		this.reloadSupplier = Suppliers.memoizeWithExpiration(() -> {
+			try {
+				logger.debug("Refreshing guilds for user {}", this.userId);
+				return this.api.fetchGuilds();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}, 10, TimeUnit.MINUTES);
 	}
 
 
 	public User getUser() {
 		try {
 			if (user == null)
-				user = api.fetchUser();
+				refreshUser();
 
 			return user;
 		} catch (IOException e) {
@@ -104,17 +112,12 @@ public class OAuthUser {
 	}
 
 	public OAuthUser refreshUser() throws IOException {
+		logger.debug("Refreshing user {}", this.userId);
 		this.user = api.fetchUser();
 		return this;
 	}
 
-	private final Supplier<List<Guild>> reloadSupplier = Suppliers.memoizeWithExpiration(() -> {
-		try {
-			return this.api.fetchGuilds();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}, 10, TimeUnit.MINUTES);
+	private final Supplier<List<Guild>> reloadSupplier;
 
 	/**
 	 * @return the guilds as discord's json response or null
