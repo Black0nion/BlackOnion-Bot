@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.rest.api;
 
-import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import org.json.JSONObject;

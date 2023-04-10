@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.Interaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class StatisticsManager extends ListenerAdapter {
@@ -59,7 +61,8 @@ public class StatisticsManager extends ListenerAdapter {
 	}
 
 	public void start() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
+		ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor(); // NOSONAR closing it will shut it down
+		ex.scheduleAtFixedRate(new StatsJob(featureFlags), 0, DELAY_BETWEEN_COLLECTION, TimeUnit.SECONDS);
 	}
 
 	public static final Gauge UPTIME = Gauge.build()
@@ -204,12 +207,16 @@ public class StatisticsManager extends ListenerAdapter {
 			guildId = guildEvent.getGuild().getId();
 			guildName = guildEvent.getGuild().getName();
 		}
+		if (event instanceof Interaction interaction && interaction.getGuild() != null) {
+			guildId = interaction.getGuild().getId();
+			guildName = interaction.getGuild().getName();
+		}
 		EVENTS.labels(event.getClass().getSimpleName(), guildId, guildName).inc();
 	}
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		MESSAGES_SENT.labels(event.getGuild().getId(), event.getGuild().getName(), event.getChannel().getId(), event.getChannel().getName());
+		MESSAGES_SENT.labels(event.getGuild().getId(), event.getGuild().getName(), event.getChannel().getId(), event.getChannel().getName()).inc();
 		TOTAL_MESSAGES_SENT.inc();
 	}
 }

@@ -13,11 +13,26 @@ import static java.util.Objects.requireNonNull;
 public interface SlashCommandEventJdaUtils extends SlashCommandEventUtilsBase {
 
 	default String getCommandHelp(SlashCommand command) {
-		return "/" + command.getData().getName() + " " + command.getData().getOptions().stream().map(data -> data.getName() + " : " + data.getType().name()).collect(Collectors.joining(", "));
+		return "/" + command.getData().getName() + " " + command.getData().getOptions().stream()
+			.map(data -> {
+				boolean isRequired = data.isRequired();
+				return (isRequired ? "<" : "[")
+					+ data.getName()
+					+ ": "
+					+ data.getType().name()
+					+ (isRequired ? ">" : "]");
+			})
+			.collect(Collectors.joining(" "));
 	}
 
+	@Nonnull
 	default <T> T getOption(@Nonnull String name, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {
-		return requireNonNull(getEvent().getOption(name, resolver));
+		return requireNonNull(getOptionNullable(name, resolver));
+	}
+
+	@Nullable
+	default <T> T getOptionNullable(@Nonnull String name, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {
+		return getEvent().getOption(name, resolver);
 	}
 
 	default <T> T getOption(@Nonnull String name, @Nullable Supplier<? extends T> fallback, @Nonnull Function<? super OptionMapping, ? extends T> resolver) {

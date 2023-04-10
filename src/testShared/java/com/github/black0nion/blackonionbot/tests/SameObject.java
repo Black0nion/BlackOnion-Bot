@@ -20,9 +20,4 @@ public class SameObject {
 		return this == obj
 			|| (obj != null && getClass() == obj.getClass() && this.obj != null && Objects.equals(this.obj, ((SameObject) obj).obj));
 	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
 }

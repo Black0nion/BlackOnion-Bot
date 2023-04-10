@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
@@ -17,7 +18,6 @@ public class DefaultInjector implements Injector {
 		requireNonNull(config, "config");
 		requireNonNull(injectorMap, "injectorMap");
 		this.injectorMap = injectorMap;
-		injectorMap.put(Injector.class, this);
 
 		if (!injectorMap.containsKey(Config.class)) {
 			injectorMap.put(Config.class, config);
@@ -27,12 +27,17 @@ public class DefaultInjector implements Injector {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T createInstance(Class<?> toInstantiate, Class<T> expectedType) {
-		Constructor<?>[] constructors = toInstantiate.getConstructors();
+		Constructor<?>[] constructors = toInstantiate.getDeclaredConstructors();
 		if (constructors.length != 1) {
 			throw new IllegalArgumentException("Only one constructor allowed");
 		}
 
 		Constructor<?> constructor = constructors[0];
+
+		if (!Modifier.isPublic(constructor.getModifiers())) {
+			throw new IllegalArgumentException("Constructor must be public");
+		}
+
 		Parameter[] parameters = constructor.getParameters();
 
 		Object[] instances;
@@ -66,5 +71,12 @@ public class DefaultInjector implements Injector {
 	@Override
 	public <T> T getInstance(Class<T> wantedClass) {
 		return injectorMap.getInstance(wantedClass);
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultInjector{" +
+				"injectorMap=" + injectorMap +
+				'}';
 	}
 }

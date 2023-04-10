@@ -18,7 +18,6 @@ import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -37,7 +36,7 @@ public class DatabaseConnector {
 
 	private final SQLHelperFactory sqlHelperFactory;
 
-	public DatabaseConnector(Config config, FeatureFlags featureFlags) throws SQLException, IOException {
+	public DatabaseConnector(Config config, FeatureFlags featureFlags) throws SQLException {
 		this.featureFlags = featureFlags;
 		this.sqlHelperFactory = new SQLHelperFactoryImpl(featureFlags, this::getConnection);
 

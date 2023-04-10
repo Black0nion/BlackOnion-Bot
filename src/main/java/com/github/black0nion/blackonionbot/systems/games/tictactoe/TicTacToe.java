@@ -1,10 +1,13 @@
 package com.github.black0nion.blackonionbot.systems.games.tictactoe;
 
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.systems.games.FieldType;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -12,7 +15,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -23,7 +25,7 @@ public class TicTacToe {
 	TicTacToePlayer playerY;
 	FieldType[][] field;
 	public FieldType currentPlayer;
-	BlackGuild guild;
+	Guild guild;
 	int moves = 0;
 	private static final List<ActionRow> initialRows = new ArrayList<>();
 
@@ -40,7 +42,7 @@ public class TicTacToe {
 		}
 	}
 
-	public TicTacToe(final LanguageSystem languageSystem, final IReplyCallback callback, final BlackGuild guild, final TicTacToePlayer playerX, final TicTacToePlayer playerY, Consumer<TicTacToe> onSent) {
+	public TicTacToe(final LanguageSystem languageSystem, final IReplyCallback callback, final UserSettingsRepo userSettingsRepo, final Guild guild, final GuildSettings guildSettings, final TicTacToePlayer playerX, final TicTacToePlayer playerY, Consumer<TicTacToe> onSent) {
 		this.field = new FieldType[TicTacToeGameManager.SIZE][TicTacToeGameManager.SIZE];
 		this.guild = guild;
 
@@ -52,12 +54,23 @@ public class TicTacToe {
 			}
 		}
 
-		final BlackUser currentUser = BlackUser.from(Objects.requireNonNull(this.currentPlayer == FieldType.X ? playerX.getUser() : (playerY.isBot() ? playerX.getUser() : playerY.getUser())));
+		final TicTacToePlayer currentPlayer = this.currentPlayer == FieldType.X ? playerX : playerY;
+		final User currentUser = currentPlayer.isBot() ? playerX.getUser() : currentPlayer.getUser();
+		assert currentUser != null;
+		final UserSettings userSettings = userSettingsRepo.getSettings(currentUser);
 
-		callback.reply(languageSystem.getTranslation("tictactoe", currentUser, this.guild) + " | " + languageSystem.getTranslation("currentplayer", currentUser, this.guild) + (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())).setComponents(this.rows).flatMap(InteractionHook::retrieveOriginal).queue(success -> {
-			this.message = success;
-			onSent.accept(this);
-		});
+		callback.reply(
+			languageSystem.getTranslation("tictactoe", userSettings, guildSettings)
+				+ " | "
+				+ languageSystem.getTranslation("currentplayer", userSettings, guildSettings)
+				+ (this.currentPlayer == FieldType.X ? playerX.getAsMention() : playerY.getAsMention())
+			).setComponents(this.rows)
+			.flatMap(InteractionHook::retrieveOriginal)
+			.queue(success -> {
+				this.message = success;
+				onSent.accept(this);
+			});
+
 		this.playerX = playerX;
 		this.playerY = playerY;
 	}

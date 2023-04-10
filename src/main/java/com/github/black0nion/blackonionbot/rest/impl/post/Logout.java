@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.rest.impl.post;
 
+import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import com.github.black0nion.blackonionbot.rest.api.IPostRoute;
 import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
-import com.github.black0nion.blackonionbot.oauth.DiscordUser;
 import io.javalin.http.Context;
 import org.json.JSONObject;
 

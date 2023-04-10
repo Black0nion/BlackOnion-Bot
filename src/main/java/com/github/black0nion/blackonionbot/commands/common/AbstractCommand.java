@@ -12,9 +12,12 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import java.util.Set;
+
 import static com.github.black0nion.blackonionbot.utils.Utils.gOD;
 
-public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils {
+public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D extends CommandData> implements CommandUtils, Command {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -22,9 +25,9 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 
 	protected Category category;
 	protected final Progress progress;
-	protected final Permission[] requiredPermissions;
-	protected final Permission[] requiredBotPermissions;
-	protected final CustomPermission[] requiredCustomPermissions;
+	protected final Set<Permission> requiredPermissions;
+	protected final Set<Permission> requiredBotPermissions;
+	protected final Set<CustomPermission> requiredCustomPermissions;
 	protected final boolean isToggleable;
 	protected final boolean shouldAutoRegister;
 	protected final boolean isPremium;
@@ -48,14 +51,17 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		this.config = config;
 	}
 
+	@Override
 	public void handleButtonPress(ButtonInteractionEvent event) {
 		// NOOP
 	}
 
+	@Override
 	public void handleModalInteraction(ModalInteractionEvent event) {
 		// NOOP
 	}
 
+	@Override
 	public void handleSelectMenuInteraction(GenericSelectMenuInteractionEvent<?, ?> event) {
 		// NOOP
 	}
@@ -65,6 +71,7 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		return isEphemeral;
 	}
 
+	@Override
 	public D getData() {
 		return data;
 	}
@@ -74,42 +81,53 @@ public abstract class AbstractCommand<T extends AbstractCommandBuilder<T, D>, D 
 		return data.getName();
 	}
 
+	@Override
 	public Category getCategory() {
 		return category;
 	}
 
+	@Override
 	public void setCategory(Category category) {
 		this.category = category;
 	}
 
+	@Override
 	public Progress getProgress() {
 		return progress;
 	}
 
-	public Permission[] getRequiredPermissions() {
+	@Override
+	public Set<Permission> getRequiredPermissions() {
 		return requiredPermissions;
 	}
 
-	public Permission[] getRequiredBotPermissions() {
+	@Override
+	@Nonnull
+	public Set<Permission> getRequiredBotPermissions() {
 		return requiredBotPermissions;
 	}
 
-	public CustomPermission[] getRequiredCustomPermissions() {
+	@Override
+	@Nonnull
+	public Set<CustomPermission> getRequiredCustomPermissions() {
 		return requiredCustomPermissions;
-	}
-
-	public boolean isToggleable() {
-		return isToggleable;
 	}
 
 	public boolean shouldAutoRegister() {
 		return shouldAutoRegister;
 	}
 
+	@Override
 	public boolean isPremiumCommand() {
 		return isPremium;
 	}
 
+	@Override
+	public boolean isToggleable() {
+		return isToggleable;
+	}
+
+	@Override
 	public boolean isAdminGuild() {
 		return isAdminGuild;
 	}

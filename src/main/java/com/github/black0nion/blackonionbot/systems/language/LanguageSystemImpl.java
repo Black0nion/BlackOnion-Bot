@@ -1,15 +1,13 @@
 package com.github.black0nion.blackonionbot.systems.language;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
-import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
-import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.misc.SQLSetup;
 import com.github.black0nion.blackonionbot.misc.exception.MultipleDefaultLanguagesException;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
+import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
+import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
@@ -73,31 +71,21 @@ public class LanguageSystemImpl implements LanguageSystem, Reloadable {
 	}
 
 	@Override
-	public Language getLanguage(User user, Guild guild) {
-		return getLanguage(BlackUser.from(user), BlackGuild.from(guild));
-	}
-
-	@Override
-	public Language getLanguage(@Nullable BlackUser user, @Nullable BlackGuild guild) {
-		return LanguageUtils.getLanguage(user, guild, getDefaultLanguage());
-	}
-
-	@Override
 	public Language getDefaultLanguage() {
 		return defaultLocale;
 	}
 
 	@Nullable
 	@Override
-	public Language getLanguageFromName(final String name) {
+	public Language getLanguageFromCode(final String name) {
 		if (name == null || !languages.containsKey(name.toUpperCase())) return null;
 		return languages.get(name.toUpperCase());
 	}
 
 	@Override
-	public String getTranslation(final @Nullable String key, final @Nullable BlackUser author, final @Nullable BlackGuild guild) {
-		if (author != null && author.getLanguage() != null) return author.getLanguage().getTranslation(key);
-		if (guild != null && guild.getLanguage() != null) return guild.getLanguage().getTranslation(key);
+	public String getTranslation(final @Nullable String key, final @Nullable UserSettings userSettings, final @Nullable GuildSettings guildSettings) {
+		if (userSettings != null && userSettings.getLanguage().getValue() != null) return userSettings.getLanguage().getTranslation(key);
+		if (guildSettings != null && guildSettings.getLanguage().getValue() != null) return guildSettings.getLanguage().getTranslation(key);
 		return defaultLocale.getTranslation(key);
 	}
 

@@ -2,13 +2,15 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -42,7 +44,7 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, @NotNull TextChannel channel) {
+	public void execute(@NotNull SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, Guild guild, @NotNull TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case "count" -> deleteCount(cmde, e, channel);
 			case "until" -> deleteUntil(cmde, e, channel);
@@ -52,7 +54,7 @@ public class ClearCommand extends SlashCommand {
 
 	private static void deleteCount(SlashCommandEvent cmde, SlashCommandInteractionEvent e, TextChannel channel) {
 		try {
-			final Integer amount = e.getOption("amount", OptionMapping::getAsInt);
+			final Integer amount = e.getOption(AMOUNT, OptionMapping::getAsInt);
 
 			try {
 				channel.getIterableHistory().cache(false).queue(msgs -> {
@@ -106,15 +108,13 @@ public class ClearCommand extends SlashCommand {
 						final List<Message> messages = new ArrayList<>();
 						int i = msgsize + 1;
 						for (final Message m : msgs.getRetrievedHistory()) {
-							if (m.getTimeCreated().isAfter(lastValidTime)) break;
+							if (!m.getTimeCreated().isAfter(lastValidTime)) break;
 
 							if (!m.isPinned()) {
 								messages.add(m);
 							}
 
-							if (--i <= 0) {
-								break;
-							}
+							if (--i <= 0) break;
 						}
 
 						ClearCommand.deleteMessages(cmde, channel, msgsize, messages);
@@ -129,6 +129,7 @@ public class ClearCommand extends SlashCommand {
 	}
 
 	static void deleteMessages(@NotNull SlashCommandEvent cmde, @NotNull TextChannel channel, int expectedCount, @NotNull List<Message> messages) {
+		// TODO: display error when no message is found
 		channel.deleteMessages(messages).queue(success -> {
 			if (messages.size() < expectedCount) {
 				cmde.send("msgsgotdeletedless", new Placeholder("msgcount", messages.size()),

@@ -1,10 +1,10 @@
 package com.github.black0nion.blackonionbot.config.immutable.impl;
 
-import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.ConfigLoaderHolder;
+import com.github.black0nion.blackonionbot.config.common.ConfigFlag;
 import com.github.black0nion.blackonionbot.config.common.ConfigLoader;
-import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
+import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

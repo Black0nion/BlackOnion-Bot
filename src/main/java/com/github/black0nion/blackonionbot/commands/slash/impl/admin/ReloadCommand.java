@@ -4,15 +4,20 @@ import com.github.black0nion.blackonionbot.commands.common.utils.UserRespondUtil
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -28,16 +33,20 @@ public class ReloadCommand extends SlashCommand {
 
 	private final ReloadSystem reloadSystem;
 	private final LanguageSystem languageSystem;
+	private final GuildSettingsRepo guildSettingsRepo;
+	private final UserSettingsRepo userSettingsRepo;
 
-	public ReloadCommand(ReloadSystem reloadSystem, LanguageSystem languageSystem) {
+	public ReloadCommand(ReloadSystem reloadSystem, LanguageSystem languageSystem, GuildSettingsRepo guildSettingsRepo, UserSettingsRepo userSettingsRepo) {
 		super(builder("reload", "Reloads the bot")
 			.setAdminGuild());
 		this.reloadSystem = reloadSystem;
 		this.languageSystem = languageSystem;
+		this.guildSettingsRepo = guildSettingsRepo;
+		this.userSettingsRepo = userSettingsRepo;
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		e.replyComponents(
 				ActionRow.of(StringSelectMenu.create(enrichId("reloadablemethods"))
 					.addOptions(reloadSystem.getReloadables().stream()
@@ -53,13 +62,10 @@ public class ReloadCommand extends SlashCommand {
 	@Override
 	public void handleSelectMenuInteraction(GenericSelectMenuInteractionEvent<?, ?> e) {
 		if (!(e instanceof StringSelectInteractionEvent event)) return;
+
 		e.deferReply().queue();
-		UserRespondUtils cmde = new UserRespondUtilsImpl(e, BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()) {
-			@Override
-			public boolean isEphemeral() {
-				return true;
-			}
-		};
+
+		UserRespondUtils cmde = createRespondUtils(event);
 
 		List<String> options = event.getValues();
 		for (String option : options) {
@@ -80,8 +86,8 @@ public class ReloadCommand extends SlashCommand {
 	}
 
 	@NotNull
-	private UserRespondUtilsImpl createRespondUtils(ButtonInteractionEvent event) {
-		return new UserRespondUtilsImpl(event, BlackGuild.from(event.getGuild()), BlackUser.from(event.getUser()), languageSystem.getDefaultLanguage()) {
+	private UserRespondUtilsImpl createRespondUtils(GenericComponentInteractionCreateEvent event) {
+		return new UserRespondUtilsImpl(event, guildSettingsRepo.getSettings(event.getGuild()), event.getUser(), userSettingsRepo.getSettings(event.getUser()), languageSystem.getDefaultLanguage()) {
 			@Override
 			public boolean isEphemeral() {
 				return true;

@@ -2,12 +2,14 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.admin;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -17,10 +19,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PermissionsCommand extends SlashCommand {
@@ -47,19 +48,19 @@ public class PermissionsCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		final String mode = cmde.getSubcommandName();
 
 		if (Utils.equalsOneIgnoreCase(mode, "add", "remove", "list")) {
-			final BlackUser user = BlackUser.from(Objects.requireNonNull(e.getOption("user", OptionMapping::getAsUser)));
+			final User user = Objects.requireNonNull(e.getOption("user", OptionMapping::getAsUser));
 			if (user.isBot()) {
 				cmde.send("invaliduser");
 				return;
 			}
 			if (mode.equalsIgnoreCase("list")) {
-				final List<CustomPermission> perms = user.getPermissions();
+				final Set<CustomPermission> perms = userSettings.getPermissions().getValue();
 				cmde.send("permissionsof",
-					new Placeholder("user", user.getFullNameEscaped()),
+					new Placeholder("user", Utils.escapeMarkdown(user.getAsTag())),
 					new Placeholder("perms", !perms.isEmpty() ? perms.stream()
 						.map(CustomPermission::name)
 						.map(Utils::list)
@@ -74,14 +75,14 @@ public class PermissionsCommand extends SlashCommand {
 				if (permission == null && !Objects.equals(permissionString, "all"))
 					throw new NullPointerException("CustomPermission is null!");
 				if (permission != null)
-					user.removePermissions(permission);
+					userSettings.getPermissions().remove(permission);
 				else
-					user.setPermissions(new ArrayList<>());
-				cmde.send("permissionsremoved", new Placeholder("perms", permissionString), new Placeholder("user", user.getFullName()));
+					userSettings.getPermissions().reset();
+				cmde.send("permissionsremoved", new Placeholder("perms", permissionString), new Placeholder("user", Utils.escapeMarkdown(user.getAsTag())));
 			} else if (mode.equalsIgnoreCase("add")) {
 				if (permission == null) throw new NullPointerException("CustomPermission is null!");
-				user.addPermissions(permission);
-				cmde.send("permissionsadded", new Placeholder("perms", permissionString), new Placeholder("user", user.getFullName()));
+				userSettings.getPermissions().add(permission);
+				cmde.send("permissionsadded", new Placeholder("perms", permissionString), new Placeholder("user", Utils.escapeMarkdown(user.getAsTag())));
 			}
 		} else {
 			cmde.sendPleaseUse();

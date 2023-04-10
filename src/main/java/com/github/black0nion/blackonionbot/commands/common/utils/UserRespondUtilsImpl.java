@@ -1,11 +1,12 @@
 package com.github.black0nion.blackonionbot.commands.common.utils;
 
 import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageUtils;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +20,11 @@ public class UserRespondUtilsImpl implements UserRespondUtils {
 	private final TranslatedEmbedBuilder errorEmbed;
 	private final TranslatedEmbedBuilder successEmbed;
 
-	public UserRespondUtilsImpl(final IReplyCallback callback, final BlackGuild guild, final BlackUser user, final Language defaultLanguage) {
+	public UserRespondUtilsImpl(final IReplyCallback callback, final GuildSettings guildSettings, final User user, final UserSettings userSettings, final Language defaultLanguage) {
 		this.callback = callback;
-		this.successEmbed = getSuccessEmbed(defaultLanguage, user, guild);
-		this.errorEmbed = getErrorEmbed(defaultLanguage, user, guild);
-		this.language = LanguageUtils.getLanguage(user, guild, defaultLanguage);
+		this.successEmbed = getSuccessEmbed(defaultLanguage, user, userSettings, guildSettings);
+		this.errorEmbed = getErrorEmbed(defaultLanguage, user, userSettings, guildSettings);
+		this.language = LanguageUtils.getLanguage(userSettings, guildSettings, defaultLanguage);
 	}
 
 	@Override

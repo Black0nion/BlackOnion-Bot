@@ -1,11 +1,13 @@
 package com.github.black0nion.blackonionbot.commands.slash;
 
 import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
-import com.github.black0nion.blackonionbot.wrappers.StartsWithArrayList;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
+import com.github.black0nion.blackonionbot.wrappers.StartsWithLinkedList;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -16,12 +18,14 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a SlashCommand that can be executed by users.
- * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, BlackMember, BlackUser, BlackGuild, TextChannel) execute} method.
+ * On every execution, it will run the {@link SlashCommand#execute(SlashCommandEvent, SlashCommandInteractionEvent, Member, User, Guild, TextChannel, UserSettings, GuildSettings) execute} method.
  * <p>
  * Implement a command by doing this:
  * <pre>{@code
@@ -45,7 +49,7 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	/**
 	 * option name : choices
 	 */
-	private final Map<String, StartsWithArrayList> autoCompletes = new HashMap<>();
+	private final Map<String, StartsWithLinkedList> autoCompletes = new HashMap<>();
 
 
 	//region Constructors
@@ -76,9 +80,9 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	}
 	//endregion
 
-	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final BlackMember member, final BlackUser author, final BlackGuild guild, final TextChannel channel) throws SQLException;
+	public abstract void execute(final SlashCommandEvent cmde, final SlashCommandInteractionEvent e, final Member member, final User author, final Guild guild, final TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception;
 
-	protected void updateAutoComplete(Map.Entry<String, StartsWithArrayList> entry) {
+	protected void updateAutoComplete(Map.Entry<String, StartsWithLinkedList> entry) {
 		Checks.notNull(entry, "Entry");
 		this.updateAutoComplete(entry.getKey(), entry.getValue());
 	}
@@ -87,11 +91,11 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 		Checks.notNull(option, "Option");
 		Checks.notNull(values, "Values");
 		Checks.notEmpty(values, "Values");
-		autoCompletes.put(option, values instanceof StartsWithArrayList value ? value : new StartsWithArrayList(values));
+		autoCompletes.put(option, values instanceof StartsWithLinkedList value ? value : new StartsWithLinkedList(values));
 	}
 
 	public void handleAutoComplete(CommandAutoCompleteInteractionEvent event) {
-		StartsWithArrayList autoComplete = autoCompletes.get(event.getFocusedOption().getName());
+		StartsWithLinkedList autoComplete = autoCompletes.get(event.getFocusedOption().getName());
 		Checks.notNull(autoComplete, "AutoComplete Choices");
 		List<String> options = autoComplete.getElementsStartingWith(event.getFocusedOption().getValue(), true);
 		event.replyChoices(options.stream().map(m -> new Command.Choice(m, m)).limit(25).toList()).queue();
@@ -100,8 +104,8 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 	/**
 	 * @return if the user doesn't have the required {@link SlashCommand#requiredCustomPermissions}. REQUIRES ALL PERMISSIONS!
 	 */
-	public boolean isHidden(final BlackUser user) {
-		return !user.hasPermission(this.requiredCustomPermissions);
+	public boolean isHidden(final UserSettings userSettings) {
+		return !userSettings.getPermissions().containsAll(this.requiredCustomPermissions);
 	}
 
 	@Nonnull
@@ -120,9 +124,9 @@ public abstract class SlashCommand extends AbstractCommand<SlashCommandBuilder, 
 			"data=" + data +
 			", category=" + category +
 			", progress=" + progress +
-			", requiredPermissions=" + Arrays.toString(requiredPermissions) +
-			", requiredBotPermissions=" + Arrays.toString(requiredBotPermissions) +
-			", requiredCustomPermissions=" + Arrays.toString(requiredCustomPermissions) +
+			", requiredPermissions=" + requiredPermissions +
+			", requiredBotPermissions=" + requiredBotPermissions +
+			", requiredCustomPermissions=" + requiredCustomPermissions +
 			", isToggleable=" + isToggleable +
 			", shouldAutoRegister=" + shouldAutoRegister +
 			", isPremium=" + isPremium +

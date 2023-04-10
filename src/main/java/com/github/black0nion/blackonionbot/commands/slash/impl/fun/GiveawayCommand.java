@@ -2,15 +2,17 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.fun;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.systems.giveaways.Giveaway;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -61,7 +63,7 @@ public class GiveawayCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case "create" -> createGiveaway(cmde, e, author, guild, channel);
 			case "end" -> endGiveaway(cmde, e, member, author, guild, channel);
@@ -69,7 +71,7 @@ public class GiveawayCommand extends SlashCommand {
 		}
 	}
 
-	private void createGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackUser author, BlackGuild guild, TextChannel channel) {
+	private void createGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, User author, Guild guild, TextChannel channel) {
 		Integer min = e.getOption(MINUTES, OptionMapping::getAsInt);
 		Integer hours = e.getOption(HOURS, OptionMapping::getAsInt);
 		Integer days = e.getOption(DAYS, OptionMapping::getAsInt);
@@ -100,16 +102,14 @@ public class GiveawayCommand extends SlashCommand {
 				new Placeholder("end", DATE_FORMAT.format(data).replace("_", " ")),
 				new Placeholder("user", author.getAsMention())));
 
-		cmde.reply(giveawayMessage, msg -> msg.retrieveOriginal().queue(
-			message -> {
-				message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
-				message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
-				giveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
-			}
-		));
+		cmde.reply(giveawayMessage, message -> {
+			message.addReaction(Emoji.fromUnicode("U+1F389")).queue();
+			message.editMessageEmbeds(giveawayMessage.setFooter(cmde.getTranslation("giveawayid", new Placeholder("id", message.getId()))).build()).queue();
+			giveawaySystem.createGiveaway(data, message.getIdLong(), channel.getIdLong(), author.getIdLong(), guild.getIdLong(), item, winners);
+		});
 	}
 
-	private void endGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	private void endGiveaway(SlashCommandEvent cmde, SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel) {
 		var id = e.getOption(MESSAGE_ID, OptionMapping::getAsString);
 		if (Utils.isLong(id)) {
 			final long idLong = Long.parseLong(id);

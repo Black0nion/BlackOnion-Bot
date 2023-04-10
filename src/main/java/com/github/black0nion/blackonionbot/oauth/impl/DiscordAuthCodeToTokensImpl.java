@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.oauth.impl;
 
 import com.github.black0nion.blackonionbot.oauth.OAuthAPI;
-import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.oauth.api.DiscordAuthCodeToTokens;
+import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import io.mokulu.discord.oauth.model.TokensResponse;
 
 import java.io.IOException;

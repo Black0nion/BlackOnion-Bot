@@ -1,8 +1,8 @@
 package com.github.black0nion.blackonionbot.bot;
 
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommand;
-import com.github.black0nion.blackonionbot.commands.common.AbstractCommandEvent;
 import com.github.black0nion.blackonionbot.commands.common.Category;
+import com.github.black0nion.blackonionbot.commands.common.Command;
+import com.github.black0nion.blackonionbot.commands.common.utils.event.UserRespondUtils;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommand;
 import com.github.black0nion.blackonionbot.commands.message.MessageCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
@@ -10,6 +10,10 @@ import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.BanUsageCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.bot.ToggleCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.information.HelpCommand;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepo;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.immutable.api.Config;
 import com.github.black0nion.blackonionbot.database.DatabaseConnector;
@@ -18,17 +22,16 @@ import com.github.black0nion.blackonionbot.inject.InjectorCreateInstanceExceptio
 import com.github.black0nion.blackonionbot.misc.enums.GuildType;
 import com.github.black0nion.blackonionbot.misc.enums.RunMode;
 import com.github.black0nion.blackonionbot.stats.StatisticsManager;
-import com.github.black0nion.blackonionbot.systems.dashboard.Dashboard;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.systems.reload.Reloadable;
 import com.github.black0nion.blackonionbot.utils.*;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -63,21 +66,23 @@ import java.util.stream.Collectors;
  *<br>
  * It'll handle things like permissions, command auto-complete, executing commands, etc.
  */
-public class SlashCommandBase extends ListenerAdapter implements Reloadable {
+public class SlashCommandBase extends ListenerAdapter implements Reloadable, CommandRegistry {
 
-	private final Map<Category, List<AbstractCommand<?, ?>>> commandsInCategory = new EnumMap<>(Category.class);
+	private final Map<Category, List<Command>> commandsInCategory = new EnumMap<>(Category.class);
+	private UserSettingsRepo userSettingsRepo;
+	private GuildSettingsRepo guildSettingsRepo;
 
-	public Map<Category, List<AbstractCommand<?, ?>>> getCommandsInCategory() {
+	public Map<Category, List<Command>> getCommandsInCategory() {
 		return commandsInCategory;
 	}
 
-	private final Map<String, Pair<Long, AbstractCommand<?, ?>>> commands = new HashMap<>();
+	private final Map<String, Pair<Long, Command>> commands = new HashMap<>();
 
-	public Map<String, Pair<Long, AbstractCommand<?, ?>>> getCommands() {
+	public Map<String, Pair<Long, Command>> getCommands() {
 		return commands;
 	}
 
-	private final Map<Class<? extends AbstractCommand<?, ?>>, AbstractCommand<?, ?>> commandInstances = new HashMap<>();
+	private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
 
 	private JSONObject commandsJson;
 
@@ -106,7 +111,16 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		reloadSystem.registerReloadable(this);
 	}
 
-	@SuppressWarnings("rawtypes")
+	public void setUserSettingsRepo(UserSettingsRepo userSettingsRepo) {
+		if (this.userSettingsRepo != null) throw new IllegalStateException("UserSettingsRepo already set!");
+		this.userSettingsRepo = userSettingsRepo;
+	}
+
+	public void setGuildSettingsRepo(GuildSettingsRepo guildSettingsRepo) {
+		if (this.guildSettingsRepo != null) throw new IllegalStateException("GuildSettingsRepo already set!");
+		this.guildSettingsRepo = guildSettingsRepo;
+	}
+
 	public void addCommands() {
 		commandCount = 0;
 		commands.clear();
@@ -115,13 +129,13 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		commandsJson = new JSONObject();
 		final JSONArray commandsArr = new JSONArray();
 		final Reflections reflections = new Reflections(SlashCommand.class.getPackage().getName());
-		final Set<Class<? extends AbstractCommand>> annotated = reflections.getSubTypesOf(AbstractCommand.class);
+		final Set<Class<? extends Command>> annotated = reflections.getSubTypesOf(Command.class);
 
-		for (final Class<? extends AbstractCommand> command : annotated) {
+		for (final Class<? extends Command> command : annotated) {
 			if (Modifier.isAbstract(command.getModifiers())) continue;
 
 			try {
-				final AbstractCommand newInstance = injector.createInstance(command, AbstractCommand.class);
+				final Command newInstance = injector.createInstance(command, Command.class);
 				final String[] packageName = command.getPackage().getName().split("\\.");
 				final Category parsedCategory = Category.parse(packageName[packageName.length - 1]);
 				newInstance.setCategory(parsedCategory != null ? parsedCategory : newInstance.getCategory());
@@ -136,7 +150,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 
 				if (newInstance instanceof SlashCommand slashCommand) {
 					SlashCommandData data = slashCommand.getData();
-					if (newInstance.getRequiredCustomPermissions() == null || newInstance.getRequiredCustomPermissions().length == 0) {
+					if (newInstance.getRequiredCustomPermissions().isEmpty()) {
 						commandsArr.put(serializeCommand(slashCommand, data));
 					}
 				}
@@ -153,8 +167,6 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 
 		Optional.ofNullable(getCommand(ToggleCommand.class)).ifPresent(ToggleCommand::updateAutoComplete);
 		Optional.ofNullable(getCommand(HelpCommand.class)).ifPresent(HelpCommand::updateAutoComplete);
-
-		Bot.getInstance().getExecutor().submit(Dashboard::init);
 	}
 
 	@Nonnull
@@ -196,14 +208,16 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends SlashCommand> T getCommand(Class<T> clazz) {
+	@Override
+	public <T extends Command> T getCommand(Class<T> clazz) {
 		return (T) commandInstances.get(clazz);
 	}
 
 	@Nullable
-	public static AbstractCommand<?, ?> getCommand(String name) {
+	@Override
+	public Command getCommand(String name) {
 		if (name == null) return null;
-		return Utils.tryGet(() -> getInstance().commands.get(name).getSecond());
+		return Utils.tryGet(() -> commands.get(name).getSecond());
 	}
 
 	@Override
@@ -219,7 +233,7 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 				.ifPresentOrElse(guild -> guild.updateCommands()
 					.addCommands(commands.values().stream()
 						.map(Pair::getSecond)
-						.map(AbstractCommand::getData)
+						.map(Command::getData)
 						.toList())
 					.queue(cmds -> logger.info("Successfully updated {} dev commands!", cmds.size())),
 					() -> logger.warn("Failed to update dev commands: dev guild set, but not found"));
@@ -289,23 +303,23 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		onCommandInteraction(event, Objects.requireNonNull(event.getChannel()).asTextChannel(), MessageCommand.class);
 	}
 
-	public <E extends GenericCommandInteractionEvent, C extends AbstractCommand<?, ?>> void onCommandInteraction(final E event, TextChannel channel, Class<C> clazz) {
+	public <E extends GenericCommandInteractionEvent, C extends Command> void onCommandInteraction(final E event, TextChannel channel, Class<C> clazz) {
 		if (event.getUser().isBot() || (event.getGuild() != null && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY)))
 			return;
 
-		final BlackUser author = BlackUser.from(event.getUser());
-		final BlackGuild guild = BlackGuild.from(event.getGuild());
-		final BlackMember member = BlackMember.from(event.getMember());
+		final User author = event.getUser();
+		final Guild guild = event.getGuild();
+		final Member member = event.getMember();
 
 		assert guild != null && member != null;
 
 		final boolean locked = BanUsageCommand.isBanned(injector.getInstance(FeatureFlags.class), injector.getInstance(DatabaseConnector.class), guild.getIdLong(), author.getIdLong());
 
 		if (config.getRunMode() == RunMode.DEV) {
-			final String log = EmojiParser.parseToAliases(guild.getDebugMessage()
+			final String log = EmojiParser.parseToAliases(Utils.getDebugMessage(guild)
 				+ " > "
 				+ channel.getName()
-				+ "(C:" + channel.getId() + ") | " + author.getDebugMessage()
+				+ "(C:" + channel.getId() + ") | " + Utils.getDebugMessage(author)
 				+ ": (E:" + event.getId() + ")"
 				+ event.getFullCommandName().replace(" ", "/") + " "
 				+ event.getOptions().stream()
@@ -319,6 +333,9 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 			FileUtils.appendToFile("files/logs/messagelog/" + guild.getId() + "/" + EmojiParser.parseToAliases(channel.getName()).replaceAll(":([^:\\s]*(?:::[^:\\s]*)*):", "($1)").replace(":", "_") + "_" + channel.getId() + ".log", log);
 		}
 
+		final UserSettings userSettings = userSettingsRepo.getSettings(author);
+		final GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
+
 		if (locked) {
 			// haha funni
 			event.reply("https://tenor.com/view/you-got-banned-banned-banned-message-mickey-mouse-club-gif-17668002").queue();
@@ -326,54 +343,54 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		}
 
 		LanguageSystem languageSystem = injector.getInstance(LanguageSystem.class);
-		if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
+		if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) return;
 		if (commands.containsKey(event.getName())) {
-			final AbstractCommand<?, ?> command = commands.get(event.getName()).getSecond();
+			final Command command = commands.get(event.getName()).getSecond();
 			if (!clazz.isAssignableFrom(command.getClass())) return;
 
 			final C cmd = clazz.cast(command);
 
-			AbstractCommandEvent<?, ?> cmde;
-			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
-			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage());
+			UserRespondUtils cmde;
+			if (event instanceof SlashCommandInteractionEvent e1) cmde = new SlashCommandEvent((SlashCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
+			else if (event instanceof MessageContextInteractionEvent e1) cmde = new MessageCommandEvent((MessageCommand) cmd, e1, guild, member, author, languageSystem.getDefaultLanguage(), userSettings, guildSettings);
 			else throw new IllegalArgumentException("Unexpected value: " + cmd);
 
-			final boolean disabled = !guild.isCommandActivated(cmd);
+			final boolean disabled = guildSettings.getDisabledCommands().contains(cmd);
 			if (disabled) {
 				cmde.send("commanddisabled", new Placeholder("cmd", cmd.getName()));
 				return;
 			}
 
-			if (cmd.getRequiredCustomPermissions() != null && !author.hasPermission(cmd.getRequiredCustomPermissions())) {
-				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredCustomPermissions())));
+			if (!userSettings.getPermissions().containsAll(cmd.getRequiredCustomPermissions())) {
+				cmde.send("missingpermissions", new Placeholder("perms", Utils.getCustomPermissionString(cmd.getRequiredCustomPermissions())));
 				return;
 			}
 
 			StatisticsManager.COMMANDS_EXECUTED.labels("slash", event.getFullCommandName().replace(" ", "/"), guild.getId(), guild.getName(), channel.getId(), channel.getName()).inc();
 			StatisticsManager.TOTAL_COMMANDS_EXECUTED.inc();
 
-			final Permission[] requiredBotPermissions = cmd.getRequiredBotPermissions() != null ? cmd.getRequiredBotPermissions() : Permission.EMPTY_PERMISSIONS;
-			final Permission[] requiredPermissions = cmd.getRequiredPermissions() != null ? cmd.getRequiredPermissions() : Permission.EMPTY_PERMISSIONS;
-			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions)) return;
+			final Set<Permission> requiredBotPermissions = cmd.getRequiredBotPermissions();
+			final Set<Permission> requiredPermissions = cmd.getRequiredPermissions();
+			if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, requiredBotPermissions)) return;
 
 			if (!member.hasPermission(requiredPermissions)) {
-				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(author)) return;
+				if (cmd instanceof SlashCommand slashCommand && slashCommand.isHidden(userSettings)) return;
 				cmde.send("missingpermissions", new Placeholder("perms", Utils.getPermissionString(cmd.getRequiredPermissions())));
 				return;
 			}
 
-			if (Utils.handleSelfRights(languageSystem, guild, author, channel, event, requiredBotPermissions))
+			if (Utils.handleSelfRights(languageSystem, guild, guildSettings, author, userSettings, channel, event, requiredBotPermissions))
 				return;
 
-			if (cmd.isPremiumCommand() && !guild.getGuildType().higherThanOrEqual(GuildType.PREMIUM)) {
-				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, guild)).queue();
+			if (cmd.isPremiumCommand() && !guildSettings.getGuildType().getValue().higherThanOrEqual(GuildType.PREMIUM)) {
+				event.replyEmbeds(injector.getInstance(EmbedUtils.class).premiumRequired(author, userSettings, guildSettings)).queue();
 				return;
 			}
 
 			commandPool.submit(() -> {
 				try {
 					if (cmd instanceof SlashCommand slashCommand) {
-						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel);
+						slashCommand.execute((SlashCommandEvent) cmde, (SlashCommandInteractionEvent) event, member, author, guild, channel, userSettings, guildSettings);
 					} else if (cmd instanceof MessageCommand messageCommand) {
 						messageCommand.execute((MessageCommandEvent) cmde, (MessageContextInteractionEvent) event, member, author, guild, channel, ((MessageContextInteractionEvent) event).getTarget());
 					}
@@ -385,18 +402,17 @@ public class SlashCommandBase extends ListenerAdapter implements Reloadable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addCommand(final AbstractCommand<?, ?> c) {
+	private void addCommand(final Command c) {
 		if (c == null) throw new NullPointerException("Command is null");
 		if (c.getData() == null) throw new NullPointerException("Command data is null");
 
 		commands.computeIfAbsent(c.getData().getName(), s -> {
 			final Category category = c.getCategory();
-			final List<AbstractCommand<?, ?>> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
+			final List<Command> commandsInCat = Optional.ofNullable(commandsInCategory.get(category)).orElseGet(ArrayList::new);
 			commandsInCat.add(c);
 			commandsInCategory.put(category, commandsInCat);
 			// no clue what the fuck the error message means tbh
-			commandInstances.put((Class<? extends AbstractCommand<?, ?>>) c.getClass(), c);
+			commandInstances.put(c.getClass(), c);
 			commandCount++;
 			return new Pair<>(null, c);
 		});

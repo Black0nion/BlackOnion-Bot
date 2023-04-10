@@ -5,12 +5,14 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.github.black0nion.blackonionbot.Main;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.common.exception.ParseException;
+import com.github.black0nion.blackonionbot.config.discord.api.settings.Setting;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.enums.CustomPermission;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import com.google.common.collect.Lists;
@@ -33,6 +35,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -44,16 +47,20 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 public class Utils {
+
+	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
 	private Utils() {}
 
 	public static final List<Character> ALPHABET = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
@@ -71,6 +78,10 @@ public class Utils {
 	}
 
 	public static String escapeMarkdown(final String text) {
+		if (text == null || text.isEmpty() || text.equals("*") || text.equals("_") || text.equals("~") || text.equals("`")) {
+			return text;
+		}
+
 		return text
 			.replace("\\(\\*|_|`|~|\\)", "$1")
 			.replace("(\\*|_|`|~|\\)", "\\$1");
@@ -178,21 +189,45 @@ public class Utils {
 	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
 	 * @return missing permissions?
 	 */
-	public static boolean handleSelfRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final Guild guild, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final TextChannel channel, @Nullable IReplyCallback callback, final Permission... permissions) {
 		if (channel == null) {
 			return !guild.getSelfMember().hasPermission(permissions);
 		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
 			(callback != null
-				? callback.replyEmbeds(noRights(languageSystem, guild, author, permissions))
-				: channel.sendMessageEmbeds(noRights(languageSystem, guild, author, permissions))
+				? callback.replyEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
 			).queue();
 			return true;
 		}
 		return false;
 	}
 
-	public static MessageEmbed noRights(final LanguageSystem languageSystem, final BlackGuild guild, final BlackUser author, final Permission... missingPermissions) {
-		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, guild).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", author, guild) + "\n" + getPermissionString(missingPermissions), false).build();
+	/**
+	 * Pass null as the channel argument to check self permissions.
+	 * USED FOR SELF PERMISSIONS!
+	 *
+	 * @param callback the IReplyCallback object that `replyEmbeds` gets called on
+	 * @return missing permissions?
+	 */
+	public static boolean handleSelfRights(final LanguageSystem languageSystem, final Guild guild, final GuildSettings guildSettings, final User author, @Nullable final UserSettings userSettings, final TextChannel channel, @Nullable IReplyCallback callback, final Collection<Permission> permissions) {
+		if (channel == null) {
+			return !guild.getSelfMember().hasPermission(permissions);
+		} else if (!guild.getSelfMember().hasPermission(channel, permissions)) {
+			(callback != null
+				? callback.replyEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
+				: channel.sendMessageEmbeds(noRights(languageSystem, guildSettings, author, userSettings, permissions))
+			).queue();
+			return true;
+		}
+		return false;
+	}
+
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final Permission... missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, userSettings, guildSettings).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", userSettings, guildSettings) + "\n" + getPermissionString(missingPermissions), false).build();
+	}
+
+	public static MessageEmbed noRights(final LanguageSystem languageSystem, final GuildSettings guildSettings, final User author, final UserSettings userSettings, final Collection<Permission> missingPermissions) {
+		return EmbedUtils.getErrorEmbed(languageSystem.getDefaultLanguage(), author, userSettings, guildSettings).addField("idonthavepermissions", languageSystem.getTranslation("requiredpermissions", userSettings, guildSettings) + "\n" + getPermissionString(missingPermissions), false).build();
 	}
 
 	/**
@@ -203,12 +238,25 @@ public class Utils {
 	 * }</pre>
 	 */
 	public static String getPermissionString(final Permission... permissions) {
-		if (permissions.length == 0) return "```\n```";
-		final List<Permission> sortedPermissions = Arrays.stream(permissions)
+		return getPermissionString(Arrays.asList(permissions));
+	}
+
+	/**
+	 * Returned format:
+	 * <pre>{@code
+	 *     - DO_THINGS
+	 *     - DO_OTHER_THINGS
+	 * }</pre>
+	 */
+	public static String getPermissionString(final Collection<Permission> permissions) {
+		if (permissions.isEmpty()) return "```\n```";
+
+		final List<Permission> sortedPermissions = permissions.stream()
 			.filter(Objects::nonNull)
 			.distinct()
 			.sorted(Comparator.comparing(Permission::getName))
 			.toList();
+
 		StringBuilder output = new StringBuilder("```");
 		for (Permission permission : sortedPermissions) {
 			output.append("\n- ").append(permission.getName());
@@ -216,13 +264,19 @@ public class Utils {
 		return output + "\n```";
 	}
 
-	public static String getPermissionString(final CustomPermission... permissions) {
-		if (permissions.length == 0) return "```\n```";
-		final List<CustomPermission> sortedPermissions = Arrays.stream(permissions)
+	public static String getCustomPermissionString(final CustomPermission... permissions) {
+		return getCustomPermissionString(Arrays.asList(permissions));
+	}
+
+	public static String getCustomPermissionString(final Collection<CustomPermission> permissions) {
+		if (permissions.isEmpty()) return "```\n```";
+
+		final List<CustomPermission> sortedPermissions = permissions.stream()
 			.filter(Objects::nonNull)
 			.distinct()
 			.sorted(Comparator.comparing(CustomPermission::getName))
 			.toList();
+
 		StringBuilder output = new StringBuilder("```");
 		for (CustomPermission permission : sortedPermissions) {
 			output.append("\n- ").append(permission.getName());
@@ -380,12 +434,13 @@ public class Utils {
 	 * @return the value of the supplier or null if the supplier throws an exception
 	 */
 	@Nullable
-	public static <T> T tryGet(Supplier<T> getter) {
+	public static <T> T tryGet(ThrowableSupplier<T> getter) {
 		try {
 			return getter.get();
 		} catch (Exception e) {
-			return null;
+			logger.error("Error while getting value", e);
 		}
+		return null;
 	}
 
 	public static <T> T parseToT(String value, Class<T> clazz) {
@@ -497,5 +552,45 @@ public class Utils {
 
 	public static String getDebugMessage(User user) {
 		return user.getName() + "#" + user.getDiscriminator() + "(U:" + user.getId() + ")";
+	}
+
+	public static Object parseValue(Setting<?> setting, ResultSet resultSet) {
+		if (setting.canParse(Integer.class)) {
+			try {
+				return resultSet.getInt(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Long.class)) {
+			try {
+				return resultSet.getLong(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Boolean.class)) {
+			try {
+				return resultSet.getBoolean(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Double.class)) {
+			try {
+				return resultSet.getDouble(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(Float.class)) {
+			try {
+				return resultSet.getFloat(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		if (setting.canParse(String.class)) {
+			try {
+				return resultSet.getString(setting.getName());
+			} catch (SQLException ignored) {}
+		}
+
+		throw new ParseException("Could not parse value for setting " + setting.getName());
 	}
 }

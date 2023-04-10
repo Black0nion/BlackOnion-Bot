@@ -146,15 +146,15 @@ class UtilsTest {
 	@Test
 	void test_getPermissionString_CustomPermission() {
 		assertEquals("```\n" + "- " + CustomPermission.ADMIN.getName() + "\n- " + CustomPermission.BAN_USAGE.getName() + "\n```",
-			Utils.getPermissionString(CustomPermission.ADMIN, CustomPermission.BAN_USAGE));
+			Utils.getCustomPermissionString(CustomPermission.ADMIN, CustomPermission.BAN_USAGE));
 
 		assertEquals("```\n" + "- " + CustomPermission.ADMIN.getName() + "\n- " + CustomPermission.BAN_USAGE.getName() + "\n```",
-			Utils.getPermissionString(CustomPermission.BAN_USAGE, CustomPermission.ADMIN));
+			Utils.getCustomPermissionString(CustomPermission.BAN_USAGE, CustomPermission.ADMIN));
 
 		assertEquals("```\n" + "- " + CustomPermission.ADMIN.getName() + "\n- " + CustomPermission.BAN_USAGE.getName() + "\n```",
-			Utils.getPermissionString(CustomPermission.BAN_USAGE, CustomPermission.ADMIN, CustomPermission.BAN_USAGE));
+			Utils.getCustomPermissionString(CustomPermission.BAN_USAGE, CustomPermission.ADMIN, CustomPermission.BAN_USAGE));
 
-		assertEquals("```\n```", Utils.getPermissionString(new CustomPermission[0]));
+		assertEquals("```\n```", Utils.getCustomPermissionString(new CustomPermission[0]));
 	}
 
 	@Test

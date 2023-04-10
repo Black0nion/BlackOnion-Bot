@@ -1,9 +1,9 @@
 package com.github.black0nion.blackonionbot.rest.impl.get;
 
-import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
-import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import com.github.black0nion.blackonionbot.bot.Bot;
 import com.github.black0nion.blackonionbot.oauth.DiscordUser;
+import com.github.black0nion.blackonionbot.rest.api.IGetRoute;
+import com.github.black0nion.blackonionbot.rest.sessions.RestSession;
 import io.javalin.http.Context;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.Nullable;

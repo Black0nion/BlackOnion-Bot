@@ -19,6 +19,7 @@ public class ConsoleCommands extends Thread {
 	public ConsoleCommands(ReloadSystem reloadSystem, Bot bot) {
 		this.reloadSystem = reloadSystem;
 		this.bot = bot;
+		super.setName("ConsoleCommands");
 	}
 
 	@Override

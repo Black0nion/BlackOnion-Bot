@@ -4,6 +4,7 @@ import com.github.black0nion.blackonionbot.utils.CommandReturnException;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.wrappers.TranslatedEmbedBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -25,7 +26,7 @@ public interface UserRespondUtils extends TranslationUtils {
 		this.success(title, name, value, new Placeholder[0]);
 	}
 
-	default void success(final String title, final String name, final String value, final Consumer<InteractionHook> msg) {
+	default void success(final String title, final String name, final String value, final Consumer<Message> msg) {
 		this.reply(this.success().setTitle(title).addField(name, value, false), msg);
 	}
 
@@ -95,21 +96,24 @@ public interface UserRespondUtils extends TranslationUtils {
 		this.reply(builder, null);
 	}
 
-	default void reply(final EmbedBuilder builder, final Consumer<InteractionHook> result) {
+	default void reply(final EmbedBuilder builder, final Consumer<Message> result) {
 		this.reply(builder, isEphemeral(), result);
 	}
 
-	default void reply(final MessageEmbed embed, Consumer<InteractionHook> result) {
+	default void reply(final MessageEmbed embed, Consumer<Message> result) {
 		this.reply(embed, isEphemeral(), result);
 	}
 
-	default void reply(final EmbedBuilder builder, boolean ephemeral, final Consumer<InteractionHook> result) {
+	default void reply(final EmbedBuilder builder, boolean ephemeral, final Consumer<Message> result) {
 		this.reply(builder.build(), ephemeral, result);
 	}
 
-	default void reply(final MessageEmbed embed, boolean ephemeral, final Consumer<InteractionHook> result) {
+	default void reply(final MessageEmbed embed, boolean ephemeral, final Consumer<Message> result) {
 		try {
-			this.getEvent().replyEmbeds(embed).setEphemeral(ephemeral).queue(result);
+			if (this.getEvent().isAcknowledged())
+				this.getEvent().getHook().sendMessageEmbeds(embed).setEphemeral(ephemeral).queue(result);
+			else
+				this.getEvent().replyEmbeds(embed).setEphemeral(ephemeral).flatMap(InteractionHook::retrieveOriginal).queue(result);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

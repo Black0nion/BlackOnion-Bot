@@ -1,19 +1,16 @@
 package com.github.black0nion.blackonionbot.systems.giveaways;
 
 import com.github.black0nion.blackonionbot.bot.Bot;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
 import com.github.black0nion.blackonionbot.database.SQLHelper;
 import com.github.black0nion.blackonionbot.database.helpers.api.SQLHelperFactory;
 import com.github.black0nion.blackonionbot.systems.language.Language;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
-import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.SelfUser;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +35,12 @@ public class GiveawaySystem {
 
 	private final SQLHelperFactory sql;
 	private final LanguageSystem languageSystem;
+	private final GuildSettingsRepo guildSettingsRepo;
 
-	public GiveawaySystem(SQLHelperFactory sql, LanguageSystem languageSystem) {
+	public GiveawaySystem(SQLHelperFactory sql, LanguageSystem languageSystem, GuildSettingsRepo guildSettingsRepo) {
 		this.sql = sql;
 		this.languageSystem = languageSystem;
+		this.guildSettingsRepo = guildSettingsRepo;
 	}
 
 	private final List<Giveaway> giveaways = new ArrayList<>();
@@ -94,7 +93,7 @@ public class GiveawaySystem {
 	 * Adds an existing giveaway to the {@link #scheduler Giveaway Scheduler}
 	 */
 	public void scheduleGiveaway(final Giveaway giveaway) {
-		final BlackGuild guild = BlackGuild.from(Bot.getInstance().getJDA().getGuildById(giveaway.guildId()));
+		final Guild guild = Bot.getInstance().getJDA().getGuildById(giveaway.guildId());
 		assert guild != null;
 		Objects.requireNonNull(guild.getTextChannelById(giveaway.channelId())).retrieveMessageById(giveaway.messageId()).queue(msg -> {
 			if (msg == null) {
@@ -106,11 +105,12 @@ public class GiveawaySystem {
 		});
 	}
 
-	public void endGiveaway(final Giveaway giveaway, final Message msg, final BlackGuild guild) {
+	public void endGiveaway(final Giveaway giveaway, final Message msg, final Guild guild) {
 		try {
+			GuildSettings guildSettings = guildSettingsRepo.getSettings(guild);
 			msg.retrieveReactionUsers(Emoji.fromUnicode("U+D83CU+DF89")).queue(users -> {
 				final SelfUser selfUser = Bot.getInstance().getJDA().getSelfUser();
-				Language lang = Utils.gOD(guild.getLanguage(), languageSystem.getDefaultLanguage());
+				Language lang = guildSettings.getLanguage().getOrDefault();
 				if (users.isEmpty() || users.stream().noneMatch(user -> (user.getIdLong() != selfUser.getIdLong()))) {
 					msg.reply(lang.getTranslationNonNull("nowinner")).queue();
 					updateGiveawayMessage(msg, lang);

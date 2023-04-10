@@ -2,6 +2,9 @@ package com.github.black0nion.blackonionbot.bot;
 
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepoImpl;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettingsRepoImpl;
 import com.github.black0nion.blackonionbot.config.featureflags.FeatureFlags;
 import com.github.black0nion.blackonionbot.config.featureflags.impl.FeatureFlagFactoryImpl;
 import com.github.black0nion.blackonionbot.config.immutable.ConfigFileLoader;
@@ -30,6 +33,7 @@ import com.github.black0nion.blackonionbot.systems.AutoRolesSystem;
 import com.github.black0nion.blackonionbot.systems.JoinLeaveSystem;
 import com.github.black0nion.blackonionbot.systems.ReactionRoleSystem;
 import com.github.black0nion.blackonionbot.systems.antispoiler.AntiSpoilerSystem;
+import com.github.black0nion.blackonionbot.systems.customcommand.CustomCommandRepositoryImpl;
 import com.github.black0nion.blackonionbot.systems.giveaways.GiveawaySystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystem;
 import com.github.black0nion.blackonionbot.systems.language.LanguageSystemImpl;
@@ -38,9 +42,6 @@ import com.github.black0nion.blackonionbot.systems.reload.ReloadSystem;
 import com.github.black0nion.blackonionbot.utils.EmbedUtils;
 import com.github.black0nion.blackonionbot.utils.Utils;
 import com.github.black0nion.blackonionbot.wrappers.ChainableArrayList;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Paginator;
 import com.github.ygimenez.model.PaginatorBuilder;
@@ -119,18 +120,14 @@ public class Bot extends ListenerAdapter {
 	private final Settings settings;
 	private final DatabaseConnector database;
 	private final SQLHelperFactory sqlHelperFactory;
-	private final GiveawaySystem giveawaySystem;
+	private volatile GiveawaySystem giveawaySystem;
 	private final PluginSystem pluginSystem;
+	private final StatisticsManager statisticsManager;
 
 	//region Getters
 	public ExecutorService getExecutor() {
 		return executor;
 	}
-
-	public ScheduledExecutorService getScheduledExecutor() {
-		return scheduledExecutor;
-	}
-
 
 	public EventWaiter getEventWaiter() {
 		return eventWaiter;
@@ -189,8 +186,10 @@ public class Bot extends ListenerAdapter {
 		sqlHelperFactory = database.getSqlHelperFactory();
 		injectorMap.add(sqlHelperFactory);
 
+		injectorMap.add(new CustomCommandRepositoryImpl(sqlHelperFactory));
+
 		SessionHandler sessionHandler = injectorMap.add(new DatabaseSessionHandler(sqlHelperFactory));
-		StatisticsManager statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
+		statisticsManager = injectorMap.add(new StatisticsManager(config, featureFlags));
 
 		AbstractSession.setSessionHandler(sessionHandler);
 		injectorMap.add(new OAuthHandler(
@@ -207,14 +206,8 @@ public class Bot extends ListenerAdapter {
 		injectorMap.add(embedUtils);
 
 		slashCommandBase = new SlashCommandBase(config, injector, reloadSystem);
-		injectorMap.add(slashCommandBase);
-
-		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem);
-		injectorMap.add(giveawaySystem);
-
-		new BlackGuild.GuildCacheClear(reloadSystem);
-		new BlackUser.UserCacheClear(reloadSystem);
-		new BlackMember.MemberCacheClear(reloadSystem);
+		injectorMap.add(SlashCommandBase.class, slashCommandBase);
+		injectorMap.add(CommandRegistry.class, slashCommandBase);
 
 		this.pluginSystem = new PluginSystem(this);
 		reloadSystem.registerReloadable(pluginSystem);
@@ -229,9 +222,6 @@ public class Bot extends ListenerAdapter {
 				slashCommandBase,
 				this,
 				new ReactionRoleSystem(sqlHelperFactory),
-				new JoinLeaveSystem(config, settings, languageSystem, embedUtils),
-				new AutoRolesSystem(languageSystem),
-				new AntiSpoilerSystem(languageSystem, embedUtils),
 				statisticsManager,
 				eventWaiter
 			);
@@ -240,7 +230,7 @@ public class Bot extends ListenerAdapter {
 		builder.setStatus(StatusCommand.getStatusFromConfig(settings));
 		builder.setActivity(ActivityCommand.getActivity(settings));
 
-		if (featureFlags.bot_shutdownBeforeConnection.getValue()) {
+		if (Boolean.TRUE.equals(featureFlags.bot_shutdownBeforeConnection.getValue())) {
 			logger.warn("Shutting down before connecting to Discord due to the 'bot.shutdownBeforeConnection' feature flag");
 			System.exit(0);
 		}
@@ -255,6 +245,21 @@ public class Bot extends ListenerAdapter {
 			return;
 		}
 		logger.info("JDA started successfully!");
+
+		UserSettingsRepoImpl userSettingsRepo = injectorMap.add(new UserSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.retrieveUserById(l).complete(), languageSystem));
+		GuildSettingsRepo guildSettingsRepo = injectorMap.add(new GuildSettingsRepoImpl(injector.getInstance(SQLHelperFactory.class), l -> jda.getGuildById(l), languageSystem, slashCommandBase));
+		slashCommandBase.setUserSettingsRepo(userSettingsRepo);
+		slashCommandBase.setGuildSettingsRepo(guildSettingsRepo);
+
+		reloadSystem.registerReloadable(userSettingsRepo);
+		reloadSystem.registerReloadable(guildSettingsRepo);
+
+		giveawaySystem = new GiveawaySystem(sqlHelperFactory, languageSystem, guildSettingsRepo);
+		injectorMap.add(giveawaySystem);
+
+		jda.addEventListener(new JoinLeaveSystem(config, settings, languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
+		jda.addEventListener(new AutoRolesSystem(languageSystem, guildSettingsRepo));
+		jda.addEventListener(new AntiSpoilerSystem(languageSystem, embedUtils, guildSettingsRepo, userSettingsRepo));
 
 		slashCommandBase.addCommands();
 
@@ -290,8 +295,6 @@ public class Bot extends ListenerAdapter {
 		}));
 		new ConsoleCommands(reloadSystem, this).start();
 
-		statisticsManager.start();
-
 		logger.info("Successfully started the application tasks in {} ms!", System.currentTimeMillis() - startTime);
 	}
 
@@ -317,8 +320,15 @@ public class Bot extends ListenerAdapter {
 		selfUserId = readyJda.getSelfUser().getIdLong();
 		logger.info("Connected to {}#{} in {}ms.", readyJda.getSelfUser().getName(), readyJda.getSelfUser().getDiscriminator(), (System.currentTimeMillis() - StatisticsManager.STARTUP_TIME));
 
+		statisticsManager.start();
+
 		slashCommandBase.updateCommandsDev(readyJda);
-		executor.submit(giveawaySystem::init);
+		executor.submit(() -> {
+			while (giveawaySystem == null) {
+				Thread.onSpinWait();
+			}
+			giveawaySystem.init();
+		});
 	}
 
 	@Override

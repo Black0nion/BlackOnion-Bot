@@ -6,11 +6,13 @@ import com.github.black0nion.blackonionbot.oauth.api.SessionHandler;
 import com.github.black0nion.blackonionbot.rest.sessions.AbstractSession;
 import com.google.gson.Gson;
 import io.mokulu.discord.oauth.model.User;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.InputMismatchException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbstractSessionTest {
 	public static final String EXAMPLE_SESSION_ID = "qUJf7fE7WooHAQUHZzsmk8lLl1HRWHTfn6lQPgDQtdSNrFHvZAf8WoEuqU7KuK72qeyi3";

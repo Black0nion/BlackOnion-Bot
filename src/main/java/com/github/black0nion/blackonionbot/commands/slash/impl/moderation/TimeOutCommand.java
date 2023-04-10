@@ -2,15 +2,16 @@ package com.github.black0nion.blackonionbot.commands.slash.impl.moderation;
 
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommand;
 import com.github.black0nion.blackonionbot.commands.slash.SlashCommandEvent;
+import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettings;
+import com.github.black0nion.blackonionbot.config.discord.user.UserSettings;
 import com.github.black0nion.blackonionbot.misc.exception.TooLongException;
+import com.github.black0nion.blackonionbot.utils.AwaitDone;
 import com.github.black0nion.blackonionbot.utils.Placeholder;
 import com.github.black0nion.blackonionbot.utils.Utils;
-import com.github.black0nion.blackonionbot.utils.AwaitDone;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackGuild;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackMember;
-import com.github.black0nion.blackonionbot.wrappers.jda.BlackUser;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -71,7 +72,7 @@ public class TimeOutCommand extends SlashCommand {
 	}
 
 	@Override
-	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, BlackMember member, BlackUser author, BlackGuild guild, TextChannel channel) {
+	public void execute(SlashCommandEvent cmde, @NotNull SlashCommandInteractionEvent e, Member member, User author, Guild guild, TextChannel channel, UserSettings userSettings, GuildSettings guildSettings) throws Exception {
 		switch (cmde.getSubcommandName()) {
 			case "add" -> addTimeout(cmde, e);
 			case "remove" -> removeTimeout(cmde, e);
@@ -115,7 +116,7 @@ public class TimeOutCommand extends SlashCommand {
 
 			cmde.send(message, await::done);
 			timeOutMember.getUser().openPrivateChannel()
-				.flatMap(channel -> channel.sendMessage(cmde.getTranslation("timedoutu", new Placeholder("guild", cmde.getGuild().getEscapedName()), new Placeholder("reason", reason))))
+				.flatMap(channel -> channel.sendMessage(cmde.getTranslation("timedoutu", new Placeholder("guild", Utils.escapeMarkdown(cmde.getGuild().getName())), new Placeholder("reason", reason))))
 				.queue(null, Utils.getCantSendHandler(await, message, cmde));
 		}, cmde::exception);
 	}
