@@ -3,6 +3,9 @@ package com.github.black0nion.blackonionbot.bot;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.ActivityCommand;
 import com.github.black0nion.blackonionbot.commands.slash.impl.admin.StatusCommand;
 import com.github.black0nion.blackonionbot.config.discord.guild.GuildSettingsRepo;
@@ -25,6 +28,7 @@ import com.github.black0nion.blackonionbot.inject.Injector;
 import com.github.black0nion.blackonionbot.inject.InjectorMap;
 import com.github.black0nion.blackonionbot.misc.exception.OAuthUserNotFoundException;
 import com.github.black0nion.blackonionbot.oauth.OAuthUser;
+import com.github.black0nion.blackonionbot.oauth.OAuthUserLoader;
 import com.github.black0nion.blackonionbot.rest.API;
 import com.github.black0nion.blackonionbot.stats.JettyCollector;
 import com.github.black0nion.blackonionbot.stats.Prometheus;
@@ -65,6 +69,7 @@ import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +84,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
 public class Bot extends ListenerAdapter {
 
@@ -292,20 +295,43 @@ public class Bot extends ListenerAdapter {
 
 		ChainableArrayList<Runnable> runnables = new ChainableArrayList<>();
 		runnables
-			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize), verifier, userid -> {
-				try (SQLHelper sql = sqlHelperFactory.create("SELECT * FROM sessions WHERE user_id = ?", userid); ResultSet rs = sql.executeQuery()) {
-					if (rs.next()) {
-						return new OAuthUser(
-							rs.getString("access_token"),
-							rs.getString("refresh_token"),
-							rs.getLong("expires_at"),
-							new DiscordAPI(rs.getString("access_token"))
-						);
+			.addAndGetSelf(() -> reloadSystem.registerReloadable(new API(config, injector, new StatsCollectorFactory(JettyCollector::initialize), verifier, new OAuthUserLoader() {
+
+				final Logger logger = LoggerFactory.getLogger(OAuthUserLoader.class); // NOSONAR lmao sir this is an anonymous class
+
+				final LoadingCache<Long, OAuthUser> userCache = Caffeine.newBuilder()
+					.expireAfterWrite(1, TimeUnit.HOURS)
+					.build(new CacheLoader<Long, OAuthUser>() {
+						@Override
+						public @Nullable OAuthUser load(Long userId) throws Exception {
+							logger.debug("Loading OAuthUser for user id {} from database", userId);
+							try (SQLHelper sql = sqlHelperFactory.create("SELECT * FROM sessions WHERE user_id = ?", userId); ResultSet rs = sql.executeQuery()) {
+								if (rs.next()) {
+									return new OAuthUser(
+										rs.getString("access_token"),
+										rs.getString("refresh_token"),
+										rs.getLong("expires_at"),
+										new DiscordAPI(rs.getString("access_token"))
+									);
+								}
+							} catch (SQLException | IOException e) {
+								throw new OAuthUserNotFoundException(e);
+							}
+							return null;
+						}
+					});
+
+				@Override
+				public OAuthUser apply(Long userid) throws OAuthUserNotFoundException {
+					try {
+						return userCache.get(userid);
+					} catch (CompletionException completionException) {
+						if (completionException.getCause() instanceof OAuthUserNotFoundException oauthException) {
+							throw oauthException;
+						}
+						throw new OAuthUserNotFoundException(completionException.getCause());
 					}
-				} catch (SQLException | IOException e) {
-					throw new OAuthUserNotFoundException(e);
 				}
-				return null;
 			})))
 			.addAndGetSelf(() -> pluginSystem.loadPlugins(null))
 			.addAndGetSelf(() -> reloadSystem.registerReloadable(new Prometheus(config)));
