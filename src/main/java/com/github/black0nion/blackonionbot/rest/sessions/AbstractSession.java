@@ -36,4 +36,8 @@ public abstract sealed class AbstractSession permits RestSession {
 	public OAuthUser getUser() {
 		return this.user;
 	}
+
+	public DecodedJWT getJwt() {
+		return jwt;
+	}
 }

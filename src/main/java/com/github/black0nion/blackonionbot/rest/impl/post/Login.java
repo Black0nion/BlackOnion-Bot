@@ -17,10 +17,10 @@ import org.json.JSONObject;
 import javax.annotation.Nonnull;
 import java.time.Instant;
 
+import static com.github.black0nion.blackonionbot.utils.AuthUtils.JWT_VALID_FOR;
+
 public class Login implements IPostRoute {
 
-	// 7 days in seconds
-	private static final int JWT_VALID_FOR = 60 * 60 * 24 * 7;
 	private final Algorithm algorithm;
 	private final DiscordOAuth discordOAuth;
 	private final SQLHelperFactory sqlHelperFactory;

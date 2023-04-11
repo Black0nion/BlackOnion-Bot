@@ -24,6 +24,8 @@ public class AuthUtils {
 
 	public static final String PUBLIC_KEY_LOCATION = "src/main/resources/keys/public_key.pem";
 	public static final String PRIVATE_KEY_LOCATION = "src/main/resources/keys/private_key.pem";
+	// 7 days in seconds
+	public static final int JWT_VALID_FOR = 60 * 60 * 24 * 7;
 
 	private AuthUtils() {}
 
@@ -78,5 +80,4 @@ public class AuthUtils {
 		byte[] bytes = AuthUtils.parsePEMFile(new File(filepath));
 		return AuthUtils.getPrivateKey(bytes, algorithm);
 	}
-
 }

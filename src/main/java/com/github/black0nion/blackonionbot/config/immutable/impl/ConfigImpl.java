@@ -17,6 +17,7 @@ public class ConfigImpl extends ConfigLoaderHolder<ConfigLoader> implements Conf
 
 	public ConfigImpl(ConfigLoader configLoader) {
 		super(configLoader);
+		validate();
 	}
 
 	private final String token = get("token", String.class, NonNull, matchesRegex("^[A-Za-z\\d]{24}.[\\w-]{6}.[\\w-]{26,40}$"));
