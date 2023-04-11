@@ -1,4 +1,5 @@
-cd src/main/resources/keys || exit
+mkdir files || exit 1
+cd files || exit 1
 
 openssl ecparam -name prime256v1 -genkey -noout -out key_pair.pem
 openssl pkcs8 -topk8 -nocrypt -in key_pair.pem -out private_key.pem

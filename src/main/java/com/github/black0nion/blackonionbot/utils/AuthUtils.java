@@ -22,8 +22,8 @@ public class AuthUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthUtils.class);
 
-	public static final String PUBLIC_KEY_LOCATION = "src/main/resources/keys/public_key.pem";
-	public static final String PRIVATE_KEY_LOCATION = "src/main/resources/keys/private_key.pem";
+	public static final String PUBLIC_KEY_LOCATION = "files/public_key.pem";
+	public static final String PRIVATE_KEY_LOCATION = "files/private_key.pem";
 	// 7 days in seconds
 	public static final int JWT_VALID_FOR = 60 * 60 * 24 * 7;
 

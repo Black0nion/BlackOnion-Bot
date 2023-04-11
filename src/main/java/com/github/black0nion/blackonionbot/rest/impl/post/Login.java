@@ -42,7 +42,7 @@ public class Login implements IPostRoute {
 		TokensResponse tokens = discordOAuth.getTokens(code);
 		String accessToken = tokens.getAccessToken();
 		String refreshToken = tokens.getRefreshToken();
-		long expiresAt = requestTime + tokens.getExpiresIn();
+		long expiresAt = requestTime / 1000 + tokens.getExpiresIn();
 
 		user = new OAuthUser(accessToken, refreshToken, expiresAt, new DiscordAPI(accessToken));
 
