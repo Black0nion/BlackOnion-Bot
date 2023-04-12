@@ -63,7 +63,7 @@ dependencies {
 
 	implementation("com.github.Mokulu:discord-oauth2-api:1.0.2")
 
-	implementation("io.javalin:javalin-bundle:5.1.4")
+	implementation("io.javalin:javalin-bundle:5.4.2")
 	implementation("com.auth0:java-jwt:4.4.0")
 	// reading public and private keys
 	implementation("org.bouncycastle:bcprov-jdk18on:1.72")
