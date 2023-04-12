@@ -41,7 +41,7 @@ jobs:
           echo "Full Version: $FULL_VERSION | Version: $VERSION | Tag: $TAG | Release?: $RELEASE"
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           push: ${{ steps.get_version.outputs.RELEASE }}
           cache-from: type=gha
