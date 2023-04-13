@@ -84,7 +84,7 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic:1.4.6")
 	implementation("uk.org.lidalia:sysout-over-slf4j:1.0.2")
 	implementation("io.prometheus:simpleclient_logback:0.16.0")
-	implementation("com.github.loki4j:loki-logback-appender:1.3.2")
+	implementation("com.github.loki4j:loki-logback-appender:1.4.0")
 	implementation("org.codehaus.janino:janino:3.1.9")
 
 	implementation("io.github.classgraph:classgraph:4.8.151")
