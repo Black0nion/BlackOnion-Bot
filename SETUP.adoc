@@ -1,0 +1,123 @@
+:toc-placement!:
+:icons: font
+:sectnums:
+:toc: left
+:experimental:
+:sourcedir: src/main/java
+
+= Setting up
+
+== General Information
+This bot is written in Java using the JDA library.
+Most of the systems used for things like config parsing and command handling are custom made. In the future, we plan on making them into their own libraries.
+
+A lot of code isn't yet documented, however, we tried our best making it somewhat self-explanatory. More system-related information will be added in the future.
+
+In general, most of these systems are designed to be as modular as possible. This ensures easy testability and maintainability. To do this, we make heavy use of the dependency injection pattern. +
+Additionally, we created a custom dependency injection library that works somewhat similar to guice. To use it, take a look at the examples and the link:src/main/java/com/github/black0nion/blackonionbot/inject/DefaultInjector.java[DefaultInjector class].
+
+== Setting up specific environments
+Generally, the environment the bot is running in has to be set in the environment variables. The key for it is `RUN_MODE`, it maps to link:src/main/java/com/github/black0nion/blackonionbot/misc/enums/RunMode.java[the RunMode enum]. +
+The RunMode is `DEV` per default.
+
+*Note:
+
+=== Development - IntelliJ
+Open the root folder as a project in IntelliJ.
+Next, navigate to link:src/main/java/com/github/black0nion/blackonionbot/Main.java[Main.java] and run it.
+
+==== Improving performance
+You can greatly improve the efficiency of the application in IntelliJ by switching the runner to IntelliJ rather than gradle. +
+This particularly helps with hot swapping.
+
+1. Open the IntelliJ settings
+2. Go to `Build, Execution, Deployment -> Build Tools -> Gradle`
+3. Change both `Build and run using` and `Run tests using` to `IntelliJ IDEA`
+
+=== Production
+==== Docker
+There's a docker image available on ghcr with the name link:https://github.com/Black0nion/BlackOnion-Bot/pkgs/container/blackonion-bot[`ghcr.io/black0nion/blackonion-bot`].
+
+The images are built in GitHub actions, see link:.github/workflows/buildandeploy.yml[the workflow file].
+
+==== Jar
+The jar file can be built using the following command:
+[source,bash]
+----
+./gradlew build
+----
+It'll be in the `build/libs` folder.
+
+However, this file doesn't include the dependencies.
+You need to run the following command to get the dependencies:
+[source,bash]
+----
+./gradlew downloadDependencies
+----
+That'll download the jars to the `libraries` folder.
+Next, add all those jars *including* the bot jar to the classpath.
+You can do this by running the following command:
+[source,bash]
+----
+java -cp "build/libs/*;libraries/*" com.github.black0nion.blackonionbot.Main
+----
+This will run the bot on your host system.
+
+== Database
+The bot uses a PostgreSQL database to store data. +
+Currently, the lowest tested version is 15. +
+It is advisable to use docker to run the database. +
+
+Once the DB is running, configure the bot to use it by setting the `JDBC_URL`, `POSTGRES_USER` and `POSTGRES_PASSWORD` environment variables. +
+The database will be bootstrapped automatically. In the future, if data migrations are required, they will be applied automatically. You can find the migration files in the `src/main/resources/database/migrations` folder.
+
+== Optional Setup
+Some features of the bot require additional setup. These are optional and can be skipped.
+
+=== API authentication
+To use the bot's Rest API, you need a JWT token. +
+This token is signed using the ECDSA256 algorithm. This allows us to make the public key available to the public for everyone to verify their tokens. +
+To generate these tokens, you need a public and private key. To do this, run link:generate-jwt-keys.sh[generate-jwt-keys.sh]. This will generate a public and private key in the `files` folder.
+
+Additionally, you need to set the `DISCORDAPP_CLIENT_ID` and `DISCORDAPP_CLIENT_SECRET` environment variables. These are used to verify the token with discord. You can get these credentials in the OAuth section of a discord application. +
+
+== Configuration
+When something is missing, the bot will error and exit. This should help you to find out what you need to add to the config file.
+
+There are 3 main configuration types:
+
+=== Config - immutable - Static Configuration
+Static configurations, as in, things that don't change during runtime, like the bot token, are supplied by environment variables. This allows us to use it properly in docker containers.
+
+In development, it can be useful to use a config file instead. To do this, create a file `files/.env`. It should look like this:
+[source,properties]
+----
+TOKEN=your_token_here
+JDBC_URL=jdbc:postgresql://localhost:5432/blackonionbot
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+----
+The bot will automatically load this file if it exists.
+
+All available config properties can be found in the link:src/main/java/com/github/black0nion/blackonionbot/config/immutable/api/Config.java[Config interface].
+
+==== Why an interface?
+By using an interface, we can easily mock the config in tests. This allows us to test the behavior of the bot without having to worry about the config loading.
+
+=== Settings - mutable - Dynamic Configuration
+// TODO: move file to `settings.json`
+Settings are stored in `files/config.json`. They can be changed at runtime using the `settings` command.
+These settings are, for example, the activity name or the logs channel.
+
+Most of these settings can be changed through various commands.
+
+You do not have to create this file, once changes are made to the settings, the bot will create it automatically.
+
+All available settings can be found in the link:src/main/java/com/github/black0nion/blackonionbot/config/mutable/api/Settings.java[Settings interface].
+
+=== Feature Flags
+Feature flags are a special kind of setting. They are used to enable or disable certain features. They are stored in `files/featureflags.properies`. +
+They are mostly re-purposed to debug flags, however, in the future, we plan on using them to enable or disable certain features. +
+Again, this file is completely optional and available feature flags can be found in the link:src/main/java/com/github/black0nion/blackonionbot/config/featureflags/FeatureFlags.java[FeatureFlags class].
+
+// TODO: log levels

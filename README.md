@@ -5,22 +5,23 @@
 [![Build & Deploy](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml/badge.svg)](https://github.com/Black0nion/BlackOnion-Bot/actions/workflows/buildandeploy.yml)
 [![All Contributors][allcontributors]](#Contributors)
 [![codecov](https://codecov.io/gh/Black0nion/BlackOnion-Bot/branch/main/graph/badge.svg?token=LZM1L4S66I)](https://codecov.io/gh/Black0nion/BlackOnion-Bot)
-	
+
 # BlackOnion-Bot
 
 The official BlackOnion-Bot!
 
-## How to run the Bot
+## Documentation
+A high-level overview of the setup can be found in [SETUP.adoc](SETUP.adoc). Further documentation, especially related to systems of the application, will follow in the future once the rewrite is finished.
+
 ### Development
-1. Clone the repository (GitHub Desktop is helpful)
-2. Download IntelliJ
-3. Open the project as a gradle project
-4. Run the `com.github.black0nion.blackonionbot.Main` class
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to the project.
+
 ### Production
 There is a pre-built docker image with the name `ghcr.io/black0nion/blackonion-bot`, use the tags `latest` and `latest-beta` appropriately.
 
 ## Contributions
-... are very welcome! If you have any questions, please use the GitHub Discussion tab. If you encounter any issues, please report them on the [issue tracker](https://github.com/Black0nion/BlackOnion-Bot/issues) and if you have an improvement, please submit a pull request.
+... are very welcome! If you have any questions, please use the GitHub Discussions tab. If you encounter any issues, please report them on the [issue tracker](https://github.com/Black0nion/BlackOnion-Bot/issues) and if you have an improvement, please submit a pull request.
+Code-related information is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributors
 
