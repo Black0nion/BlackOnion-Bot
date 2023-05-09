@@ -87,7 +87,7 @@ dependencies {
 	implementation("com.github.loki4j:loki-logback-appender:1.3.2")
 	implementation("org.codehaus.janino:janino:3.1.9")
 
-	implementation("io.github.classgraph:classgraph:4.8.151")
+	implementation("io.github.classgraph:classgraph:4.8.158")
 
 	implementation("org.postgresql:postgresql:42.6.0")
 	implementation("com.zaxxer:HikariCP:5.0.1")
