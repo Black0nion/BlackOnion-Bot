@@ -98,7 +98,7 @@ dependencies {
 
 	testsImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
 	testsImplementation("com.github.erosb:everit-json-schema:1.14.1")
-	testsImplementation("org.mockito:mockito-core:4.9.0")
+	testsImplementation("org.mockito:mockito-core:5.4.0")
 }
 
 configurations { all { exclude(group = "org.slf4j", module = "slf4j-log4j12") } }
