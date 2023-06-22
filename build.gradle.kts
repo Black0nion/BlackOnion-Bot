@@ -66,7 +66,7 @@ dependencies {
 	implementation("io.javalin:javalin-bundle:5.4.2")
 	implementation("com.auth0:java-jwt:4.4.0")
 	// reading public and private keys
-	implementation("org.bouncycastle:bcprov-jdk18on:1.72")
+	implementation("org.bouncycastle:bcprov-jdk18on:1.75")
 
 	implementation("org.json:json:20220924")
 
